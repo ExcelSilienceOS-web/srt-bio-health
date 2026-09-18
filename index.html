@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT Bio-Health — Check-in de Prontidão</title>
+    <style>
+        body { font-family: sans-serif; background: #121826; color: #fff; text-align: center; padding: 20px; }
+        .card { background: #1a2332; border-radius: 12px; padding: 24px; max-width: 400px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        button { background: #00e676; color: #000; font-size: 18px; font-weight: bold; border: none; padding: 16px 32px; border-radius: 50px; cursor: pointer; margin-top: 20px; }
+        button:disabled { background: #555; color: #aaa; }
+        .status { margin-top: 24px; font-size: 20px; font-weight: bold; }
+        .verde { color: #00e676; }
+        .amarelo { color: #ffab00; }
+        .vermelho { color: #ff1744; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>SRT Bio-Health</h2>
+        <p>Aferição Telemétrica de Prontidão Operacional</p>
+        <p style="font-size: 14px; color: #90a4ae;">Leia a frase: "Iniciando checagem de prontidão operativa. Declaro que estou em condições de atenção e foco."</p>
+
+        <button id="recordBtn">🎤 Gravar Check-in (10s)</button>
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        const recordBtn = document.getElementById('recordBtn');
+        const statusDiv = document.getElementById('status');
+
+        recordBtn.onclick = async () => {
+            if (!navigator.mediaDevices) {
+                alert('Microfone não suportado no navegador.');
+                return;
+            }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
+                statusDiv.innerText = '⏳ Processando telemetria na nuvem...';
+
+                const formData = new FormData();
+                formData.append('file', audioBlob, 'checkin.ogg');
+                formData.append('user_id', 'OPERADOR_01');
+
+                try {
+                    // Substitua pela sua URL do Render quando estiver no ar
+                    const res = await fetch('/api/v1/telemetry/checkin', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    const status = data.telemetry.status;
+                    if (status === 'VERDE_APTO') {
+                        statusDiv.innerHTML = '<span class="verde">🟢 LIBERADO (VERDE)</span><br><small>Reflexos e atenção normais</small>';
+                    } else if (status === 'AMARELO_ATENCAO') {
+                        statusDiv.innerHTML = '<span class="amarelo">🟡 ATENÇÃO (AMARELO)</span><br><small>Pausa de 15 min recomendada</small>';
+                    } else {
+                        statusDiv.innerHTML = '<span class="vermelho">🔴 INAPTO TEMPORÁRIO</span><br><small>Remanejamento de segurança (NR-01)</small>';
+                    }
+                } catch(err) {
+                    statusDiv.innerText = '❌ Erro de conexão com o servidor.';
+                }
+            };
+
+            mediaRecorder.start();
+            recordBtn.disabled = true;
+            statusDiv.innerText = '🔴 Gravando... Fale a frase agora!';
+            setTimeout(() => {
+                mediaRecorder.stop();
+                recordBtn.disabled = false;
+                recordBtn.innerText = '🎤 Gravar Novamente';
+            }, 7000);
+        };
+    </script>
+</body>
+</html>
+
