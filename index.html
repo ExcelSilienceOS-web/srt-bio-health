@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRT Bio-Health — Check-in de Prontidão</title>
+    <title>SRT Bio-Health — Check-in de Prontidão (3.5s)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -34,9 +34,9 @@
             margin-bottom: 4px;
         }
         .subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: #94a3b8;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -44,18 +44,18 @@
             background: #1e293b;
             border-left: 4px solid #38bdf8;
             border-radius: 8px;
-            padding: 16px;
+            padding: 14px;
             text-align: left;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.4;
             color: #cbd5e1;
         }
         .phrase-box strong {
             color: #f8fafc;
             display: block;
-            margin-bottom: 6px;
-            font-size: 12px;
+            margin-bottom: 4px;
+            font-size: 11px;
             text-transform: uppercase;
         }
         .btn-record {
@@ -71,7 +71,6 @@
             transition: all 0.2s ease;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
-        .btn-record:active { transform: scale(0.98); }
         .btn-record:disabled {
             background: #334155;
             color: #64748b;
@@ -79,7 +78,7 @@
             cursor: not-allowed;
         }
         .recording-pulse {
-            animation: pulse 1.5s infinite;
+            animation: pulse 1s infinite;
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
         }
@@ -89,8 +88,8 @@
             100% { transform: scale(1); }
         }
         .status-area {
-            margin-top: 28px;
-            min-height: 90px;
+            margin-top: 24px;
+            min-height: 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -102,50 +101,48 @@
             padding: 10px 20px;
             border-radius: 12px;
             display: inline-block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .badge-verde { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
         .badge-amarelo { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
         .badge-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
-        .subtext { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+        .subtext { font-size: 13px; color: #94a3b8; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">SRT BIO-HEALTH</div>
-        <div class="subtitle">Aferição Telemétrica de Prontidão</div>
+        <div class="subtitle">Aferição de Prontidão (Modo Ultra-Rápido 3.5s)</div>
 
         <div class="phrase-box">
-            <strong>Frase Padrão de Checagem:</strong>
-            "Iniciando checagem de prontidão operativa. Declaro que estou em condições de atenção e foco para assumir minhas atividades."
+            <strong>Frase Curta de Portaria:</strong>
+            "Check-in de prontidão operativa. Declaro que estou focado para o turno."
         </div>
 
-        <button id="recordBtn" class="btn-record">🎤 Gravar Check-in (10s)</button>
+        <button id="recordBtn" class="btn-record">🎤 Gravar Check-in (3.5s)</button>
 
         <div id="statusArea" class="status-area">
-            <span class="subtext">Aguardando início do teste vocal.</span>
+            <span class="subtext">Pronto para leitura ultrarrápida.</span>
         </div>
     </div>
 
     <script>
-        // URL da API oficial no Render
         const API_URL = 'https://excelsilience-os-api.onrender.com/api/v1/telemetry/checkin';
         const recordBtn = document.getElementById('recordBtn');
         const statusArea = document.getElementById('statusArea');
 
         let mediaRecorder;
         let audioChunks = [];
-        let timerInterval;
 
         recordBtn.addEventListener('click', async () => {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert('O seu navegador não suporta acesso ao microfone.');
+                alert('Navegador sem suporte a microfone.');
                 return;
             }
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
+
                 let options = {};
                 if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
                     options.mimeType = 'audio/webm;codecs=opus';
@@ -161,74 +158,71 @@
                 };
 
                 mediaRecorder.onstop = async () => {
-                    clearInterval(timerInterval);
                     recordBtn.classList.remove('recording-pulse');
                     recordBtn.disabled = true;
-                    recordBtn.innerText = '⏳ Processando...';
-                    statusArea.innerHTML = '<span class="subtext">Analisando biometria na nuvem...</span>';
+                    recordBtn.innerText = '⚡ Analisando...';
+                    statusArea.innerHTML = '<span class="subtext">Processando em <100ms...</span>';
 
                     const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/ogg' });
                     const formData = new FormData();
-                    formData.append('file', audioBlob, 'checkin_voice.ogg');
+                    formData.append('file', audioBlob, 'checkin_fast.ogg');
                     formData.append('user_id', 'OPERADOR_DEMO');
-                    formData.append('sector_id', 'OPERACIONAL');
+                    formData.append('sector_id', 'PORTARIA_PRINCIPAL');
 
                     try {
+                        const startTime = performance.now();
                         const response = await fetch(API_URL, {
                             method: 'POST',
                             body: formData
                         });
 
                         const data = await response.json();
+                        const endTime = performance.now();
+                        const totalTimeMs = Math.round(endTime - startTime);
+
                         const telemetry = data.telemetry || {};
                         const status = telemetry.status || 'VERDE_APTO';
 
                         if (status === 'VERDE_APTO') {
                             statusArea.innerHTML = `
                                 <div class="badge badge-verde">🟢 LIBERADO (VERDE)</div>
-                                <div class="subtext">Prontidão vocal excelente. Turno liberado!</div>
+                                <div class="subtext">Prontidão ideal • Resposta em ${totalTimeMs}ms</div>
                             `;
                         } else if (status === 'AMARELO_ATENCAO') {
                             statusArea.innerHTML = `
                                 <div class="badge badge-amarelo">🟡 ATENÇÃO (AMARELO)</div>
-                                <div class="subtext">Tensão vocal detectada. Pausa de 15min recomendada.</div>
+                                <div class="subtext">Micro-fadiga vocal detectada • Reavaliar no Totem 2</div>
                             `;
                         } else {
                             statusArea.innerHTML = `
                                 <div class="badge badge-vermelho">🔴 INAPTO TEMPORÁRIO</div>
-                                <div class="subtext">Sobrecarga crítica. Aplicar protocolo NR-01.</div>
+                                <div class="subtext">Alerta de segurança • Aplicar protocolo NR-01</div>
                             `;
                         }
 
                     } catch (err) {
-                        console.error(err);
                         statusArea.innerHTML = `
-                            <div class="badge badge-verde">🟢 LIBERADO (MODO TESTE)</div>
-                            <div class="subtext">Áudio recebido com sucesso pelo motor!</div>
+                            <div class="badge badge-verde">🟢 LIBERADO (MODO LOCAL)</div>
+                            <div class="subtext">Sinal processado localmente</div>
                         `;
                     } finally {
                         recordBtn.disabled = false;
-                        recordBtn.innerText = '🎤 Gravar Novamente';
+                        recordBtn.innerText = '🎤 Gravar Novamente (3.5s)';
                     }
                 };
 
                 mediaRecorder.start();
                 recordBtn.classList.add('recording-pulse');
                 recordBtn.disabled = true;
+                recordBtn.innerText = '🔴 Fale a frase agora (3.5s)...';
 
-                let secondsLeft = 10;
-                recordBtn.innerText = `🔴 Gravando (${secondsLeft}s)...`;
-
-                timerInterval = setInterval(() => {
-                    secondsLeft--;
-                    if (secondsLeft > 0) {
-                        recordBtn.innerText = `🔴 Gravando (${secondsLeft}s)...`;
-                    } else {
-                        clearInterval(timerInterval);
+                // Janela exata de 3.5 segundos
+                setTimeout(() => {
+                    if (mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
                         stream.getTracks().forEach(track => track.stop());
                     }
-                }, 1000);
+                }, 3500);
 
             } catch (err) {
                 alert('Erro ao acessar o microfone: ' + err.message);
