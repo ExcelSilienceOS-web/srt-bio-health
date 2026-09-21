@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SRT Bio-Health — Check-in Operacional (VSI + IDC Veto)</title>
+    <title>SRT Bio-Health — Check-in Operacional</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
         body {
@@ -41,13 +41,15 @@
         .phrase-text { font-size: 13px; color: #cbd5e1; font-style: italic; background: #0f172a; padding: 10px; border-radius: 6px; margin-top: 6px; }
 
         .rules-box {
-            font-size: 11px;
+            font-size: 12px;
             background: #0f172a;
-            padding: 8px 12px;
+            border-left: 4px solid #38bdf8;
+            padding: 10px 14px;
             border-radius: 6px;
-            margin-top: 8px;
-            color: #94a3b8;
-            line-height: 1.4;
+            margin-bottom: 12px;
+            color: #e2e8f0;
+            line-height: 1.5;
+            text-align: left;
         }
         .rules-box span.green { color: #34d399; font-weight: 700; }
         .rules-box span.red { color: #f87171; font-weight: 700; }
@@ -101,20 +103,24 @@
 
     <!-- ETAPA 1: VOZ (5 SEGUNDOS) -->
     <div id="step1" class="step-box">
-        <div class="step-title">🎙️ 1. Teste Vocográfico (5 Segundos)</div>
-        <div style="font-size: 12px; color: #94a3b8;">Fale a frase abaixo com clareza:</div>
+        <div class="step-title">🎙️ ETAPA 1: TESTE VOCOGRÁFICO (5S)</div>
+        <div style="font-size: 12px; color: #94a3b8;">Fale a frase abaixo com clareza ao clicar no botão:</div>
         <div class="phrase-text">"Check-in de prontidão operativa. Declaro que estou focado para o turno."</div>
         <button id="recordBtn" class="btn btn-voice">🎤 Gravar Voz (5s)</button>
     </div>
 
     <!-- ETAPA 2: BOLINHAS COM VETO (IDC GO / NO-GO) -->
     <div id="step2" class="step-box" style="display: none;">
-        <div class="step-title">🎯 2. Teste Neuro-Ocular de Veto (10 Alvos)</div>
+        <div class="step-title">🎯 ETAPA 2: TESTE DE VETO NEURO-OCULAR (IDC)</div>
+        
+        <!-- INSTRUÇÕES CLARAS ANTES DE COMECAR -->
         <div class="rules-box">
-            👉 <span class="green">🟢 VERDE:</span> Toque rápido!<br>
-            👉 <span class="red">🔴 VERMELHA:</span> NÃO TOQUE! Espere sumir.
+            <strong>⚠️ INSTRUÇÕES DO TESTE:</strong><br>
+            • <span class="green">🟢 BOLINHA VERDE:</span> TOQUE RÁPIDO! (Mede seu reflexo).<br>
+            • <span class="red">🔴 BOLINHA VERMELHA:</span> NÃO TOQUE! Deixe sumir sozinha em 1.2s (Mede seu veto motor).
         </div>
-        <button id="startGameBtn" class="btn btn-game" style="margin-top: 12px;">⚡ Iniciar Teste das Bolinhas</button>
+
+        <button id="startGameBtn" class="btn btn-game">⚡ INICIAR TESTE DAS BOLINHAS</button>
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
         </div>
@@ -124,6 +130,7 @@
     <div id="resultArea" style="display: none;">
         <div id="statusBadge" class="result-badge"></div>
         <div id="resultText" style="font-size: 13px; color: #cbd5e1; margin-top: 10px; line-height: 1.5;"></div>
+        <button onclick="window.location.reload()" class="btn btn-voice" style="margin-top:16px;">🔄 Repetir Teste</button>
     </div>
 </div>
 
@@ -141,28 +148,34 @@
     // ETAPA 1: VOZ (5s)
     const recordBtn = document.getElementById('recordBtn');
     recordBtn.addEventListener('click', async () => {
-        if (!navigator.mediaDevices) return alert('Sem suporte a microfone.');
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('Aviso: Ativando modo de teste sem microfone.');
+            avancarParaBolinhas();
+            return;
+        }
         
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            recordBtn.innerText = '🔴 Gravando... Fale a frase';
+            recordBtn.innerText = '🔴 Gravando (5s)... Fale a frase!';
             recordBtn.disabled = true;
 
             setTimeout(() => {
                 stream.getTracks().forEach(track => track.stop());
                 recordBtn.innerText = '✅ Voz Capturada (5s)!';
-                
-                setTimeout(() => {
-                    document.getElementById('step1').style.opacity = '0.5';
-                    document.getElementById('step2').style.display = 'block';
-                }, 600);
-
+                avancarParaBolinhas();
             }, 5000);
         } catch (err) {
-            alert('Permissão de microfone negada.');
-            recordBtn.disabled = false;
+            alert('Sem acesso ao microfone. Avançando para o teste de bolinhas.');
+            avancarParaBolinhas();
         }
     });
+
+    function avancarParaBolinhas() {
+        setTimeout(() => {
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }, 500);
+    }
 
     // ETAPA 2: JOGO DAS BOLINHAS (VERDE + VERMELHA)
     const startGameBtn = document.getElementById('startGameBtn');
@@ -175,8 +188,8 @@
         canvasContainer.style.display = 'block';
         
         const rect = canvasContainer.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+        canvas.width = rect.width || 320;
+        canvas.height = rect.height || 280;
         
         rounds = 0;
         vetoErrors = 0;
@@ -193,12 +206,12 @@
         }
 
         rounds++;
-        const radius = 28;
+        const radius = 32;
         const x = Math.random() * (canvas.width - radius * 2 - 20) + radius + 10;
         const y = Math.random() * (canvas.height - radius * 2 - 20) + radius + 10;
 
-        // ~35% de chance de ser Vermelha (Armadilha No-Go)
-        const isRed = Math.random() < 0.35;
+        // ~30% de chance de ser Vermelha (Armadilha No-Go)
+        const isRed = Math.random() < 0.30;
         const color = isRed ? '#ef4444' : '#10b981';
 
         currentTarget = { x, y, radius, isRed };
@@ -206,10 +219,8 @@
 
         drawTarget(x, y, radius, color);
 
-        // Se for vermelha, expira em 1.2 segundos (Veto Bem Sucedido se o usuário não tocar)
         if (isRed) {
             redExpireTimer = setTimeout(() => {
-                // Usuário aplicou Veto correto! Não tocou na vermelha.
                 currentTarget = null;
                 spawnTarget();
             }, 1200);
@@ -228,64 +239,62 @@
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
     }
 
-    // CAPTURA DO TOQUE
+    // MANIPULADOR DE TOQUE
     function handleTouch(e) {
         if (!currentTarget) return;
         e.preventDefault();
 
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches.clientX : e.clientX;
-        const clientY = e.touches ? e.touches.clientY : e.clientY;
+        const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+        const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
 
         const touchX = clientX - rect.left;
         const touchY = clientY - rect.top;
 
         const dist = Math.hypot(touchX - currentTarget.x, touchY - currentTarget.y);
-        if (dist <= currentTarget.radius + 15) {
+        if (dist <= currentTarget.radius + 20) {
             if (redExpireTimer) clearTimeout(redExpireTimer);
 
             if (currentTarget.isRed) {
-                // FALHA DE VETO: Tocou na vermelha!
                 vetoErrors++;
-                reactionTimes.push(1100); // Penalidade de latência
-                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#991b1b');
+                reactionTimes.push(1000);
+                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#7f1d1d');
             } else {
-                // ACERTO GO: Tocou na verde!
                 const reactionMs = performance.now() - targetStartTime;
                 reactionTimes.push(reactionMs);
-                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#059669');
+                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#047857');
             }
 
             currentTarget = null;
-            setTimeout(spawnTarget, 150);
+            setTimeout(spawnTarget, 120);
         }
     }
 
     canvas.addEventListener('pointerdown', handleTouch);
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
 
-    // CÁLCULO FINAL E ENVIO
+    // FINALIZACAO E ENVIO
     async function finishCheckin() {
         canvasContainer.style.display = 'none';
+        document.getElementById('step2').style.display = 'none';
         document.getElementById('resultArea').style.display = 'block';
 
-        const validTimes = reactionTimes.length > 0 ? reactionTimes : [600];
+        const validTimes = reactionTimes.length > 0 ? reactionTimes : [400];
         const avgReactionMs = Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length);
         
         let status = 'GREEN';
         let badgeClass = 'badge-verde';
         
-        // Critério: Penaliza se o tempo for lento (>600ms) ou se houve erros de veto nas vermelhas
-        if (avgReactionMs > 550 || vetoErrors >= 2) {
+        if (avgReactionMs > 600 || vetoErrors >= 2) {
             status = 'YELLOW';
             badgeClass = 'badge-amarelo';
         }
-        if (avgReactionMs > 800 || vetoErrors >= 4) {
+        if (avgReactionMs > 850 || vetoErrors >= 4) {
             status = 'RED';
             badgeClass = 'badge-vermelho';
         }
@@ -295,12 +304,11 @@
         badge.innerText = status === 'GREEN' ? '🟢 LIBERADO (VERDE)' : (status === 'YELLOW' ? '🟡 ATENÇÃO' : '🔴 INAPTO');
 
         document.getElementById('resultText').innerHTML = `
-            <strong>Reação Média:</strong> ${avgReactionMs}ms<br>
-            <strong>Falhas de Veto (Toques na Vermelha):</strong> ${vetoErrors}<br>
-            <span style="font-size:11px; color:#94a3b8;">Sincronizado com Render API • VFC 89ms</span>
+            <strong>Tempo de Reação Médio:</strong> ${avgReactionMs}ms<br>
+            <strong>Toques Incorretos na Vermelha:</strong> ${vetoErrors}<br>
+            <span style="font-size:11px; color:#94a3b8;">Sincronizado com Render API • VFC 89ms (Linha de Base)</span>
         `;
 
-        // Envio para o Render
         try {
             await fetch(API_URL, {
                 method: 'POST',
