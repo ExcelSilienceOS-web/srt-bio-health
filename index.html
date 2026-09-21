@@ -37,7 +37,7 @@
             margin-bottom: 16px;
             text-align: left;
         }
-        .step-title { font-size: 13px; font-weight: 700; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px; }
+        .step-title { font-size: 13px; font-weight: 700; color: #f8fafc; text-transform: uppercase; margin-bottom: 12px; }
         
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
@@ -127,13 +127,23 @@
     <div class="title">EXCELSILIENCE SRT</div>
     <div class="subtitle">Check-in Operacional de Prontidão</div>
 
-    <!-- PASSO 0: CADASTRO / SELEÇÃO DE MODO -->
+    <!-- ETAPA 0: CADASTRO COMPLETO (FORMA B) -->
     <div id="step0" class="step-box">
-        <div class="step-title">📋 IDENTIFICAÇÃO DE CHECK-IN</div>
-        
+        <div class="step-title">📋 CADASTRO DO TESTE DE PRONTIDÃO</div>
+
+        <div class="form-group">
+            <label>Empresa / Organização:</label>
+            <input type="text" id="inputEmpresa" placeholder="Ex: Osborne Construtora, Intergramed..." value="ExcelSilience Direct">
+        </div>
+
+        <div class="form-group">
+            <label>WhatsApp / Celular (Chave de Vínculo):</label>
+            <input type="tel" id="inputWhatsapp" placeholder="Ex: (11) 99999-8888" value="">
+        </div>
+
         <div class="btn-mode-grid">
-            <button id="btnModeIdentified" class="btn-mode active" onclick="setMode('identificado')">👤 Identificado</button>
-            <button id="btnModeAnon" class="btn-mode" onclick="setMode('anonimo')">🕵️ Anônimo (LGPD)</button>
+            <button id="btnModeIdentified" class="btn-mode active" type="button" onclick="setMode('identificado')">👤 Identificado</button>
+            <button id="btnModeAnon" class="btn-mode" type="button" onclick="setMode('anonimo')">🕵️ Anônimo (LGPD)</button>
         </div>
 
         <div id="fieldGroupNome" class="form-group">
@@ -152,7 +162,7 @@
             </select>
         </div>
 
-        <button onclick="iniciarFluxo()" class="btn btn-voice">🚀 Iniciar Check-in</button>
+        <button onclick="iniciarFluxo()" class="btn btn-voice" type="button">🚀 Iniciar Check-in</button>
     </div>
 
     <!-- ETAPA 1: VOZ (5 SEGUNDOS) -->
@@ -160,7 +170,7 @@
         <div class="step-title">🎙️ ETAPA 1: TESTE VOCOGRÁFICO (5S)</div>
         <div style="font-size: 12px; color: #94a3b8;">Fale a frase abaixo com clareza ao clicar no botão:</div>
         <div class="phrase-text">"Check-in de prontidão operativa. Declaro que estou focado para o turno."</div>
-        <button id="recordBtn" class="btn btn-voice">🎤 Gravar Voz (5s)</button>
+        <button id="recordBtn" class="btn btn-voice" type="button">🎤 Gravar Voz (5s)</button>
     </div>
 
     <!-- ETAPA 2: BOLINHAS COM VETO (IDC GO / NO-GO) -->
@@ -171,7 +181,7 @@
             • <span class="green">🟢 BOLINHA VERDE:</span> TOQUE RÁPIDO!<br>
             • <span class="red">🔴 BOLINHA VERMELHA:</span> NÃO TOQUE! Deixe sumir em 1.2s.
         </div>
-        <button id="startGameBtn" class="btn btn-game">⚡ INICIAR TESTE DAS BOLINHAS</button>
+        <button id="startGameBtn" class="btn btn-game" type="button">⚡ INICIAR TESTE DAS BOLINHAS</button>
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
         </div>
@@ -181,7 +191,7 @@
     <div id="resultArea" style="display: none;">
         <div id="statusBadge" class="result-badge"></div>
         <div id="resultText" style="font-size: 13px; color: #cbd5e1; margin-top: 10px; line-height: 1.5;"></div>
-        <button onclick="window.location.reload()" class="btn btn-voice" style="margin-top:16px;">🔄 Novo Check-in</button>
+        <button onclick="window.location.reload()" class="btn btn-voice" type="button" style="margin-top:16px;">🔄 Novo Check-in</button>
     </div>
 </div>
 
@@ -189,7 +199,7 @@
     const API_URL = 'https://excelsilience-backend.onrender.com/api/v1/smartwatch/sync';
     
     let currentMode = 'identificado';
-    let currentUser = { name: '', sector: '', userId: '', isAnon: false };
+    let currentUser = { company: '', whatsapp: '', name: '', sector: '', userId: '', isAnon: false };
     
     let reactionTimes = [];
     let vetoErrors = 0;
@@ -199,22 +209,18 @@
     let currentTarget = null;
     let redExpireTimer = null;
 
-    // LER PARÂMETROS DA URL
+    // PREENCHER DE CAMPOS VIA URL (CASO ENVIE LINK PRÉ-CONFIGURADO)
     window.onload = () => {
         const urlParams = new URLSearchParams(window.location.search);
+        const empresaParam = urlParams.get('empresa') || urlParams.get('company');
+        const waParam = urlParams.get('whatsapp') || urlParams.get('wa');
         const nameParam = urlParams.get('nome') || urlParams.get('name');
         const sectorParam = urlParams.get('sector') || urlParams.get('setor');
-        const modeParam = urlParams.get('mode');
 
-        if (nameParam) {
-            document.getElementById('inputNome').value = nameParam;
-        }
-        if (sectorParam) {
-            document.getElementById('selectSector').value = sectorParam;
-        }
-        if (modeParam === 'anonimo') {
-            setMode('anonimo');
-        }
+        if (empresaParam) document.getElementById('inputEmpresa').value = empresaParam;
+        if (waParam) document.getElementById('inputWhatsapp').value = waParam;
+        if (nameParam) document.getElementById('inputNome').value = nameParam;
+        if (sectorParam) document.getElementById('selectSector').value = sectorParam;
     };
 
     function setMode(mode) {
@@ -235,22 +241,35 @@
     }
 
     function iniciarFluxo() {
+        const empresa = document.getElementById('inputEmpresa').value.trim() || 'ExcelSilience Direct';
+        const whatsappRaw = document.getElementById('inputWhatsapp').value.trim();
         const sector = document.getElementById('selectSector').value;
+
+        if (!whatsappRaw) {
+            return alert('Por favor, informe seu WhatsApp/Telefone para vincularmos os seus testes.');
+        }
+
+        const cleanWa = whatsappRaw.replace(/\D/g, ''); // Apenas números
+
         if (currentMode === 'identificado') {
             const nomeInput = document.getElementById('inputNome').value.trim();
             if (!nomeInput) return alert('Por favor, digite seu nome ou selecione a opção Anônimo.');
             currentUser = {
+                company: empresa,
+                whatsapp: cleanWa,
                 name: nomeInput,
                 sector: sector,
-                userId: nomeInput.toUpperCase().replace(/\s+/g, '_'),
+                userId: `WA_${cleanWa}`,
                 isAnon: false
             };
         } else {
-            const randomCode = Math.floor(1000 + Math.random() * 9000);
+            const randomCode = cleanWa.slice(-4) || Math.floor(1000 + Math.random() * 9000);
             currentUser = {
+                company: empresa,
+                whatsapp: cleanWa,
                 name: `Operador Anônimo (${randomCode})`,
                 sector: sector,
-                userId: `ANO_${randomCode}`,
+                userId: `ANO_${cleanWa}`,
                 isAnon: true
             };
         }
@@ -259,7 +278,7 @@
         document.getElementById('step1').style.display = 'block';
     }
 
-    // ETAPA 1: VOZ
+    // ETAPA 1: VOZ (5S)
     const recordBtn = document.getElementById('recordBtn');
     recordBtn.addEventListener('click', async () => {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -288,7 +307,7 @@
         }, 500);
     }
 
-    // ETAPA 2: JOGO DAS BOLINHAS
+    // ETAPA 2: JOGO DAS BOLINHAS (IDC)
     const startGameBtn = document.getElementById('startGameBtn');
     const canvasContainer = document.getElementById('canvas-container');
     const canvas = document.getElementById('gameCanvas');
@@ -370,13 +389,13 @@
     canvas.addEventListener('pointerdown', handleTouch);
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
 
-    // FINALIZACÃO & SALVAMENTO LOCAL/REMOTO
+    // FINALIZAÇÃO E ENVIO DE DADOS
     async function finishCheckin() {
         canvasContainer.style.display = 'none';
         document.getElementById('step2').style.display = 'none';
         document.getElementById('resultArea').style.display = 'block';
 
-        const validTimes = reactionTimes.length > 0 ? reactionTimes : [600];
+        const validTimes = reactionTimes.length > 0 ? reactionTimes : [700];
         const avgReactionMs = Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length);
         
         let status = 'GREEN';
@@ -389,15 +408,19 @@
         badge.innerText = status === 'GREEN' ? '🟢 LIBERADO (VERDE)' : (status === 'YELLOW' ? '🟡 ATENÇÃO' : '🔴 INAPTO');
 
         document.getElementById('resultText').innerHTML = `
+            <strong>Empresa:</strong> ${currentUser.company}<br>
             <strong>Usuário:</strong> ${currentUser.name}<br>
+            <strong>WhatsApp:</strong> ${currentUser.whatsapp}<br>
             <strong>Setor:</strong> ${currentUser.sector}<br>
             <strong>Tempo de Reação:</strong> ${avgReactionMs}ms<br>
             <strong>Erros de Veto:</strong> ${vetoErrors}
         `;
 
-        // SALVAR NO LOCAL STORAGE PARA O DASHBOARD LER INSTANTANEMENTE
+        // SALVAMENTO NO LOCAL STORAGE PARA O DASHBOARD LER NA HORA
         const newRecord = {
             id: currentUser.userId,
+            company: currentUser.company,
+            whatsapp: currentUser.whatsapp,
             name: currentUser.name,
             sector: currentUser.sector,
             reaction_ms: avgReactionMs,
@@ -412,13 +435,15 @@
             localStorage.setItem('srt_live_records', JSON.stringify(existing));
         } catch(e){}
 
-        // ENVIO PARA O RENDER
+        // DISPARO DA API PARA O RENDER
         try {
             await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     user_id: currentUser.userId,
+                    company: currentUser.company,
+                    whatsapp: currentUser.whatsapp,
                     name: currentUser.name,
                     sector: currentUser.sector,
                     telemetry: { reaction_ms: avgReactionMs, veto_errors: vetoErrors, status: status }
@@ -430,3 +455,4 @@
 
 </body>
 </html>
+
