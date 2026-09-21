@@ -250,8 +250,8 @@
         e.preventDefault();
 
         const rect = canvas.getBoundingClientRect();
-        const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
-        const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+        const clientX = (e.touches && e.touches.length > 0) ? e.touches.clientX : e.clientX;
+        const clientY = (e.touches && e.touches.length > 0) ? e.touches.clientY : e.clientY;
 
         const touchX = clientX - rect.left;
         const touchY = clientY - rect.top;
@@ -284,17 +284,20 @@
         document.getElementById('step2').style.display = 'none';
         document.getElementById('resultArea').style.display = 'block';
 
-        const validTimes = reactionTimes.length > 0 ? reactionTimes : [400];
+        const validTimes = reactionTimes.length > 0 ? reactionTimes : [500];
         const avgReactionMs = Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length);
         
         let status = 'GREEN';
         let badgeClass = 'badge-verde';
         
-        if (avgReactionMs > 600 || vetoErrors >= 2) {
+        // CALIBRAÇÃO RECURSIVA PARA TELA TOUCH (GO / NO-GO)
+        // Sinal Verde até 700ms com até 1 erro de veto
+        if (avgReactionMs > 700 || vetoErrors >= 2) {
             status = 'YELLOW';
             badgeClass = 'badge-amarelo';
         }
-        if (avgReactionMs > 850 || vetoErrors >= 4) {
+        // Sinal Vermelho acima de 950ms ou 4+ erros de veto
+        if (avgReactionMs > 950 || vetoErrors >= 4) {
             status = 'RED';
             badgeClass = 'badge-vermelho';
         }
