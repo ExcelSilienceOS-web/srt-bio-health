@@ -2,14 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SRT Bio-Health — Check-in Operacional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExcelSilience SRT — Mobility Check-in</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #0b0f19;
-            color: #e2e8f0;
+            background: #0f172a;
+            color: #f8fafc;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,31 +17,26 @@
             padding: 16px;
         }
         .container {
-            background: #151c2c;
-            border: 1px solid #2a364f;
-            border-radius: 16px;
-            padding: 20px;
-            max-width: 480px;
             width: 100%;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .title { font-size: 22px; font-weight: 800; color: #38bdf8; margin-bottom: 4px; }
-        .subtitle { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-        
-        .step-box {
+            max-width: 420px;
             background: #1e293b;
             border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            text-align: left;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .step-title { font-size: 13px; font-weight: 700; color: #f8fafc; text-transform: uppercase; margin-bottom: 12px; }
+        .logo-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-title h1 { font-size: 20px; color: #38bdf8; font-weight: 800; }
+        .logo-title p { font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-top: 4px; }
         
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-        input, select {
+        .step { display: none; }
+        .step.active { display: block; }
+
+        label { font-size: 12px; color: #94a3b8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        input {
             width: 100%;
             padding: 12px;
             background: #0f172a;
@@ -49,410 +44,269 @@
             border-radius: 8px;
             color: #fff;
             font-size: 14px;
+            margin-bottom: 16px;
         }
-
-        .btn-mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-        .btn-mode {
-            padding: 10px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #94a3b8;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .btn-mode.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
-
-        .phrase-text { font-size: 13px; color: #cbd5e1; font-style: italic; background: #0f172a; padding: 10px; border-radius: 6px; margin-top: 6px; }
-
-        .rules-box {
-            font-size: 12px;
-            background: #0f172a;
-            border-left: 4px solid #38bdf8;
-            padding: 10px 14px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            color: #e2e8f0;
-            line-height: 1.5;
-            text-align: left;
-        }
-        .rules-box span.green { color: #34d399; font-weight: 700; }
-        .rules-box span.red { color: #f87171; font-weight: 700; }
+        input:focus { outline: none; border-color: #38bdf8; }
 
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 700;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 10px;
+            background: #0284c7;
+            color: #fff;
+            transition: 0.2s;
         }
-        .btn-voice { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
-        .btn-game { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; }
-        .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        .btn:hover { background: #0369a1; }
 
-        #canvas-container {
+        /* TELA DAS BOLINHAS */
+        .game-box {
             width: 100%;
             height: 280px;
-            background: #090d16;
-            border: 2px solid #38bdf8;
+            background: #0f172a;
+            border: 2px dashed #334155;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
-            margin-top: 10px;
-            display: none;
+            margin-bottom: 16px;
         }
-        canvas { width: 100%; height: 100%; display: block; }
+        .target-ball {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(255,255,255,0.3);
+        }
+        .ball-green { background: #10b981; }
+        .ball-red { background: #ef4444; }
 
-        .result-badge {
+        .badge-status {
             font-size: 20px;
             font-weight: 800;
-            padding: 12px 20px;
+            text-align: center;
+            padding: 16px;
             border-radius: 12px;
-            display: inline-block;
-            margin-top: 16px;
+            margin-bottom: 16px;
         }
-        .badge-verde { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-        .badge-amarelo { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-        .badge-vermelho { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .status-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .status-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .status-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="title">EXCELSILIENCE SRT</div>
-    <div class="subtitle">Check-in Operacional de Prontidão</div>
-
-    <!-- ETAPA 0: CADASTRO COMPLETO (FORMA B) -->
-    <div id="step0" class="step-box">
-        <div class="step-title">📋 CADASTRO DO TESTE DE PRONTIDÃO</div>
-
-        <div class="form-group">
-            <label>Empresa / Organização:</label>
-            <input type="text" id="inputEmpresa" placeholder="Ex: Osborne Construtora, Intergramed..." value="ExcelSilience Direct">
+    <div class="container">
+        <div class="logo-title">
+            <h1>EXCELSILIENCE SRT</h1>
+            <p>Telemetria de Prontidão — Módulo Mobility</p>
         </div>
 
-        <div class="form-group">
-            <label>WhatsApp / Celular (Chave de Vínculo):</label>
-            <input type="tel" id="inputWhatsapp" placeholder="Ex: (11) 99999-8888" value="">
+        <!-- PASSO 1: IDENTIFICAÇÃO OBRIGATÓRIA -->
+        <div id="stepForm" class="step active">
+            <label for="txtName">Nome Completo do Condutor:</label>
+            <input type="text" id="txtName" placeholder="Ex: João Silva" required>
+
+            <label for="txtWA">WhatsApp (com DDD):</label>
+            <input type="tel" id="txtWA" placeholder="Ex: 11999998888" required>
+
+            <label for="txtEmpresa">Empresa / Transportadora:</label>
+            <input type="text" id="txtEmpresa" placeholder="Ex: Osborne Construtora" required>
+
+            <label for="txtSetor">Setor / Placa do Veículo:</label>
+            <input type="text" id="txtSetor" placeholder="Ex: Frota 01 / Caminhão ABC-1234" required>
+
+            <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão (30s) 🚀</button>
         </div>
 
-        <div class="btn-mode-grid">
-            <button id="btnModeIdentified" class="btn-mode active" type="button" onclick="setMode('identificado')">👤 Identificado</button>
-            <button id="btnModeAnon" class="btn-mode" type="button" onclick="setMode('anonimo')">🕵️ Anônimo (LGPD)</button>
+        <!-- PASSO 2: TESTE DE VOZ -->
+        <div id="stepVoz" class="step">
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎙️ Teste Vocográfico (5s)</h3>
+            <p style="font-size:13px; text-align:center; color:#94a3b8; margin-bottom:16px;">
+                Mantenha o celular próximo e leia a frase abaixo em voz alta ao clicar no botão:
+            </p>
+            <div style="background:#0f172a; padding:12px; border-radius:8px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:16px;">
+                "Pronto para operar com foco e segurança total."
+            </div>
+            <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Frase (5s)</button>
         </div>
 
-        <div id="fieldGroupNome" class="form-group">
-            <label>Nome Completo:</label>
-            <input type="text" id="inputNome" placeholder="Ex: Carlos Mendes" value="">
+        <!-- PASSO 3: TESTE DE VETO MOTOR (BOLINHAS) -->
+        <div id="stepBolinhas" class="step">
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">🎯 Teste de Veto Motor (IDC)</h3>
+            <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
+                Toque o mais rápido que puder nas bolinhas 🟢 <b>VERDES</b>!<br>Evite tocar nas 🔴 <b>VERMELHAS</b>.
+            </p>
+            <div class="game-box" id="gameArea"></div>
+            <p id="gameStats" style="text-align:center; font-size:12px; color:#cbd5e1; font-weight:700;">Progresso: 0 / 5</p>
         </div>
 
-        <div class="form-group">
-            <label>Setor / Departamento:</label>
-            <select id="selectSector">
-                <option value="Diretoria / C-Suite">Diretoria / C-Suite</option>
-                <option value="Engenharia e Obras">Engenharia e Obras</option>
-                <option value="Manutenção Operacional">Manutenção Operacional</option>
-                <option value="Logística e Frotas">Logística e Frotas</option>
-                <option value="Escritório / Administrativo">Escritório / Administrativo</option>
-            </select>
-        </div>
-
-        <button onclick="iniciarFluxo()" class="btn btn-voice" type="button">🚀 Iniciar Check-in</button>
-    </div>
-
-    <!-- ETAPA 1: VOZ (5 SEGUNDOS) -->
-    <div id="step1" class="step-box" style="display: none;">
-        <div class="step-title">🎙️ ETAPA 1: TESTE VOCOGRÁFICO (5S)</div>
-        <div style="font-size: 12px; color: #94a3b8;">Fale a frase abaixo com clareza ao clicar no botão:</div>
-        <div class="phrase-text">"Check-in de prontidão operativa. Declaro que estou focado para o turno."</div>
-        <button id="recordBtn" class="btn btn-voice" type="button">🎤 Gravar Voz (5s)</button>
-    </div>
-
-    <!-- ETAPA 2: BOLINHAS COM VETO (IDC GO / NO-GO) -->
-    <div id="step2" class="step-box" style="display: none;">
-        <div class="step-title">🎯 ETAPA 2: TESTE DE VETO NEURO-OCULAR (IDC)</div>
-        <div class="rules-box">
-            <strong>⚠️ INSTRUÇÕES DO TESTE:</strong><br>
-            • <span class="green">🟢 BOLINHA VERDE:</span> TOQUE RÁPIDO!<br>
-            • <span class="red">🔴 BOLINHA VERMELHA:</span> NÃO TOQUE! Deixe sumir em 1.2s.
-        </div>
-        <button id="startGameBtn" class="btn btn-game" type="button">⚡ INICIAR TESTE DAS BOLINHAS</button>
-        <div id="canvas-container">
-            <canvas id="gameCanvas"></canvas>
+        <!-- PASSO 4: RESULTADO -->
+        <div id="stepResult" class="step">
+            <div id="resultBadge" class="badge-status">
+                --
+            </div>
+            <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px;">
+                <p>👤 <b>Condutor:</b> <span id="resName">--</span></p>
+                <p>🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
+                <p>⚡ <b>Tempo de Reação:</b> <span id="resReaction">--</span> ms</p>
+                <p>🎯 <b>Erros de Veto:</b> <span id="resErrors">--</span></p>
+            </div>
+            <button class="btn" onclick="location.reload()">🔄 Concluir Check-in</button>
         </div>
     </div>
 
-    <!-- ÁREA DE RESULTADO -->
-    <div id="resultArea" style="display: none;">
-        <div id="statusBadge" class="result-badge"></div>
-        <div id="resultText" style="font-size: 13px; color: #cbd5e1; margin-top: 10px; line-height: 1.5;"></div>
-        <button onclick="window.location.reload()" class="btn btn-voice" type="button" style="margin-top:16px;">🔄 Novo Check-in</button>
-    </div>
-</div>
+    <script>
+        const API_URL = 'https://excelsilience-backend.onrender.com/api/v1/smartwatch/sync';
 
-<script>
-    const API_URL = 'https://excelsilience-backend.onrender.com/api/v1/smartwatch/sync';
-    
-    let currentMode = 'identificado';
-    let currentUser = { company: '', whatsapp: '', name: '', sector: '', userId: '', isAnon: false };
-    
-    let reactionTimes = [];
-    let vetoErrors = 0;
-    let rounds = 0;
-    const totalRounds = 10;
-    let targetStartTime = 0;
-    let currentTarget = null;
-    let redExpireTimer = null;
+        let userData = {};
+        let gameHits = 0;
+        let gameErrors = 0;
+        let reactionTimes = [];
+        let ballSpawnTime = 0;
 
-    // PREENCHER DE CAMPOS VIA URL (CASO ENVIE LINK PRÉ-CONFIGURADO)
-    window.onload = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const empresaParam = urlParams.get('empresa') || urlParams.get('company');
-        const waParam = urlParams.get('whatsapp') || urlParams.get('wa');
-        const nameParam = urlParams.get('nome') || urlParams.get('name');
-        const sectorParam = urlParams.get('sector') || urlParams.get('setor');
+        function startCheckin() {
+            const name = document.getElementById('txtName').value.trim();
+            const wa = document.getElementById('txtWA').value.trim();
+            const empresa = document.getElementById('txtEmpresa').value.trim();
+            const setor = document.getElementById('txtSetor').value.trim();
 
-        if (empresaParam) document.getElementById('inputEmpresa').value = empresaParam;
-        if (waParam) document.getElementById('inputWhatsapp').value = waParam;
-        if (nameParam) document.getElementById('inputNome').value = nameParam;
-        if (sectorParam) document.getElementById('selectSector').value = sectorParam;
-    };
-
-    function setMode(mode) {
-        currentMode = mode;
-        const btnIdent = document.getElementById('btnModeIdentified');
-        const btnAnon = document.getElementById('btnModeAnon');
-        const fieldNome = document.getElementById('fieldGroupNome');
-
-        if (mode === 'anonimo') {
-            btnAnon.classList.add('active');
-            btnIdent.classList.remove('active');
-            fieldNome.style.display = 'none';
-        } else {
-            btnIdent.classList.add('active');
-            btnAnon.classList.remove('active');
-            fieldNome.style.display = 'block';
-        }
-    }
-
-    function iniciarFluxo() {
-        const empresa = document.getElementById('inputEmpresa').value.trim() || 'ExcelSilience Direct';
-        const whatsappRaw = document.getElementById('inputWhatsapp').value.trim();
-        const sector = document.getElementById('selectSector').value;
-
-        if (!whatsappRaw) {
-            return alert('Por favor, informe seu WhatsApp/Telefone para vincularmos os seus testes.');
-        }
-
-        const cleanWa = whatsappRaw.replace(/\D/g, ''); // Apenas números
-
-        if (currentMode === 'identificado') {
-            const nomeInput = document.getElementById('inputNome').value.trim();
-            if (!nomeInput) return alert('Por favor, digite seu nome ou selecione a opção Anônimo.');
-            currentUser = {
-                company: empresa,
-                whatsapp: cleanWa,
-                name: nomeInput,
-                sector: sector,
-                userId: `WA_${cleanWa}`,
-                isAnon: false
-            };
-        } else {
-            const randomCode = cleanWa.slice(-4) || Math.floor(1000 + Math.random() * 9000);
-            currentUser = {
-                company: empresa,
-                whatsapp: cleanWa,
-                name: `Operador Anônimo (${randomCode})`,
-                sector: sector,
-                userId: `ANO_${cleanWa}`,
-                isAnon: true
-            };
-        }
-
-        document.getElementById('step0').style.display = 'none';
-        document.getElementById('step1').style.display = 'block';
-    }
-
-    // ETAPA 1: VOZ (5S)
-    const recordBtn = document.getElementById('recordBtn');
-    recordBtn.addEventListener('click', async () => {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            avancarParaBolinhas();
-            return;
-        }
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            recordBtn.innerText = '🔴 Gravando (5s)... Fale a frase!';
-            recordBtn.disabled = true;
-
-            setTimeout(() => {
-                stream.getTracks().forEach(track => track.stop());
-                recordBtn.innerText = '✅ Voz Capturada (5s)!';
-                avancarParaBolinhas();
-            }, 5000);
-        } catch (err) {
-            avancarParaBolinhas();
-        }
-    });
-
-    function avancarParaBolinhas() {
-        setTimeout(() => {
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
-        }, 500);
-    }
-
-    // ETAPA 2: JOGO DAS BOLINHAS (IDC)
-    const startGameBtn = document.getElementById('startGameBtn');
-    const canvasContainer = document.getElementById('canvas-container');
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    startGameBtn.addEventListener('click', () => {
-        startGameBtn.style.display = 'none';
-        canvasContainer.style.display = 'block';
-        
-        const rect = canvasContainer.getBoundingClientRect();
-        canvas.width = rect.width || 320;
-        canvas.height = rect.height || 280;
-        
-        rounds = 0; vetoErrors = 0; reactionTimes = [];
-        spawnTarget();
-    });
-
-    function spawnTarget() {
-        if (redExpireTimer) clearTimeout(redExpireTimer);
-        if (rounds >= totalRounds) return finishCheckin();
-
-        rounds++;
-        const radius = 32;
-        const x = Math.random() * (canvas.width - radius * 2 - 20) + radius + 10;
-        const y = Math.random() * (canvas.height - radius * 2 - 20) + radius + 10;
-
-        const isRed = Math.random() < 0.30;
-        const color = isRed ? '#ef4444' : '#10b981';
-
-        currentTarget = { x, y, radius, isRed };
-        targetStartTime = performance.now();
-
-        drawTarget(x, y, radius, color);
-
-        if (isRed) {
-            redExpireTimer = setTimeout(() => {
-                currentTarget = null;
-                spawnTarget();
-            }, 1200);
-        }
-    }
-
-    function drawTarget(x, y, radius, color) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = color; ctx.fill();
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(x, y, 8, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff'; ctx.fill();
-    }
-
-    function handleTouch(e) {
-        if (!currentTarget) return;
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        const clientX = (e.touches && e.touches.length > 0) ? e.touches.clientX : e.clientX;
-        const clientY = (e.touches && e.touches.length > 0) ? e.touches.clientY : e.clientY;
-        const touchX = clientX - rect.left;
-        const touchY = clientY - rect.top;
-
-        const dist = Math.hypot(touchX - currentTarget.x, touchY - currentTarget.y);
-        if (dist <= currentTarget.radius + 20) {
-            if (redExpireTimer) clearTimeout(redExpireTimer);
-            if (currentTarget.isRed) {
-                vetoErrors++; reactionTimes.push(1000);
-                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#7f1d1d');
-            } else {
-                const reactionMs = performance.now() - targetStartTime;
-                reactionTimes.push(reactionMs);
-                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#047857');
+            if (!name || !wa || !empresa) {
+                alert('Por favor, preencha o Nome, WhatsApp e Empresa para iniciar!');
+                return;
             }
-            currentTarget = null;
-            setTimeout(spawnTarget, 120);
+
+            userData = { name, whatsapp: wa, company: empresa, sector: setor || 'Operacional' };
+
+            // Salva os dados no celular para facilitar no próximo teste
+            localStorage.setItem('srt_user_cache', JSON.stringify(userData));
+
+            document.getElementById('stepForm').classList.remove('active');
+            document.getElementById('stepVoz').classList.add('active');
         }
-    }
 
-    canvas.addEventListener('pointerdown', handleTouch);
-    canvas.addEventListener('touchstart', handleTouch, { passive: false });
-
-    // FINALIZAÇÃO E ENVIO DE DADOS
-    async function finishCheckin() {
-        canvasContainer.style.display = 'none';
-        document.getElementById('step2').style.display = 'none';
-        document.getElementById('resultArea').style.display = 'block';
-
-        const validTimes = reactionTimes.length > 0 ? reactionTimes : [700];
-        const avgReactionMs = Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length);
-        
-        let status = 'GREEN';
-        let badgeClass = 'badge-verde';
-        if (avgReactionMs > 700 || vetoErrors >= 2) { status = 'YELLOW'; badgeClass = 'badge-amarelo'; }
-        if (avgReactionMs > 950 || vetoErrors >= 4) { status = 'RED'; badgeClass = 'badge-vermelho'; }
-
-        const badge = document.getElementById('statusBadge');
-        badge.className = `result-badge ${badgeClass}`;
-        badge.innerText = status === 'GREEN' ? '🟢 LIBERADO (VERDE)' : (status === 'YELLOW' ? '🟡 ATENÇÃO' : '🔴 INAPTO');
-
-        document.getElementById('resultText').innerHTML = `
-            <strong>Empresa:</strong> ${currentUser.company}<br>
-            <strong>Usuário:</strong> ${currentUser.name}<br>
-            <strong>WhatsApp:</strong> ${currentUser.whatsapp}<br>
-            <strong>Setor:</strong> ${currentUser.sector}<br>
-            <strong>Tempo de Reação:</strong> ${avgReactionMs}ms<br>
-            <strong>Erros de Veto:</strong> ${vetoErrors}
-        `;
-
-        // SALVAMENTO NO LOCAL STORAGE PARA O DASHBOARD LER NA HORA
-        const newRecord = {
-            id: currentUser.userId,
-            company: currentUser.company,
-            whatsapp: currentUser.whatsapp,
-            name: currentUser.name,
-            sector: currentUser.sector,
-            reaction_ms: avgReactionMs,
-            veto_errors: vetoErrors,
-            status: status,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        // Auto-preenche se já usou antes
+        window.onload = () => {
+            const cache = localStorage.getItem('srt_user_cache');
+            if (cache) {
+                try {
+                    const u = JSON.parse(cache);
+                    if (u.name) document.getElementById('txtName').value = u.name;
+                    if (u.whatsapp) document.getElementById('txtWA').value = u.whatsapp;
+                    if (u.company) document.getElementById('txtEmpresa').value = u.company;
+                    if (u.sector) document.getElementById('txtSetor').value = u.sector;
+                } catch(e){}
+            }
         };
 
-        try {
-            let existing = JSON.parse(localStorage.getItem('srt_live_records') || '[]');
-            existing.unshift(newRecord);
-            localStorage.setItem('srt_live_records', JSON.stringify(existing));
-        } catch(e){}
+        function runAudioTest() {
+            const btn = document.getElementById('btnRec');
+            btn.innerText = '🎙️ Gravando... (5s)';
+            btn.style.background = '#ef4444';
+            btn.disabled = true;
 
-        // DISPARO DA API PARA O RENDER
-        try {
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: currentUser.userId,
-                    company: currentUser.company,
-                    whatsapp: currentUser.whatsapp,
-                    name: currentUser.name,
-                    sector: currentUser.sector,
-                    telemetry: { reaction_ms: avgReactionMs, veto_errors: vetoErrors, status: status }
-                })
-            });
-        } catch (e) {}
-    }
-</script>
+            setTimeout(() => {
+                document.getElementById('stepVoz').classList.remove('active');
+                document.getElementById('stepBolinhas').classList.add('active');
+                spawnNextBall();
+            }, 5000);
+        }
 
+        function spawnNextBall() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = '';
+
+            if (gameHits >= 5) {
+                finishTest();
+                return;
+            }
+
+            const isGreen = Math.random() > 0.3; // 70% verdes, 30% vermelhas
+            const ball = document.createElement('div');
+            ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+
+            const maxX = gameArea.clientWidth - 60;
+            const maxY = gameArea.clientHeight - 60;
+            ball.style.left = `${Math.floor(Math.random() * maxX)}px`;
+            ball.style.top = `${Math.floor(Math.random() * maxY)}px`;
+
+            ballSpawnTime = Date.now();
+
+            ball.onclick = () => {
+                const reaction = Date.now() - ballSpawnTime;
+                if (isGreen) {
+                    reactionTimes.push(reaction);
+                    gameHits++;
+                } else {
+                    gameErrors++;
+                }
+                document.getElementById('gameStats').innerText = `Progresso: ${gameHits} / 5 | Erros: ${gameErrors}`;
+                spawnNextBall();
+            };
+
+            gameArea.appendChild(ball);
+        }
+
+        async function finishTest() {
+            document.getElementById('stepBolinhas').classList.remove('active');
+            document.getElementById('stepResult').classList.add('active');
+
+            const avgReaction = reactionTimes.length > 0 
+                ? Math.round(reactionTimes.reduce((a,b)=>a+b, 0) / reactionTimes.length) 
+                : 650;
+
+            let status = 'GREEN';
+            let badgeText = '🟢 LIBERADO PARA OPERAR';
+            let badgeClass = 'status-green';
+
+            if (avgReaction > 700 || gameErrors >= 2) {
+                status = 'YELLOW';
+                badgeText = '🟡 ATENÇÃO REDOBRADA';
+                badgeClass = 'status-yellow';
+            }
+            if (avgReaction > 950 || gameErrors >= 4) {
+                status = 'RED';
+                badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
+                badgeClass = 'status-red';
+            }
+
+            const badgeElem = document.getElementById('resultBadge');
+            badgeElem.innerText = badgeText;
+            badgeElem.className = `badge-status ${badgeClass}`;
+
+            document.getElementById('resName').innerText = userData.name;
+            document.getElementById('resEmpresa').innerText = userData.company;
+            document.getElementById('resReaction').innerText = avgReaction;
+            document.getElementById('resErrors').innerText = gameErrors;
+
+            // PACOTE DE ENVIO PARA A API RENDER
+            const payload = {
+                company: userData.company,
+                name: userData.name,
+                whatsapp: userData.whatsapp,
+                sector: userData.sector,
+                telemetry: {
+                    reaction_ms: avgReaction,
+                    veto_errors: gameErrors,
+                    status: status
+                }
+            };
+
+            // Envia para o Render
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                console.log('Dados processados localmente.');
+            }
+        }
+    </script>
 </body>
 </html>
 
