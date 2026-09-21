@@ -1,29 +1,412 @@
-async function sendDataToBackend() {
-    const syncElem = document.getElementById('syncStatus');
-    syncElem.className = 'sync-banner sync-loading';
-    syncElem.innerText = '⏳ Conectando ao CCO (aguarde até 30s)...';
-
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s de tolerância para o Render ligar
-
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(lastPayload),
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-
-        if (res.ok) {
-            syncElem.className = 'sync-banner sync-success';
-            syncElem.innerText = '✅ Diagnóstico Registrado no CCO com Sucesso!';
-        } else {
-            throw new Error('Servidor retornou erro');
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ExcelSilience SRT — Mobility Check-in</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
         }
-    } catch (e) {
-        syncElem.className = 'sync-banner sync-error';
-        syncElem.innerText = '⚠️ Servidor em repouso. Clique AQUI para Reenviar!';
-        syncElem.onclick = sendDataToBackend;
-    }
-}
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .logo-title { text-align: center; margin-bottom: 20px; }
+        .logo-title h1 { font-size: 20px; color: #38bdf8; font-weight: 800; }
+        .logo-title p { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+        
+        .step { display: none; }
+        .step.active { display: block; }
+
+        label { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+        input:focus { outline: none; border-color: #38bdf8; }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            background: #0284c7;
+            color: #fff;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #0369a1; }
+
+        .instruction-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .rule-item:last-child { margin-bottom: 0; }
+        .icon-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .icon-green { background: #10b981; color: #fff; }
+        .icon-red { background: #ef4444; color: #fff; }
+
+        .game-box {
+            width: 100%;
+            height: 260px;
+            background: #0f172a;
+            border: 2px dashed #334155;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .target-ball {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(255,255,255,0.4);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .ball-green { background: #10b981; border: 2px solid #34d399; }
+        .ball-red { background: #ef4444; border: 2px solid #f87171; }
+
+        .badge-status {
+            font-size: 18px;
+            font-weight: 800;
+            text-align: center;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .status-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .status-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .status-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+
+        .sync-banner {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .sync-loading { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
+        .sync-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
+        .sync-error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-title">
+            <h1>EXCELSILIENCE SRT</h1>
+            <p>Telemetria de Prontidão — Módulo Mobility</p>
+        </div>
+
+        <!-- PASSO 1: IDENTIFICAÇÃO OBRIGATÓRIA -->
+        <div id="stepForm" class="step active">
+            <label for="txtName">Nome Completo do Condutor:</label>
+            <input type="text" id="txtName" placeholder="Ex: João Silva" required>
+
+            <label for="txtWA">WhatsApp (com DDD):</label>
+            <input type="tel" id="txtWA" placeholder="Ex: 11999998888" required>
+
+            <label for="txtEmpresa">Empresa / Transportadora:</label>
+            <input type="text" id="txtEmpresa" placeholder="Ex: Osborne Construtora" required>
+
+            <label for="txtSetor">Setor / Placa do Veículo:</label>
+            <input type="text" id="txtSetor" placeholder="Ex: Frota 01 / Caminhão ABC-1234" required>
+
+            <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão (30s) 🚀</button>
+        </div>
+
+        <!-- PASSO 2: TESTE DE VOZ -->
+        <div id="stepVoz" class="step">
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎙️ Etapa 1: Análise de Voz (5s)</h3>
+            <p style="font-size:13px; text-align:center; color:#94a3b8; margin-bottom:16px;">
+                Leia a frase abaixo em voz alta assim que clicar no botão:
+            </p>
+            <div style="background:#0f172a; padding:14px; border-radius:8px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:16px; border:1px solid #334155;">
+                "Pronto para operar com foco e segurança total."
+            </div>
+            <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Frase Agora</button>
+        </div>
+
+        <!-- PASSO 3: INSTRUÇÃO DO TESTE DE BOLINHAS -->
+        <div id="stepInstruction" class="step">
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎯 Etapa 2: Teste de Reflexo e Foco</h3>
+            <div class="instruction-card">
+                <div class="rule-item">
+                    <div class="icon-circle icon-green">⚡</div>
+                    <div><b>Bolinha VERDE:</b> TOQUE O MAIS RÁPIDO POSSÍVEL!</div>
+                </div>
+                <div class="rule-item">
+                    <div class="icon-circle icon-red">🛑</div>
+                    <div><b>Bolinha VERMELHA:</b> NÃO TOQUE! Espere ela sumir sozinha.</div>
+                </div>
+            </div>
+            <button class="btn" onclick="startGame()">Entendi, Começar Teste! 🎯</button>
+        </div>
+
+        <!-- PASSO 4: O JOGO DAS BOLINHAS -->
+        <div id="stepBolinhas" class="step">
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
+                <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 5</b></span>
+                <span>Erros de Veto: <b id="lblErrors" style="color:#ef4444;">0</b></span>
+            </div>
+            <div class="game-box" id="gameArea"></div>
+        </div>
+
+        <!-- PASSO 5: RESULTADO -->
+        <div id="stepResult" class="step">
+            <div id="syncStatus" class="sync-banner sync-loading">⏳ Enviando diagnóstico ao CCO...</div>
+            <div id="resultBadge" class="badge-status">--</div>
+            <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
+                <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
+                <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
+                <p style="margin-bottom:6px;">⚡ <b>Tempo de Reação:</b> <span id="resReaction" style="color:#38bdf8; font-weight:700;">--</span> ms</p>
+                <p>🎯 <b>Erros de Veto:</b> <span id="resErrors" style="color:#ef4444; font-weight:700;">--</span></p>
+            </div>
+            <button class="btn" onclick="location.reload()">🔄 Concluir e Sair</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://excelsilience-backend.onrender.com/api/v1/smartwatch/sync';
+
+        let userData = {};
+        let currentRound = 0;
+        const TOTAL_ROUNDS = 5;
+        let gameErrors = 0;
+        let reactionTimes = [];
+        let ballSpawnTime = 0;
+        let ballTimer = null;
+        let ballHandled = false;
+        let lastPayload = null;
+
+        function startCheckin() {
+            const name = document.getElementById('txtName').value.trim();
+            const wa = document.getElementById('txtWA').value.trim();
+            const empresa = document.getElementById('txtEmpresa').value.trim();
+            const setor = document.getElementById('txtSetor').value.trim();
+
+            if (!name || !wa || !empresa) {
+                alert('Por favor, preencha o Nome, WhatsApp e Empresa!');
+                return;
+            }
+
+            userData = { name, whatsapp: wa, company: empresa, sector: setor || 'Operacional' };
+            localStorage.setItem('srt_user_cache', JSON.stringify(userData));
+
+            document.getElementById('stepForm').classList.remove('active');
+            document.getElementById('stepVoz').classList.add('active');
+        }
+
+        window.onload = () => {
+            const cache = localStorage.getItem('srt_user_cache');
+            if (cache) {
+                try {
+                    const u = JSON.parse(cache);
+                    if (u.name) document.getElementById('txtName').value = u.name;
+                    if (u.whatsapp) document.getElementById('txtWA').value = u.whatsapp;
+                    if (u.company) document.getElementById('txtEmpresa').value = u.company;
+                    if (u.sector) document.getElementById('txtSetor').value = u.sector;
+                } catch(e){}
+            }
+        };
+
+        function runAudioTest() {
+            const btn = document.getElementById('btnRec');
+            btn.innerText = '🎙️ Gravando... (5s)';
+            btn.style.background = '#ef4444';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                document.getElementById('stepVoz').classList.remove('active');
+                document.getElementById('stepInstruction').classList.add('active');
+            }, 5000);
+        }
+
+        function startGame() {
+            document.getElementById('stepInstruction').classList.remove('active');
+            document.getElementById('stepBolinhas').classList.add('active');
+            currentRound = 0;
+            gameErrors = 0;
+            reactionTimes = [];
+            spawnNextBall();
+        }
+
+        function spawnNextBall() {
+            if (ballTimer) clearTimeout(ballTimer);
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = '';
+
+            if (currentRound >= TOTAL_ROUNDS) {
+                finishTest();
+                return;
+            }
+
+            currentRound++;
+            document.getElementById('lblRound').innerText = `${currentRound} / ${TOTAL_ROUNDS}`;
+            document.getElementById('lblErrors').innerText = gameErrors;
+
+            ballHandled = false;
+            const isGreen = Math.random() > 0.3;
+            const ball = document.createElement('div');
+            ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+
+            const maxX = gameArea.clientWidth - 70;
+            const maxY = gameArea.clientHeight - 70;
+            ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
+            ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
+
+            ballSpawnTime = Date.now();
+
+            const handleTouch = (e) => {
+                if (e) e.preventDefault();
+                if (ballHandled) return;
+                ballHandled = true;
+                if (ballTimer) clearTimeout(ballTimer);
+
+                const reaction = Date.now() - ballSpawnTime;
+                if (isGreen) reactionTimes.push(reaction);
+                else gameErrors++;
+
+                document.getElementById('lblErrors').innerText = gameErrors;
+                spawnNextBall();
+            };
+
+            ball.addEventListener('pointerdown', handleTouch);
+            ball.addEventListener('click', handleTouch);
+            gameArea.appendChild(ball);
+
+            ballTimer = setTimeout(() => {
+                if (!ballHandled) {
+                    ballHandled = true;
+                    if (isGreen) reactionTimes.push(1500);
+                    spawnNextBall();
+                }
+            }, 1500);
+        }
+
+        async function finishTest() {
+            if (ballTimer) clearTimeout(ballTimer);
+            document.getElementById('stepBolinhas').classList.remove('active');
+            document.getElementById('stepResult').classList.add('active');
+
+            const avgReaction = reactionTimes.length > 0 
+                ? Math.round(reactionTimes.reduce((a,b)=>a+b, 0) / reactionTimes.length) 
+                : 650;
+
+            let status = 'GREEN';
+            let badgeText = '🟢 LIBERADO PARA OPERAR';
+            let badgeClass = 'status-green';
+
+            if (avgReaction > 700 || gameErrors >= 2) {
+                status = 'YELLOW';
+                badgeText = '🟡 ATENÇÃO REDOBRADA';
+                badgeClass = 'status-yellow';
+            }
+            if (avgReaction > 950 || gameErrors >= 4) {
+                status = 'RED';
+                badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
+                badgeClass = 'status-red';
+            }
+
+            const badgeElem = document.getElementById('resultBadge');
+            badgeElem.innerText = badgeText;
+            badgeElem.className = `badge-status ${badgeClass}`;
+
+            document.getElementById('resName').innerText = userData.name;
+            document.getElementById('resEmpresa').innerText = userData.company;
+            document.getElementById('resReaction').innerText = avgReaction;
+            document.getElementById('resErrors').innerText = gameErrors;
+
+            lastPayload = {
+                company: userData.company,
+                name: userData.name,
+                whatsapp: userData.whatsapp,
+                sector: userData.sector,
+                telemetry: {
+                    reaction_ms: avgReaction,
+                    veto_errors: gameErrors,
+                    status: status
+                }
+            };
+
+            sendDataToBackend();
+        }
+
+        async function sendDataToBackend() {
+            const syncElem = document.getElementById('syncStatus');
+            syncElem.className = 'sync-banner sync-loading';
+            syncElem.innerText = '⏳ Conectando ao CCO (aguarde até 30s)...';
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lastPayload),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    syncElem.className = 'sync-banner sync-success';
+                    syncElem.innerText = '✅ Diagnóstico Registrado no CCO com Sucesso!';
+                } else {
+                    throw new Error('Servidor retornou erro');
+                }
+            } catch (e) {
+                syncElem.className = 'sync-banner sync-error';
+                syncElem.innerText = '⚠️ Servidor em repouso. Clique AQUI para Reenviar!';
+                syncElem.onclick = sendDataToBackend;
+            }
+        }
+    </script>
+</body>
+</html>
