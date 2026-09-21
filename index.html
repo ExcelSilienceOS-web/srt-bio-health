@@ -38,6 +38,32 @@
             text-align: left;
         }
         .step-title { font-size: 13px; font-weight: 700; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px; }
+        
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .btn-mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        .btn-mode {
+            padding: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #94a3b8;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-mode.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+
         .phrase-text { font-size: 13px; color: #cbd5e1; font-style: italic; background: #0f172a; padding: 10px; border-radius: 6px; margin-top: 6px; }
 
         .rules-box {
@@ -99,10 +125,38 @@
 
 <div class="container">
     <div class="title">EXCELSILIENCE SRT</div>
-    <div class="subtitle">Check-in Operacional (Voz 5s & Veto Óptico IDC)</div>
+    <div class="subtitle">Check-in Operacional de Prontidão</div>
+
+    <!-- PASSO 0: CADASTRO / SELEÇÃO DE MODO -->
+    <div id="step0" class="step-box">
+        <div class="step-title">📋 IDENTIFICAÇÃO DE CHECK-IN</div>
+        
+        <div class="btn-mode-grid">
+            <button id="btnModeIdentified" class="btn-mode active" onclick="setMode('identificado')">👤 Identificado</button>
+            <button id="btnModeAnon" class="btn-mode" onclick="setMode('anonimo')">🕵️ Anônimo (LGPD)</button>
+        </div>
+
+        <div id="fieldGroupNome" class="form-group">
+            <label>Nome Completo:</label>
+            <input type="text" id="inputNome" placeholder="Ex: Carlos Mendes" value="">
+        </div>
+
+        <div class="form-group">
+            <label>Setor / Departamento:</label>
+            <select id="selectSector">
+                <option value="Diretoria / C-Suite">Diretoria / C-Suite</option>
+                <option value="Engenharia e Obras">Engenharia e Obras</option>
+                <option value="Manutenção Operacional">Manutenção Operacional</option>
+                <option value="Logística e Frotas">Logística e Frotas</option>
+                <option value="Escritório / Administrativo">Escritório / Administrativo</option>
+            </select>
+        </div>
+
+        <button onclick="iniciarFluxo()" class="btn btn-voice">🚀 Iniciar Check-in</button>
+    </div>
 
     <!-- ETAPA 1: VOZ (5 SEGUNDOS) -->
-    <div id="step1" class="step-box">
+    <div id="step1" class="step-box" style="display: none;">
         <div class="step-title">🎙️ ETAPA 1: TESTE VOCOGRÁFICO (5S)</div>
         <div style="font-size: 12px; color: #94a3b8;">Fale a frase abaixo com clareza ao clicar no botão:</div>
         <div class="phrase-text">"Check-in de prontidão operativa. Declaro que estou focado para o turno."</div>
@@ -112,14 +166,11 @@
     <!-- ETAPA 2: BOLINHAS COM VETO (IDC GO / NO-GO) -->
     <div id="step2" class="step-box" style="display: none;">
         <div class="step-title">🎯 ETAPA 2: TESTE DE VETO NEURO-OCULAR (IDC)</div>
-        
-        <!-- INSTRUÇÕES CLARAS ANTES DE COMECAR -->
         <div class="rules-box">
             <strong>⚠️ INSTRUÇÕES DO TESTE:</strong><br>
-            • <span class="green">🟢 BOLINHA VERDE:</span> TOQUE RÁPIDO! (Mede seu reflexo).<br>
-            • <span class="red">🔴 BOLINHA VERMELHA:</span> NÃO TOQUE! Deixe sumir sozinha em 1.2s (Mede seu veto motor).
+            • <span class="green">🟢 BOLINHA VERDE:</span> TOQUE RÁPIDO!<br>
+            • <span class="red">🔴 BOLINHA VERMELHA:</span> NÃO TOQUE! Deixe sumir em 1.2s.
         </div>
-
         <button id="startGameBtn" class="btn btn-game">⚡ INICIAR TESTE DAS BOLINHAS</button>
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
@@ -130,12 +181,15 @@
     <div id="resultArea" style="display: none;">
         <div id="statusBadge" class="result-badge"></div>
         <div id="resultText" style="font-size: 13px; color: #cbd5e1; margin-top: 10px; line-height: 1.5;"></div>
-        <button onclick="window.location.reload()" class="btn btn-voice" style="margin-top:16px;">🔄 Repetir Teste</button>
+        <button onclick="window.location.reload()" class="btn btn-voice" style="margin-top:16px;">🔄 Novo Check-in</button>
     </div>
 </div>
 
 <script>
     const API_URL = 'https://excelsilience-backend.onrender.com/api/v1/smartwatch/sync';
+    
+    let currentMode = 'identificado';
+    let currentUser = { name: '', sector: '', userId: '', isAnon: false };
     
     let reactionTimes = [];
     let vetoErrors = 0;
@@ -145,15 +199,73 @@
     let currentTarget = null;
     let redExpireTimer = null;
 
-    // ETAPA 1: VOZ (5s)
+    // LER PARÂMETROS DA URL
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const nameParam = urlParams.get('nome') || urlParams.get('name');
+        const sectorParam = urlParams.get('sector') || urlParams.get('setor');
+        const modeParam = urlParams.get('mode');
+
+        if (nameParam) {
+            document.getElementById('inputNome').value = nameParam;
+        }
+        if (sectorParam) {
+            document.getElementById('selectSector').value = sectorParam;
+        }
+        if (modeParam === 'anonimo') {
+            setMode('anonimo');
+        }
+    };
+
+    function setMode(mode) {
+        currentMode = mode;
+        const btnIdent = document.getElementById('btnModeIdentified');
+        const btnAnon = document.getElementById('btnModeAnon');
+        const fieldNome = document.getElementById('fieldGroupNome');
+
+        if (mode === 'anonimo') {
+            btnAnon.classList.add('active');
+            btnIdent.classList.remove('active');
+            fieldNome.style.display = 'none';
+        } else {
+            btnIdent.classList.add('active');
+            btnAnon.classList.remove('active');
+            fieldNome.style.display = 'block';
+        }
+    }
+
+    function iniciarFluxo() {
+        const sector = document.getElementById('selectSector').value;
+        if (currentMode === 'identificado') {
+            const nomeInput = document.getElementById('inputNome').value.trim();
+            if (!nomeInput) return alert('Por favor, digite seu nome ou selecione a opção Anônimo.');
+            currentUser = {
+                name: nomeInput,
+                sector: sector,
+                userId: nomeInput.toUpperCase().replace(/\s+/g, '_'),
+                isAnon: false
+            };
+        } else {
+            const randomCode = Math.floor(1000 + Math.random() * 9000);
+            currentUser = {
+                name: `Operador Anônimo (${randomCode})`,
+                sector: sector,
+                userId: `ANO_${randomCode}`,
+                isAnon: true
+            };
+        }
+
+        document.getElementById('step0').style.display = 'none';
+        document.getElementById('step1').style.display = 'block';
+    }
+
+    // ETAPA 1: VOZ
     const recordBtn = document.getElementById('recordBtn');
     recordBtn.addEventListener('click', async () => {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert('Aviso: Ativando modo de teste sem microfone.');
             avancarParaBolinhas();
             return;
         }
-        
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             recordBtn.innerText = '🔴 Gravando (5s)... Fale a frase!';
@@ -165,7 +277,6 @@
                 avancarParaBolinhas();
             }, 5000);
         } catch (err) {
-            alert('Sem acesso ao microfone. Avançando para o teste de bolinhas.');
             avancarParaBolinhas();
         }
     });
@@ -177,7 +288,7 @@
         }, 500);
     }
 
-    // ETAPA 2: JOGO DAS BOLINHAS (VERDE + VERMELHA)
+    // ETAPA 2: JOGO DAS BOLINHAS
     const startGameBtn = document.getElementById('startGameBtn');
     const canvasContainer = document.getElementById('canvas-container');
     const canvas = document.getElementById('gameCanvas');
@@ -191,26 +302,19 @@
         canvas.width = rect.width || 320;
         canvas.height = rect.height || 280;
         
-        rounds = 0;
-        vetoErrors = 0;
-        reactionTimes = [];
+        rounds = 0; vetoErrors = 0; reactionTimes = [];
         spawnTarget();
     });
 
     function spawnTarget() {
         if (redExpireTimer) clearTimeout(redExpireTimer);
-
-        if (rounds >= totalRounds) {
-            finishCheckin();
-            return;
-        }
+        if (rounds >= totalRounds) return finishCheckin();
 
         rounds++;
         const radius = 32;
         const x = Math.random() * (canvas.width - radius * 2 - 20) + radius + 10;
         const y = Math.random() * (canvas.height - radius * 2 - 20) + radius + 10;
 
-        // ~30% de chance de ser Vermelha (Armadilha No-Go)
         const isRed = Math.random() < 0.30;
         const color = isRed ? '#ef4444' : '#10b981';
 
@@ -229,47 +333,35 @@
 
     function drawTarget(x, y, radius, color) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
+        ctx.fillStyle = color; ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.stroke();
         ctx.beginPath();
         ctx.arc(x, y, 8, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.fill();
     }
 
-    // MANIPULADOR DE TOQUE
     function handleTouch(e) {
         if (!currentTarget) return;
         e.preventDefault();
-
         const rect = canvas.getBoundingClientRect();
         const clientX = (e.touches && e.touches.length > 0) ? e.touches.clientX : e.clientX;
         const clientY = (e.touches && e.touches.length > 0) ? e.touches.clientY : e.clientY;
-
         const touchX = clientX - rect.left;
         const touchY = clientY - rect.top;
 
         const dist = Math.hypot(touchX - currentTarget.x, touchY - currentTarget.y);
         if (dist <= currentTarget.radius + 20) {
             if (redExpireTimer) clearTimeout(redExpireTimer);
-
             if (currentTarget.isRed) {
-                vetoErrors++;
-                reactionTimes.push(1000);
+                vetoErrors++; reactionTimes.push(1000);
                 drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#7f1d1d');
             } else {
                 const reactionMs = performance.now() - targetStartTime;
                 reactionTimes.push(reactionMs);
                 drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#047857');
             }
-
             currentTarget = null;
             setTimeout(spawnTarget, 120);
         }
@@ -278,60 +370,61 @@
     canvas.addEventListener('pointerdown', handleTouch);
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
 
-    // FINALIZACAO E ENVIO
+    // FINALIZACÃO & SALVAMENTO LOCAL/REMOTO
     async function finishCheckin() {
         canvasContainer.style.display = 'none';
         document.getElementById('step2').style.display = 'none';
         document.getElementById('resultArea').style.display = 'block';
 
-        const validTimes = reactionTimes.length > 0 ? reactionTimes : [500];
+        const validTimes = reactionTimes.length > 0 ? reactionTimes : [600];
         const avgReactionMs = Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length);
         
         let status = 'GREEN';
         let badgeClass = 'badge-verde';
-        
-        // CALIBRAÇÃO RECURSIVA PARA TELA TOUCH (GO / NO-GO)
-        // Sinal Verde até 700ms com até 1 erro de veto
-        if (avgReactionMs > 700 || vetoErrors >= 2) {
-            status = 'YELLOW';
-            badgeClass = 'badge-amarelo';
-        }
-        // Sinal Vermelho acima de 950ms ou 4+ erros de veto
-        if (avgReactionMs > 950 || vetoErrors >= 4) {
-            status = 'RED';
-            badgeClass = 'badge-vermelho';
-        }
+        if (avgReactionMs > 700 || vetoErrors >= 2) { status = 'YELLOW'; badgeClass = 'badge-amarelo'; }
+        if (avgReactionMs > 950 || vetoErrors >= 4) { status = 'RED'; badgeClass = 'badge-vermelho'; }
 
         const badge = document.getElementById('statusBadge');
         badge.className = `result-badge ${badgeClass}`;
         badge.innerText = status === 'GREEN' ? '🟢 LIBERADO (VERDE)' : (status === 'YELLOW' ? '🟡 ATENÇÃO' : '🔴 INAPTO');
 
         document.getElementById('resultText').innerHTML = `
-            <strong>Tempo de Reação Médio:</strong> ${avgReactionMs}ms<br>
-            <strong>Toques Incorretos na Vermelha:</strong> ${vetoErrors}<br>
-            <span style="font-size:11px; color:#94a3b8;">Sincronizado com Render API • VFC 89ms (Linha de Base)</span>
+            <strong>Usuário:</strong> ${currentUser.name}<br>
+            <strong>Setor:</strong> ${currentUser.sector}<br>
+            <strong>Tempo de Reação:</strong> ${avgReactionMs}ms<br>
+            <strong>Erros de Veto:</strong> ${vetoErrors}
         `;
 
+        // SALVAR NO LOCAL STORAGE PARA O DASHBOARD LER INSTANTANEMENTE
+        const newRecord = {
+            id: currentUser.userId,
+            name: currentUser.name,
+            sector: currentUser.sector,
+            reaction_ms: avgReactionMs,
+            veto_errors: vetoErrors,
+            status: status,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        try {
+            let existing = JSON.parse(localStorage.getItem('srt_live_records') || '[]');
+            existing.unshift(newRecord);
+            localStorage.setItem('srt_live_records', JSON.stringify(existing));
+        } catch(e){}
+
+        // ENVIO PARA O RENDER
         try {
             await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    user_id: "FLAVIO_C_SUITE",
-                    name: "Flávio Veríssimo",
-                    provider: "Totem VSI/IDC",
-                    timestamp: new Date().toISOString(),
-                    telemetry: {
-                        hrv_rmssd_ms: 89,
-                        resting_hr_bpm: 62,
-                        sleep_score: 88,
-                        daily_stress_score: status === 'GREEN' ? 15 : (status === 'YELLOW' ? 55 : 85)
-                    }
+                    user_id: currentUser.userId,
+                    name: currentUser.name,
+                    sector: currentUser.sector,
+                    telemetry: { reaction_ms: avgReactionMs, veto_errors: vetoErrors, status: status }
                 })
             });
-        } catch (e) {
-            console.log('Enviado localmente');
-        }
+        } catch (e) {}
     }
 </script>
 
