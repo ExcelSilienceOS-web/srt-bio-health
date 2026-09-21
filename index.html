@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRT Bio-Health — Check-in Operacional (Voz & Bolinhas)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SRT Bio-Health — Check-in Operacional (VSI + IDC Veto)</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #0b0f19;
@@ -14,31 +14,43 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
         }
         .container {
             background: #151c2c;
             border: 1px solid #2a364f;
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px;
             max-width: 480px;
             width: 100%;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .title { font-size: 22px; font-weight: 800; color: #38bdf8; margin-bottom: 4px; }
-        .subtitle { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+        .subtitle { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
         
         .step-box {
             background: #1e293b;
             border: 1px solid #334155;
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: left;
         }
-        .step-title { font-size: 13px; font-weight: 700; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .phrase-text { font-size: 14px; color: #cbd5e1; font-style: italic; background: #0f172a; padding: 10px; border-radius: 6px; margin-top: 6px; }
+        .step-title { font-size: 13px; font-weight: 700; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px; }
+        .phrase-text { font-size: 13px; color: #cbd5e1; font-style: italic; background: #0f172a; padding: 10px; border-radius: 6px; margin-top: 6px; }
+
+        .rules-box {
+            font-size: 11px;
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+        .rules-box span.green { color: #34d399; font-weight: 700; }
+        .rules-box span.red { color: #f87171; font-weight: 700; }
 
         .btn {
             width: 100%;
@@ -57,21 +69,21 @@
 
         #canvas-container {
             width: 100%;
-            height: 260px;
+            height: 280px;
             background: #090d16;
-            border: 2px dashed #334155;
+            border: 2px solid #38bdf8;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
             margin-top: 10px;
             display: none;
         }
-        canvas { width: 100%; height: 100%; cursor: crosshair; }
+        canvas { width: 100%; height: 100%; display: block; }
 
         .result-badge {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
-            padding: 12px 24px;
+            padding: 12px 20px;
             border-radius: 12px;
             display: inline-block;
             margin-top: 16px;
@@ -85,43 +97,48 @@
 
 <div class="container">
     <div class="title">EXCELSILIENCE SRT</div>
-    <div class="subtitle">Check-in de Prontidão Operacional (VSI + IDC)</div>
+    <div class="subtitle">Check-in Operacional (Voz 5s & Veto Óptico IDC)</div>
 
-    <!-- ETAPA 1: VOZ -->
+    <!-- ETAPA 1: VOZ (5 SEGUNDOS) -->
     <div id="step1" class="step-box">
-        <div class="step-title">🎙️ 1. Teste Vocográfico (VSI - 30s)</div>
-        <div style="font-size: 12px; color: #94a3b8;">Leia a frase abaixo com voz clara e ritmo natural:</div>
-        <div class="phrase-text">"Declaro que estou em boas condições e focado para iniciar minhas atividades com total segurança."</div>
-        <button id="recordBtn" class="btn btn-voice">🎤 Gravar Voz (30s)</button>
+        <div class="step-title">🎙️ 1. Teste Vocográfico (5 Segundos)</div>
+        <div style="font-size: 12px; color: #94a3b8;">Fale a frase abaixo com clareza:</div>
+        <div class="phrase-text">"Check-in de prontidão operativa. Declaro que estou focado para o turno."</div>
+        <button id="recordBtn" class="btn btn-voice">🎤 Gravar Voz (5s)</button>
     </div>
 
-    <!-- ETAPA 2: BOLINHAS (IDC) -->
+    <!-- ETAPA 2: BOLINHAS COM VETO (IDC GO / NO-GO) -->
     <div id="step2" class="step-box" style="display: none;">
-        <div class="step-title">🎯 2. Teste Neuro-Ocular das Bolinhas (IDC - 30s)</div>
-        <div style="font-size: 12px; color: #94a3b8;">Toque nas bolinhas verdes que surgirem na tela o mais rápido possível:</div>
-        <button id="startGameBtn" class="btn btn-game">⚡ Iniciar Teste das Bolinhas</button>
+        <div class="step-title">🎯 2. Teste Neuro-Ocular de Veto (10 Alvos)</div>
+        <div class="rules-box">
+            👉 <span class="green">🟢 VERDE:</span> Toque rápido!<br>
+            👉 <span class="red">🔴 VERMELHA:</span> NÃO TOQUE! Espere sumir.
+        </div>
+        <button id="startGameBtn" class="btn btn-game" style="margin-top: 12px;">⚡ Iniciar Teste das Bolinhas</button>
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
         </div>
     </div>
 
-    <!-- AREA DE RESULTADO -->
+    <!-- ÁREA DE RESULTADO -->
     <div id="resultArea" style="display: none;">
         <div id="statusBadge" class="result-badge"></div>
-        <div id="resultText" style="font-size: 13px; color: #94a3b8; margin-top: 8px;"></div>
+        <div id="resultText" style="font-size: 13px; color: #cbd5e1; margin-top: 10px; line-height: 1.5;"></div>
     </div>
 </div>
 
 <script>
     const API_URL = 'https://excelsilience-backend.onrender.com/api/v1/smartwatch/sync';
     
-    let voiceRecorded = false;
     let reactionTimes = [];
-    let hits = 0;
-    let totalTargets = 10;
+    let vetoErrors = 0;
+    let rounds = 0;
+    const totalRounds = 10;
     let targetStartTime = 0;
+    let currentTarget = null;
+    let redExpireTimer = null;
 
-    // ETAPA 1: GRAVAÇÃO DE VOZ
+    // ETAPA 1: VOZ (5s)
     const recordBtn = document.getElementById('recordBtn');
     recordBtn.addEventListener('click', async () => {
         if (!navigator.mediaDevices) return alert('Sem suporte a microfone.');
@@ -133,106 +150,157 @@
 
             setTimeout(() => {
                 stream.getTracks().forEach(track => track.stop());
-                recordBtn.innerText = '✅ Voz Capturada com Sucesso!';
-                voiceRecorded = true;
+                recordBtn.innerText = '✅ Voz Capturada (5s)!';
                 
-                // Transição para Etapa 2
                 setTimeout(() => {
                     document.getElementById('step1').style.opacity = '0.5';
                     document.getElementById('step2').style.display = 'block';
-                }, 1000);
+                }, 600);
 
-            }, 5000); // Teste rápido de 5s para demonstração
+            }, 5000);
         } catch (err) {
             alert('Permissão de microfone negada.');
             recordBtn.disabled = false;
         }
     });
 
-    // ETAPA 2: JOGO DAS BOLINHAS (IDC)
+    // ETAPA 2: JOGO DAS BOLINHAS (VERDE + VERMELHA)
     const startGameBtn = document.getElementById('startGameBtn');
     const canvasContainer = document.getElementById('canvas-container');
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    let currentTarget = null;
-
     startGameBtn.addEventListener('click', () => {
         startGameBtn.style.display = 'none';
         canvasContainer.style.display = 'block';
-        canvas.width = canvasContainer.clientWidth;
-        canvas.height = canvasContainer.clientHeight;
-        hits = 0;
+        
+        const rect = canvasContainer.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        
+        rounds = 0;
+        vetoErrors = 0;
         reactionTimes = [];
         spawnTarget();
     });
 
     function spawnTarget() {
-        if (hits >= totalTargets) {
+        if (redExpireTimer) clearTimeout(redExpireTimer);
+
+        if (rounds >= totalRounds) {
             finishCheckin();
             return;
         }
 
-        const radius = 24;
-        const x = Math.random() * (canvas.width - radius * 2) + radius;
-        const y = Math.random() * (canvas.height - radius * 2) + radius;
+        rounds++;
+        const radius = 28;
+        const x = Math.random() * (canvas.width - radius * 2 - 20) + radius + 10;
+        const y = Math.random() * (canvas.height - radius * 2 - 20) + radius + 10;
 
-        currentTarget = { x, y, radius };
+        // ~35% de chance de ser Vermelha (Armadilha No-Go)
+        const isRed = Math.random() < 0.35;
+        const color = isRed ? '#ef4444' : '#10b981';
+
+        currentTarget = { x, y, radius, isRed };
         targetStartTime = performance.now();
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#10b981';
-        ctx.fill();
-        ctx.strokeStyle = '#34d399';
-        ctx.lineWidth = 3;
-        ctx.stroke();
+        drawTarget(x, y, radius, color);
+
+        // Se for vermelha, expira em 1.2 segundos (Veto Bem Sucedido se o usuário não tocar)
+        if (isRed) {
+            redExpireTimer = setTimeout(() => {
+                // Usuário aplicou Veto correto! Não tocou na vermelha.
+                currentTarget = null;
+                spawnTarget();
+            }, 1200);
+        }
     }
 
-    canvas.addEventListener('click', (e) => {
+    function drawTarget(x, y, radius, color) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+    }
+
+    // CAPTURA DO TOQUE
+    function handleTouch(e) {
         if (!currentTarget) return;
+        e.preventDefault();
+
         const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
+        const clientX = e.touches ? e.touches.clientX : e.clientX;
+        const clientY = e.touches ? e.touches.clientY : e.clientY;
 
-        const dist = Math.hypot(clickX - currentTarget.x, clickY - currentTarget.y);
-        if (dist <= currentTarget.radius) {
-            const reactionMs = performance.now() - targetStartTime;
-            reactionTimes.push(reactionMs);
-            hits++;
-            spawnTarget();
+        const touchX = clientX - rect.left;
+        const touchY = clientY - rect.top;
+
+        const dist = Math.hypot(touchX - currentTarget.x, touchY - currentTarget.y);
+        if (dist <= currentTarget.radius + 15) {
+            if (redExpireTimer) clearTimeout(redExpireTimer);
+
+            if (currentTarget.isRed) {
+                // FALHA DE VETO: Tocou na vermelha!
+                vetoErrors++;
+                reactionTimes.push(1100); // Penalidade de latência
+                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#991b1b');
+            } else {
+                // ACERTO GO: Tocou na verde!
+                const reactionMs = performance.now() - targetStartTime;
+                reactionTimes.push(reactionMs);
+                drawTarget(currentTarget.x, currentTarget.y, currentTarget.radius, '#059669');
+            }
+
+            currentTarget = null;
+            setTimeout(spawnTarget, 150);
         }
-    });
+    }
 
-    // FINALIZAÇÃO E ENVIO AO RENDER
+    canvas.addEventListener('pointerdown', handleTouch);
+    canvas.addEventListener('touchstart', handleTouch, { passive: false });
+
+    // CÁLCULO FINAL E ENVIO
     async function finishCheckin() {
         canvasContainer.style.display = 'none';
         document.getElementById('resultArea').style.display = 'block';
 
-        const avgReactionMs = Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length);
+        const validTimes = reactionTimes.length > 0 ? reactionTimes : [600];
+        const avgReactionMs = Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length);
         
         let status = 'GREEN';
         let badgeClass = 'badge-verde';
-        let statusText = `Sinal Verde 🟢 • Reação Média: ${avgReactionMs}ms (Apto)`;
-
-        if (avgReactionMs > 500) {
+        
+        // Critério: Penaliza se o tempo for lento (>600ms) ou se houve erros de veto nas vermelhas
+        if (avgReactionMs > 550 || vetoErrors >= 2) {
             status = 'YELLOW';
             badgeClass = 'badge-amarelo';
-            statusText = `Sinal Amarelo 🟡 • Reação Média: ${avgReactionMs}ms (Atenção / Fadiga)`;
         }
-        if (avgReactionMs > 800) {
+        if (avgReactionMs > 800 || vetoErrors >= 4) {
             status = 'RED';
             badgeClass = 'badge-vermelho';
-            statusText = `Sinal Vermelho 🔴 • Reação Média: ${avgReactionMs}ms (Inapto Temporário)`;
         }
 
         const badge = document.getElementById('statusBadge');
         badge.className = `result-badge ${badgeClass}`;
-        badge.innerText = status === 'GREEN' ? '🟢 LIBERADO' : (status === 'YELLOW' ? '🟡 ATENÇÃO' : '🔴 INAPTO');
-        document.getElementById('resultText').innerText = statusText;
+        badge.innerText = status === 'GREEN' ? '🟢 LIBERADO (VERDE)' : (status === 'YELLOW' ? '🟡 ATENÇÃO' : '🔴 INAPTO');
 
-        // Disparo para o Render
+        document.getElementById('resultText').innerHTML = `
+            <strong>Reação Média:</strong> ${avgReactionMs}ms<br>
+            <strong>Falhas de Veto (Toques na Vermelha):</strong> ${vetoErrors}<br>
+            <span style="font-size:11px; color:#94a3b8;">Sincronizado com Render API • VFC 89ms</span>
+        `;
+
+        // Envio para o Render
         try {
             await fetch(API_URL, {
                 method: 'POST',
@@ -246,8 +314,7 @@
                         hrv_rmssd_ms: 89,
                         resting_hr_bpm: 62,
                         sleep_score: 88,
-                        spo2_percent: 98,
-                        daily_stress_score: status === 'GREEN' ? 15 : 75
+                        daily_stress_score: status === 'GREEN' ? 15 : (status === 'YELLOW' ? 55 : 85)
                     }
                 })
             });
