@@ -200,7 +200,7 @@
 
         <!-- PASSO 5: RESULTADO -->
         <div id="stepResult" class="step">
-            <div id="syncStatus" class="sync-banner sync-loading">⏳ Enviando diagnóstico ao CCO...</div>
+            <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando com o CCO...</div>
             <div id="resultBadge" class="badge-status">--</div>
             <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
                 <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
@@ -214,6 +214,7 @@
 
     <script>
         const API_URL = 'https://excelsilience-backend.onrender.com/api/v1/smartwatch/sync';
+        const PING_URL = 'https://excelsilience-backend.onrender.com/ping';
 
         let userData = {};
         let currentRound = 0;
@@ -224,6 +225,22 @@
         let ballTimer = null;
         let ballHandled = false;
         let lastPayload = null;
+
+        // WARM-UP AUTOMÁTICO: Dispara o sinal assim que abre a página para já ir ligando o Render
+        window.onload = () => {
+            fetch(PING_URL).catch(() => {});
+
+            const cache = localStorage.getItem('srt_user_cache');
+            if (cache) {
+                try {
+                    const u = JSON.parse(cache);
+                    if (u.name) document.getElementById('txtName').value = u.name;
+                    if (u.whatsapp) document.getElementById('txtWA').value = u.whatsapp;
+                    if (u.company) document.getElementById('txtEmpresa').value = u.company;
+                    if (u.sector) document.getElementById('txtSetor').value = u.sector;
+                } catch(e){}
+            }
+        };
 
         function startCheckin() {
             const name = document.getElementById('txtName').value.trim();
@@ -242,19 +259,6 @@
             document.getElementById('stepForm').classList.remove('active');
             document.getElementById('stepVoz').classList.add('active');
         }
-
-        window.onload = () => {
-            const cache = localStorage.getItem('srt_user_cache');
-            if (cache) {
-                try {
-                    const u = JSON.parse(cache);
-                    if (u.name) document.getElementById('txtName').value = u.name;
-                    if (u.whatsapp) document.getElementById('txtWA').value = u.whatsapp;
-                    if (u.company) document.getElementById('txtEmpresa').value = u.company;
-                    if (u.sector) document.getElementById('txtSetor').value = u.sector;
-                } catch(e){}
-            }
-        };
 
         function runAudioTest() {
             const btn = document.getElementById('btnRec');
@@ -381,29 +385,24 @@
         async function sendDataToBackend() {
             const syncElem = document.getElementById('syncStatus');
             syncElem.className = 'sync-banner sync-loading';
-            syncElem.innerText = '⏳ Conectando ao CCO (aguarde até 30s)...';
+            syncElem.innerText = '⏳ Sincronizando com o CCO...';
 
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 60000);
-
                 const res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(lastPayload),
-                    signal: controller.signal
+                    body: JSON.stringify(lastPayload)
                 });
-                clearTimeout(timeoutId);
 
                 if (res.ok) {
                     syncElem.className = 'sync-banner sync-success';
                     syncElem.innerText = '✅ Diagnóstico Registrado no CCO com Sucesso!';
                 } else {
-                    throw new Error('Servidor retornou erro');
+                    throw new Error('Falha no servidor');
                 }
             } catch (e) {
                 syncElem.className = 'sync-banner sync-error';
-                syncElem.innerText = '⚠️ Servidor em repouso. Clique AQUI para Reenviar!';
+                syncElem.innerText = '⚠️ Clique AQUI para Reenviar ao CCO';
                 syncElem.onclick = sendDataToBackend;
             }
         }
