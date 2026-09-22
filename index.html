@@ -112,7 +112,7 @@
         .ball-red { background: #ef4444; border: 2px solid #f87171; }
 
         .badge-status {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             text-align: center;
             padding: 16px;
@@ -122,6 +122,7 @@
         .status-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
         .status-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
         .status-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .status-purple { background: rgba(192, 132, 252, 0.2); color: #c084fc; border: 1px solid #a855f7; }
 
         .sync-banner {
             padding: 10px;
@@ -134,6 +135,16 @@
         .sync-loading { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
         .sync-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
         .sync-error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; cursor: pointer; }
+
+        .conduta-box {
+            background: #0f172a;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            margin-bottom: 16px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -142,6 +153,11 @@
         <div class="logo-title">
             <h1>EXCELSILIENCE SRT</h1>
             <p>Telemetria de Prontidão — Módulo Mobility</p>
+        </div>
+
+        <!-- TELA DE BLOQUEIO / AVISO DE TRAVA (EXIBIDA QUANDO ESTIVER EM PAUSA OU VETO) -->
+        <div id="stepLockout" class="step">
+            <div id="lockoutCard"></div>
         </div>
 
         <!-- PASSO 1: IDENTIFICAÇÃO OBRIGATÓRIA -->
@@ -202,6 +218,9 @@
         <div id="stepResult" class="step">
             <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando com o CCO...</div>
             <div id="resultBadge" class="badge-status">--</div>
+            
+            <div id="condutaCard" class="conduta-box">--</div>
+
             <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
                 <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
                 <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
@@ -227,6 +246,26 @@
         let lastPayload = null;
 
         window.onload = () => {
+            // 1. VERIFICA SE HÁ BLOQUEIO PRESENCIAL DA EMPRESA (Inibição / Álcool / Drogas)
+            const lockCompany = localStorage.getItem('srt_lock_company');
+            if (lockCompany === 'true') {
+                exibirBloqueioEmpresa();
+                return;
+            }
+
+            // 2. VERIFICA SE HÁ TRAVA TEMPORIZADA DE RE-TESTE (Pausa Tática ou Sono)
+            const lockUntil = localStorage.getItem('srt_lock_until');
+            if (lockUntil) {
+                const diff = parseInt(lockUntil) - Date.now();
+                if (diff > 0) {
+                    exibirBloqueioTempo(Math.ceil(diff / 60000));
+                    return;
+                } else {
+                    localStorage.removeItem('srt_lock_until');
+                }
+            }
+
+            // 3. CARREGA DADOS EM CACHE
             const cache = localStorage.getItem('srt_user_cache');
             if (cache) {
                 try {
@@ -238,6 +277,44 @@
                 } catch(e){}
             }
         };
+
+        function exibirBloqueioEmpresa() {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            const lockStep = document.getElementById('stepLockout');
+            lockStep.classList.add('active');
+            document.getElementById('lockoutCard').innerHTML = `
+                <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
+                    <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
+                    <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
+                        Identificada <b>Disfunção no Controle Inibitório Neuromotor</b>.<br><br>
+                        Por normas de segurança e conformidade (NR-01/NR-17), <b>este aplicativo está bloqueado para novos re-testes automáticos</b>.
+                    </p>
+                    <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
+                        👉 Apresente-se imediatamente ao Supervisor / SESMT no CCO para avaliação presencial.
+                    </div>
+                </div>
+            `;
+        }
+
+        function exibirBloqueioTempo(minutosRestantes) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            const lockStep = document.getElementById('stepLockout');
+            lockStep.classList.add('active');
+            document.getElementById('lockoutCard').innerHTML = `
+                <div style="background:rgba(245, 158, 11, 0.15); border:2px solid #f59e0b; border-radius:12px; padding:20px; text-align:center;">
+                    <h3 style="color:#fbbf24; margin-bottom:12px; font-size:18px;">⏳ PAUSA OBRIGATÓRIA EM ANDAMENTO</h3>
+                    <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
+                        Você está no intervalo compulsório de recuperação de prontidão.
+                    </p>
+                    <div style="background:#0f172a; padding:16px; border-radius:8px; border:1px solid #334155; font-size:20px; color:#38bdf8; font-weight:800; margin-bottom:14px;">
+                        Tempo Restante: ${minutosRestantes} min
+                    </div>
+                    <p style="font-size:12px; color:#94a3b8;">
+                        Aproveite este tempo para se hidratar, lavar o rosto ou descansar. O sistema liberará o re-teste após o término da contagem.
+                    </p>
+                </div>
+            `;
+        }
 
         function startCheckin() {
             const name = document.getElementById('txtName').value.trim();
@@ -343,21 +420,64 @@
             let status = 'GREEN';
             let badgeText = '🟢 LIBERADO PARA OPERAR';
             let badgeClass = 'status-green';
+            let condutaHtml = '';
 
-            if (avgReaction > 700 || gameErrors >= 2) {
-                status = 'YELLOW';
-                badgeText = '🟡 ATENÇÃO REDOBRADA';
-                badgeClass = 'status-yellow';
-            }
-            if (avgReaction > 950 || gameErrors >= 4) {
+            // 1. CLASSIFICAÇÃO DOS VETORES E DEFINIÇÃO DAS TRAVAS
+            if (gameErrors >= 2) {
+                // RED / INIBIÇÃO (ÁLCOOL / DROGAS / IMPULSIVIDADE CRÍTICA)
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
                 badgeClass = 'status-red';
+                condutaHtml = `
+                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
+                    <div>Identificada disfunção no controle inibitório. <b>Re-teste automático bloqueado</b>. Dirija-se imediatamente à Supervisão / CCO para avaliação presencial.</div>
+                `;
+                // BLOQUEIO PERMANENTE NO CELULAR (Apenas a empresa destrava via CCO)
+                localStorage.setItem('srt_lock_company', 'true');
+
+            } else if (avgReaction > 950) {
+                // EXAUSTÃO SEVERA / PRIVACÃO DE SONO (ROXO)
+                status = 'RED';
+                badgeText = '🟣 EXAUSTÃO SEVERA / SONO (INAPTO)';
+                badgeClass = 'status-purple';
+                condutaHtml = `
+                    <div style="color:#c084fc; font-weight:800; margin-bottom:4px;">🟣 AJUSTE DE CONDUTA: PAUSA DE EXAUSTÃO (45 MIN)</div>
+                    <div>Sincronia neurofisiológica degradada por privação de sono. Faça um descanso/descompressão obrigatório de <b>45 minutos</b> antes do re-teste.</div>
+                `;
+                // BLOQUEIO TEMPORIZADO DE 45 MINUTOS
+                localStorage.setItem('srt_lock_until', Date.now() + 45 * 60 * 1000);
+
+            } else if (avgReaction > 700) {
+                // AMARILO / SOBRECARGA AUTONÔMICA / ESTRESSE
+                status = 'YELLOW';
+                badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
+                badgeClass = 'status-yellow';
+                condutaHtml = `
+                    <div style="color:#fbbf24; font-weight:800; margin-bottom:4px;">🟡 AJUSTE DE CONDUTA: PAUSA TÁTICA (15 MIN)</div>
+                    <div>Faça uma pausa de <b>10 a 15 minutos</b> (tome uma água, lave o rosto). Somente após esse intervalo faça o re-teste. Se mantido Amarelo, o CCO prestará suporte no turno.</div>
+                `;
+                // BLOQUEIO TEMPORIZADO DE 15 MINUTOS
+                localStorage.setItem('srt_lock_until', Date.now() + 15 * 60 * 1000);
+
+            } else {
+                // VERDE / HOMEOSTASE PRESERVADA
+                status = 'GREEN';
+                badgeText = '🟢 LIBERADO PARA OPERAR';
+                badgeClass = 'status-green';
+                condutaHtml = `
+                    <div style="color:#34d399; font-weight:800; margin-bottom:4px;">✅ HOMEOSTASE PRESERVADA</div>
+                    <div>Parâmetros biométricos de foco e velocidade ideais. Liberado para operação padrão com segurança.</div>
+                `;
+                // LIMPA TRAVAS SE ESTIVER VERDE
+                localStorage.removeItem('srt_lock_until');
+                localStorage.removeItem('srt_lock_company');
             }
 
             const badgeElem = document.getElementById('resultBadge');
             badgeElem.innerText = badgeText;
             badgeElem.className = `badge-status ${badgeClass}`;
+
+            document.getElementById('condutaCard').innerHTML = condutaHtml;
 
             document.getElementById('resName').innerText = userData.name;
             document.getElementById('resEmpresa').innerText = userData.company;
@@ -384,7 +504,7 @@
         async function sendDataToBackend() {
             const syncElem = document.getElementById('syncStatus');
             syncElem.className = 'sync-banner sync-loading';
-            syncElem.innerText = '⏳ Gravação Direta na Nuvem CCO...';
+            syncElem.innerText = '⏳ Sincronizando com o CCO...';
 
             try {
                 const res = await fetch(SUPABASE_URL, {
