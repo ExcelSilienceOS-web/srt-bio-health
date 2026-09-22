@@ -122,7 +122,6 @@
         .status-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
         .status-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
         .status-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-        .status-purple { background: rgba(192, 132, 252, 0.2); color: #c084fc; border: 1px solid #a855f7; }
 
         .sync-banner {
             padding: 10px;
@@ -155,7 +154,7 @@
             <p>Telemetria de Prontidão — Módulo Mobility</p>
         </div>
 
-        <!-- TELA DE BLOQUEIO / AVISO DE TRAVA (EXIBIDA QUANDO ESTIVER EM PAUSA OU VETO) -->
+        <!-- TELA DE BLOQUEIO / AVISO DE TRAVA -->
         <div id="stepLockout" class="step">
             <div id="lockoutCard"></div>
         </div>
@@ -174,7 +173,7 @@
             <label for="txtSetor">Setor / Placa do Veículo:</label>
             <input type="text" id="txtSetor" placeholder="Ex: Frota 01 / Caminhão ABC-1234" required>
 
-            <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão (30s) 🚀</button>
+            <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão 🚀</button>
         </div>
 
         <!-- PASSO 2: TESTE DE VOZ -->
@@ -205,10 +204,10 @@
             <button class="btn" onclick="startGame()">Entendi, Começar Teste! 🎯</button>
         </div>
 
-        <!-- PASSO 4: O JOGO DAS BOLINHAS -->
+        <!-- PASSO 4: O JOGO DAS BOLINHAS (AGORA COM 8 RODADAS) -->
         <div id="stepBolinhas" class="step">
             <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
-                <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 5</b></span>
+                <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
                 <span>Erros de Veto: <b id="lblErrors" style="color:#ef4444;">0</b></span>
             </div>
             <div class="game-box" id="gameArea"></div>
@@ -237,7 +236,9 @@
 
         let userData = {};
         let currentRound = 0;
-        const TOTAL_ROUNDS = 5;
+        const TOTAL_ROUNDS = 8; // Aumentado para 8 rodadas (+5 segundos de teste)
+        const BALL_SPEED_MS = 1425; // 5% mais rápido que os 1500ms anteriores
+
         let gameErrors = 0;
         let reactionTimes = [];
         let ballSpawnTime = 0;
@@ -246,14 +247,12 @@
         let lastPayload = null;
 
         window.onload = () => {
-            // 1. VERIFICA SE HÁ BLOQUEIO PRESENCIAL DA EMPRESA (Inibição / Álcool / Drogas)
             const lockCompany = localStorage.getItem('srt_lock_company');
             if (lockCompany === 'true') {
                 exibirBloqueioEmpresa();
                 return;
             }
 
-            // 2. VERIFICA SE HÁ TRAVA TEMPORIZADA DE RE-TESTE (Pausa Tática ou Sono)
             const lockUntil = localStorage.getItem('srt_lock_until');
             if (lockUntil) {
                 const diff = parseInt(lockUntil) - Date.now();
@@ -265,7 +264,6 @@
                 }
             }
 
-            // 3. CARREGA DADOS EM CACHE
             const cache = localStorage.getItem('srt_user_cache');
             if (cache) {
                 try {
@@ -286,7 +284,7 @@
                 <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
                     <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
                     <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Identificada <b>Disfunção no Controle Inibitório Neuromotor</b>.<br><br>
+                        Identificada <b>Disfunção no Controle Inibitório ou Desaceleração Neuromotora Crítica</b>.<br><br>
                         Por normas de segurança e conformidade (NR-01/NR-17), <b>este aplicativo está bloqueado para novos re-testes automáticos</b>.
                     </p>
                     <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
@@ -310,7 +308,7 @@
                         Tempo Restante: ${minutosRestantes} min
                     </div>
                     <p style="font-size:12px; color:#94a3b8;">
-                        Aproveite este tempo para se hidratar, lavar o rosto ou descansar. O sistema liberará o re-teste após o término da contagem.
+                        Aproveite para se hidratar e lavar o rosto. O sistema liberará o re-teste após o término da contagem.
                     </p>
                 </div>
             `;
@@ -370,7 +368,7 @@
             document.getElementById('lblErrors').innerText = gameErrors;
 
             ballHandled = false;
-            const isGreen = Math.random() > 0.3;
+            const isGreen = Math.random() > 0.35; // Probabilidade ligeiramente maior de bolinhas para testar inibição
             const ball = document.createElement('div');
             ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
 
@@ -399,13 +397,14 @@
             ball.addEventListener('click', handleTouch);
             gameArea.appendChild(ball);
 
+            // Tempo limite ajustado (1.425 ms - 5% mais rápido)
             ballTimer = setTimeout(() => {
                 if (!ballHandled) {
                     ballHandled = true;
-                    if (isGreen) reactionTimes.push(1500);
+                    if (isGreen) reactionTimes.push(1425);
                     spawnNextBall();
                 }
-            }, 1500);
+            }, BALL_SPEED_MS);
         }
 
         async function finishTest() {
@@ -422,45 +421,31 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            // 1. CLASSIFICAÇÃO DOS VETORES E DEFINIÇÃO DAS TRAVAS
-            if (gameErrors >= 2) {
-                // RED / INIBIÇÃO (ÁLCOOL / DROGAS / IMPULSIVIDADE CRÍTICA)
+            // CALIBRAÇÃO RÍGIDA DE TOLERÂNCIA ZERO:
+            // 1 Erro de Veto na Bolinha Vermelha OU Média de Reação > 750 ms gera SINAL VERMELHO
+            if (gameErrors >= 1 || avgReaction > 750) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
                 badgeClass = 'status-red';
                 condutaHtml = `
                     <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
-                    <div>Identificada disfunção no controle inibitório. <b>Re-teste automático bloqueado</b>. Dirija-se imediatamente à Supervisão / CCO para avaliação presencial.</div>
+                    <div>Identificada disfunção no controle inibitório ou lentidão de reflexo crítica (> 750ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão / CCO.</div>
                 `;
-                // BLOQUEIO PERMANENTE NO CELULAR (Apenas a empresa destrava via CCO)
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (avgReaction > 950) {
-                // EXAUSTÃO SEVERA / PRIVACÃO DE SONO (ROXO)
-                status = 'RED';
-                badgeText = '🟣 EXAUSTÃO SEVERA / SONO (INAPTO)';
-                badgeClass = 'status-purple';
-                condutaHtml = `
-                    <div style="color:#c084fc; font-weight:800; margin-bottom:4px;">🟣 AJUSTE DE CONDUTA: PAUSA DE EXAUSTÃO (45 MIN)</div>
-                    <div>Sincronia neurofisiológica degradada por privação de sono. Faça um descanso/descompressão obrigatório de <b>45 minutos</b> antes do re-teste.</div>
-                `;
-                // BLOQUEIO TEMPORIZADO DE 45 MINUTOS
-                localStorage.setItem('srt_lock_until', Date.now() + 45 * 60 * 1000);
-
-            } else if (avgReaction > 700) {
-                // AMARILO / SOBRECARGA AUTONÔMICA / ESTRESSE
+            } else if (avgReaction > 600) {
+                // SINAL AMARELO: Reação entre 601ms e 750ms
                 status = 'YELLOW';
                 badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
                 badgeClass = 'status-yellow';
                 condutaHtml = `
                     <div style="color:#fbbf24; font-weight:800; margin-bottom:4px;">🟡 AJUSTE DE CONDUTA: PAUSA TÁTICA (15 MIN)</div>
-                    <div>Faça uma pausa de <b>10 a 15 minutos</b> (tome uma água, lave o rosto). Somente após esse intervalo faça o re-teste. Se mantido Amarelo, o CCO prestará suporte no turno.</div>
+                    <div>Faça uma pausa de <b>10 a 15 minutos</b> (tome uma água, lave o rosto). Somente após o término do cronômetro faça o re-teste no celular.</div>
                 `;
-                // BLOQUEIO TEMPORIZADO DE 15 MINUTOS
                 localStorage.setItem('srt_lock_until', Date.now() + 15 * 60 * 1000);
 
             } else {
-                // VERDE / HOMEOSTASE PRESERVADA
+                // SINAL VERDE: Reação <= 600ms e 0 Erros
                 status = 'GREEN';
                 badgeText = '🟢 LIBERADO PARA OPERAR';
                 badgeClass = 'status-green';
@@ -468,7 +453,6 @@
                     <div style="color:#34d399; font-weight:800; margin-bottom:4px;">✅ HOMEOSTASE PRESERVADA</div>
                     <div>Parâmetros biométricos de foco e velocidade ideais. Liberado para operação padrão com segurança.</div>
                 `;
-                // LIMPA TRAVAS SE ESTIVER VERDE
                 localStorage.removeItem('srt_lock_until');
                 localStorage.removeItem('srt_lock_company');
             }
