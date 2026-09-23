@@ -264,7 +264,7 @@
         let userData = {};
         let currentRound = 0;
         const TOTAL_ROUNDS = 8;
-        const BALL_SPEED_MS = 1550; // Tempo de exibição mais confortável
+        const BALL_SPEED_MS = 1550;
 
         let gameErrors = 0;
         let reactionTimes = [];
@@ -274,6 +274,12 @@
         let lastPayload = null;
         let photoCaptured = false;
         let mediaStream = null;
+
+        // VSI Web Audio API Variables
+        let audioCtx, analyser, microphone, dataArray;
+        let audioEnergySamples = [];
+        let audioInterval = null;
+        let computedVsiStatus = '🟢 Voz Estável (VSI 1.2 / Estresse Baixo)';
 
         window.onload = () => {
             const lockCompany = localStorage.getItem('srt_lock_company');
@@ -361,17 +367,28 @@
             document.getElementById('stepVoz').classList.add('active');
 
             try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" },
+                    audio: true 
+                });
                 const videoElem = document.getElementById('webcam');
                 videoElem.srcObject = mediaStream;
+
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                microphone = audioCtx.createMediaStreamSource(mediaStream);
+                microphone.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+
             } catch (err) {
-                console.warn('Câmera indisponível:', err);
+                console.warn('Câmera ou Microfone indisponível:', err);
             }
         }
 
         function runAudioAndFaceTest() {
             const btn = document.getElementById('btnRec');
-            btn.innerText = '📸 Gravando Rosto e Voz... (5s)';
+            btn.innerText = '🎙️ Analisando Espectro Vocal e Rosto... (5s)';
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
@@ -385,13 +402,59 @@
                 photoCaptured = false;
             }
 
+            audioEnergySamples = [];
+            if (analyser) {
+                audioInterval = setInterval(() => {
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) {
+                        sum += dataArray[i];
+                    }
+                    let avg = sum / dataArray.length;
+                    audioEnergySamples.push(avg);
+                }, 100);
+            }
+
             setTimeout(() => {
+                if (audioInterval) clearInterval(audioInterval);
+
+                calcularVSI();
+
                 if (mediaStream) {
                     mediaStream.getTracks().forEach(track => track.stop());
                 }
                 document.getElementById('stepVoz').classList.remove('active');
                 document.getElementById('stepInstruction').classList.add('active');
             }, 5000);
+        }
+
+        function calcularVSI() {
+            if (!audioEnergySamples || audioEnergySamples.length === 0) {
+                computedVsiStatus = '🟡 Ausência de Áudio / Silêncio';
+                return;
+            }
+
+            let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
+            let mean = sum / audioEnergySamples.length;
+
+            if (mean < 3) {
+                computedVsiStatus = '🟡 Voz Muito Baixa / Silêncio Detectado';
+                return;
+            }
+
+            let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
+            let stdDev = Math.sqrt(variance);
+
+            let cv = stdDev / (mean + 1);
+            let vsiScore = (1.0 + cv * 4).toFixed(1);
+
+            if (vsiScore <= 1.8) {
+                computedVsiStatus = `🟢 Voz Estável (VSI ${vsiScore} / Estresse Baixo)`;
+            } else if (vsiScore <= 2.8) {
+                computedVsiStatus = `🟡 Estresse Laríngeo Moderado (VSI ${vsiScore})`;
+            } else {
+                computedVsiStatus = `🔴 Alta Flutuação Laríngea (VSI ${vsiScore} / Estresse Simpático)`;
+            }
         }
 
         function startGame() {
@@ -470,7 +533,6 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            // CORTES AJUSTADOS (VERDE ATÉ 650 ms):
             if (gameErrors >= 1 || avgReaction > 800) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
@@ -481,7 +543,7 @@
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (avgReaction > 650) {
+            } else if (avgReaction > 650 || computedVsiStatus.includes('🟡')) {
                 status = 'YELLOW';
                 badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
                 badgeClass = 'status-yellow';
@@ -513,11 +575,9 @@
                 ? '✅ Confirmado (Biometria Facial / Foto Registrada)' 
                 : '✅ Confirmado (Identificação Nominal)';
 
-            const vozStatusText = '🟢 Voz Estável (VSI 1.2 / Estresse Baixo)';
-
             document.getElementById('resName').innerText = userData.name;
             document.getElementById('resBiometria').innerText = confirmStatusText;
-            document.getElementById('resVoz').innerText = vozStatusText;
+            document.getElementById('resVoz').innerText = computedVsiStatus;
             document.getElementById('resEmpresa').innerText = userData.company;
             document.getElementById('resReaction').innerText = avgReaction;
             document.getElementById('resErrors').innerText = gameErrors;
@@ -535,7 +595,7 @@
                 veto_errors: gameErrors,
                 status: status,
                 driver_confirmation: confirmStatusText,
-                vsi_status: vozStatusText
+                vsi_status: computedVsiStatus
             };
 
             sendDataToBackend();
