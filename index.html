@@ -288,7 +288,6 @@
 
         // Biometria Facial & VSI
         let faceMatchPassed = true;
-        let currentFaceData = null;
         let audioCtx, analyser, microphone, dataArray;
         let audioEnergySamples = [];
         let audioInterval = null;
@@ -296,6 +295,15 @@
         let computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada)';
 
         window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('reset') === '1' || urlParams.get('reset') === 'true') {
+                localStorage.removeItem('srt_lock_company');
+                localStorage.removeItem('srt_lock_until');
+                localStorage.removeItem('srt_baseline_face');
+                alert('🔓 Aplicativo desbloqueado e redefinido com sucesso!');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             const lockCompany = localStorage.getItem('srt_lock_company');
             if (lockCompany === 'true') {
                 exibirBloqueioEmpresa();
@@ -329,7 +337,15 @@
             localStorage.removeItem('srt_baseline_face');
             localStorage.removeItem('srt_lock_company');
             localStorage.removeItem('srt_lock_until');
-            alert(' Biometria de Referência do Titular limpa com sucesso! O próximo teste cadastrará o novo Rosto Titular.');
+            alert(' Biometria de Referência do Titular limpa! O próximo teste cadastrará o novo Rosto Titular.');
+        }
+
+        function desbloquearModoDemo() {
+            localStorage.removeItem('srt_lock_company');
+            localStorage.removeItem('srt_lock_until');
+            localStorage.removeItem('srt_baseline_face');
+            alert('🔓 Trava removida com sucesso!');
+            location.reload();
         }
 
         function exibirBloqueioEmpresa() {
@@ -340,12 +356,13 @@
                 <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
                     <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
                     <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Identificada <b>Disfunção Biometrica ou Inaptidão Neuromotora Crítica</b>.<br><br>
+                        Identificada <b>Disfunção Biométrica ou Inaptidão Neuromotora Crítica</b>.<br><br>
                         Por normas de segurança (NR-01/NR-17), <b>este aplicativo está bloqueado no celular</b>.
                     </p>
                     <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
                         👉 Apresente-se ao Supervisor / CCO para avaliação presencial.
                     </div>
+                    <button class="btn-reset" onclick="desbloquearModoDemo()">🔓 Desbloquear Modo Demonstração</button>
                 </div>
             `;
         }
@@ -363,6 +380,7 @@
                     <div style="background:#0f172a; padding:16px; border-radius:8px; border:1px solid #334155; font-size:20px; color:#38bdf8; font-weight:800; margin-bottom:14px;">
                         Tempo Restante: ${minutosRestantes} min
                     </div>
+                    <button class="btn-reset" onclick="desbloquearModoDemo()">🔓 Desbloquear Modo Demonstração</button>
                 </div>
             `;
         }
@@ -410,7 +428,6 @@
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
-            // Processamento da Imagem e Comparação Facial
             try {
                 const videoElem = document.getElementById('webcam');
                 const canvasElem = document.getElementById('photoCanvas');
@@ -422,7 +439,6 @@
 
                 const baselineStr = localStorage.getItem('srt_baseline_face');
                 if (!baselineStr) {
-                    // Cadastra a primeira foto como referência do Titular
                     localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
                     faceMatchPassed = true;
                     computedDriverConfirm = '✅ Confirmado (Biometria Facial do Titular Cadastrada)';
@@ -430,7 +446,6 @@
                     const baselineVector = JSON.parse(baselineStr);
                     const diffScore = calculateImageDifference(featureVector, baselineVector);
 
-                    // Se a diferença for significativa (> 22%), detecta rosto de outra pessoa
                     if (diffScore > 0.22) {
                         faceMatchPassed = false;
                         computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
@@ -445,7 +460,6 @@
                 computedDriverConfirm = '✅ Confirmado (Biometria Facial de Referência)';
             }
 
-            // Análise Espectrograma de Voz
             audioEnergySamples = [];
             if (analyser) {
                 audioInterval = setInterval(() => {
@@ -472,7 +486,6 @@
             }, 5000);
         }
 
-        // Algoritmo de Extração de Feições
         function extractImageFeatures(imgData) {
             const data = imgData.data;
             let blocks = [];
@@ -598,7 +611,6 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            // REGRA DA DUPLA CHECAGEM: Se o rosto for diferente OU houver erro de veto motor
             if (!faceMatchPassed) {
                 status = 'RED';
                 badgeText = '🔴 VETO OPERACIONAL PRESENCIAL';
