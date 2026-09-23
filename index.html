@@ -251,7 +251,7 @@
                 <p style="margin-bottom:6px;">🎙️ <b>Análise de Voz:</b> <span id="resVoz" style="color:#38bdf8; font-weight:700;">--</span></p>
                 <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
                 <p style="margin-bottom:6px;">⚡ <b>Tempo de Reação:</b> <span id="resReaction" style="color:#38bdf8; font-weight:700;">--</span> ms</p>
-                <p>🎯 <b>Erros de Veto:</b> <span id="resErrors" style="color:#ef4444; font-weight:700;">--</span></p>
+                <p>🎯 <b>Erros de Veto Motor:</b> <span id="resErrors" style="color:#ef4444; font-weight:700;">--</span></p>
             </div>
             <button class="btn" onclick="location.reload()">🔄 Concluir e Sair</button>
         </div>
@@ -539,7 +539,7 @@
                 badgeClass = 'status-red';
                 condutaHtml = `
                     <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
-                    <div>Identificada disfunção no controle inibitório ou lentidão de reflexo crítica (> 800ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão / CCO.</div>
+                    <div>Identificada disfunção no controle inibitório ou desaceleração neuromotora crítica (> 800ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão / CCO.</div>
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
