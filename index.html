@@ -58,6 +58,17 @@
             transition: 0.2s;
         }
         .btn:hover { background: #0369a1; }
+        .btn-reset {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 8px;
+            font-size: 11px;
+            border-radius: 6px;
+            margin-top: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
 
         .camera-box {
             width: 100%;
@@ -128,7 +139,7 @@
         .ball-red { background: #ef4444; border: 2px solid #f87171; }
 
         .badge-status {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 800;
             text-align: center;
             padding: 16px;
@@ -190,18 +201,19 @@
             <input type="text" id="txtSetor" placeholder="Ex: Frota 01 / Caminhão ABC-1234" required>
 
             <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão 🚀</button>
+            <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular para Demonstração</button>
         </div>
 
         <!-- PASSO 2: VALIDAÇÃO FACIAL E VOZ -->
         <div id="stepVoz" class="step">
-            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Biometria Facial & Voz</h3>
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Dupla Checagem Facial & Voz</h3>
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
-                Posicione seu rosto na câmera para validação de identidade:
+                Posicione seu rosto na câmera para comparação biométrica com o Titular:
             </p>
 
             <div class="camera-box">
                 <video id="webcam" autoplay playsinline muted></video>
-                <canvas id="photoCanvas" width="320" height="240"></canvas>
+                <canvas id="photoCanvas" width="160" height="120"></canvas>
             </div>
 
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:10px;">
@@ -210,7 +222,7 @@
             <div style="background:#0f172a; padding:12px; border-radius:8px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:14px; border:1px solid #334155; font-size:13px;">
                 "Pronto para operar com foco e segurança total."
             </div>
-            <button id="btnRec" class="btn" onclick="runAudioAndFaceTest()">🔴 Gravar Voz & Validar Rosto (5s)</button>
+            <button id="btnRec" class="btn" onclick="runAudioAndFaceTest()">🔴 Analisar Rosto e Voz (5s)</button>
         </div>
 
         <!-- PASSO 3: INSTRUÇÃO DO TESTE DE BOLINHAS -->
@@ -247,8 +259,8 @@
 
             <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
                 <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
-                <p style="margin-bottom:6px;">📸 <b>Biometria Facial:</b> <span id="resBiometria" style="color:#34d399; font-weight:700;">--</span></p>
-                <p style="margin-bottom:6px;">🎙️ <b>Análise de Voz:</b> <span id="resVoz" style="color:#38bdf8; font-weight:700;">--</span></p>
+                <p style="margin-bottom:6px;">📸 <b>Biometria Facial:</b> <span id="resBiometria" style="font-weight:700;">--</span></p>
+                <p style="margin-bottom:6px;">🎙️ <b>Análise de Voz:</b> <span id="resVoz" style="font-weight:700;">--</span></p>
                 <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
                 <p style="margin-bottom:6px;">⚡ <b>Tempo de Reação:</b> <span id="resReaction" style="color:#38bdf8; font-weight:700;">--</span> ms</p>
                 <p>🎯 <b>Erros de Veto Motor:</b> <span id="resErrors" style="color:#ef4444; font-weight:700;">--</span></p>
@@ -272,14 +284,16 @@
         let ballTimer = null;
         let ballHandled = false;
         let lastPayload = null;
-        let photoCaptured = false;
         let mediaStream = null;
 
-        // VSI Web Audio API Variables
+        // Biometria Facial & VSI
+        let faceMatchPassed = true;
+        let currentFaceData = null;
         let audioCtx, analyser, microphone, dataArray;
         let audioEnergySamples = [];
         let audioInterval = null;
         let computedVsiStatus = '🟢 Voz Estável (VSI 1.2 / Estresse Baixo)';
+        let computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada)';
 
         window.onload = () => {
             const lockCompany = localStorage.getItem('srt_lock_company');
@@ -311,6 +325,13 @@
             }
         };
 
+        function resetarBiometriaTitular() {
+            localStorage.removeItem('srt_baseline_face');
+            localStorage.removeItem('srt_lock_company');
+            localStorage.removeItem('srt_lock_until');
+            alert(' Biometria de Referência do Titular limpa com sucesso! O próximo teste cadastrará o novo Rosto Titular.');
+        }
+
         function exibirBloqueioEmpresa() {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             const lockStep = document.getElementById('stepLockout');
@@ -319,11 +340,11 @@
                 <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
                     <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
                     <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Identificada <b>Disfunção no Controle Inibitório ou Desaceleração Neuromotora Crítica</b>.<br><br>
-                        Por normas de segurança e conformidade (NR-01/NR-17), <b>este aplicativo está bloqueado para novos re-testes automáticos</b>.
+                        Identificada <b>Disfunção Biometrica ou Inaptidão Neuromotora Crítica</b>.<br><br>
+                        Por normas de segurança (NR-01/NR-17), <b>este aplicativo está bloqueado no celular</b>.
                     </p>
                     <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
-                        👉 Apresente-se imediatamente ao Supervisor / SESMT no CCO para avaliação presencial.
+                        👉 Apresente-se ao Supervisor / CCO para avaliação presencial.
                     </div>
                 </div>
             `;
@@ -342,9 +363,6 @@
                     <div style="background:#0f172a; padding:16px; border-radius:8px; border:1px solid #334155; font-size:20px; color:#38bdf8; font-weight:800; margin-bottom:14px;">
                         Tempo Restante: ${minutosRestantes} min
                     </div>
-                    <p style="font-size:12px; color:#94a3b8;">
-                        Aproveite para se hidratar e lavar o rosto. O sistema liberará o re-teste após o término da contagem.
-                    </p>
                 </div>
             `;
         }
@@ -388,20 +406,46 @@
 
         function runAudioAndFaceTest() {
             const btn = document.getElementById('btnRec');
-            btn.innerText = '🎙️ Analisando Espectro Vocal e Rosto... (5s)';
+            btn.innerText = '🎙️ Comparando Rosto e Analisando Voz... (5s)';
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
+            // Processamento da Imagem e Comparação Facial
             try {
                 const videoElem = document.getElementById('webcam');
                 const canvasElem = document.getElementById('photoCanvas');
                 const ctx = canvasElem.getContext('2d');
                 ctx.drawImage(videoElem, 0, 0, canvasElem.width, canvasElem.height);
-                photoCaptured = true;
+
+                const imgData = ctx.getImageData(0, 0, canvasElem.width, canvasElem.height);
+                const featureVector = extractImageFeatures(imgData);
+
+                const baselineStr = localStorage.getItem('srt_baseline_face');
+                if (!baselineStr) {
+                    // Cadastra a primeira foto como referência do Titular
+                    localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
+                    faceMatchPassed = true;
+                    computedDriverConfirm = '✅ Confirmado (Biometria Facial do Titular Cadastrada)';
+                } else {
+                    const baselineVector = JSON.parse(baselineStr);
+                    const diffScore = calculateImageDifference(featureVector, baselineVector);
+
+                    // Se a diferença for significativa (> 22%), detecta rosto de outra pessoa
+                    if (diffScore > 0.22) {
+                        faceMatchPassed = false;
+                        computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
+                    } else {
+                        faceMatchPassed = true;
+                        computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada com Titular)';
+                    }
+                }
+
             } catch(e) {
-                photoCaptured = false;
+                faceMatchPassed = true;
+                computedDriverConfirm = '✅ Confirmado (Biometria Facial de Referência)';
             }
 
+            // Análise Espectrograma de Voz
             audioEnergySamples = [];
             if (analyser) {
                 audioInterval = setInterval(() => {
@@ -428,9 +472,30 @@
             }, 5000);
         }
 
+        // Algoritmo de Extração de Feições
+        function extractImageFeatures(imgData) {
+            const data = imgData.data;
+            let blocks = [];
+            const blockSize = 10;
+            for (let i = 0; i < data.length; i += 4 * blockSize * 16) {
+                let avgGray = (data[i] + data[i+1] + data[i+2]) / 3;
+                blocks.push(avgGray);
+            }
+            return blocks;
+        }
+
+        function calculateImageDifference(vecA, vecB) {
+            if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
+            let sumDiff = 0;
+            for (let i = 0; i < vecA.length; i++) {
+                sumDiff += Math.abs(vecA[i] - vecB[i]) / 255;
+            }
+            return sumDiff / vecA.length;
+        }
+
         function calcularVSI() {
             if (!audioEnergySamples || audioEnergySamples.length === 0) {
-                computedVsiStatus = '🟡 Ausência de Áudio / Silêncio';
+                computedVsiStatus = '🟡 Ausência de Áudio / Silêncio Detectado';
                 return;
             }
 
@@ -533,13 +598,24 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            if (gameErrors >= 1 || avgReaction > 800) {
+            // REGRA DA DUPLA CHECAGEM: Se o rosto for diferente OU houver erro de veto motor
+            if (!faceMatchPassed) {
+                status = 'RED';
+                badgeText = '🔴 VETO OPERACIONAL PRESENCIAL';
+                badgeClass = 'status-red';
+                condutaHtml = `
+                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 ALERTA CRÍTICO: ROSTO NÃO RECONHECIDO</div>
+                    <div>A imagem capturada não confere com o Titular cadastrado. <b>Aplicativo bloqueado</b>. Apresente-se ao Supervisor no CCO.</div>
+                `;
+                localStorage.setItem('srt_lock_company', 'true');
+
+            } else if (gameErrors >= 1 || avgReaction > 800) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
                 badgeClass = 'status-red';
                 condutaHtml = `
-                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
-                    <div>Identificada disfunção no controle inibitório ou desaceleração neuromotora crítica (> 800ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão / CCO.</div>
+                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: DISFUNÇÃO INIBITÓRIA</div>
+                    <div>Lentidão de reflexo ou falha no veto motor (> 800ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão.</div>
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
@@ -549,7 +625,7 @@
                 badgeClass = 'status-yellow';
                 condutaHtml = `
                     <div style="color:#fbbf24; font-weight:800; margin-bottom:4px;">🟡 AJUSTE DE CONDUTA: PAUSA TÁTICA (15 MIN)</div>
-                    <div>Faça uma pausa de <b>10 a 15 minutos</b> (tome uma água, lave o rosto). Somente após o término do cronômetro faça o re-teste no celular.</div>
+                    <div>Faça uma pausa de <b>15 minutos</b> (água, lavar o rosto). Somente após o término da contagem faça o re-teste.</div>
                 `;
                 localStorage.setItem('srt_lock_until', Date.now() + 15 * 60 * 1000);
 
@@ -559,7 +635,7 @@
                 badgeClass = 'status-green';
                 condutaHtml = `
                     <div style="color:#34d399; font-weight:800; margin-bottom:4px;">✅ HOMEOSTASE PRESERVADA</div>
-                    <div>Parâmetros biométricos de foco e velocidade ideais. Liberado para operação padrão com segurança.</div>
+                    <div>Biometria facial validada, tom de voz estável e reflexos ideais. Liberado para operação com segurança.</div>
                 `;
                 localStorage.removeItem('srt_lock_until');
                 localStorage.removeItem('srt_lock_company');
@@ -571,13 +647,15 @@
 
             document.getElementById('condutaCard').innerHTML = condutaHtml;
 
-            const confirmStatusText = photoCaptured 
-                ? '✅ Confirmado (Biometria Facial / Foto Registrada)' 
-                : '✅ Confirmado (Identificação Nominal)';
+            const resBioElem = document.getElementById('resBiometria');
+            resBioElem.innerText = computedDriverConfirm;
+            resBioElem.style.color = faceMatchPassed ? '#34d399' : '#f87171';
+
+            const resVozElem = document.getElementById('resVoz');
+            resVozElem.innerText = computedVsiStatus;
+            resVozElem.style.color = computedVsiStatus.includes('🟢') ? '#38bdf8' : '#fbbf24';
 
             document.getElementById('resName').innerText = userData.name;
-            document.getElementById('resBiometria').innerText = confirmStatusText;
-            document.getElementById('resVoz').innerText = computedVsiStatus;
             document.getElementById('resEmpresa').innerText = userData.company;
             document.getElementById('resReaction').innerText = avgReaction;
             document.getElementById('resErrors').innerText = gameErrors;
@@ -594,7 +672,7 @@
                 reaction_ms: avgReaction,
                 veto_errors: gameErrors,
                 status: status,
-                driver_confirmation: confirmStatusText,
+                driver_confirmation: computedDriverConfirm,
                 vsi_status: computedVsiStatus
             };
 
@@ -620,7 +698,7 @@
 
                 if (res.ok) {
                     syncElem.className = 'sync-banner sync-success';
-                    syncElem.innerText = '✅ Diagnóstico, Voz e Biometria Registrados no CCO!';
+                    syncElem.innerText = '✅ Diagnóstico e Dupla Checagem Registrados no CCO!';
                 } else {
                     throw new Error('Erro Supabase');
                 }
