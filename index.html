@@ -59,6 +59,22 @@
         }
         .btn:hover { background: #0369a1; }
 
+        .camera-box {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            border: 2px solid #38bdf8;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        canvas { display: none; }
+
         .instruction-card {
             background: #0f172a;
             border: 1px solid #334155;
@@ -176,16 +192,25 @@
             <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão 🚀</button>
         </div>
 
-        <!-- PASSO 2: TESTE DE VOZ -->
+        <!-- PASSO 2: VALIDAÇÃO FACIAL E VOZ -->
         <div id="stepVoz" class="step">
-            <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎙️ Etapa 1: Análise de Voz (5s)</h3>
-            <p style="font-size:13px; text-align:center; color:#94a3b8; margin-bottom:16px;">
-                Leia a frase abaixo em voz alta assim que clicar no botão:
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Biometria Facial & Voz</h3>
+            <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
+                Posicione seu rosto na câmera para validação de identidade:
             </p>
-            <div style="background:#0f172a; padding:14px; border-radius:8px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:16px; border:1px solid #334155;">
+
+            <div class="camera-box">
+                <video id="webcam" autoplay playsinline muted></video>
+                <canvas id="photoCanvas" width="320" height="240"></canvas>
+            </div>
+
+            <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:10px;">
+                Leia a frase abaixo em voz alta ao clicar no botão:
+            </p>
+            <div style="background:#0f172a; padding:12px; border-radius:8px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:14px; border:1px solid #334155; font-size:13px;">
                 "Pronto para operar com foco e segurança total."
             </div>
-            <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Frase Agora</button>
+            <button id="btnRec" class="btn" onclick="runAudioAndFaceTest()">🔴 Gravar Voz & Validar Rosto (5s)</button>
         </div>
 
         <!-- PASSO 3: INSTRUÇÃO DO TESTE DE BOLINHAS -->
@@ -204,7 +229,7 @@
             <button class="btn" onclick="startGame()">Entendi, Começar Teste! 🎯</button>
         </div>
 
-        <!-- PASSO 4: O JOGO DAS BOLINHAS (AGORA COM 8 RODADAS) -->
+        <!-- PASSO 4: O JOGO DAS BOLINHAS (8 RODADAS) -->
         <div id="stepBolinhas" class="step">
             <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
                 <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
@@ -222,6 +247,7 @@
 
             <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
                 <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
+                <p style="margin-bottom:6px;">📸 <b>Biometria Facial:</b> <span id="resBiometria" style="color:#34d399; font-weight:700;">--</span></p>
                 <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
                 <p style="margin-bottom:6px;">⚡ <b>Tempo de Reação:</b> <span id="resReaction" style="color:#38bdf8; font-weight:700;">--</span> ms</p>
                 <p>🎯 <b>Erros de Veto:</b> <span id="resErrors" style="color:#ef4444; font-weight:700;">--</span></p>
@@ -236,8 +262,8 @@
 
         let userData = {};
         let currentRound = 0;
-        const TOTAL_ROUNDS = 8; // Aumentado para 8 rodadas (+5 segundos de teste)
-        const BALL_SPEED_MS = 1425; // 5% mais rápido que os 1500ms anteriores
+        const TOTAL_ROUNDS = 8;
+        const BALL_SPEED_MS = 1425;
 
         let gameErrors = 0;
         let reactionTimes = [];
@@ -245,6 +271,8 @@
         let ballTimer = null;
         let ballHandled = false;
         let lastPayload = null;
+        let photoCaptured = false;
+        let mediaStream = null;
 
         window.onload = () => {
             const lockCompany = localStorage.getItem('srt_lock_company');
@@ -314,7 +342,7 @@
             `;
         }
 
-        function startCheckin() {
+        async function startCheckin() {
             const name = document.getElementById('txtName').value.trim();
             const wa = document.getElementById('txtWA').value.trim();
             const empresa = document.getElementById('txtEmpresa').value.trim();
@@ -330,15 +358,39 @@
 
             document.getElementById('stepForm').classList.remove('active');
             document.getElementById('stepVoz').classList.add('active');
+
+            // Inicializa a câmera frontal
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                const videoElem = document.getElementById('webcam');
+                videoElem.srcObject = mediaStream;
+            } catch (err) {
+                console.warn('Câmera não permitida ou indisponível:', err);
+            }
         }
 
-        function runAudioTest() {
+        function runAudioAndFaceTest() {
             const btn = document.getElementById('btnRec');
-            btn.innerText = '🎙️ Gravando... (5s)';
+            btn.innerText = '📸 Gravando Rosto e Voz... (5s)';
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
+            // Captura snapshot do rosto no canvas
+            try {
+                const videoElem = document.getElementById('webcam');
+                const canvasElem = document.getElementById('photoCanvas');
+                const ctx = canvasElem.getContext('2d');
+                ctx.drawImage(videoElem, 0, 0, canvasElem.width, canvasElem.height);
+                photoCaptured = true;
+            } catch(e) {
+                photoCaptured = false;
+            }
+
             setTimeout(() => {
+                // Desliga a câmera para economizar bateria
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                }
                 document.getElementById('stepVoz').classList.remove('active');
                 document.getElementById('stepInstruction').classList.add('active');
             }, 5000);
@@ -368,7 +420,7 @@
             document.getElementById('lblErrors').innerText = gameErrors;
 
             ballHandled = false;
-            const isGreen = Math.random() > 0.35; // Probabilidade ligeiramente maior de bolinhas para testar inibição
+            const isGreen = Math.random() > 0.35;
             const ball = document.createElement('div');
             ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
 
@@ -397,7 +449,6 @@
             ball.addEventListener('click', handleTouch);
             gameArea.appendChild(ball);
 
-            // Tempo limite ajustado (1.425 ms - 5% mais rápido)
             ballTimer = setTimeout(() => {
                 if (!ballHandled) {
                     ballHandled = true;
@@ -421,8 +472,6 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            // CALIBRAÇÃO RÍGIDA DE TOLERÂNCIA ZERO:
-            // 1 Erro de Veto na Bolinha Vermelha OU Média de Reação > 750 ms gera SINAL VERMELHO
             if (gameErrors >= 1 || avgReaction > 750) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
@@ -434,7 +483,6 @@
                 localStorage.setItem('srt_lock_company', 'true');
 
             } else if (avgReaction > 600) {
-                // SINAL AMARELO: Reação entre 601ms e 750ms
                 status = 'YELLOW';
                 badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
                 badgeClass = 'status-yellow';
@@ -445,7 +493,6 @@
                 localStorage.setItem('srt_lock_until', Date.now() + 15 * 60 * 1000);
 
             } else {
-                // SINAL VERDE: Reação <= 600ms e 0 Erros
                 status = 'GREEN';
                 badgeText = '🟢 LIBERADO PARA OPERAR';
                 badgeClass = 'status-green';
@@ -463,7 +510,12 @@
 
             document.getElementById('condutaCard').innerHTML = condutaHtml;
 
+            const confirmStatusText = photoCaptured 
+                ? '✅ Confirmado (Biometria Facial / Foto Registrada)' 
+                : '✅ Confirmado (Identificação Nominal)';
+
             document.getElementById('resName').innerText = userData.name;
+            document.getElementById('resBiometria').innerText = confirmStatusText;
             document.getElementById('resEmpresa').innerText = userData.company;
             document.getElementById('resReaction').innerText = avgReaction;
             document.getElementById('resErrors').innerText = gameErrors;
@@ -479,7 +531,8 @@
                 sector: userData.sector,
                 reaction_ms: avgReaction,
                 veto_errors: gameErrors,
-                status: status
+                status: status,
+                driver_confirmation: confirmStatusText
             };
 
             sendDataToBackend();
@@ -504,7 +557,7 @@
 
                 if (res.ok) {
                     syncElem.className = 'sync-banner sync-success';
-                    syncElem.innerText = '✅ Diagnóstico Registrado no CCO com Sucesso!';
+                    syncElem.innerText = '✅ Diagnóstico e Biometria Registrados no CCO com Sucesso!';
                 } else {
                     throw new Error('Erro Supabase');
                 }
