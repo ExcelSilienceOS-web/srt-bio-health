@@ -249,7 +249,7 @@
                     <div class="face-oval-guide"></div>
                     <div class="face-guide-text">Centralize o Rosto</div>
                 </div>
-                <canvas id="photoCanvas" width="200" height="200"></canvas>
+                <canvas id="photoCanvas" width="300" height="300"></canvas>
             </div>
 
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:10px;">
@@ -465,41 +465,7 @@
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
-            try {
-                const videoElem = document.getElementById('webcam');
-                const canvasElem = document.getElementById('photoCanvas');
-                const ctx = canvasElem.getContext('2d');
-                ctx.drawImage(videoElem, 0, 0, canvasElem.width, canvasElem.height);
-
-                // Captura e compactação da foto em formato leve (JPEG Base64 qualidade 0.4)
-                capturedPhotoBase64 = canvasElem.toDataURL('image/jpeg', 0.4);
-
-                const imgData = ctx.getImageData(0, 0, canvasElem.width, canvasElem.height);
-                const featureVector = extractImageFeatures(imgData);
-
-                const baselineStr = localStorage.getItem('srt_baseline_face');
-                if (!baselineStr) {
-                    localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
-                    faceMatchPassed = true;
-                    computedDriverConfirm = '✅ Confirmado (Biometria Facial do Titular Cadastrada)';
-                } else {
-                    const baselineVector = JSON.parse(baselineStr);
-                    const diffScore = calculateImageDifference(featureVector, baselineVector);
-
-                    if (diffScore > 0.22) {
-                        faceMatchPassed = false;
-                        computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
-                    } else {
-                        faceMatchPassed = true;
-                        computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada com Titular)';
-                    }
-                }
-
-            } catch(e) {
-                faceMatchPassed = true;
-                computedDriverConfirm = '✅ Confirmado (Biometria Facial de Referência)';
-            }
-
+            // 1. Inicia amostragem de áudio da voz
             audioEnergySamples = [];
             if (analyser) {
                 audioInterval = setInterval(() => {
@@ -513,6 +479,54 @@
                 }, 100);
             }
 
+            // 2. Tira a foto aos 1,2s do teste (quando a câmera já ajustou o foco/luz)
+            setTimeout(() => {
+                try {
+                    const videoElem = document.getElementById('webcam');
+                    const canvasElem = document.getElementById('photoCanvas');
+                    
+                    if (videoElem && videoElem.videoWidth > 0) {
+                        canvasElem.width = 300;
+                        canvasElem.height = 300;
+                        const ctx = canvasElem.getContext('2d');
+                        ctx.drawImage(videoElem, 0, 0, 300, 300);
+
+                        // Captura a foto compactada em Base64 JPEG
+                        const dataUrl = canvasElem.toDataURL('image/jpeg', 0.5);
+                        if (dataUrl && dataUrl.length > 200) {
+                            capturedPhotoBase64 = dataUrl;
+                        }
+
+                        // Análise de comparação facial
+                        const imgData = ctx.getImageData(0, 0, 300, 300);
+                        const featureVector = extractImageFeatures(imgData);
+
+                        const baselineStr = localStorage.getItem('srt_baseline_face');
+                        if (!baselineStr) {
+                            localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
+                            faceMatchPassed = true;
+                            computedDriverConfirm = '✅ Confirmado (Biometria Facial do Titular Cadastrada)';
+                        } else {
+                            const baselineVector = JSON.parse(baselineStr);
+                            const diffScore = calculateImageDifference(featureVector, baselineVector);
+
+                            if (diffScore > 0.22) {
+                                faceMatchPassed = false;
+                                computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
+                            } else {
+                                faceMatchPassed = true;
+                                computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada com Titular)';
+                            }
+                        }
+                    }
+                } catch(e) {
+                    console.warn('Erro na captura da câmera:', e);
+                    faceMatchPassed = true;
+                    computedDriverConfirm = '✅ Confirmado (Biometria Facial de Referência)';
+                }
+            }, 1200);
+
+            // 3. Conclui após 5s
             setTimeout(() => {
                 if (audioInterval) clearInterval(audioInterval);
 
