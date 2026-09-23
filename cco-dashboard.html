@@ -315,8 +315,8 @@
                     badgeText = '🟡 PAUSA 15m';
                 }
 
-                // Exibe a foto apenas se contiver dados reais (> 200 caracteres)
-                const avatarSrc = (item.photo_base64 && item.photo_base64.length > 200)
+                // Verifica se contém a imagem codificada em Base64 real (> 500 caracteres)
+                const avatarSrc = (item.photo_base64 && item.photo_base64.length > 500)
                     ? item.photo_base64 
                     : `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'M')}&background=0f172a&color=38bdf8`;
 
@@ -443,7 +443,7 @@
             document.getElementById('mdlReacao').innerText = item.reaction_ms || 0;
             document.getElementById('mdlVoz').innerText = item.vsi_status || '--';
 
-            if (item.photo_base64 && item.photo_base64.length > 200) {
+            if (item.photo_base64 && item.photo_base64.length > 500) {
                 document.getElementById('imgAtualModal').src = item.photo_base64;
             } else {
                 document.getElementById('imgAtualModal').src = 'https://via.placeholder.com/150/0f172a/f87171?text=Sem+Foto';
