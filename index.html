@@ -70,7 +70,7 @@
             cursor: pointer;
         }
 
-        /* Moldura de Câmera Quadrada (1:1) com Máscara de Alinhamento Facial */
+        /* Moldura Quadrada (1:1) com Máscara de Alinhamento Facial */
         .camera-box-square {
             width: 220px;
             height: 220px;
@@ -236,7 +236,7 @@
             <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular para Demonstração</button>
         </div>
 
-        <!-- PASSO 2: VALIDAÇÃO FACIAL E VOZ COM CÂMERA QUADRADA 1:1 -->
+        <!-- PASSO 2: VALIDAÇÃO FACIAL E VOZ -->
         <div id="stepVoz" class="step">
             <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Dupla Checagem Facial & Voz</h3>
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
@@ -321,6 +321,7 @@
         let ballHandled = false;
         let lastPayload = null;
         let mediaStream = null;
+        let capturedPhotoBase64 = "";
 
         // Biometria Facial & VSI
         let faceMatchPassed = true;
@@ -469,6 +470,9 @@
                 const canvasElem = document.getElementById('photoCanvas');
                 const ctx = canvasElem.getContext('2d');
                 ctx.drawImage(videoElem, 0, 0, canvasElem.width, canvasElem.height);
+
+                // Captura e compactação da foto em formato leve (JPEG Base64 qualidade 0.4)
+                capturedPhotoBase64 = canvasElem.toDataURL('image/jpeg', 0.4);
 
                 const imgData = ctx.getImageData(0, 0, canvasElem.width, canvasElem.height);
                 const featureVector = extractImageFeatures(imgData);
@@ -723,7 +727,8 @@
                 veto_errors: gameErrors,
                 status: status,
                 driver_confirmation: computedDriverConfirm,
-                vsi_status: computedVsiStatus
+                vsi_status: computedVsiStatus,
+                photo_base64: capturedPhotoBase64
             };
 
             sendDataToBackend();
