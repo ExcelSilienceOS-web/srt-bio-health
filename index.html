@@ -356,7 +356,7 @@
                 <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
                     <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
                     <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Identificada <b>Disfunção no Controle Inibitório ou Desaceleração Neuromotora Crítica</b>.<br><br>
+                        Identificada <b>Disfunção no Controle Inibitório ou Alta Flutuação Laríngea Crítica</b>.<br><br>
                         Por normas de segurança (NR-01/NR-17), <b>este aplicativo está bloqueado no celular</b>.
                     </p>
                     <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
@@ -526,9 +526,10 @@
             let cv = stdDev / (mean + 1);
             let vsiScore = (1.0 + cv * 4).toFixed(1);
 
-            if (vsiScore <= 1.8) {
+            // CALIBRAÇÃO CIENTÍFICA: Verde <= 2.7, Amarelo 2.8 a 3.4, Vermelho >= 3.5
+            if (vsiScore <= 2.7) {
                 computedVsiStatus = `🟢 Voz Estável (VSI ${vsiScore} / Estresse Baixo)`;
-            } else if (vsiScore <= 2.8) {
+            } else if (vsiScore < 3.5) {
                 computedVsiStatus = `🟡 Estresse Laríngeo Moderado (VSI ${vsiScore})`;
             } else {
                 computedVsiStatus = `🔴 Alta Flutuação Laríngea (VSI ${vsiScore} / Estresse Simpático)`;
@@ -611,7 +612,9 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            // CALIBRAÇÃO AJUSTADA: Reação <= 650ms para SINAL VERDE
+            // VSI >= 3.5 aciona a trava vermelha de emergência
+            const isVozCritical = computedVsiStatus.includes('🔴');
+
             if (!faceMatchPassed) {
                 status = 'RED';
                 badgeText = '🔴 VETO OPERACIONAL PRESENCIAL';
@@ -622,13 +625,13 @@
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (gameErrors >= 1 || avgReaction > 800) {
+            } else if (gameErrors >= 1 || avgReaction > 800 || isVozCritical) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
                 badgeClass = 'status-red';
                 condutaHtml = `
-                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: DISFUNÇÃO INIBITÓRIA</div>
-                    <div>Lentidão de reflexo ou falha de veto motor (> 800ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão no CCO.</div>
+                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
+                    <div>Identificada alta flutuação laríngea crítica (VSI ≥ 3.5) ou disfunção no controle inibitório. <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão no CCO.</div>
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
@@ -666,7 +669,7 @@
 
             const resVozElem = document.getElementById('resVoz');
             resVozElem.innerText = computedVsiStatus;
-            resVozElem.style.color = computedVsiStatus.includes('🟢') ? '#38bdf8' : '#fbbf24';
+            resVozElem.style.color = computedVsiStatus.includes('🟢') ? '#38bdf8' : (computedVsiStatus.includes('🟡') ? '#fbbf24' : '#f87171');
 
             document.getElementById('resName').innerText = userData.name;
             document.getElementById('resEmpresa').innerText = userData.company;
