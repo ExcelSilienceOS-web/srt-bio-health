@@ -70,21 +70,53 @@
             cursor: pointer;
         }
 
-        .camera-box {
-            width: 100%;
-            height: 180px;
+        /* Moldura de Câmera Quadrada (1:1) com Máscara de Alinhamento Facial */
+        .camera-box-square {
+            width: 220px;
+            height: 220px;
             background: #000;
             border: 2px solid #38bdf8;
-            border-radius: 12px;
+            border-radius: 20px;
             overflow: hidden;
-            margin-bottom: 14px;
+            margin: 0 auto 16px auto;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
         }
         video { width: 100%; height: 100%; object-fit: cover; }
         canvas { display: none; }
+
+        .face-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .face-oval-guide {
+            width: 130px;
+            height: 160px;
+            border: 2px dashed #38bdf8;
+            border-radius: 50%;
+            box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.4);
+        }
+        .face-guide-text {
+            position: absolute;
+            bottom: 8px;
+            font-size: 10px;
+            color: #38bdf8;
+            font-weight: 800;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+        }
 
         .instruction-card {
             background: #0f172a;
@@ -204,16 +236,20 @@
             <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular para Demonstração</button>
         </div>
 
-        <!-- PASSO 2: VALIDAÇÃO FACIAL E VOZ -->
+        <!-- PASSO 2: VALIDAÇÃO FACIAL E VOZ COM CÂMERA QUADRADA 1:1 -->
         <div id="stepVoz" class="step">
             <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Dupla Checagem Facial & Voz</h3>
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
-                Posicione seu rosto na câmera para comparação biométrica com o Titular:
+                Centralize seu rosto no guia para comparação biométrica:
             </p>
 
-            <div class="camera-box">
+            <div class="camera-box-square">
                 <video id="webcam" autoplay playsinline muted></video>
-                <canvas id="photoCanvas" width="160" height="120"></canvas>
+                <div class="face-overlay">
+                    <div class="face-oval-guide"></div>
+                    <div class="face-guide-text">Centralize o Rosto</div>
+                </div>
+                <canvas id="photoCanvas" width="200" height="200"></canvas>
             </div>
 
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:10px;">
@@ -526,7 +562,6 @@
             let cv = stdDev / (mean + 1);
             let vsiScore = (1.0 + cv * 4).toFixed(1);
 
-            // CALIBRAÇÃO CIENTÍFICA: Verde <= 2.7, Amarelo 2.8 a 3.4, Vermelho >= 3.5
             if (vsiScore <= 2.7) {
                 computedVsiStatus = `🟢 Voz Estável (VSI ${vsiScore} / Estresse Baixo)`;
             } else if (vsiScore < 3.5) {
@@ -612,7 +647,6 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            // VSI >= 3.5 aciona a trava vermelha de emergência
             const isVozCritical = computedVsiStatus.includes('🔴');
 
             if (!faceMatchPassed) {
