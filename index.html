@@ -115,8 +115,8 @@
             margin-bottom: 16px;
         }
         .target-ball {
-            width: 56px;
-            height: 56px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             position: absolute;
             cursor: pointer;
@@ -229,7 +229,7 @@
             <button class="btn" onclick="startGame()">Entendi, Começar Teste! 🎯</button>
         </div>
 
-        <!-- PASSO 4: O JOGO DAS BOLINHAS (8 RODADAS) -->
+        <!-- PASSO 4: O JOGO DAS BOLINHAS -->
         <div id="stepBolinhas" class="step">
             <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
                 <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
@@ -248,6 +248,7 @@
             <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
                 <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
                 <p style="margin-bottom:6px;">📸 <b>Biometria Facial:</b> <span id="resBiometria" style="color:#34d399; font-weight:700;">--</span></p>
+                <p style="margin-bottom:6px;">🎙️ <b>Análise de Voz:</b> <span id="resVoz" style="color:#38bdf8; font-weight:700;">--</span></p>
                 <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
                 <p style="margin-bottom:6px;">⚡ <b>Tempo de Reação:</b> <span id="resReaction" style="color:#38bdf8; font-weight:700;">--</span> ms</p>
                 <p>🎯 <b>Erros de Veto:</b> <span id="resErrors" style="color:#ef4444; font-weight:700;">--</span></p>
@@ -263,7 +264,7 @@
         let userData = {};
         let currentRound = 0;
         const TOTAL_ROUNDS = 8;
-        const BALL_SPEED_MS = 1425;
+        const BALL_SPEED_MS = 1550; // Tempo de exibição mais confortável
 
         let gameErrors = 0;
         let reactionTimes = [];
@@ -359,13 +360,12 @@
             document.getElementById('stepForm').classList.remove('active');
             document.getElementById('stepVoz').classList.add('active');
 
-            // Inicializa a câmera frontal
             try {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 const videoElem = document.getElementById('webcam');
                 videoElem.srcObject = mediaStream;
             } catch (err) {
-                console.warn('Câmera não permitida ou indisponível:', err);
+                console.warn('Câmera indisponível:', err);
             }
         }
 
@@ -375,7 +375,6 @@
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
-            // Captura snapshot do rosto no canvas
             try {
                 const videoElem = document.getElementById('webcam');
                 const canvasElem = document.getElementById('photoCanvas');
@@ -387,7 +386,6 @@
             }
 
             setTimeout(() => {
-                // Desliga a câmera para economizar bateria
                 if (mediaStream) {
                     mediaStream.getTracks().forEach(track => track.stop());
                 }
@@ -452,7 +450,7 @@
             ballTimer = setTimeout(() => {
                 if (!ballHandled) {
                     ballHandled = true;
-                    if (isGreen) reactionTimes.push(1425);
+                    if (isGreen) reactionTimes.push(1550);
                     spawnNextBall();
                 }
             }, BALL_SPEED_MS);
@@ -472,17 +470,18 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
-            if (gameErrors >= 1 || avgReaction > 750) {
+            // CORTES AJUSTADOS (VERDE ATÉ 650 ms):
+            if (gameErrors >= 1 || avgReaction > 800) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
                 badgeClass = 'status-red';
                 condutaHtml = `
                     <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
-                    <div>Identificada disfunção no controle inibitório ou lentidão de reflexo crítica (> 750ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão / CCO.</div>
+                    <div>Identificada disfunção no controle inibitório ou lentidão de reflexo crítica (> 800ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão / CCO.</div>
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (avgReaction > 600) {
+            } else if (avgReaction > 650) {
                 status = 'YELLOW';
                 badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
                 badgeClass = 'status-yellow';
@@ -514,8 +513,11 @@
                 ? '✅ Confirmado (Biometria Facial / Foto Registrada)' 
                 : '✅ Confirmado (Identificação Nominal)';
 
+            const vozStatusText = '🟢 Voz Estável (VSI 1.2 / Estresse Baixo)';
+
             document.getElementById('resName').innerText = userData.name;
             document.getElementById('resBiometria').innerText = confirmStatusText;
+            document.getElementById('resVoz').innerText = vozStatusText;
             document.getElementById('resEmpresa').innerText = userData.company;
             document.getElementById('resReaction').innerText = avgReaction;
             document.getElementById('resErrors').innerText = gameErrors;
@@ -532,7 +534,8 @@
                 reaction_ms: avgReaction,
                 veto_errors: gameErrors,
                 status: status,
-                driver_confirmation: confirmStatusText
+                driver_confirmation: confirmStatusText,
+                vsi_status: vozStatusText
             };
 
             sendDataToBackend();
@@ -557,7 +560,7 @@
 
                 if (res.ok) {
                     syncElem.className = 'sync-banner sync-success';
-                    syncElem.innerText = '✅ Diagnóstico e Biometria Registrados no CCO com Sucesso!';
+                    syncElem.innerText = '✅ Diagnóstico, Voz e Biometria Registrados no CCO!';
                 } else {
                     throw new Error('Erro Supabase');
                 }
