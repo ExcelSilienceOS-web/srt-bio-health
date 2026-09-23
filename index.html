@@ -276,7 +276,8 @@
         let userData = {};
         let currentRound = 0;
         const TOTAL_ROUNDS = 8;
-        const BALL_SPEED_MS = 1550;
+        // CALIBRAÇÃO ACELERADA: 1100ms por bolinha para capturar inaptidão por substâncias/fadiga
+        const BALL_SPEED_MS = 1100;
 
         let gameErrors = 0;
         let reactionTimes = [];
@@ -356,7 +357,7 @@
                 <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
                     <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
                     <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Identificada <b>Disfunção Biométrica ou Inaptidão Neuromotora Crítica</b>.<br><br>
+                        Identificada <b>Disfunção no Controle Inibitório ou Desaceleração Neuromotora Crítica</b>.<br><br>
                         Por normas de segurança (NR-01/NR-17), <b>este aplicativo está bloqueado no celular</b>.
                     </p>
                     <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
@@ -559,7 +560,8 @@
             document.getElementById('lblErrors').innerText = gameErrors;
 
             ballHandled = false;
-            const isGreen = Math.random() > 0.35;
+            // 42% de chance de bolinha VERMELHA para pressionar o freio inibitório
+            const isGreen = Math.random() > 0.42;
             const ball = document.createElement('div');
             ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
 
@@ -591,7 +593,7 @@
             ballTimer = setTimeout(() => {
                 if (!ballHandled) {
                     ballHandled = true;
-                    if (isGreen) reactionTimes.push(1550);
+                    if (isGreen) reactionTimes.push(1100);
                     spawnNextBall();
                 }
             }, BALL_SPEED_MS);
@@ -611,6 +613,7 @@
             let badgeClass = 'status-green';
             let condutaHtml = '';
 
+            // CRITÉRIO RE-CALIBRADO: Reação <= 600ms e 0 Erros de Veto para VERDE
             if (!faceMatchPassed) {
                 status = 'RED';
                 badgeText = '🔴 VETO OPERACIONAL PRESENCIAL';
@@ -621,17 +624,17 @@
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (gameErrors >= 1 || avgReaction > 800) {
+            } else if (gameErrors >= 1 || avgReaction > 700) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
                 badgeClass = 'status-red';
                 condutaHtml = `
                     <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: DISFUNÇÃO INIBITÓRIA</div>
-                    <div>Lentidão de reflexo ou falha no veto motor (> 800ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão.</div>
+                    <div>Lentidão de reflexo ou falha de veto motor (> 700ms). <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão no CCO.</div>
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (avgReaction > 650 || computedVsiStatus.includes('🟡')) {
+            } else if (avgReaction > 600 || computedVsiStatus.includes('🟡')) {
                 status = 'YELLOW';
                 badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
                 badgeClass = 'status-yellow';
