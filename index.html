@@ -70,7 +70,7 @@
             cursor: pointer;
         }
 
-        /* Moldura Quadrada (1:1) com Máscara de Alinhamento Facial */
+        /* Moldura Quadrada (1:1) com Guia de Alinhamento Facial */
         .camera-box-square {
             width: 220px;
             height: 220px;
@@ -441,11 +441,14 @@
 
             try {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" },
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } },
                     audio: true 
                 });
                 const videoElem = document.getElementById('webcam');
                 videoElem.srcObject = mediaStream;
+                videoElem.setAttribute('playsinline', 'true');
+                videoElem.setAttribute('muted', 'true');
+                await videoElem.play();
 
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 analyser = audioCtx.createAnalyser();
@@ -459,13 +462,67 @@
             }
         }
 
+        function captureCameraPhoto() {
+            try {
+                const videoElem = document.getElementById('webcam');
+                const canvasElem = document.getElementById('photoCanvas');
+                if (!videoElem || !canvasElem) return;
+
+                const vW = videoElem.videoWidth || 300;
+                const vH = videoElem.videoHeight || 300;
+
+                canvasElem.width = 300;
+                canvasElem.height = 300;
+                const ctx = canvasElem.getContext('2d');
+
+                // Recorte central quadrado 1:1 proporcional
+                const minDim = Math.min(vW, vH);
+                const startX = (vW - minDim) / 2;
+                const startY = (vH - minDim) / 2;
+
+                ctx.drawImage(videoElem, startX, startY, minDim, minDim, 0, 0, 300, 300);
+
+                const dataUrl = canvasElem.toDataURL('image/jpeg', 0.6);
+                if (dataUrl && dataUrl.length > 500) {
+                    capturedPhotoBase64 = dataUrl;
+                }
+
+                const imgData = ctx.getImageData(0, 0, 300, 300);
+                const featureVector = extractImageFeatures(imgData);
+
+                const baselineStr = localStorage.getItem('srt_baseline_face');
+                if (!baselineStr) {
+                    localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
+                    faceMatchPassed = true;
+                    computedDriverConfirm = '✅ Confirmado (Biometria Facial do Titular Cadastrada)';
+                } else {
+                    const baselineVector = JSON.parse(baselineStr);
+                    const diffScore = calculateImageDifference(featureVector, baselineVector);
+
+                    if (diffScore > 0.22) {
+                        faceMatchPassed = false;
+                        computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
+                    } else {
+                        faceMatchPassed = true;
+                        computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada com Titular)';
+                    }
+                }
+            } catch(e) {
+                console.warn('Erro ao capturar foto:', e);
+            }
+        }
+
         function runAudioAndFaceTest() {
             const btn = document.getElementById('btnRec');
             btn.innerText = '🎙️ Comparando Rosto e Analisando Voz... (5s)';
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
-            // 1. Inicia amostragem de áudio da voz
+            // Tentativas de captura aos 1s, 2.5s e 4s
+            setTimeout(captureCameraPhoto, 1000);
+            setTimeout(captureCameraPhoto, 2500);
+            setTimeout(captureCameraPhoto, 4000);
+
             audioEnergySamples = [];
             if (analyser) {
                 audioInterval = setInterval(() => {
@@ -479,54 +536,6 @@
                 }, 100);
             }
 
-            // 2. Tira a foto aos 1,2s do teste (quando a câmera já ajustou o foco/luz)
-            setTimeout(() => {
-                try {
-                    const videoElem = document.getElementById('webcam');
-                    const canvasElem = document.getElementById('photoCanvas');
-                    
-                    if (videoElem && videoElem.videoWidth > 0) {
-                        canvasElem.width = 300;
-                        canvasElem.height = 300;
-                        const ctx = canvasElem.getContext('2d');
-                        ctx.drawImage(videoElem, 0, 0, 300, 300);
-
-                        // Captura a foto compactada em Base64 JPEG
-                        const dataUrl = canvasElem.toDataURL('image/jpeg', 0.5);
-                        if (dataUrl && dataUrl.length > 200) {
-                            capturedPhotoBase64 = dataUrl;
-                        }
-
-                        // Análise de comparação facial
-                        const imgData = ctx.getImageData(0, 0, 300, 300);
-                        const featureVector = extractImageFeatures(imgData);
-
-                        const baselineStr = localStorage.getItem('srt_baseline_face');
-                        if (!baselineStr) {
-                            localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
-                            faceMatchPassed = true;
-                            computedDriverConfirm = '✅ Confirmado (Biometria Facial do Titular Cadastrada)';
-                        } else {
-                            const baselineVector = JSON.parse(baselineStr);
-                            const diffScore = calculateImageDifference(featureVector, baselineVector);
-
-                            if (diffScore > 0.22) {
-                                faceMatchPassed = false;
-                                computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
-                            } else {
-                                faceMatchPassed = true;
-                                computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada com Titular)';
-                            }
-                        }
-                    }
-                } catch(e) {
-                    console.warn('Erro na captura da câmera:', e);
-                    faceMatchPassed = true;
-                    computedDriverConfirm = '✅ Confirmado (Biometria Facial de Referência)';
-                }
-            }, 1200);
-
-            // 3. Conclui após 5s
             setTimeout(() => {
                 if (audioInterval) clearInterval(audioInterval);
 
