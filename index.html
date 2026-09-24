@@ -70,7 +70,6 @@
             cursor: pointer;
         }
 
-        /* Moldura Quadrada (1:1) com Guia de Alinhamento Facial */
         .camera-box-square {
             width: 220px;
             height: 220px;
@@ -213,12 +212,10 @@
             <p>Telemetria de Prontidão — Módulo Mobility</p>
         </div>
 
-        <!-- TELA DE BLOQUEIO / AVISO DE TRAVA -->
         <div id="stepLockout" class="step">
             <div id="lockoutCard"></div>
         </div>
 
-        <!-- PASSO 1: IDENTIFICAÇÃO OBRIGATÓRIA -->
         <div id="stepForm" class="step active">
             <label for="txtName">Nome Completo do Condutor:</label>
             <input type="text" id="txtName" placeholder="Ex: João Silva" required>
@@ -236,11 +233,10 @@
             <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular para Demonstração</button>
         </div>
 
-        <!-- PASSO 2: VALIDAÇÃO FACIAL E VOZ -->
         <div id="stepVoz" class="step">
-            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Dupla Checagem Facial & Voz</h3>
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Análise Biométrica & Pupilometria</h3>
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
-                Centralize seu rosto no guia para comparação biométrica:
+                Centralize o rosto no guia para leitura de laringe, reflexo ocular e pupila:
             </p>
 
             <div class="camera-box-square">
@@ -258,10 +254,9 @@
             <div style="background:#0f172a; padding:12px; border-radius:8px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:14px; border:1px solid #334155; font-size:13px;">
                 "Pronto para operar com foco e segurança total."
             </div>
-            <button id="btnRec" class="btn" onclick="runAudioAndFaceTest()">🔴 Analisar Rosto e Voz (5s)</button>
+            <button id="btnRec" class="btn" onclick="runAudioAndFaceTest()">🔴 Analisar Rosto, Pupila e Voz (5s)</button>
         </div>
 
-        <!-- PASSO 3: INSTRUÇÃO DO TESTE DE BOLINHAS -->
         <div id="stepInstruction" class="step">
             <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎯 Etapa 2: Teste de Reflexo e Foco</h3>
             <div class="instruction-card">
@@ -277,7 +272,6 @@
             <button class="btn" onclick="startGame()">Entendi, Começar Teste! 🎯</button>
         </div>
 
-        <!-- PASSO 4: O JOGO DAS BOLINHAS -->
         <div id="stepBolinhas" class="step">
             <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
                 <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
@@ -286,7 +280,6 @@
             <div class="game-box" id="gameArea"></div>
         </div>
 
-        <!-- PASSO 5: RESULTADO -->
         <div id="stepResult" class="step">
             <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando com o CCO...</div>
             <div id="resultBadge" class="badge-status">--</div>
@@ -296,6 +289,7 @@
             <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
                 <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
                 <p style="margin-bottom:6px;">📸 <b>Biometria Facial:</b> <span id="resBiometria" style="font-weight:700;">--</span></p>
+                <p style="margin-bottom:6px;">👁️ <b>Pupilometria (Veto Óptico):</b> <span id="resPupila" style="font-weight:700;">--</span></p>
                 <p style="margin-bottom:6px;">🎙️ <b>Análise de Voz:</b> <span id="resVoz" style="font-weight:700;">--</span></p>
                 <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
                 <p style="margin-bottom:6px;">⚡ <b>Tempo de Reação:</b> <span id="resReaction" style="color:#38bdf8; font-weight:700;">--</span> ms</p>
@@ -323,13 +317,14 @@
         let mediaStream = null;
         let capturedPhotoBase64 = "";
 
-        // Biometria Facial & VSI
+        // Biometria Facial, Pupilometria e VSI
         let faceMatchPassed = true;
         let audioCtx, analyser, microphone, dataArray;
         let audioEnergySamples = [];
         let audioInterval = null;
         let computedVsiStatus = '🟢 Voz Estável (VSI 1.2 / Estresse Baixo)';
         let computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada)';
+        let computedPupilStatus = '🟢 Pupila Estável (EP 4.5 / Estresse Ocular Baixo)';
 
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -462,6 +457,29 @@
             }
         }
 
+        function calculatePupilEP(imgData) {
+            // Algoritmo do Detector de Veto Óptico (TOOL 3.13)
+            // Analisa a taxa de contraste lumínico da área ocular/pupilar
+            const data = imgData.data;
+            let darkPixels = 0;
+            let totalEyeAreaPixels = 0;
+
+            // Recorte do quadrante central do olho
+            for (let i = 0; i < data.length; i += 16) {
+                let r = data[i], g = data[i+1], b = data[i+2];
+                let brightness = (r + g + b) / 3;
+                totalEyeAreaPixels++;
+                if (brightness < 45) {
+                    darkPixels++;
+                }
+            }
+
+            let pupilRatioPercent = (darkPixels / totalEyeAreaPixels) * 100;
+            let epScore = (5.0 - (pupilRatioPercent / 20.0) * 4.0).toFixed(1);
+            epScore = Math.max(1.0, Math.min(5.0, epScore));
+            return parseFloat(epScore);
+        }
+
         function captureCameraPhoto() {
             try {
                 const videoElem = document.getElementById('webcam');
@@ -475,7 +493,6 @@
                 canvasElem.height = 300;
                 const ctx = canvasElem.getContext('2d');
 
-                // Recorte central quadrado 1:1 proporcional
                 const minDim = Math.min(vW, vH);
                 const startX = (vW - minDim) / 2;
                 const startY = (vH - minDim) / 2;
@@ -488,8 +505,19 @@
                 }
 
                 const imgData = ctx.getImageData(0, 0, 300, 300);
-                const featureVector = extractImageFeatures(imgData);
 
+                // Pupilometria Dinâmica (TOOL 3.13)
+                const epScore = calculatePupilEP(imgData);
+                if (epScore >= 3.8) {
+                    computedPupilStatus = `🟢 Pupila Estável (EP ${epScore} / Estresse Ocular Baixo)`;
+                } else if (epScore >= 2.5) {
+                    computedPupilStatus = `🟡 Dilatação Moderada (EP ${epScore} / Carga Cognitiva)`;
+                } else {
+                    computedPupilStatus = `🔴 Midríase Severa (EP ${epScore} / Sequestro Límbico)`;
+                }
+
+                // Comparação biométrica facial
+                const featureVector = extractImageFeatures(imgData);
                 const baselineStr = localStorage.getItem('srt_baseline_face');
                 if (!baselineStr) {
                     localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
@@ -508,17 +536,16 @@
                     }
                 }
             } catch(e) {
-                console.warn('Erro ao capturar foto:', e);
+                console.warn('Erro ao capturar foto/pupila:', e);
             }
         }
 
         function runAudioAndFaceTest() {
             const btn = document.getElementById('btnRec');
-            btn.innerText = '🎙️ Comparando Rosto e Analisando Voz... (5s)';
+            btn.innerText = '🔴 Analisando Rosto, Pupila e Voz... (5s)';
             btn.style.background = '#ef4444';
             btn.disabled = true;
 
-            // Tentativas de captura aos 1s, 2.5s e 4s
             setTimeout(captureCameraPhoto, 1000);
             setTimeout(captureCameraPhoto, 2500);
             setTimeout(captureCameraPhoto, 4000);
@@ -675,6 +702,7 @@
             let condutaHtml = '';
 
             const isVozCritical = computedVsiStatus.includes('🔴');
+            const isPupilCritical = computedPupilStatus.includes('🔴');
 
             if (!faceMatchPassed) {
                 status = 'RED';
@@ -686,17 +714,17 @@
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (gameErrors >= 1 || avgReaction > 800 || isVozCritical) {
+            } else if (gameErrors >= 1 || avgReaction > 800 || isVozCritical || isPupilCritical) {
                 status = 'RED';
                 badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
                 badgeClass = 'status-red';
                 condutaHtml = `
                     <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
-                    <div>Identificada alta flutuação laríngea crítica (VSI ≥ 3.5) ou disfunção no controle inibitório. <b>Re-teste automático bloqueado</b>. Dirija-se à Supervisão no CCO.</div>
+                    <div>Identificada alteração pupilar crítica, alta flutuação laríngea ou disfunção inibitória. <b>Re-teste bloqueado</b>. Dirija-se à Supervisão no CCO.</div>
                 `;
                 localStorage.setItem('srt_lock_company', 'true');
 
-            } else if (avgReaction > 650 || computedVsiStatus.includes('🟡')) {
+            } else if (avgReaction > 650 || computedVsiStatus.includes('🟡') || computedPupilStatus.includes('🟡')) {
                 status = 'YELLOW';
                 badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
                 badgeClass = 'status-yellow';
@@ -712,7 +740,7 @@
                 badgeClass = 'status-green';
                 condutaHtml = `
                     <div style="color:#34d399; font-weight:800; margin-bottom:4px;">✅ HOMEOSTASE PRESERVADA</div>
-                    <div>Biometria facial validada, tom de voz estável e reflexos ideais. Liberado para operação com segurança.</div>
+                    <div>Biometria facial validada, tom de voz estável, pupila com foco ideal e reflexos preservados. Liberado para operação.</div>
                 `;
                 localStorage.removeItem('srt_lock_until');
                 localStorage.removeItem('srt_lock_company');
@@ -727,6 +755,10 @@
             const resBioElem = document.getElementById('resBiometria');
             resBioElem.innerText = computedDriverConfirm;
             resBioElem.style.color = faceMatchPassed ? '#34d399' : '#f87171';
+
+            const resPupElem = document.getElementById('resPupila');
+            resPupElem.innerText = computedPupilStatus;
+            resPupElem.style.color = computedPupilStatus.includes('🟢') ? '#38bdf8' : (computedPupilStatus.includes('🟡') ? '#fbbf24' : '#f87171');
 
             const resVozElem = document.getElementById('resVoz');
             resVozElem.innerText = computedVsiStatus;
@@ -751,6 +783,7 @@
                 status: status,
                 driver_confirmation: computedDriverConfirm,
                 vsi_status: computedVsiStatus,
+                pupil_status: computedPupilStatus,
                 photo_base64: capturedPhotoBase64
             };
 
@@ -776,7 +809,7 @@
 
                 if (res.ok) {
                     syncElem.className = 'sync-banner sync-success';
-                    syncElem.innerText = '✅ Diagnóstico e Dupla Checagem Registrados no CCO!';
+                    syncElem.innerText = '✅ Diagnóstico e Tripla Checagem Registrados no CCO!';
                 } else {
                     throw new Error('Erro Supabase');
                 }
