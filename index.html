@@ -212,10 +212,12 @@
             <p>Telemetria de Prontidão — Módulo Mobility</p>
         </div>
 
+        <!-- TELA DE BLOQUEIO / AVISO DE TRAVA -->
         <div id="stepLockout" class="step">
             <div id="lockoutCard"></div>
         </div>
 
+        <!-- PASSO 1: IDENTIFICAÇÃO OBRIGATÓRIA OU MAGIC LINK -->
         <div id="stepForm" class="step active">
             <label for="txtName">Nome Completo do Condutor:</label>
             <input type="text" id="txtName" placeholder="Ex: João Silva" required>
@@ -233,8 +235,9 @@
             <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular para Demonstração</button>
         </div>
 
+        <!-- PASSO 2: VALIDAÇÃO FACIAL, PUPILA E VOZ -->
         <div id="stepVoz" class="step">
-            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Análise Biométrica & Pupilometria</h3>
+            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Tripla Checagem Biométrica</h3>
             <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
                 Centralize o rosto no guia para leitura de laringe, reflexo ocular e pupila:
             </p>
@@ -257,6 +260,7 @@
             <button id="btnRec" class="btn" onclick="runAudioAndFaceTest()">🔴 Analisar Rosto, Pupila e Voz (5s)</button>
         </div>
 
+        <!-- PASSO 3: INSTRUÇÃO DO TESTE DE BOLINHAS -->
         <div id="stepInstruction" class="step">
             <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎯 Etapa 2: Teste de Reflexo e Foco</h3>
             <div class="instruction-card">
@@ -272,6 +276,7 @@
             <button class="btn" onclick="startGame()">Entendi, Começar Teste! 🎯</button>
         </div>
 
+        <!-- PASSO 4: O JOGO DAS BOLINHAS -->
         <div id="stepBolinhas" class="step">
             <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
                 <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
@@ -280,6 +285,7 @@
             <div class="game-box" id="gameArea"></div>
         </div>
 
+        <!-- PASSO 5: RESULTADO E TRANSMISSÃO -->
         <div id="stepResult" class="step">
             <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando com o CCO...</div>
             <div id="resultBadge" class="badge-status">--</div>
@@ -302,6 +308,9 @@
     <script>
         const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
         const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        // REGRA DE SEGURANÇA: Inatividade máxima de 1 HORA (60 min)
+        const MAX_INACTIVITY_MS = 1 * 60 * 60 * 1000; 
 
         let userData = {};
         let currentRound = 0;
@@ -327,21 +336,46 @@
         let computedPupilStatus = '🟢 Pupila Estável (EP 4.5 / Estresse Ocular Baixo)';
 
         window.onload = () => {
+            // 1. Reset manual via parâmetro de URL (?reset=1)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('reset') === '1' || urlParams.get('reset') === 'true') {
                 localStorage.removeItem('srt_lock_company');
                 localStorage.removeItem('srt_lock_until');
                 localStorage.removeItem('srt_baseline_face');
+                localStorage.removeItem('srt_last_checkin_time');
                 alert('🔓 Aplicativo desbloqueado e redefinido com sucesso!');
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
+            // 2. Leitura de Magic Link da Empresa ou Z-API (?name=...&company=...&wa=...&sector=...)
+            const magicName = urlParams.get('name');
+            const magicCompany = urlParams.get('company');
+            const magicWA = urlParams.get('wa');
+            const magicSector = urlParams.get('sector');
+
+            if (magicName) document.getElementById('txtName').value = magicName;
+            if (magicWA) document.getElementById('txtWA').value = magicWA;
+            if (magicCompany) document.getElementById('txtEmpresa').value = magicCompany;
+            if (magicSector) document.getElementById('txtSetor').value = magicSector;
+
+            // 3. Validação da Regra de Inatividade de 1 HORA
+            const lastCheckinTime = localStorage.getItem('srt_last_checkin_time');
+            if (lastCheckinTime) {
+                const diffTime = Date.now() - parseInt(lastCheckinTime);
+                if (diffTime > MAX_INACTIVITY_MS) {
+                    localStorage.removeItem('srt_last_checkin_time');
+                    console.log('⏰ Inatividade superior a 1 hora. Exigindo novo check-in biométrico!');
+                }
+            }
+
+            // 4. Verificação de Trava Permanente por Veto (Sinal Vermelho)
             const lockCompany = localStorage.getItem('srt_lock_company');
             if (lockCompany === 'true') {
                 exibirBloqueioEmpresa();
                 return;
             }
 
+            // 5. Verificação de Pausa Tática (Sinal Amarelo)
             const lockUntil = localStorage.getItem('srt_lock_until');
             if (lockUntil) {
                 const diff = parseInt(lockUntil) - Date.now();
@@ -353,8 +387,9 @@
                 }
             }
 
+            // 6. Preenchimento via Cache Local
             const cache = localStorage.getItem('srt_user_cache');
-            if (cache) {
+            if (cache && !magicName) {
                 try {
                     const u = JSON.parse(cache);
                     if (u.name) document.getElementById('txtName').value = u.name;
@@ -369,6 +404,7 @@
             localStorage.removeItem('srt_baseline_face');
             localStorage.removeItem('srt_lock_company');
             localStorage.removeItem('srt_lock_until');
+            localStorage.removeItem('srt_last_checkin_time');
             alert(' Biometria de Referência do Titular limpa! O próximo teste cadastrará o novo Rosto Titular.');
         }
 
@@ -376,6 +412,7 @@
             localStorage.removeItem('srt_lock_company');
             localStorage.removeItem('srt_lock_until');
             localStorage.removeItem('srt_baseline_face');
+            localStorage.removeItem('srt_last_checkin_time');
             alert('🔓 Trava removida com sucesso!');
             location.reload();
         }
@@ -388,7 +425,7 @@
                 <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
                     <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
                     <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Identificada <b>Disfunção no Controle Inibitório ou Alta Flutuação Laríngea Crítica</b>.<br><br>
+                        Identificada <b>Inaptidão Neuromotora, Alteração Ocular ou Flutuação Laríngea Crítica</b>.<br><br>
                         Por normas de segurança (NR-01/NR-17), <b>este aplicativo está bloqueado no celular</b>.
                     </p>
                     <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
@@ -459,12 +496,10 @@
 
         function calculatePupilEP(imgData) {
             // Algoritmo do Detector de Veto Óptico (TOOL 3.13)
-            // Analisa a taxa de contraste lumínico da área ocular/pupilar
             const data = imgData.data;
             let darkPixels = 0;
             let totalEyeAreaPixels = 0;
 
-            // Recorte do quadrante central do olho
             for (let i = 0; i < data.length; i += 16) {
                 let r = data[i], g = data[i+1], b = data[i+2];
                 let brightness = (r + g + b) / 3;
@@ -516,7 +551,7 @@
                     computedPupilStatus = `🔴 Midríase Severa (EP ${epScore} / Sequestro Límbico)`;
                 }
 
-                // Comparação biométrica facial
+                // Comparação biométrica facial com o Titular
                 const featureVector = extractImageFeatures(imgData);
                 const baselineStr = localStorage.getItem('srt_baseline_face');
                 if (!baselineStr) {
@@ -744,6 +779,9 @@
                 `;
                 localStorage.removeItem('srt_lock_until');
                 localStorage.removeItem('srt_lock_company');
+                
+                // Grava o horário da liberação válida do turno
+                localStorage.setItem('srt_last_checkin_time', Date.now().toString());
             }
 
             const badgeElem = document.getElementById('resultBadge');
