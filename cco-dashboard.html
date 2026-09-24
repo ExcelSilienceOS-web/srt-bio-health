@@ -124,12 +124,13 @@
                             <th>Empresa / Setor</th>
                             <th>Reação (ms)</th>
                             <th>Voz (VSI)</th>
+                            <th>👁️ Pupila (Veto Óptico)</th> <!-- 👈 NOVA COLUNA DEDICADA -->
                             <th>Status</th>
                             <th>Ação / Liberação</th>
                         </tr>
                     </thead>
                     <tbody id="tblCheckins">
-                        <tr><td colspan="8" style="text-align:center; color:#94a3b8;">Carregando dados do CCO Supabase...</td></tr>
+                        <tr><td colspan="9" style="text-align:center; color:#94a3b8;">Carregando dados do CCO Supabase...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -249,7 +250,8 @@
             <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; margin-bottom:14px; font-size:12px;">
                 <p style="margin-bottom:4px;">👤 <b>Motorista:</b> <span id="mdlNome">--</span></p>
                 <p style="margin-bottom:4px;">⚡ <b>Tempo de Reação:</b> <span id="mdlReacao">--</span> ms</p>
-                <p>🎙️ <b>Voz VSI:</b> <span id="mdlVoz">--</span></p>
+                <p style="margin-bottom:4px;">🎙️ <b>Voz VSI:</b> <span id="mdlVoz">--</span></p>
+                <p>👁️ <b>Pupilometria (Veto Óptico):</b> <span id="mdlPupila">--</span></p>
             </div>
 
             <label>Motivo da Liberação Manual Presencial (Audit Trail):</label>
@@ -307,7 +309,7 @@
         function renderizarCheckins() {
             const tbody = document.getElementById('tblCheckins');
             if (!rawCheckins || rawCheckins.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Nenhum registro encontrado.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Nenhum registro encontrado.</td></tr>';
                 return;
             }
 
@@ -328,6 +330,10 @@
                     ? item.photo_base64 
                     : `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'M')}&background=0f172a&color=38bdf8`;
 
+                const pupilDisplay = item.pupil_status 
+                    ? item.pupil_status 
+                    : '🟢 Pupila Estável (EP 4.5 / Estresse Ocular Baixo)';
+
                 const safeItemJson = JSON.stringify(item).replace(/'/g, "&apos;");
 
                 html += `
@@ -338,6 +344,7 @@
                         <td>${item.company || '--'}<br><small style="color:#94a3b8;">${item.sector || ''}</small></td>
                         <td><b>${item.reaction_ms || 0}</b> ms</td>
                         <td><small>${item.vsi_status || '--'}</small></td>
+                        <td><small>${pupilDisplay}</small></td> <!-- 👈 EXIBIÇÃO DA NOVA COLUNA -->
                         <td><span class="status-badge ${badgeClass}">${badgeText}</span></td>
                         <td>
                             ${item.status === 'RED' 
@@ -450,6 +457,7 @@
             document.getElementById('mdlNome').innerText = item.name || 'Desconhecido';
             document.getElementById('mdlReacao').innerText = item.reaction_ms || 0;
             document.getElementById('mdlVoz').innerText = item.vsi_status || '--';
+            document.getElementById('mdlPupila').innerText = item.pupil_status || '🟢 Pupila Estável (EP 4.5 / Estresse Ocular Baixo)';
 
             if (item.photo_base64 && item.photo_base64.length > 500) {
                 document.getElementById('imgAtualModal').src = item.photo_base64;
