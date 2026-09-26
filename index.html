@@ -303,13 +303,13 @@
             <input type="tel" id="txtWA" placeholder="Ex: 11999998888" required>
 
             <label for="txtEmpresa">Empresa / Transportadora:</label>
-            <input type="text" id="txtEmpresa" placeholder="Ex: Osborne Construtora" required>
+            <input type="text" id="txtEmpresa" placeholder="Ex: Uber / Frota Partner" required>
 
             <label for="txtSetor">Setor / Placa do Veículo:</label>
-            <input type="text" id="txtSetor" placeholder="Ex: Frota 01 / Caminhão ABC-1234" required>
+            <input type="text" id="txtSetor" placeholder="Ex: Frota 01 / Veículo ABC-1234" required>
 
             <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão 🚀</button>
-            <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular para Demonstração</button>
+            <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular e Aceite para Testes</button>
         </div>
 
         <!-- PASSO 2: VALIDAÇÃO FACIAL, PUPILA E VOZ -->
@@ -434,7 +434,7 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // 2. Leitura de Magic Link da Empresa ou Z-API (?name=...&company=...&wa=...&sector=...)
+            // 2. Leitura de Magic Link da Empresa (?name=...&company=...&wa=...&sector=...)
             const magicName = urlParams.get('name');
             const magicCompany = urlParams.get('company');
             const magicWA = urlParams.get('wa');
@@ -487,9 +487,40 @@
             }
         };
 
-        function aceitarLGPD() {
-            localStorage.setItem(`lgpd_consent_${POLICY_VERSION}`, new Date().toISOString());
+        // 🔒 ACEITE LGPD COM GRAVAÇÃO SIMULTÂNEA NO CELULAR E NO SUPABASE
+        async function aceitarLGPD() {
+            const policyVersion = POLICY_VERSION || 'v1.0';
+            const name = document.getElementById('txtName')?.value || 'Condutor Não Identificado';
+            const company = document.getElementById('txtEmpresa')?.value || 'N/A';
+            const wa = document.getElementById('txtWA')?.value || 'N/A';
+
+            // 1. Grava no dispositivo do motorista
+            localStorage.setItem(`lgpd_consent_${policyVersion}`, new Date().toISOString());
             document.getElementById('lgpd-modal').style.display = 'none';
+
+            // 2. Dispara registro de auditoria imutável para a tabela srt_consents do Supabase
+            try {
+                await fetch('https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_consents', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        driver_name: name,
+                        company: company,
+                        whatsapp: wa,
+                        policy_version: policyVersion,
+                        accepted_at: new Date().toISOString(),
+                        user_agent: navigator.userAgent
+                    })
+                });
+                console.log('✅ Consentimento LGPD registrado com sucesso no Supabase!');
+            } catch (e) {
+                console.error('Erro ao registrar consentimento no Supabase:', e);
+            }
         }
 
         function recusarLGPD() {
@@ -502,7 +533,8 @@
             localStorage.removeItem('srt_lock_until');
             localStorage.removeItem('srt_last_checkin_time');
             localStorage.removeItem(`lgpd_consent_${POLICY_VERSION}`);
-            alert(' Biometria e Consentimento limpos! O próximo teste cadastrará o novo Rosto Titular e solicitará o aceite.');
+            alert('🔄 Biometria e Consentimento redefinidos com sucesso!');
+            location.reload();
         }
 
         function desbloquearModoDemo() {
