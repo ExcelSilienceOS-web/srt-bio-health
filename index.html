@@ -385,7 +385,9 @@
     <script>
         const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
         const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
-        const POLICY_VERSION = 'v1.0';
+        
+        // Versão da política atualizada para v2.0 (Força o re-aceite do modal em todos os aparelhos)
+        const POLICY_VERSION = 'v2.0';
 
         // REGRA DE SEGURANÇA: Inatividade máxima de 1 HORA (60 min)
         const MAX_INACTIVITY_MS = 1 * 60 * 60 * 1000; 
@@ -414,7 +416,7 @@
         let computedPupilStatus = '🟢 Pupila Estável (EP 4.5 / Estresse Ocular Baixo)';
 
         window.onload = () => {
-            // 0. Verificação do Modal LGPD
+            // 0. Verificação do Modal LGPD para v2.0
             const lgpdConsented = localStorage.getItem(`lgpd_consent_${POLICY_VERSION}`);
             if (!lgpdConsented) {
                 document.getElementById('lgpd-modal').style.display = 'flex';
@@ -489,7 +491,7 @@
 
         // 🔒 ACEITE LGPD COM GRAVAÇÃO SIMULTÂNEA NO CELULAR E NO SUPABASE
         async function aceitarLGPD() {
-            const policyVersion = POLICY_VERSION || 'v1.0';
+            const policyVersion = POLICY_VERSION || 'v2.0';
             const name = document.getElementById('txtName')?.value || 'Condutor Não Identificado';
             const company = document.getElementById('txtEmpresa')?.value || 'N/A';
             const wa = document.getElementById('txtWA')?.value || 'N/A';
@@ -517,7 +519,7 @@
                         user_agent: navigator.userAgent
                     })
                 });
-                console.log('✅ Consentimento LGPD registrado com sucesso no Supabase!');
+                console.log('✅ Consentimento LGPD v2.0 registrado com sucesso no Supabase!');
             } catch (e) {
                 console.error('Erro ao registrar consentimento no Supabase:', e);
             }
@@ -688,7 +690,8 @@
                     const baselineVector = JSON.parse(baselineStr);
                     const diffScore = calculateImageDifference(featureVector, baselineVector);
 
-                    if (diffScore > 0.22) {
+                    // SENSIBILIDADE AUMENTADA: Reduzido de 0.22 para 0.12 para impedir falsos positivos de terceiros
+                    if (diffScore > 0.12) {
                         faceMatchPassed = false;
                         computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
                     } else {
