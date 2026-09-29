@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCELSILIENCE HUMAN OS — Capítulo 0: Diagnóstico ESI</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b1329; color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 16px;
+        }
+        .container {
+            width: 100%; max-width: 440px; background: #1e293b;
+            border-radius: 20px; padding: 24px; border: 1px solid #334155;
+        }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 20px; font-weight: 900; color: #38bdf8; }
+        .header p { font-size: 12px; color: #94a3b8; }
+        .game-box {
+            width: 100%; height: 260px; background: #0f172a;
+            border: 2px dashed #334155; border-radius: 12px;
+            position: relative; overflow: hidden; margin: 16px 0;
+        }
+        .target-ball {
+            width: 58px; height: 58px; border-radius: 50%;
+            position: absolute; cursor: pointer; user-select: none;
+        }
+        .ball-green { background: #10b981; border: 2px solid #34d399; }
+        .ball-red { background: #ef4444; border: 2px solid #f87171; }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 800; cursor: pointer;
+            background: #0284c7; color: #fff;
+        }
+        .res-box {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; display: none; margin-top: 16px; font-size: 13px; line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPÍTULO 0 :: DIAGNÓSTICO ESI</h1>
+            <p>Aglutinação 1: Velocidade de Veto vs. Linha de Base Vocal</p>
+        </div>
+
+        <div id="stepStart" style="text-align:center;">
+            <p style="font-size:13px; color:#cbd5e1; margin-bottom:16px;">Toque rápido nas bolinhas <b>VERDES</b>. Ignore as <b>VERMELHAS</b>.</p>
+            <button class="btn" onclick="iniciarTesteC0()">🎯 Iniciar Teste Visuomotor (15s)</button>
+        </div>
+
+        <div id="stepGame" style="display:none;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; font-weight:700;">
+                <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 6</b></span>
+                <span>Erros: <b id="lblErrors" style="color:#ef4444;">0</b></span>
+            </div>
+            <div class="game-box" id="gameArea"></div>
+        </div>
+
+        <div id="stepResult" class="res-box"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
+        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        let readerId = localStorage.getItem('excs_reader_id') || 'LEITOR-ANONIMO';
+        let vsiBase = localStorage.getItem('excs_vsi_base') || '2.5';
+
+        let round = 0, errors = 0, reactionTimes = [];
+        let spawnTime = 0, timer = null, handled = false;
+
+        function iniciarTesteC0() {
+            document.getElementById('stepStart').style.display = 'none';
+            document.getElementById('stepGame').style.display = 'block';
+            round = 0; errors = 0; reactionTimes = [];
+            spawnNext();
+        }
+
+        function spawnNext() {
+            if (timer) clearTimeout(timer);
+            const area = document.getElementById('gameArea');
+            area.innerHTML = '';
+
+            if (round >= 6) {
+                finalizarC0();
+                return;
+            }
+
+            round++;
+            document.getElementById('lblRound').innerText = `${round} / 6`;
+            document.getElementById('lblErrors').innerText = errors;
+
+            handled = false;
+            const isGreen = Math.random() > 0.4;
+            const ball = document.createElement('div');
+            ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+            
+            ball.style.left = `${Math.max(10, Math.floor(Math.random() * (area.clientWidth - 70)))}px`;
+            ball.style.top = `${Math.max(10, Math.floor(Math.random() * (area.clientHeight - 70)))}px`;
+
+            spawnTime = Date.now();
+
+            const onTouch = (e) => {
+                if (e) e.preventDefault();
+                if (handled) return;
+                handled = true;
+                if (timer) clearTimeout(timer);
+
+                if (isGreen) reactionTimes.push(Date.now() - spawnTime);
+                else errors++;
+
+                spawnNext();
+            };
+
+            ball.addEventListener('pointerdown', onTouch);
+            area.appendChild(ball);
+
+            timer = setTimeout(() => {
+                if (!handled) {
+                    handled = true;
+                    if (isGreen) reactionTimes.push(1100);
+                    spawnNext();
+                }
+            }, 1100);
+        }
+
+        async function finalizarC0() {
+            document.getElementById('stepGame').style.display = 'none';
+            const resBox = document.getElementById('stepResult');
+            resBox.style.display = 'block';
+
+            const avgReaction = reactionTimes.length > 0 
+                ? Math.round(reactionTimes.reduce((a,b)=>a+b, 0) / reactionTimes.length) 
+                : 650;
+
+            let statusText = avgReaction < 600 && errors === 0 
+                ? '🟢 SOBRIEDADE ALOSTÁTICA' 
+                : '🟡 DISSONÂNCIA COGNITIVA';
+
+            resBox.innerHTML = `
+                <h3 style="color:#38bdf8; margin-bottom:8px; text-align:center;">${statusText}</h3>
+                <p><b>ID do Exocórtex:</b> <code>${readerId}</code></p>
+                <p><b>Linha de Base Vocal (Intro):</b> VSI ${vsiBase}</p>
+                <p><b>Tempo Médio de Reação:</b> <span style="color:#38bdf8; font-weight:700;">${avgReaction} ms</span></p>
+                <p><b>Erros de Veto Motor:</b> <span style="color:#ef4444; font-weight:700;">${errors}</span></p>
+                <hr style="border-color:#334155; margin:12px 0;">
+                <p style="font-size:12px; color:#94a3b8;"><b>Análise de Aglutinação:</b> ${avgReaction < 600 ? 'Seu sistema motor respondeu em perfeita sintonia com sua linha de base vocal.' : 'Identificada leve paralisia/latência em relação ao seu VSI basal.'}</p>
+                <br>
+                <a href="c1.html" class="btn" style="display:block; text-align:center; text-decoration:none;">Avançar para o Capítulo 1 ➔</a>
+            `;
+
+            // Grava o teste aglutinado no Supabase
+            await fetch(SUPABASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    timestamp: new Date().toLocaleTimeString('pt-BR'),
+                    company: 'Livro ExcelSilience',
+                    name: readerId,
+                    sector: 'Capítulo 0 - ESI',
+                    reaction_ms: avgReaction,
+                    veto_errors: errors,
+                    status: avgReaction < 600 ? 'GREEN' : 'YELLOW',
+                    vsi_status: `VSI_BASE_${vsiBase}`
+                })
+            });
+        }
+    </script>
+</body>
+</html>
