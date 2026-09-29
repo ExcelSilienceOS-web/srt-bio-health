@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCELSILIENCE HUMAN OS — Capítulo 5: Sovereign Bios-Lock</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b1329; color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 16px;
+        }
+        .container {
+            width: 100%; max-width: 440px; background: #1e293b;
+            border-radius: 20px; padding: 24px; border: 1px solid #334155; text-align:center;
+        }
+        .header h1 { font-size: 20px; font-weight: 900; color: #38bdf8; margin-bottom:4px; }
+        .header p { font-size: 12px; color: #94a3b8; margin-bottom:16px; }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 800; cursor: pointer;
+            background: #10b981; color: #fff; margin-top:12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPÍTULO 5 :: EXOCÓRTEX™ COMMIT</h1>
+            <p>Sovereign Bios-Lock & Ancoragem Definitiva</p>
+        </div>
+
+        <div id="stepLock">
+            <div style="font-size:48px; margin-bottom:12px;">🔒</div>
+            <p style="font-size:13px; color:#cbd5e1; margin-bottom:16px;">Grave a sua confirmação soberana final de 5s no microfone para selar o seu contrato no silício:</p>
+            <div style="background:rgba(16,185,129,0.15); border:1px solid #10b981; padding:12px; border-radius:8px; font-weight:800; color:#34d399; margin-bottom:16px;">
+                "Sistema operando em Modo Soberano."
+            </div>
+            <button id="btnCommit" class="btn" onclick="executarCommit()">🔒 Executar Bios-Lock (5s)</button>
+        </div>
+
+        <div id="stepDone" style="display:none; text-align:left;">
+            <div style="background:#0f172a; border:1px solid #10b981; border-radius:12px; padding:16px;">
+                <h3 style="color:#34d399; text-align:center; margin-bottom:8px;">✅ EXOCÓRTEX™ BLOQUEADO & OPERACIONAL</h3>
+                <p style="font-size:12px; color:#cbd5e1; line-height:1.5;">Todos os seus vetores da <b>Introdução ao Capítulo 5</b> foram sincronizados e gravados no banco de dados com sucesso.</p>
+                <hr style="border-color:#334155; margin:12px 0;">
+                <p style="font-size:12px; color:#94a3b8;"><b>Chave de Segurança Cap 5:</b> <code>EXCS-CAP5-KERNEL</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
+        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        let readerId = localStorage.getItem('excs_reader_id') || 'LEITOR-ANONIMO';
+
+        async function executarCommit() {
+            const btn = document.getElementById('btnCommit');
+            btn.innerText = '🔒 Ancorando no Silício (5s)...';
+            btn.disabled = true;
+
+            setTimeout(async () => {
+                document.getElementById('stepLock').style.display = 'none';
+                document.getElementById('stepDone').style.display = 'block';
+
+                await fetch(SUPABASE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                    body: JSON.stringify({
+                        timestamp: new Date().toLocaleTimeString('pt-BR'),
+                        company: 'Livro ExcelSilience', name: readerId,
+                        sector: 'Capítulo 5 - Bios-Lock', reaction_ms: 0,
+                        status: 'GREEN', vsi_status: 'SOVEREIGN_BIOS_LOCKED'
+                    })
+                });
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
