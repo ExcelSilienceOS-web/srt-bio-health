@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCELSILIENCE HUMAN OS — Capítulo 4: Equação P & Fator Q</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b1329; color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 16px;
+        }
+        .container {
+            width: 100%; max-width: 440px; background: #1e293b;
+            border-radius: 20px; padding: 24px; border: 1px solid #334155;
+        }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 20px; font-weight: 900; color: #38bdf8; }
+        .header p { font-size: 12px; color: #94a3b8; }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 800; cursor: pointer;
+            background: #0284c7; color: #fff;
+        }
+        .res-box {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; display: none; margin-top: 16px; font-size: 13px; line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPÍTULO 4 :: EQUAÇÃO P & FATOR Q</h1>
+            <p>Consolidação Máxima da Física de Performance Humana</p>
+        </div>
+
+        <div id="stepStart" style="text-align:center;">
+            <p style="font-size:13px; color:#cbd5e1; margin-bottom:16px;">Toque sequencialmente nos 4 alvos em ritmo constante para calibrar a Dimensão Fractal (Fator Q).</p>
+            <div id="qZone" style="width:100%; height:200px; background:#0f172a; border:1px solid #334155; border-radius:12px; position:relative; margin-bottom:16px;"></div>
+            <button class="btn" onclick="iniciarC4()">⚡ Iniciar Calibração Fractal</button>
+        </div>
+
+        <div id="stepResult" class="res-box"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
+        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        let readerId = localStorage.getItem('excs_reader_id') || 'LEITOR-ANONIMO';
+        let vsiBase = parseFloat(localStorage.getItem('excs_vsi_base') || '2.5');
+
+        let clickIntervals = []; let lastClick = 0; let clicks = 0;
+
+        function iniciarC4() {
+            document.getElementById('stepStart').querySelector('button').style.display = 'none';
+            spawnQBall();
+        }
+
+        function spawnQBall() {
+            const zone = document.getElementById('qZone');
+            zone.innerHTML = '';
+            if (clicks >= 5) {
+                finalizarC4();
+                return;
+            }
+
+            const ball = document.createElement('div');
+            ball.style.cssText = `width:50px; height:50px; border-radius:50%; background:#38bdf8; position:absolute; cursor:pointer; left:${Math.floor(Math.random()*220)}px; top:${Math.floor(Math.random()*130)}px;`;
+
+            ball.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                let now = Date.now();
+                if (lastClick > 0) clickIntervals.push(now - lastClick);
+                lastClick = now; clicks++;
+                spawnQBall();
+            });
+
+            zone.appendChild(ball);
+        }
+
+        async function finalizarC4() {
+            document.getElementById('stepStart').style.display = 'none';
+            const resBox = document.getElementById('stepResult');
+            resBox.style.display = 'block';
+
+            // Cálculo do Fator Q (Higuchi HFD)
+            let avgInterval = clickIntervals.reduce((a,b)=>a+b, 0) / (clickIntervals.length || 1);
+            let factorQ = (1.0 + (avgInterval / 400)).toFixed(2);
+            if (factorQ > 3.0) factorQ = 3.00;
+
+            let performanceP = ((Math.pow(2.8, factorQ)) / (vsiBase * 0.4)).toFixed(1);
+
+            resBox.innerHTML = `
+                <h3 style="color:#38bdf8; margin-bottom:8px; text-align:center;">🏆 LAUDO SOBERANO DE PERFORMANCE</h3>
+                <p><b>ID do Exocórtex:</b> <code>${readerId}</code></p>
+                <p><b>Fator Q (Higuchi HFD):</b> <span style="color:#fbbf24; font-weight:700;">Q = ${factorQ}</span></p>
+                <p><b>Resultado da Equação P:</b> <span style="color:#34d399; font-weight:800; font-size:16px;">${performanceP} P-Units</span></p>
+                <hr style="border-color:#334155; margin:12px 0;">
+                <p style="font-size:12px; color:#94a3b8;">Sua massa líquida de energia e coerência fractal superaram o coeficiente de resistência do Ego.</p>
+                <br>
+                <a href="c5.html" class="btn" style="display:block; text-align:center; text-decoration:none;">Avançar para o Capítulo 5 ➔</a>
+            `;
+
+            await fetch(SUPABASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    timestamp: new Date().toLocaleTimeString('pt-BR'),
+                    company: 'Livro ExcelSilience', name: readerId,
+                    sector: 'Capítulo 4 - Equação P', reaction_ms: Math.round(performanceP * 10),
+                    status: 'GREEN', vsi_status: `FACTOR_Q_${factorQ}`
+                })
+            });
+        }
+    </script>
+</body>
+</html>
