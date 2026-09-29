@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCELSILIENCE HUMAN OS — Capítulo 2: Detector SGI</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b1329; color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 16px;
+        }
+        .container {
+            width: 100%; max-width: 440px; background: #1e293b;
+            border-radius: 20px; padding: 24px; border: 1px solid #334155;
+        }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 20px; font-weight: 900; color: #38bdf8; }
+        .header p { font-size: 12px; color: #94a3b8; }
+        .card {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; margin-bottom: 16px; text-align: center;
+        }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 800; cursor: pointer;
+            background: #0284c7; color: #fff;
+        }
+        .res-box {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; display: none; margin-top: 16px; font-size: 13px; line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPÍTULO 2 :: SOBERANIA (SGI)</h1>
+            <p>Aglutinação 3: Micro-Polígrafo de Voz sob Provocação</p>
+        </div>
+
+        <div class="card" id="stepStart">
+            <p style="font-size: 13px; color: #cbd5e1; margin-bottom:12px;">Clique abaixo. Ao sinal sonoro, fale no microfone com firmeza:</p>
+            <div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; padding:12px; border-radius:8px; font-weight:800; color:#f87171; margin-bottom:16px;">
+                "Assumo responsabilidade total pelos meus resultados."
+            </div>
+            <button id="btnRec" class="btn" onclick="iniciarSGI()">🔴 Iniciar Provocação Vocal (5s)</button>
+        </div>
+
+        <div id="stepResult" class="res-box"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
+        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        let readerId = localStorage.getItem('excs_reader_id') || 'LEITOR-ANONIMO';
+        let vsiBase = parseFloat(localStorage.getItem('excs_vsi_base') || '2.5');
+
+        async function iniciarSGI() {
+            const btn = document.getElementById('btnRec');
+            btn.innerText = '📢 GRAVE AGORA!';
+            btn.style.background = '#ef4444';
+
+            // Bipe sonoro de provocação
+            let ctx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = ctx.createOscillator();
+            osc.connect(ctx.destination);
+            osc.frequency.value = 880;
+            osc.start(); osc.stop(ctx.currentTime + 0.3);
+
+            let mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            let analyser = ctx.createAnalyser();
+            analyser.fftSize = 256;
+            let source = ctx.createMediaStreamSource(mediaStream);
+            source.connect(analyser);
+            let dataArray = new Uint8Array(analyser.frequencyBinCount);
+            let samples = [];
+
+            let interval = setInterval(() => {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = dataArray.reduce((a, b) => a + b, 0);
+                samples.push(sum / dataArray.length);
+            }, 100);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                mediaStream.getTracks().forEach(t => t.stop());
+                finalizarSGI(samples);
+            }, 5000);
+        }
+
+        async function finalizarSGI(samples) {
+            document.getElementById('stepStart').style.display = 'none';
+            const resBox = document.getElementById('stepResult');
+            resBox.style.display = 'block';
+
+            let sum = samples.reduce((a,b)=>a+b, 0);
+            let mean = sum / (samples.length || 1);
+            let variance = samples.reduce((a,b)=>a+Math.pow(b-mean, 2), 0) / (samples.length || 1);
+            let vsiStress = parseFloat((1.0 + (Math.sqrt(variance) / (mean + 1)) * 4).toFixed(2));
+
+            let deltaVsi = (vsiStress - vsiBase).toFixed(2);
+            let sgiStatus = deltaVsi <= 0.8 ? '🟢 SOBERANIA CONFIRMADA (Skin in the Game)' : '🔴 ALTA TENSÃO LARÍNGEA (Fricção do Ego)';
+
+            resBox.innerHTML = `
+                <h3 style="color:#38bdf8; margin-bottom:8px; text-align:center;">${sgiStatus}</h3>
+                <p><b>ID do Exocórtex:</b> <code>${readerId}</code></p>
+                <p><b>VSI Basal (Intro):</b> ${vsiBase}</p>
+                <p><b>VSI sob Provocação:</b> <span style="color:#fbbf24; font-weight:700;">${vsiStress}</span></p>
+                <p><b>Delta de Tensão:</b> +${deltaVsi}</p>
+                <hr style="border-color:#334155; margin:12px 0;">
+                <p style="font-size:12px; color:#94a3b8;"><b>Análise do Polígrafo:</b> ${deltaVsi <= 0.8 ? 'Sua fisiologia vocal manteve-se inabalável sob estresse verbal.' : 'Detectado aumento brusco de rigidez laríngea ao assumir a frase de comando.'}</p>
+                <br>
+                <a href="c3.html" class="btn" style="display:block; text-align:center; text-decoration:none;">Avançar para o Capítulo 3 ➔</a>
+            `;
+
+            await fetch(SUPABASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    timestamp: new Date().toLocaleTimeString('pt-BR'),
+                    company: 'Livro ExcelSilience', name: readerId,
+                    sector: 'Capítulo 2 - SGI', reaction_ms: Math.round(deltaVsi * 100),
+                    status: deltaVsi <= 0.8 ? 'GREEN' : 'RED', vsi_status: `SGI_DELTA_${deltaVsi}`
+                })
+            });
+        }
+    </script>
+</body>
+</html>
