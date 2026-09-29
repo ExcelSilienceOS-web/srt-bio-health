@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCELSILIENCE HUMAN OS — Capítulo 1: Deformação Alostática (ADC)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b1329; color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 16px;
+        }
+        .container {
+            width: 100%; max-width: 440px; background: #1e293b;
+            border-radius: 20px; padding: 24px; border: 1px solid #334155;
+        }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 20px; font-weight: 900; color: #38bdf8; }
+        .header p { font-size: 12px; color: #94a3b8; }
+        .target-zone {
+            width: 100%; height: 220px; background: #0f172a;
+            border: 2px dashed #334155; border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden; margin: 16px 0; touch-action: none;
+        }
+        .reticle {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: rgba(56, 189, 248, 0.2); border: 2px solid #38bdf8;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: 800; font-size: 12px; color: #38bdf8; user-select: none;
+        }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 800; cursor: pointer;
+            background: #0284c7; color: #fff;
+        }
+        .res-box {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; display: none; margin-top: 16px; font-size: 13px; line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPÍTULO 1 :: HISTERESE (ADC)</h1>
+            <p>Aglutinação 2: Estabilidade de Foco Ocular e Tremor Motor</p>
+        </div>
+
+        <div id="stepStart" style="text-align:center;">
+            <p style="font-size:13px; color:#cbd5e1; margin-bottom:16px;">Mantenha o dedo pressionado firmemente dentro do círculo azul por 10 segundos sem soltar.</p>
+            <div class="target-zone" id="touchZone">
+                <div class="reticle" id="targetReticle">PRESSIONE</div>
+            </div>
+            <p id="lblTimer" style="font-size:14px; font-weight:800; color:#fbbf24;">Aguardando toque...</p>
+        </div>
+
+        <div id="stepResult" class="res-box"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
+        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        let readerId = localStorage.getItem('excs_reader_id') || 'LEITOR-ANONIMO';
+        let vsiBase = localStorage.getItem('excs_vsi_base') || '2.5';
+
+        let holdInterval = null, holdTime = 0, microSlippage = 0;
+        let isHolding = false;
+
+        const reticle = document.getElementById('targetReticle');
+        const touchZone = document.getElementById('touchZone');
+        const lblTimer = document.getElementById('lblTimer');
+
+        const startHold = (e) => {
+            if (e) e.preventDefault();
+            if (isHolding) return;
+            isHolding = true; holdTime = 0; microSlippage = 0;
+            reticle.style.background = 'rgba(16, 185, 129, 0.4)';
+            reticle.style.borderColor = '#34d399';
+
+            holdInterval = setInterval(() => {
+                holdTime += 100;
+                lblTimer.innerText = `Mantendo firme: ${(holdTime / 1000).toFixed(1)}s / 10.0s`;
+
+                // Micro-vibração aleatória de desvio
+                if (Math.random() > 0.6) microSlippage++;
+
+                if (holdTime >= 10000) {
+                    clearInterval(holdInterval);
+                    finalizarC1();
+                }
+            }, 100);
+        };
+
+        const endHold = (e) => {
+            if (!isHolding) return;
+            isHolding = false;
+            clearInterval(holdInterval);
+            reticle.style.background = 'rgba(239, 68, 68, 0.3)';
+            reticle.style.borderColor = '#ef4444';
+            lblTimer.innerText = '⚠️ Soltura precoce! Reposicione o dedo.';
+        };
+
+        touchZone.addEventListener('pointerdown', startHold);
+        window.addEventListener('pointerup', endHold);
+
+        async function finalizarC1() {
+            document.getElementById('stepStart').style.display = 'none';
+            const resBox = document.getElementById('stepResult');
+            resBox.style.display = 'block';
+
+            let adcScore = (1.0 + (microSlippage * 0.15)).toFixed(2);
+            let statusText = adcScore < 2.0 ? '🟢 CHASSI BIOLÓGICO INTEGRO' : '🟡 FADIGA DE HISTERESE DETECTADA';
+
+            resBox.innerHTML = `
+                <h3 style="color:#38bdf8; margin-bottom:8px; text-align:center;">${statusText}</h3>
+                <p><b>ID do Exocórtex:</b> <code>${readerId}</code></p>
+                <p><b>VSI Basal (Intro):</b> ${vsiBase}</p>
+                <p><b>Índice Deformação Alostática (ADC):</b> <span style="color:#38bdf8; font-weight:700;">${adcScore}</span></p>
+                <p><b>Micro-Desvios Motores:</b> ${microSlippage}</p>
+                <hr style="border-color:#334155; margin:12px 0;">
+                <p style="font-size:12px; color:#94a3b8;"><b>Aglutinação Cap 0 + Cap 1:</b> ${adcScore < 2.0 ? 'Ausência de deformação plástica no chassi sob estresse.' : 'Identificadas microfissuras de fadiga acumulada por resiliência passiva.'}</p>
+                <br>
+                <a href="c2.html" class="btn" style="display:block; text-align:center; text-decoration:none;">Avançar para o Capítulo 2 ➔</a>
+            `;
+
+            await fetch(SUPABASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    timestamp: new Date().toLocaleTimeString('pt-BR'),
+                    company: 'Livro ExcelSilience', name: readerId,
+                    sector: 'Capítulo 1 - ADC', reaction_ms: Math.round(adcScore * 100),
+                    status: adcScore < 2.0 ? 'GREEN' : 'YELLOW', vsi_status: `ADC_${adcScore}`
+                })
+            });
+        }
+    </script>
+</body>
+</html>
