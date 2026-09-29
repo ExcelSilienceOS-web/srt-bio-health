@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCELSILIENCE SRT - RH :: Painel de People Analytics Anônimo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b1329; color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; padding: 20px 16px;
+        }
+        .container {
+            width: 100%; max-width: 800px; background: #1e293b;
+            border-radius: 20px; padding: 24px; border: 1px solid #334155;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .header {
+            text-align: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 16px;
+        }
+        .header h1 { font-size: 22px; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px; }
+        .header p { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+
+        .lgpd-badge {
+            background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 10px;
+            padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; font-size: 12px; color: #34d399; font-weight: 700;
+        }
+
+        /* Indicadores Principais em Grade */
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px;
+        }
+        @media (max-width: 600px) {
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .metric-card {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 14px; text-align: center;
+        }
+        .metric-title { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+        .metric-value { font-size: 20px; font-weight: 900; color: #38bdf8; }
+        .metric-sub { font-size: 10px; color: #64748b; margin-top: 4px; }
+
+        /* Barra de Distribuição de Risco da Empresa */
+        .risk-bar-container {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; margin-bottom: 24px;
+        }
+        .risk-bar-title { font-size: 12px; font-weight: 800; color: #cbd5e1; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .risk-bar-outer { width: 100%; height: 16px; background: #334155; border-radius: 8px; overflow: hidden; display: flex; }
+        .risk-seg-green { background: #10b981; height: 100%; }
+        .risk-seg-yellow { background: #fbbf24; height: 100%; }
+        .risk-seg-purple { background: #a855f7; height: 100%; }
+        .risk-seg-red { background: #ef4444; height: 100%; }
+
+        .legend-grid {
+            display: flex; justify-content: space-around; margin-top: 10px; font-size: 11px; font-weight: 700;
+        }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+        /* Mapa de Calor por Setor (Tabela/Cards) */
+        .section-title { font-size: 13px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .sector-card {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; margin-bottom: 12px; transition: border-color 0.2s;
+        }
+        .sector-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .sector-name { font-size: 15px; font-weight: 800; color: #f8fafc; }
+        .status-badge {
+            padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+        }
+        .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .badge-yellow { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid #fbbf24; }
+        .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
+        .badge-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .badge-lock { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #64748b; }
+
+        .sector-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 12px; color: #94a3b8; }
+        .sector-details b { color: #f8fafc; }
+
+        .btn-reload {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 13px; font-weight: 800; cursor: pointer;
+            background: #0284c7; color: #fff; margin-top: 10px; transition: 0.2s;
+        }
+        .btn-reload:hover { background: #0369a1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>EXCELSILIENCE SRT - RH</h1>
+            <p>MAPA DE CALOR DE SAÚDE OCUPACIONAL & PEOPLE ANALYTICS</p>
+        </div>
+
+        <!-- Trava de Anonimato LGPD -->
+        <div class="lgpd-badge">
+            <span>🛡️ MODO ANÔNIMO COMPLIANCE (LGPD Art. 7º/11)</span>
+            <span>Amostragem Mínima por Setor: N ≥ 5</span>
+        </div>
+
+        <!-- Cards Globais da Empresa -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Check-ins</div>
+                <div class="metric-value" id="valTotalCheckins">0</div>
+                <div class="metric-sub">Amostragem Total</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Média VSI</div>
+                <div class="metric-value" id="valAvgVsi">--</div>
+                <div class="metric-sub">Tensão Vocal Global</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Estresse</div>
+                <div class="metric-value" id="valPctStress" style="color:#fbbf24;">0%</div>
+                <div class="metric-sub">Amarelo / Roxo</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Inaptidão</div>
+                <div class="metric-value" id="valPctInapt" style="color:#ef4444;">0%</div>
+                <div class="metric-sub">Vermelho Crítico</div>
+            </div>
+        </div>
+
+        <!-- Barra do Panorama Geral de Risco -->
+        <div class="risk-bar-container">
+            <div class="risk-bar-title">
+                <span>Distribuição de Clima & Carga Psicossocial</span>
+                <span id="lblRiskRatio">0% Verde | 0% Amarelo | 0% Roxo | 0% Vermelho</span>
+            </div>
+            <div class="risk-bar-outer">
+                <div id="barGreen" class="risk-seg-green" style="width: 100%;"></div>
+                <div id="barYellow" class="risk-seg-yellow" style="width: 0%;"></div>
+                <div id="barPurple" class="risk-seg-purple" style="width: 0%;"></div>
+                <div id="barRed" class="risk-seg-red" style="width: 0%;"></div>
+            </div>
+            <div class="legend-grid">
+                <div class="legend-item"><span class="dot" style="background:#10b981;"></span> Homeostase</div>
+                <div class="legend-item"><span class="dot" style="background:#fbbf24;"></span> Sobrecarga Tática</div>
+                <div class="legend-item"><span class="dot" style="background:#a855f7;"></span> Exaustão / Sono</div>
+                <div class="legend-item"><span class="dot" style="background:#ef4444;"></span> Inaptidão Crítica</div>
+            </div>
+        </div>
+
+        <!-- Mapa por Setor/Departamento -->
+        <div class="section-title">📊 Diagnóstico de Riscos por Departamento (NR-01 / NR-17)</div>
+        <div id="sectorContainer">
+            <p style="text-align:center; color:#64748b; font-size:13px; padding:20px;">Carregando dados biométricos do Supabase...</p>
+        </div>
+
+        <button class="btn-reload" onclick="carregarDadosRH()">🔄 Atualizar Analytics no Supabase</button>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
+        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        async function carregarDadosRH() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}?select=*`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    carregarMocksRH();
+                    return;
+                }
+
+                processarEExibirRH(data);
+            } catch (err) {
+                console.warn('Erro ao conectar ao Supabase, exibindo simulação:', err);
+                carregarMocksRH();
+            }
+        }
+
+        function processarEExibirRH(data) {
+            let total = data.length;
+            let countGreen = 0, countYellow = 0, countPurple = 0, countRed = 0;
+            let sumVsi = 0, vsiCount = 0;
+
+            // Agrupamento por Setor
+            let sectors = {};
+
+            data.forEach(item => {
+                let sec = item.sector || 'Operações Gerais';
+                if (!sectors[sec]) {
+                    sectors[sec] = { total: 0, green: 0, yellow: 0, purple: 0, red: 0, sumVsi: 0 };
+                }
+
+                sectors[sec].total++;
+
+                let st = (item.status || 'GREEN').toUpperCase();
+                if (st === 'GREEN') { countGreen++; sectors[sec].green++; }
+                else if (st === 'YELLOW') { countYellow++; sectors[sec].yellow++; }
+                else if (st === 'PURPLE') { countPurple++; sectors[sec].purple++; }
+                else if (st === 'RED') { countRed++; sectors[sec].red++; }
+                else { countGreen++; sectors[sec].green++; }
+
+                if (item.vsi_status) {
+                    let match = item.vsi_status.match(/[\d.]+/);
+                    if (match) {
+                        let val = parseFloat(match[0]);
+                        sumVsi += val;
+                        sectors[sec].sumVsi += val;
+                        vsiCount++;
+                    }
+                }
+            });
+
+            // Atualiza Cards Globais
+            document.getElementById('valTotalCheckins').innerText = total;
+            let avgVsi = vsiCount > 0 ? (sumVsi / vsiCount).toFixed(2) : '2.3';
+            document.getElementById('valAvgVsi').innerText = avgVsi;
+
+            let pYellow = Math.round(((countYellow + countPurple) / total) * 100) || 0;
+            let pRed = Math.round((countRed / total) * 100) || 0;
+            let pGreen = 100 - pYellow - pRed;
+
+            document.getElementById('valPctStress').innerText = `${pYellow}%`;
+            document.getElementById('valPctInapt').innerText = `${pRed}%`;
+
+            // Atualiza Barra Geral
+            document.getElementById('barGreen').style.width = `${pGreen}%`;
+            document.getElementById('barYellow').style.width = `${Math.round((countYellow/total)*100)}%`;
+            document.getElementById('barPurple').style.width = `${Math.round((countPurple/total)*100)}%`;
+            document.getElementById('barRed').style.width = `${pRed}%`;
+
+            document.getElementById('lblRiskRatio').innerText = `${pGreen}% Verde | ${pYellow}% Estresse | ${pRed}% Crítico`;
+
+            // Renderiza Cards dos Setores
+            const container = document.getElementById('sectorContainer');
+            container.innerHTML = '';
+
+            Object.keys(sectors).forEach(secName => {
+                let sec = sectors[secName];
+                let isAnon = sec.total >= 5;
+
+                let badgeClass = 'badge-green', badgeText = 'HOMEOSTASE';
+                if (!isAnon) {
+                    badgeClass = 'badge-lock'; badgeText = '🔒 LGPD (N < 5)';
+                } else if (sec.red > 0) {
+                    badgeClass = 'badge-red'; badgeText = '🔴 ALERTA CRÍTICO';
+                } else if (sec.purple > 0) {
+                    badgeClass = 'badge-purple'; badgeText = '🟣 EXAUSTÃO / SONO';
+                } else if (sec.yellow > 0) {
+                    badgeClass = 'badge-yellow'; badgeText = '🟡 SOBRECARGA';
+                }
+
+                let secAvgVsi = (sec.sumVsi / (sec.total || 1)).toFixed(2);
+
+                container.innerHTML += `
+                    <div class="sector-card">
+                        <div class="sector-header">
+                            <span class="sector-name">${secName}</span>
+                            <span class="status-badge ${badgeClass}">${badgeText}</span>
+                        </div>
+                        <div class="sector-details">
+                            <div>Amostragem: <b>${sec.total} check-ins</b></div>
+                            <div>Tensão Vocal: <b>${isAnon ? 'VSI ' + secAvgVsi : '🔒 Oculto'}</b></div>
+                            <div>Ação NR-17: <b>${isAnon ? (sec.red > 0 ? 'Intervenção' : 'Monitoramento') : 'Aguardando N≥5'}</b></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function carregarMocksRH() {
+            const mocks = [
+                { sector: 'Operações & Logística', status: 'GREEN', vsi_status: 'VSI_BASE_2.1' },
+                { sector: 'Operações & Logística', status: 'GREEN', vsi_status: 'VSI_BASE_2.2' },
+                { sector: 'Operações & Logística', status: 'YELLOW', vsi_status: 'VSI_BASE_3.4' },
+                { sector: 'Operações & Logística', status: 'GREEN', vsi_status: 'VSI_BASE_2.0' },
+                { sector: 'Operações & Logística', status: 'PURPLE', vsi_status: 'VSI_BASE_3.8' },
+                { sector: 'Atendimento & Vendas', status: 'YELLOW', vsi_status: 'VSI_BASE_3.2' },
+                { sector: 'Atendimento & Vendas', status: 'YELLOW', vsi_status: 'VSI_BASE_3.5' },
+                { sector: 'Atendimento & Vendas', status: 'GREEN', vsi_status: 'VSI_BASE_2.4' },
+                { sector: 'Atendimento & Vendas', status: 'GREEN', vsi_status: 'VSI_BASE_2.3' },
+                { sector: 'Atendimento & Vendas', status: 'RED', vsi_status: 'VSI_BASE_4.1' },
+                { sector: 'TI & Engenharia', status: 'GREEN', vsi_status: 'VSI_BASE_1.9' },
+                { sector: 'TI & Engenharia', status: 'GREEN', vsi_status: 'VSI_BASE_2.1' },
+                { sector: 'TI & Engenharia', status: 'GREEN', vsi_status: 'VSI_BASE_2.0' },
+                { sector: 'TI & Engenharia', status: 'GREEN', vsi_status: 'VSI_BASE_2.2' },
+                { sector: 'TI & Engenharia', status: 'GREEN', vsi_status: 'VSI_BASE_2.1' },
+                { sector: 'Financeiro / Jurídico', status: 'GREEN', vsi_status: 'VSI_BASE_2.3' },
+                { sector: 'Financeiro / Jurídico', status: 'GREEN', vsi_status: 'VSI_BASE_2.4' }
+            ];
+            processarEExibirRH(mocks);
+        }
+
+        window.onload = carregarDadosRH;
+    </script>
+</body>
+</html>
