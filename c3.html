@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCELSILIENCE HUMAN OS — Capítulo 3: Veto Óptico IDC</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0b1329; color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 16px;
+        }
+        .container {
+            width: 100%; max-width: 440px; background: #1e293b;
+            border-radius: 20px; padding: 24px; border: 1px solid #334155;
+        }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 20px; font-weight: 900; color: #38bdf8; }
+        .header p { font-size: 12px; color: #94a3b8; }
+        .game-box {
+            width: 100%; height: 240px; background: #0f172a;
+            border: 2px dashed #334155; border-radius: 12px;
+            position: relative; overflow: hidden; margin: 16px 0;
+        }
+        .target-ball {
+            width: 58px; height: 58px; border-radius: 50%; position: absolute;
+            cursor: pointer; user-select: none;
+        }
+        .ball-green { background: #10b981; border: 2px solid #34d399; }
+        .glitch-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(239, 68, 68, 0.8); display:none;
+            justify-content:center; align-items:center; color:#fff; font-weight:900; font-size:18px;
+        }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 800; cursor: pointer;
+            background: #0284c7; color: #fff;
+        }
+        .res-box {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            padding: 16px; display: none; margin-top: 16px; font-size: 13px; line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPÍTULO 3 :: DOMÍNIO CORTICAL (IDC)</h1>
+            <p>Aglutinação 4: Veto Motor sob Pane de Surpresa</p>
+        </div>
+
+        <div id="stepStart" style="text-align:center;">
+            <p style="font-size:13px; color:#cbd5e1; margin-bottom:16px;">Toque nas bolinhas <b>VERDES</b>. Se a tela piscar em <b>PANE VERMELHA</b>, pare imediatamente e NÃO toque em nada!</p>
+            <button class="btn" onclick="iniciarC3()">🎯 Iniciar Simulador de Pane (15s)</button>
+        </div>
+
+        <div id="stepGame" style="display:none;">
+            <div class="game-box" id="gameArea">
+                <div id="glitch" class="glitch-overlay">⚠️ PANE DE SISTEMA!</div>
+            </div>
+        </div>
+
+        <div id="stepResult" class="res-box"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
+        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+
+        let readerId = localStorage.getItem('excs_reader_id') || 'LEITOR-ANONIMO';
+        let rounds = 0, vetoErrors = 0, glitchActive = false;
+
+        function iniciarC3() {
+            document.getElementById('stepStart').style.display = 'none';
+            document.getElementById('stepGame').style.display = 'block';
+            spawnRound();
+        }
+
+        function spawnRound() {
+            const area = document.getElementById('gameArea');
+            const glitch = document.getElementById('glitch');
+            area.querySelectorAll('.target-ball').forEach(b => b.remove());
+            glitch.style.display = 'none'; glitchActive = false;
+
+            if (rounds >= 5) {
+                finalizarC3();
+                return;
+            }
+
+            rounds++;
+            const isGlitchRound = rounds === 3 || rounds === 5;
+            const ball = document.createElement('div');
+            ball.className = 'target-ball ball-green';
+            ball.style.left = `${Math.floor(Math.random() * (area.clientWidth - 70))}px`;
+            ball.style.top = `${Math.floor(Math.random() * (area.clientHeight - 70))}px`;
+
+            ball.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                if (glitchActive) vetoErrors++;
+                spawnRound();
+            });
+
+            area.appendChild(ball);
+
+            if (isGlitchRound) {
+                setTimeout(() => {
+                    glitchActive = true;
+                    glitch.style.display = 'flex';
+                }, 300);
+            }
+
+            setTimeout(spawnRound, 1200);
+        }
+
+        async function finalizarC3() {
+            document.getElementById('stepGame').style.display = 'none';
+            const resBox = document.getElementById('stepResult');
+            resBox.style.display = 'block';
+
+            let idcStatus = vetoErrors === 0 ? '🟢 DOMÍNIO CÓRTEX PRÉ-FRONTAL' : '🔴 SEQUESTRO DA AMÍGDALA';
+
+            resBox.innerHTML = `
+                <h3 style="color:#38bdf8; margin-bottom:8px; text-align:center;">${idcStatus}</h3>
+                <p><b>ID do Exocórtex:</b> <code>${readerId}</code></p>
+                <p><b>Erros de Inibição na Pane:</b> <span style="color:#ef4444; font-weight:700;">${vetoErrors}</span></p>
+                <hr style="border-color:#334155; margin:12px 0;">
+                <p style="font-size:12px; color:#94a3b8;"><b>Análise de Veto:</b> ${vetoErrors === 0 ? 'Seu Córtex Pré-Frontal manteve o veto consciente mesmo sob estresse de surpresa.' : 'Sua resposta motora foi capturada pelo impulso límbico durante o estresse.'}</p>
+                <br>
+                <a href="c4.html" class="btn" style="display:block; text-align:center; text-decoration:none;">Avançar para o Capítulo 4 ➔</a>
+            `;
+
+            await fetch(SUPABASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    timestamp: new Date().toLocaleTimeString('pt-BR'),
+                    company: 'Livro ExcelSilience', name: readerId,
+                    sector: 'Capítulo 3 - IDC', reaction_ms: vetoErrors * 500,
+                    status: vetoErrors === 0 ? 'GREEN' : 'RED', vsi_status: `IDC_ERRORS_${vetoErrors}`
+                })
+            });
+        }
+    </script>
+</body>
+</html>
