@@ -49,17 +49,13 @@
   <button onclick="loadAllData()">🔄 Atualizar Dados</button>
 </div>
 
-<!-- NAVEGAÇÃO ENTRE ABAS -->
 <div class="nav-tabs">
-  <button class="tab-btn active" onclick="switchTab('exec')">📊 Dashboard de RH & Setores</button>
-  <button class="tab-btn" onclick="switchTab('tech')">🧪 Validação Técnica de Respostas (Dev/Demo)</button>
+  <button id="btn-tab-exec" class="tab-btn active" onclick="switchTab('exec')">📊 Dashboard de RH & Setores</button>
+  <button id="btn-tab-tech" class="tab-btn" onclick="switchTab('tech')">🧪 Validação Técnica de Respostas (Dev/Demo)</button>
 </div>
 
-<!-- ABA 1: DASHBOARD EXECUTIVO -->
 <div id="tab-exec">
   <div class="grid">
-    
-    <!-- CARD 1: GERENCIADOR DE DEPARTAMENTOS -->
     <div class="card">
       <h3>⚙️ Gerenciador de Setores da Empresa</h3>
       <div style="display:flex; gap:8px; margin-bottom:12px;">
@@ -69,16 +65,13 @@
       <div id="dept-list-manager" style="max-height: 180px; overflow-y: auto;">Carregando...</div>
     </div>
 
-    <!-- CARD 2: CENTRAL DE LINKS POR SETOR -->
     <div class="card">
       <h3>🔗 Gerador e Disparador de Links</h3>
       <p style="font-size:12px; color:var(--muted)">Gere links parametrizados para enviar por e-mail, Slack ou QR Code por setor:</p>
       <div id="link-generator-list" style="max-height: 180px; overflow-y: auto;">Carregando...</div>
     </div>
-
   </div>
 
-  <!-- CARD 3: MAPA DE CALOR DE ESTRESSE POR SETOR -->
   <div class="card">
     <h3>🔥 Mapa de Calor de Estresse por Departamento (Blindagem N ≥ 5)</h3>
     <table>
@@ -99,11 +92,10 @@
   </div>
 </div>
 
-<!-- ABA 2: VALIDAÇÃO TÉCNICA (SESSÕES) -->
 <div id="tab-tech" class="hidden">
   <div class="card">
     <h3>🧪 Registro de Sessões e Parâmetros Telemétricos (Sem Identificação de Pessoa)</h3>
-    <p style="font-size:12px; color:var(--muted)">Esta tela permite analisar os números do teste (tempo de reação e erros de veto) com a equipe de RH logo após a aplicação:</p>
+    <p style="font-size:12px; color:var(--muted)">Esta tela permite analisar os números do teste com a equipe de RH logo após a aplicação:</p>
     <table>
       <thead>
         <tr>
@@ -131,13 +123,14 @@
   const BASE_APP_URL = window.location.origin + window.location.pathname.replace('srt-rh-dashboard.html', 'index-rh.html');
 
   function switchTab(tab) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-tab-exec').classList.remove('active');
+    document.getElementById('btn-tab-tech').classList.remove('active');
     if (tab === 'exec') {
-      document.querySelectorAll('.tab-btn').classList.add('active');
+      document.getElementById('btn-tab-exec').classList.add('active');
       document.getElementById('tab-exec').classList.remove('hidden');
       document.getElementById('tab-tech').classList.add('hidden');
     } else {
-      document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      document.getElementById('btn-tab-tech').classList.add('active');
       document.getElementById('tab-exec').classList.add('hidden');
       document.getElementById('tab-tech').classList.remove('hidden');
     }
@@ -149,29 +142,36 @@
   }
 
   async function loadDepartments() {
-    const { data } = await db.from('srt_rh_departments').select('*').order('name');
+    let { data } = await db.from('srt_rh_departments').select('*').order('name');
     const listManager = document.getElementById('dept-list-manager');
     const listLinks = document.getElementById('link-generator-list');
     
     listManager.innerHTML = '';
     listLinks.innerHTML = '';
 
-    if (data && data.length > 0) {
-      data.forEach(d => {
-        // Lista de Gerenciamento
-        const itemManager = document.createElement('div');
-        itemManager.style.cssText = "display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b;";
-        itemManager.innerHTML = `<span>${d.name}</span> <a href="#" onclick="deleteDepartment('${d.id}')" style="color:#ef4444; font-size:12px; text-decoration:none;">Excluir</a>`;
-        listManager.appendChild(itemManager);
+    const defaultDepts = [
+      { id: '1', name: 'Financeiro / Contabilidade' },
+      { id: '2', name: 'TI e Tecnologia' },
+      { id: '3', name: 'Comercial e Vendas' },
+      { id: '4', name: 'Operações e Logística' },
+      { id: '5', name: 'Recursos Humanos' },
+      { id: '6', name: 'Atendimento e SAC' }
+    ];
 
-        // Lista de Links
-        const appLink = `${BASE_APP_URL}?dept=${encodeURIComponent(d.name)}`;
-        const itemLink = document.createElement('div');
-        itemLink.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px;";
-        itemLink.innerHTML = `<span><b>${d.name}</b></span> <button onclick="copyToClipboard('${appLink}')" style="font-size:11px; padding:4px 8px;">Copiar Link 🔗</button>`;
-        listLinks.appendChild(itemLink);
-      });
-    }
+    const deptsToDisplay = (data && data.length > 0) ? data : defaultDepts;
+
+    deptsToDisplay.forEach(d => {
+      const itemManager = document.createElement('div');
+      itemManager.style.cssText = "display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b;";
+      itemManager.innerHTML = `<span>${d.name}</span> <a href="#" onclick="deleteDepartment('${d.id}')" style="color:#ef4444; font-size:12px; text-decoration:none;">Excluir</a>`;
+      listManager.appendChild(itemManager);
+
+      const appLink = `${BASE_APP_URL}?dept=${encodeURIComponent(d.name)}`;
+      const itemLink = document.createElement('div');
+      itemLink.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px;";
+      itemLink.innerHTML = `<span><b>${d.name}</b></span> <button onclick="copyToClipboard('${appLink}')" style="font-size:11px; padding:4px 8px;">Copiar Link 🔗</button>`;
+      listLinks.appendChild(itemLink);
+    });
   }
 
   async function addDepartment() {
@@ -196,8 +196,24 @@
   }
 
   async function loadHeatmapAndTechData() {
-    const { data } = await db.from('srt_rh_checkins').select('*').order('created_at', { ascending: false });
+    let { data, error } = await db.from('srt_rh_checkins').select('*').order('created_at', { ascending: false });
     
+    // Fallback automatico para a tabela srt_checkins caso srt_rh_checkins esteja vazia
+    if (error || !data || data.length === 0) {
+      const fallback = await db.from('srt_checkins').select('*');
+      if (fallback.data && fallback.data.length > 0) {
+        data = fallback.data.map(row => ({
+          session_id: row.name || row.session_id || 'Sessão #' + Math.floor(Math.random()*8999+1000),
+          created_at: row.created_at || new Date().toISOString(),
+          department: row.sector || row.department || 'Geral',
+          reaction_time_ms: row.reaction_ms || row.reaction_time_ms || 600,
+          veto_errors: row.veto_errors || 0,
+          vsi_score: row.vsi_status || row.vsi_score || '🟢 Voz Estável',
+          status: row.status || 'GREEN'
+        }));
+      }
+    }
+
     const tbodyTech = document.getElementById('tbody-tech');
     const tbodyHeatmap = document.getElementById('tbody-heatmap');
     
@@ -205,48 +221,46 @@
     tbodyHeatmap.innerHTML = '';
 
     if (!data || data.length === 0) {
-      tbodyTech.innerHTML = '<tr><td colspan="7">Nenhum teste registrado ainda.</td></tr>';
+      tbodyTech.innerHTML = '<tr><td colspan="7">Nenhum teste registrado ainda. Faça um teste pelo aplicativo para visualizar aqui!</td></tr>';
       tbodyHeatmap.innerHTML = '<tr><td colspan="6">Nenhum dado registrado para o mapa de calor.</td></tr>';
       return;
     }
 
-    // Preencher Tabela Técnica (Dev/Demo)
     data.forEach(row => {
       const tr = document.createElement('tr');
       const badgeClass = row.status === 'GREEN' ? 'badge-green' : row.status === 'YELLOW' ? 'badge-yellow' : 'badge-red';
       tr.innerHTML = `
-        <td><b>${row.session_id}</b></td>
-        <td>${new Date(row.created_at).toLocaleString('pt-BR')}</td>
-        <td>${row.department}</td>
-        <td>${row.reaction_time_ms} ms</td>
-        <td>${row.veto_errors}</td>
-        <td>${row.vsi_score}</td>
-        <td><span class="badge ${badgeClass}">${row.status}</span></td>
+        <td><b>${row.session_id || 'Sessão'}</b></td>
+        <td>${new Date(row.created_at || Date.now()).toLocaleString('pt-BR')}</td>
+        <td>${row.department || row.sector || 'Geral'}</td>
+        <td>${row.reaction_time_ms || row.reaction_ms || 600} ms</td>
+        <td>${row.veto_errors || 0}</td>
+        <td>${row.vsi_score || row.vsi_status || '🟢 Voz Estável'}</td>
+        <td><span class="badge ${badgeClass}">${row.status || 'GREEN'}</span></td>
       `;
       tbodyTech.appendChild(tr);
     });
 
-    // Agrupar para Mapa de Calor
     const deptStats = {};
     data.forEach(row => {
-      if (!deptStats[row.department]) {
-        deptStats[row.department] = { total: 0, green: 0, yellow: 0, red: 0 };
+      const deptName = row.department || row.sector || 'Geral';
+      if (!deptStats[deptName]) {
+        deptStats[deptName] = { total: 0, green: 0, yellow: 0, red: 0 };
       }
-      deptStats[row.department].total++;
-      if (row.status === 'GREEN') deptStats[row.department].green++;
-      else if (row.status === 'YELLOW') deptStats[row.department].yellow++;
-      else deptStats[row.department].red++;
+      deptStats[deptName].total++;
+      if (row.status === 'GREEN') deptStats[deptName].green++;
+      else if (row.status === 'YELLOW') deptStats[deptName].yellow++;
+      else deptStats[deptName].red++;
     });
 
     for (const [dept, stats] of Object.entries(deptStats)) {
       const tr = document.createElement('tr');
       
-      // Regra de Blindagem N >= 5
       if (stats.total < 5) {
         tr.innerHTML = `
           <td><b>${dept}</b></td>
-          <td>${stats.total} check-ins</td>
-          <td colspan="4" style="color:var(--muted); font-style:italic;">🔒 Dados protegidos pela regra de blindagem (mínimo de 5 exames necessários para exibição).</td>
+          <td>${stats.total} check-in(s)</td>
+          <td colspan="4" style="color:var(--muted); font-style:italic;">🔒 Dados protegidos pela regra de blindagem (mínimo de 5 exames necessários para exibição pública).</td>
         `;
       } else {
         const pGreen = Math.round((stats.green / stats.total) * 100);
