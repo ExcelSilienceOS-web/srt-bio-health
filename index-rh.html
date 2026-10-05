@@ -148,7 +148,7 @@
         <label for="txtSetor">Selecione o seu Departamento / Setor:</label>
         <select id="txtSetor" required>
             <option value="">-- Clique para escolher --</option>
-            <option value="Financeiro">Financeiro / Contabilidade</option>
+            <option value="Financeiro / Contabilidade">Financeiro / Contabilidade</option>
             <option value="TI e Tecnologia">TI, Sistemas e Tecnologia</option>
             <option value="Comercial e Vendas">Comercial, Vendas e Marketing</option>
             <option value="Operações e Logística">Operações, Campo e Logística</option>
@@ -217,7 +217,6 @@
 </div>
 
 <script>
-    // CONFIGURAÇÃO OFICIAL DO SUPABASE
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5d2ZjcmhreXJ6bWhydWt4Z2FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjE0ODcsImV4cCI6MjA1NTczNzQ4N30.8M4C6pU_2T3XJ8y0QW81Zk6qX32K7v7A42mX_g0g03k";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -236,7 +235,7 @@
     let audioCtx, analyser, microphone, dataArray;
     let audioEnergySamples = [];
     let audioInterval = null;
-    let computedVsiStatus = '🟢 Voz Estável (Baixo Estresse)';
+    let computedVsiStatus = '🟢 Voz Estável';
     let numericVsiScore = 0.25;
 
     window.onload = () => {
@@ -439,39 +438,45 @@
 
         const sessionId = "Sessão #" + Math.floor(Math.random() * 8999 + 1000);
 
-        // Payload unificado que atende a todos os formatos de colunas do banco
-        const payload = {
+        // 1. Payload estrito para tabela srt_rh_checkins
+        const rhPayload = {
             session_id: sessionId,
-            company: 'Corporativo Anônimo (RH)',
-            name: 'Colaborador Anônimo',
-            whatsapp: 'N/A',
-            sector: selectedSector,
             department: selectedSector,
-            reaction_ms: avgReaction,
+            status: status,
             reaction_time_ms: avgReaction,
             veto_errors: gameErrors,
-            vsi_score: numericVsiScore,
-            vsi_status: computedVsiStatus,
-            status: status
+            vsi_score: numericVsiScore
         };
 
-        sendDataToBackend(payload);
+        // 2. Payload estrito para tabela antiga srt_checkins (fallback)
+        const legacyPayload = {
+            timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            company: 'Corporativo Anônimo (RH)',
+            name: sessionId,
+            whatsapp: 'N/A',
+            sector: selectedSector,
+            reaction_ms: avgReaction,
+            veto_errors: gameErrors,
+            status: status,
+            vsi_status: computedVsiStatus
+        };
+
+        sendDataToBackend(rhPayload, legacyPayload);
     }
 
-    async function sendDataToBackend(payload) {
+    async function sendDataToBackend(rhPayload, legacyPayload) {
         const syncElem = document.getElementById('syncStatus');
         try {
-            // Tenta gravar nas tabelas do Supabase usando a SDK
-            const req1 = await db.from('srt_rh_checkins').insert([payload]);
-            const req2 = await db.from('srt_checkins').insert([payload]);
+            const resRH = await db.from('srt_rh_checkins').insert([rhPayload]);
+            const resLegacy = await db.from('srt_checkins').insert([legacyPayload]);
 
-            if (!req1.error || !req2.error) {
+            if (!resRH.error || !resLegacy.error) {
                 syncElem.className = 'sync-banner sync-success';
                 syncElem.innerText = '✅ Dados sincronizados com o Dashboard!';
             } else {
-                console.error('Erro de envio:', req1.error, req2.error);
+                console.error('Erros Supabase:', resRH.error, resLegacy.error);
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Teste registrado localmente!';
+                syncElem.innerText = '✅ Teste concluído!';
             }
         } catch (e) {
             console.warn('Erro ao sincronizar:', e);
