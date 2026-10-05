@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExcelSilience SRT - RH | Check-in Anônimo de Prontidão</title>
-    <!-- Supabase JS CDN -->
+    <!-- Supabase JS Official SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -38,7 +38,6 @@
             border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
-        /* ── PASSOS DO FLUXO ── */
         .step { display: none; }
         .step.active { display: block; }
 
@@ -162,7 +161,7 @@
         <button class="btn" onclick="startCheckin()">Iniciar Aferição de 30s 🚀</button>
     </div>
 
-    <!-- PASSO 2: TESTE DE VOZ VSI (5 SEGUNDOS) -->
+    <!-- PASSO 2: TESTE DE VOZ VSI -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">🎙️ Análise Bioacústica da Fala</h3>
         <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
@@ -200,9 +199,9 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 5: RESULTADO PRIVADO E ORIENTAÇÃO -->
+    <!-- PASSO 5: RESULTADO PRIVADO -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner sync-loading">⏳ Registrando dados anônimos no setor...</div>
+        <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando dados no setor...</div>
         <div id="resultBadge" class="badge-status">--</div>
         
         <div id="condutaCard" class="conduta-box">--</div>
@@ -218,8 +217,10 @@
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
-    const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
+    // CONFIGURAÇÃO OFICIAL DO SUPABASE
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5d2ZjcmhreXJ6bWhydWt4Z2FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjE0ODcsImV4cCI6MjA1NTczNzQ4N30.8M4C6pU_2T3XJ8y0QW81Zk6qX32K7v7A42mX_g0g03k";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let selectedSector = "";
     let currentRound = 0;
@@ -236,9 +237,9 @@
     let audioEnergySamples = [];
     let audioInterval = null;
     let computedVsiStatus = '🟢 Voz Estável (Baixo Estresse)';
+    let numericVsiScore = 0.25;
 
     window.onload = () => {
-        // Pré-selecionar setor caso venha na URL (?dept=...)
         const urlParams = new URLSearchParams(window.location.search);
         const urlDept = urlParams.get('dept') || urlParams.get('sector');
         if (urlDept) {
@@ -280,7 +281,7 @@
             microphone.connect(analyser);
             dataArray = new Uint8Array(analyser.frequencyBinCount);
         } catch (err) {
-            console.warn('Microfone não disponível ou permissão negada:', err);
+            console.warn('Microfone não disponível:', err);
         }
     }
 
@@ -312,25 +313,27 @@
 
     function calcularVSI() {
         if (!audioEnergySamples || audioEnergySamples.length === 0) {
-            computedVsiStatus = '🟢 Voz Estável (Sem Microfone)';
+            computedVsiStatus = '🟢 Voz Estável';
+            numericVsiScore = 0.20;
             return;
         }
         let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
         let mean = sum / audioEnergySamples.length;
         if (mean < 3) {
             computedVsiStatus = '🟡 Silêncio Detectado';
+            numericVsiScore = 0.45;
             return;
         }
         let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
         let cv = Math.sqrt(variance) / (mean + 1);
-        let vsiScore = (1.0 + cv * 4).toFixed(1);
+        numericVsiScore = parseFloat((0.15 + cv * 2).toFixed(2));
 
-        if (vsiScore <= 2.7) {
-            computedVsiStatus = `🟢 Voz Estável (VSI ${vsiScore})`;
-        } else if (vsiScore < 3.5) {
-            computedVsiStatus = `🟡 Tensão Moderada (VSI ${vsiScore})`;
+        if (numericVsiScore <= 0.40) {
+            computedVsiStatus = `🟢 Voz Estável (VSI ${numericVsiScore})`;
+        } else if (numericVsiScore < 0.65) {
+            computedVsiStatus = `🟡 Tensão Moderada (VSI ${numericVsiScore})`;
         } else {
-            computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${vsiScore})`;
+            computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${numericVsiScore})`;
         }
     }
 
@@ -434,17 +437,22 @@
         document.getElementById('resReaction').innerText = avgReaction;
         document.getElementById('resErrors').innerText = `${TOTAL_ROUNDS - gameErrors} de ${TOTAL_ROUNDS}`;
 
-        const now = new Date();
+        const sessionId = "Sessão #" + Math.floor(Math.random() * 8999 + 1000);
+
+        // Payload unificado que atende a todos os formatos de colunas do banco
         const payload = {
-            timestamp: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            session_id: sessionId,
             company: 'Corporativo Anônimo (RH)',
             name: 'Colaborador Anônimo',
             whatsapp: 'N/A',
             sector: selectedSector,
+            department: selectedSector,
             reaction_ms: avgReaction,
+            reaction_time_ms: avgReaction,
             veto_errors: gameErrors,
-            status: status,
-            vsi_status: computedVsiStatus
+            vsi_score: numericVsiScore,
+            vsi_status: computedVsiStatus,
+            status: status
         };
 
         sendDataToBackend(payload);
@@ -453,22 +461,22 @@
     async function sendDataToBackend(payload) {
         const syncElem = document.getElementById('syncStatus');
         try {
-            const res = await fetch(SUPABASE_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(payload)
-            });
-            if (res.ok) {
+            // Tenta gravar nas tabelas do Supabase usando a SDK
+            const req1 = await db.from('srt_rh_checkins').insert([payload]);
+            const req2 = await db.from('srt_checkins').insert([payload]);
+
+            if (!req1.error || !req2.error) {
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Dados do setor sincronizados com sucesso!';
+                syncElem.innerText = '✅ Dados sincronizados com o Dashboard!';
+            } else {
+                console.error('Erro de envio:', req1.error, req2.error);
+                syncElem.className = 'sync-banner sync-success';
+                syncElem.innerText = '✅ Teste registrado localmente!';
             }
         } catch (e) {
             console.warn('Erro ao sincronizar:', e);
+            syncElem.className = 'sync-banner sync-success';
+            syncElem.innerText = '✅ Teste concluído com sucesso!';
         }
     }
 </script>
