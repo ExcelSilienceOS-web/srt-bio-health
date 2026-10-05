@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExcelSilience SRT - RH | Check-in Anônimo de Prontidão</title>
-    <!-- Supabase JS Official SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -205,7 +204,6 @@
         <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando dados no setor...</div>
         <div id="resultBadge" class="badge-status">--</div>
         
-        <!-- Bloco de Autoajuda Técnica e Motivacional -->
         <div id="condutaCard" class="conduta-box">--</div>
 
         <div style="background:#0b1329; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
@@ -221,7 +219,6 @@
 <script>
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5d2ZjcmhreXJ6bWhydWt4Z2FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjE0ODcsImV4cCI6MjA1NTczNzQ4N30.8M4C6pU_2T3XJ8y0QW81Zk6qX32K7v7A42mX_g0g03k";
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let selectedSector = "";
     let currentRound = 0;
@@ -413,34 +410,33 @@
         let badgeClass = 'status-green';
         let condutaHtml = '';
 
-        // LÓGICA DAS MENSAGENS DE AUTOAJUDA TÉCNICA E MOTIVACIONAL
         if (gameErrors >= 2 || avgReaction > 800) {
             status = 'RED';
             badgeText = '🔴 ELEVADA CARGA / FADIGA ACUMULADA';
             badgeClass = 'status-red';
             condutaHtml = `<b>🛑 Orientação Técnica de Bem-Estar:</b><br>
             Sua capacidade de atenção e tempo de resposta apresentam forte lentidão.<br><br>
-            👉 <b>O que fazer agora:</b> Faça uma pausa imediata de 30 a 45 minutos. Tome um copo d'água, faça respirações profundas e desacelere antes de retomar tarefas críticas. Se necessário, converse com o RH ou seu gestor.`;
+            👉 <b>O que fazer agora:</b> Faça uma pausa imediata de 30 a 45 minutos. Tome um copo d'água, faça respirações profundas e desacelere antes de retomar tarefas críticas.`;
         } else if (numericVsiScore > 0.65) {
             status = 'PURPLE';
             badgeText = '🟣 SINAIS DE EXAUSTÃO / PRIVAÇÃO DE SONO';
             badgeClass = 'status-purple';
             condutaHtml = `<b>💜 Orientação Técnica de Bem-Estar:</b><br>
-            Sua energia vocal e tônus autônomo indicam desgaste severo e cansaço acumulado.<br><br>
-            👉 <b>O que fazer agora:</b> Descanse por 45 minutos. Tome um copo d'água gelado, feche os olhos em um local calmo e evite tomar decisões de alta complexidade até recuperar sua clareza mental.`;
+            Sua energia vocal indica desgaste severo e cansaço acumulado.<br><br>
+            👉 <b>O que fazer agora:</b> Descanse por 45 minutos. Tome um copo d'água gelado e evite tomar decisões de alta complexidade até recuperar sua clareza mental.`;
         } else if (avgReaction > 650 || computedVsiStatus.includes('🟡')) {
             status = 'YELLOW';
             badgeText = '🟡 SOBRECARGA MODERADA / ESTRESSE INICIAL';
             badgeClass = 'status-yellow';
             condutaHtml = `<b>⚠️ Orientação Técnica de Bem-Estar:</b><br>
             Identificamos leve tensão e início de sobrecarga no seu sistema nervoso.<br><br>
-            👉 <b>O que fazer agora:</b> Faça uma pausa tática de 10 minutos. Tome um copo d'água e faça 3 ciclos de respiração consciente (inspire em 4s, segure por 4s e solte devagar em 4s) para restaurar seu equilíbrio.`;
+            👉 <b>O que fazer agora:</b> Faça uma pausa tática de 10 minutos. Tome um copo d'água e faça 3 ciclos de respiração consciente para restaurar seu equilíbrio.`;
         } else {
             status = 'GREEN';
             badgeText = '🟢 HOMEOSTASE E FOCO EXCELENTES';
             badgeClass = 'status-green';
             condutaHtml = `<b>✨ Mensagem Motivacional:</b><br>
-            <b>Você está com toda a energia e foco!</b> Seus reflexos visuomotores e estabilidade vocal estão em perfeita harmonia.<br><br>
+            <b>Você está com toda a energia e foco!</b> Seus reflexos e estabilidade vocal estão em perfeita harmonia.<br><br>
             👉 <b>Vá para o trabalho com total confiança e mantenha esse excelente ritmo durante o dia!</b>`;
         }
 
@@ -454,36 +450,28 @@
 
         const sessionId = "Sessão #" + Math.floor(Math.random() * 8999 + 1000);
 
-        // Payloads estritos para garantir gravação
-        const rhPayload = {
-            session_id: sessionId,
-            department: selectedSector,
-            status: status,
-            reaction_time_ms: avgReaction,
-            veto_errors: gameErrors,
-            vsi_score: numericVsiScore
-        };
-
-        const legacyPayload = {
+        const payload = {
             timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             company: 'Corporativo Anônimo (RH)',
             name: sessionId,
             whatsapp: 'N/A',
             sector: selectedSector,
+            department: selectedSector,
             reaction_ms: avgReaction,
+            reaction_time_ms: avgReaction,
             veto_errors: gameErrors,
-            status: status,
-            vsi_status: computedVsiStatus
+            vsi_score: numericVsiScore,
+            vsi_status: computedVsiStatus,
+            status: status
         };
 
-        sendDataToBackend(rhPayload, legacyPayload);
+        sendDataToBackend(payload);
     }
 
-    async function sendDataToBackend(rhPayload, legacyPayload) {
+    async function sendDataToBackend(payload) {
         const syncElem = document.getElementById('syncStatus');
         try {
-            // Tenta salvar via REST API direto para evitar falhas do SDK
-            const res1 = await fetch(`${SUPABASE_URL}/rest/v1/srt_rh_checkins`, {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -491,26 +479,19 @@
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
                     'Prefer': 'return=minimal'
                 },
-                body: JSON.stringify(rhPayload)
+                body: JSON.stringify(payload)
             });
 
-            const res2 = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(legacyPayload)
-            });
-
-            if (res1.ok || res2.ok) {
+            if (res.ok) {
                 syncElem.className = 'sync-banner sync-success';
                 syncElem.innerText = '✅ Dados sincronizados com o Dashboard!';
             } else {
-                syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Teste concluído com orientação personalizada!';
+                const errText = await res.text();
+                console.error('Erro no banco:', res.status, errText);
+                syncElem.className = 'sync-banner sync-loading';
+                syncElem.style.background = 'rgba(239, 68, 68, 0.2)';
+                syncElem.style.color = '#f87171';
+                syncElem.innerText = '⚠️ Teste concluído (Aviso Banco: ' + res.status + ')';
             }
         } catch (e) {
             console.warn('Erro ao sincronizar:', e);
