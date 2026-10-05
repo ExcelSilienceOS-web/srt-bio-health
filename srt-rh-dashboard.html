@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExcelSilience SRT - RH | Painel Executivo & Validação Técnica</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0b1329;
+      --card: #0f172a;
+      --card-inner: #1e293b;
+      --border: #334155;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+    }
+    body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 24px; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
+    h1 { font-size: 22px; color: #fff; margin: 0; }
+    .nav-tabs { display: flex; gap: 12px; margin-bottom: 24px; }
+    .tab-btn { background: var(--card-inner); border: 1px solid var(--border); color: var(--muted); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .tab-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .card h3 { font-size: 16px; color: var(--accent); margin-top: 0; }
+    input, button { padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--card-inner); color: #fff; }
+    button { background: #0284c7; font-weight: bold; cursor: pointer; border: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--card-inner); color: var(--accent); }
+    .badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; display: inline-block; }
+    .badge-green { background: rgba(16,185,129,0.2); color: var(--green); }
+    .badge-yellow { background: rgba(245,158,11,0.2); color: var(--yellow); }
+    .badge-red { background: rgba(239,68,68,0.2); color: var(--red); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>👥 ExcelSilience SRT - RH | Painel de Gestão & Telemetria</h1>
+    <span style="color:var(--muted); font-size:12px;">People Analytics Anônimo & Validação de Riscos Psicossociais</span>
+  </div>
+  <button onclick="loadAllData()">🔄 Atualizar Dados</button>
+</div>
+
+<!-- NAVEGAÇÃO ENTRE ABAS -->
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('exec')">📊 Dashboard de RH & Setores</button>
+  <button class="tab-btn" onclick="switchTab('tech')">🧪 Validação Técnica de Respostas (Dev/Demo)</button>
+</div>
+
+<!-- ABA 1: DASHBOARD EXECUTIVO -->
+<div id="tab-exec">
+  <div class="grid">
+    
+    <!-- CARD 1: GERENCIADOR DE DEPARTAMENTOS -->
+    <div class="card">
+      <h3>⚙️ Gerenciador de Setores da Empresa</h3>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input type="text" id="new-dept-input" placeholder="Nome do novo setor..." style="flex:1;">
+        <button onclick="addDepartment()">+ Adicionar</button>
+      </div>
+      <div id="dept-list-manager" style="max-height: 180px; overflow-y: auto;">Carregando...</div>
+    </div>
+
+    <!-- CARD 2: CENTRAL DE LINKS POR SETOR -->
+    <div class="card">
+      <h3>🔗 Gerador e Disparador de Links</h3>
+      <p style="font-size:12px; color:var(--muted)">Gere links parametrizados para enviar por e-mail, Slack ou QR Code por setor:</p>
+      <div id="link-generator-list" style="max-height: 180px; overflow-y: auto;">Carregando...</div>
+    </div>
+
+  </div>
+
+  <!-- CARD 3: MAPA DE CALOR DE ESTRESSE POR SETOR -->
+  <div class="card">
+    <h3>🔥 Mapa de Calor de Estresse por Departamento (Blindagem N ≥ 5)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Departamento</th>
+          <th>Total Check-ins</th>
+          <th>🟢 Homeostase (%)</th>
+          <th>🟡 Sobrecarga (%)</th>
+          <th>🔴 Exaustão (%)</th>
+          <th>Status Organizacional</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-heatmap">
+        <tr><td colspan="6">Carregando dados agregados...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ABA 2: VALIDAÇÃO TÉCNICA (SESSÕES) -->
+<div id="tab-tech" class="hidden">
+  <div class="card">
+    <h3>🧪 Registro de Sessões e Parâmetros Telemétricos (Sem Identificação de Pessoa)</h3>
+    <p style="font-size:12px; color:var(--muted)">Esta tela permite analisar os números do teste (tempo de reação e erros de veto) com a equipe de RH logo após a aplicação:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>ID da Sessão</th>
+          <th>Data / Hora</th>
+          <th>Departamento</th>
+          <th>Tempo Reação (ms)</th>
+          <th>Erros Veto (Red)</th>
+          <th>Score Voz (VSI)</th>
+          <th>Status Calculado</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-tech">
+        <tr><td colspan="7">Carregando respostas telemétricas...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5d2ZjcmhreXJ6bWhydWt4Z2FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjE0ODcsImV4cCI6MjA1NTczNzQ4N30.8M4C6pU_2T3XJ8y0QW81Zk6qX32K7v7A42mX_g0g03k";
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const BASE_APP_URL = window.location.origin + window.location.pathname.replace('srt-rh-dashboard.html', 'index-rh.html');
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    if (tab === 'exec') {
+      document.querySelectorAll('.tab-btn').classList.add('active');
+      document.getElementById('tab-exec').classList.remove('hidden');
+      document.getElementById('tab-tech').classList.add('hidden');
+    } else {
+      document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      document.getElementById('tab-exec').classList.add('hidden');
+      document.getElementById('tab-tech').classList.remove('hidden');
+    }
+  }
+
+  async function loadAllData() {
+    await loadDepartments();
+    await loadHeatmapAndTechData();
+  }
+
+  async function loadDepartments() {
+    const { data } = await db.from('srt_rh_departments').select('*').order('name');
+    const listManager = document.getElementById('dept-list-manager');
+    const listLinks = document.getElementById('link-generator-list');
+    
+    listManager.innerHTML = '';
+    listLinks.innerHTML = '';
+
+    if (data && data.length > 0) {
+      data.forEach(d => {
+        // Lista de Gerenciamento
+        const itemManager = document.createElement('div');
+        itemManager.style.cssText = "display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b;";
+        itemManager.innerHTML = `<span>${d.name}</span> <a href="#" onclick="deleteDepartment('${d.id}')" style="color:#ef4444; font-size:12px; text-decoration:none;">Excluir</a>`;
+        listManager.appendChild(itemManager);
+
+        // Lista de Links
+        const appLink = `${BASE_APP_URL}?dept=${encodeURIComponent(d.name)}`;
+        const itemLink = document.createElement('div');
+        itemLink.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px;";
+        itemLink.innerHTML = `<span><b>${d.name}</b></span> <button onclick="copyToClipboard('${appLink}')" style="font-size:11px; padding:4px 8px;">Copiar Link 🔗</button>`;
+        listLinks.appendChild(itemLink);
+      });
+    }
+  }
+
+  async function addDepartment() {
+    const input = document.getElementById('new-dept-input');
+    const name = input.value.trim();
+    if (!name) return alert('Digite o nome do setor.');
+    await db.from('srt_rh_departments').insert([{ name }]);
+    input.value = '';
+    loadDepartments();
+  }
+
+  async function deleteDepartment(id) {
+    if (confirm('Deseja remover este departamento?')) {
+      await db.from('srt_rh_departments').delete().eq('id', id);
+      loadDepartments();
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    alert('Link do setor copiado com sucesso!');
+  }
+
+  async function loadHeatmapAndTechData() {
+    const { data } = await db.from('srt_rh_checkins').select('*').order('created_at', { ascending: false });
+    
+    const tbodyTech = document.getElementById('tbody-tech');
+    const tbodyHeatmap = document.getElementById('tbody-heatmap');
+    
+    tbodyTech.innerHTML = '';
+    tbodyHeatmap.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      tbodyTech.innerHTML = '<tr><td colspan="7">Nenhum teste registrado ainda.</td></tr>';
+      tbodyHeatmap.innerHTML = '<tr><td colspan="6">Nenhum dado registrado para o mapa de calor.</td></tr>';
+      return;
+    }
+
+    // Preencher Tabela Técnica (Dev/Demo)
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      const badgeClass = row.status === 'GREEN' ? 'badge-green' : row.status === 'YELLOW' ? 'badge-yellow' : 'badge-red';
+      tr.innerHTML = `
+        <td><b>${row.session_id}</b></td>
+        <td>${new Date(row.created_at).toLocaleString('pt-BR')}</td>
+        <td>${row.department}</td>
+        <td>${row.reaction_time_ms} ms</td>
+        <td>${row.veto_errors}</td>
+        <td>${row.vsi_score}</td>
+        <td><span class="badge ${badgeClass}">${row.status}</span></td>
+      `;
+      tbodyTech.appendChild(tr);
+    });
+
+    // Agrupar para Mapa de Calor
+    const deptStats = {};
+    data.forEach(row => {
+      if (!deptStats[row.department]) {
+        deptStats[row.department] = { total: 0, green: 0, yellow: 0, red: 0 };
+      }
+      deptStats[row.department].total++;
+      if (row.status === 'GREEN') deptStats[row.department].green++;
+      else if (row.status === 'YELLOW') deptStats[row.department].yellow++;
+      else deptStats[row.department].red++;
+    });
+
+    for (const [dept, stats] of Object.entries(deptStats)) {
+      const tr = document.createElement('tr');
+      
+      // Regra de Blindagem N >= 5
+      if (stats.total < 5) {
+        tr.innerHTML = `
+          <td><b>${dept}</b></td>
+          <td>${stats.total} check-ins</td>
+          <td colspan="4" style="color:var(--muted); font-style:italic;">🔒 Dados protegidos pela regra de blindagem (mínimo de 5 exames necessários para exibição).</td>
+        `;
+      } else {
+        const pGreen = Math.round((stats.green / stats.total) * 100);
+        const pYellow = Math.round((stats.yellow / stats.total) * 100);
+        const pRed = Math.round((stats.red / stats.total) * 100);
+        
+        let statusTag = '<span class="badge badge-green">ESTÁVEL</span>';
+        if (pRed > 15) statusTag = '<span class="badge badge-red">RISCO DE BURNOUT</span>';
+        else if (pYellow > 30) statusTag = '<span class="badge badge-yellow">ATENÇÃO</span>';
+
+        tr.innerHTML = `
+          <td><b>${dept}</b></td>
+          <td>${stats.total}</td>
+          <td>${pGreen}%</td>
+          <td>${pYellow}%</td>
+          <td>${pRed}%</td>
+          <td>${statusTag}</td>
+        `;
+      }
+      tbodyHeatmap.appendChild(tr);
+    }
+  }
+
+  window.onload = loadAllData;
+</script>
+</body>
+</html>
