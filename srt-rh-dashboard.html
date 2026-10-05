@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ExcelSilience SRT - RH | Painel Executivo & Validação Técnica</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #0b1329;
@@ -52,7 +51,7 @@
   <button onclick="loadAllData()">🔄 Atualizar Dados</button>
 </div>
 
-<!-- Alerta de Diagnóstico do Supabase -->
+<!-- Alerta Diagnóstico -->
 <div id="debugAlert" class="debug-box"></div>
 
 <div class="nav-tabs">
@@ -123,8 +122,7 @@
 
 <script>
   const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5d2ZjcmhreXJ6bWhydWt4Z2FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjE0ODcsImV4cCI6MjA1NTczNzQ4N30.8M4C6pU_2T3XJ8y0QW81Zk6qX32K7v7A42mX_g0g03k";
-  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
   const BASE_APP_URL = window.location.origin + window.location.pathname.replace('srt-rh-dashboard.html', 'index-rh.html');
 
@@ -143,12 +141,11 @@
   }
 
   async function loadAllData() {
-    await loadDepartments();
+    loadDepartments();
     await loadHeatmapAndTechData();
   }
 
-  async function loadDepartments() {
-    let { data } = await db.from('srt_rh_departments').select('*').order('name');
+  function loadDepartments() {
     const listManager = document.getElementById('dept-list-manager');
     const listLinks = document.getElementById('link-generator-list');
     
@@ -164,12 +161,10 @@
       { id: '6', name: 'Atendimento e SAC' }
     ];
 
-    const deptsToDisplay = (data && data.length > 0) ? data : defaultDepts;
-
-    deptsToDisplay.forEach(d => {
+    defaultDepts.forEach(d => {
       const itemManager = document.createElement('div');
       itemManager.style.cssText = "display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b;";
-      itemManager.innerHTML = `<span>${d.name}</span> <a href="#" onclick="deleteDepartment('${d.id}')" style="color:#ef4444; font-size:12px; text-decoration:none;">Excluir</a>`;
+      itemManager.innerHTML = `<span>${d.name}</span>`;
       if (listManager) listManager.appendChild(itemManager);
 
       const appLink = `${BASE_APP_URL}?dept=${encodeURIComponent(d.name)}`;
@@ -178,22 +173,6 @@
       itemLink.innerHTML = `<span><b>${d.name}</b></span> <button onclick="copyToClipboard('${appLink}')" style="font-size:11px; padding:4px 8px;">Copiar Link 🔗</button>`;
       if (listLinks) listLinks.appendChild(itemLink);
     });
-  }
-
-  async function addDepartment() {
-    const input = document.getElementById('new-dept-input');
-    const name = input.value.trim();
-    if (!name) return alert('Digite o nome do setor.');
-    await db.from('srt_rh_departments').insert([{ name }]);
-    input.value = '';
-    loadDepartments();
-  }
-
-  async function deleteDepartment(id) {
-    if (confirm('Deseja remover este departamento?')) {
-      await db.from('srt_rh_departments').delete().eq('id', id);
-      loadDepartments();
-    }
   }
 
   function copyToClipboard(text) {
@@ -205,80 +184,94 @@
     const debugAlert = document.getElementById('debugAlert');
     debugAlert.style.display = 'none';
 
-    let { data, error } = await db.from('srt_checkins').select('*').order('created_at', { ascending: false });
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`, {
+        method: 'GET',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      });
 
-    if (error) {
-      debugAlert.style.display = 'block';
-      debugAlert.innerHTML = `⚠️ <b>AVISO DO BANCO DE DADOS:</b> ${error.message} (Código: ${error.code}).<br><i>Execute o script SQL no Supabase para liberar o acesso!</i>`;
-    }
-
-    const tbodyTech = document.getElementById('tbody-tech');
-    const tbodyHeatmap = document.getElementById('tbody-heatmap');
-    
-    tbodyTech.innerHTML = '';
-    tbodyHeatmap.innerHTML = '';
-
-    if (!data || data.length === 0) {
-      tbodyTech.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">Nenhum teste encontrado na tabela. Faça um novo teste pelo celular para visualizar aqui!</td></tr>';
-      tbodyHeatmap.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted);">Nenhum dado registrado para o mapa de calor.</td></tr>';
-      return;
-    }
-
-    data.forEach(row => {
-      const tr = document.createElement('tr');
-      const badgeClass = row.status === 'GREEN' ? 'badge-green' : row.status === 'YELLOW' ? 'badge-yellow' : row.status === 'PURPLE' ? 'badge-purple' : 'badge-red';
-      tr.innerHTML = `
-        <td><b>${row.name || row.session_id || 'Sessão'}</b></td>
-        <td>${new Date(row.created_at || Date.now()).toLocaleString('pt-BR')}</td>
-        <td>${row.sector || row.department || 'Geral'}</td>
-        <td>${row.reaction_ms || row.reaction_time_ms || 600} ms</td>
-        <td>${row.veto_errors || 0}</td>
-        <td>${row.vsi_status || row.vsi_score || '🟢 Voz Estável'}</td>
-        <td><span class="badge ${badgeClass}">${row.status || 'GREEN'}</span></td>
-      `;
-      tbodyTech.appendChild(tr);
-    });
-
-    const deptStats = {};
-    data.forEach(row => {
-      const deptName = row.sector || row.department || 'Geral';
-      if (!deptStats[deptName]) {
-        deptStats[deptName] = { total: 0, green: 0, yellow: 0, red: 0 };
+      if (!res.ok) {
+        const errText = await res.text();
+        debugAlert.style.display = 'block';
+        debugAlert.innerHTML = `⚠️ <b>AVISO DO BANCO DE DADOS (${res.status}):</b> ${errText}`;
+        return;
       }
-      deptStats[deptName].total++;
-      if (row.status === 'GREEN') deptStats[deptName].green++;
-      else if (row.status === 'YELLOW') deptStats[deptName].yellow++;
-      else deptStats[deptName].red++;
-    });
 
-    for (const [dept, stats] of Object.entries(deptStats)) {
-      const tr = document.createElement('tr');
+      const data = await res.json();
+      const tbodyTech = document.getElementById('tbody-tech');
+      const tbodyHeatmap = document.getElementById('tbody-heatmap');
       
-      if (stats.total < 5) {
-        tr.innerHTML = `
-          <td><b>${dept}</b></td>
-          <td>${stats.total} check-in(s)</td>
-          <td colspan="4" style="color:var(--muted); font-style:italic;">🔒 Dados protegidos pela regra de blindagem (mínimo de 5 exames necessários para exibição pública).</td>
-        `;
-      } else {
-        const pGreen = Math.round((stats.green / stats.total) * 100);
-        const pYellow = Math.round((stats.yellow / stats.total) * 100);
-        const pRed = Math.round((stats.red / stats.total) * 100);
-        
-        let statusTag = '<span class="badge badge-green">ESTÁVEL</span>';
-        if (pRed > 15) statusTag = '<span class="badge badge-red">RISCO DE BURNOUT</span>';
-        else if (pYellow > 30) statusTag = '<span class="badge badge-yellow">ATENÇÃO</span>';
+      tbodyTech.innerHTML = '';
+      tbodyHeatmap.innerHTML = '';
 
-        tr.innerHTML = `
-          <td><b>${dept}</b></td>
-          <td>${stats.total}</td>
-          <td>${pGreen}%</td>
-          <td>${pYellow}%</td>
-          <td>${pRed}%</td>
-          <td>${statusTag}</td>
-        `;
+      if (!data || data.length === 0) {
+        tbodyTech.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">Nenhum teste encontrado na tabela. Faça um novo teste pelo celular para visualizar aqui!</td></tr>';
+        tbodyHeatmap.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted);">Nenhum dado registrado para o mapa de calor.</td></tr>';
+        return;
       }
-      tbodyHeatmap.appendChild(tr);
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        const badgeClass = row.status === 'GREEN' ? 'badge-green' : row.status === 'YELLOW' ? 'badge-yellow' : row.status === 'PURPLE' ? 'badge-purple' : 'badge-red';
+        tr.innerHTML = `
+          <td><b>${row.name || row.session_id || 'Sessão'}</b></td>
+          <td>${new Date(row.created_at || Date.now()).toLocaleString('pt-BR')}</td>
+          <td>${row.sector || row.department || 'Geral'}</td>
+          <td>${row.reaction_ms || row.reaction_time_ms || 600} ms</td>
+          <td>${row.veto_errors || 0}</td>
+          <td>${row.vsi_status || row.vsi_score || '🟢 Voz Estável'}</td>
+          <td><span class="badge ${badgeClass}">${row.status || 'GREEN'}</span></td>
+        `;
+        tbodyTech.appendChild(tr);
+      });
+
+      const deptStats = {};
+      data.forEach(row => {
+        const deptName = row.sector || row.department || 'Geral';
+        if (!deptStats[deptName]) {
+          deptStats[deptName] = { total: 0, green: 0, yellow: 0, red: 0 };
+        }
+        deptStats[deptName].total++;
+        if (row.status === 'GREEN') deptStats[deptName].green++;
+        else if (row.status === 'YELLOW') deptStats[deptName].yellow++;
+        else deptStats[deptName].red++;
+      });
+
+      for (const [dept, stats] of Object.entries(deptStats)) {
+        const tr = document.createElement('tr');
+        
+        if (stats.total < 5) {
+          tr.innerHTML = `
+            <td><b>${dept}</b></td>
+            <td>${stats.total} check-in(s)</td>
+            <td colspan="4" style="color:var(--muted); font-style:italic;">🔒 Dados protegidos pela regra de blindagem (mínimo de 5 exames necessários para exibição pública).</td>
+          `;
+        } else {
+          const pGreen = Math.round((stats.green / stats.total) * 100);
+          const pYellow = Math.round((stats.yellow / stats.total) * 100);
+          const pRed = Math.round((stats.red / stats.total) * 100);
+          
+          let statusTag = '<span class="badge badge-green">ESTÁVEL</span>';
+          if (pRed > 15) statusTag = '<span class="badge badge-red">RISCO DE BURNOUT</span>';
+          else if (pYellow > 30) statusTag = '<span class="badge badge-yellow">ATENÇÃO</span>';
+
+          tr.innerHTML = `
+            <td><b>${dept}</b></td>
+            <td>${stats.total}</td>
+            <td>${pGreen}%</td>
+            <td>${pYellow}%</td>
+            <td>${pRed}%</td>
+            <td>${statusTag}</td>
+          `;
+        }
+        tbodyHeatmap.appendChild(tr);
+      }
+    } catch (e) {
+      debugAlert.style.display = 'block';
+      debugAlert.innerHTML = `⚠️ <b>Erro de Conexão:</b> ${e.message}`;
     }
   }
 
