@@ -19,7 +19,7 @@
       --purple: #a855f7;
       --red: #ef4444;
     }
-    body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 24px; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 24px; }
     .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
     h1 { font-size: 22px; color: #fff; margin: 0; }
     .nav-tabs { display: flex; gap: 12px; margin-bottom: 24px; }
@@ -39,6 +39,7 @@
     .badge-purple { background: rgba(168,85,247,0.2); color: var(--purple); }
     .badge-red { background: rgba(239,68,68,0.2); color: var(--red); }
     .hidden { display: none; }
+    .debug-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; font-weight: bold; display: none; }
   </style>
 </head>
 <body>
@@ -50,6 +51,9 @@
   </div>
   <button onclick="loadAllData()">🔄 Atualizar Dados</button>
 </div>
+
+<!-- Alerta de Diagnóstico do Supabase -->
+<div id="debugAlert" class="debug-box"></div>
 
 <div class="nav-tabs">
   <button id="btn-tab-exec" class="tab-btn active" onclick="switchTab('exec')">📊 Dashboard de RH & Setores</button>
@@ -148,8 +152,8 @@
     const listManager = document.getElementById('dept-list-manager');
     const listLinks = document.getElementById('link-generator-list');
     
-    listManager.innerHTML = '';
-    listLinks.innerHTML = '';
+    if (listManager) listManager.innerHTML = '';
+    if (listLinks) listLinks.innerHTML = '';
 
     const defaultDepts = [
       { id: '1', name: 'Financeiro / Contabilidade' },
@@ -166,13 +170,13 @@
       const itemManager = document.createElement('div');
       itemManager.style.cssText = "display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b;";
       itemManager.innerHTML = `<span>${d.name}</span> <a href="#" onclick="deleteDepartment('${d.id}')" style="color:#ef4444; font-size:12px; text-decoration:none;">Excluir</a>`;
-      listManager.appendChild(itemManager);
+      if (listManager) listManager.appendChild(itemManager);
 
       const appLink = `${BASE_APP_URL}?dept=${encodeURIComponent(d.name)}`;
       const itemLink = document.createElement('div');
       itemLink.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px;";
       itemLink.innerHTML = `<span><b>${d.name}</b></span> <button onclick="copyToClipboard('${appLink}')" style="font-size:11px; padding:4px 8px;">Copiar Link 🔗</button>`;
-      listLinks.appendChild(itemLink);
+      if (listLinks) listLinks.appendChild(itemLink);
     });
   }
 
@@ -198,7 +202,15 @@
   }
 
   async function loadHeatmapAndTechData() {
+    const debugAlert = document.getElementById('debugAlert');
+    debugAlert.style.display = 'none';
+
     let { data, error } = await db.from('srt_checkins').select('*').order('created_at', { ascending: false });
+
+    if (error) {
+      debugAlert.style.display = 'block';
+      debugAlert.innerHTML = `⚠️ <b>AVISO DO BANCO DE DADOS:</b> ${error.message} (Código: ${error.code}).<br><i>Execute o script SQL no Supabase para liberar o acesso!</i>`;
+    }
 
     const tbodyTech = document.getElementById('tbody-tech');
     const tbodyHeatmap = document.getElementById('tbody-heatmap');
@@ -206,9 +218,9 @@
     tbodyTech.innerHTML = '';
     tbodyHeatmap.innerHTML = '';
 
-    if (error || !data || data.length === 0) {
-      tbodyTech.innerHTML = '<tr><td colspan="7">Nenhum teste registrado ainda. Faça um teste pelo celular para visualizar aqui!</td></tr>';
-      tbodyHeatmap.innerHTML = '<tr><td colspan="6">Nenhum dado registrado para o mapa de calor.</td></tr>';
+    if (!data || data.length === 0) {
+      tbodyTech.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">Nenhum teste encontrado na tabela. Faça um novo teste pelo celular para visualizar aqui!</td></tr>';
+      tbodyHeatmap.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted);">Nenhum dado registrado para o mapa de calor.</td></tr>';
       return;
     }
 
@@ -274,3 +286,4 @@
 </script>
 </body>
 </html>
+
