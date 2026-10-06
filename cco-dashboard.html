@@ -3,591 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT — Dashboard CCO & Gestão de Frotas</title>
+    <title>SRT Bio-Health & Mobility — Painel CCO de Prontidão</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #0b0f19;
-            color: #e2e8f0;
-            padding: 24px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b0f19; color: #e2e8f0; padding: 24px; }
+        
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 16px;
-            margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px;
+            flex-wrap: wrap; gap: 12px;
         }
-        .title-group h1 {
-            font-size: 22px;
-            font-weight: 800;
-            color: #38bdf8;
-            letter-spacing: 0.5px;
-        }
-        .title-group p {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 4px;
-        }
+        .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
+        .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
+        
         .live-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #34d399;
+            display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; color: #34d399;
         }
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
+        .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* PAINEL DE FILTROS DE DATA */
+        .filter-panel {
+            background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px;
+            margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;
         }
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
+        .filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
+        
+        input[type="date"] {
+            background: #0b0f19; border: 1px solid #334155; color: #f8fafc;
+            padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
         }
+        input[type="date"]:focus { border-color: #38bdf8; }
+
+        .btn-quick {
+            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
+            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; }
+
+        .btn-action {
+            background: #10b981; border: none; color: #ffffff; padding: 8px 18px;
+            border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto;
+        }
+        .btn-action:hover { background: #059669; }
 
         /* METRICS CARDS */
         .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px; margin-bottom: 28px;
         }
-        .card-metric {
-            background: #151c2c;
-            border: 1px solid #2a364f;
-            border-radius: 12px;
-            padding: 20px;
-        }
-        .card-metric .label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #94a3b8;
-            margin-bottom: 8px;
-        }
-        .card-metric .value {
-            font-size: 28px;
-            font-weight: 800;
-        }
-        .val-total { color: #38bdf8; }
-        .val-green { color: #34d399; }
-        .val-yellow { color: #fbbf24; }
-        .val-red { color: #f87171; }
+        .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; }
+        .card-metric .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 700; }
+        .card-metric .value { font-size: 26px; font-weight: 800; }
+        .val-total { color: #f8fafc; }
+        .val-verde { color: #34d399; }
+        .val-amarelo { color: #fbbf24; }
+        .val-roxo { color: #c084fc; }
+        .val-vermelho { color: #f87171; }
+        .val-tempo { color: #38bdf8; }
 
-        /* TABS */
-        .tab-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 8px;
-        }
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            padding: 10px 18px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: #1e293b;
-            color: #38bdf8;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* TABELA */
+        .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
 
-        /* TABLE */
-        .table-container {
-            background: #151c2c;
-            border: 1px solid #2a364f;
-            border-radius: 12px;
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 13px;
-        }
-        th {
-            background: #1e293b;
-            color: #94a3b8;
-            padding: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-        }
-        td {
-            padding: 14px;
-            border-bottom: 1px solid #1e293b;
-            color: #cbd5e1;
-            vertical-align: middle;
-        }
-        tr:hover { background: #1a2336; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
+        td { padding: 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-        .avatar-thumb {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #334155;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 11px;
-        }
-        .badge-green { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
-        .badge-yellow { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
-        .badge-red { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
-
-        .btn {
-            background: #0284c7;
-            color: #fff;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn:hover { background: #0369a1; }
-        .btn-wa { background: #16a34a; }
-        .btn-wa:hover { background: #15803d; }
-
-        /* MODAL */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            padding: 20px;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-card {
-            background: #151c2c;
-            border: 1px solid #334155;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 500px;
-            padding: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .modal-header h3 { color: #f87171; font-size: 18px; }
-        .modal-close { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
-        .form-control {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
+        .badge-status { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
+        .b-verde { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
+        .b-amarelo { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
+        .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
+        .b-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="title-group">
-            <h1>🚚 ExcelSilience SRT Mobility — CCO & Gestão de Prontidão</h1>
-            <p>Painel de Monitoramento de Frotas e Telemetria em Tempo Real</p>
+            <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
+            <p>Monitoramento Telemétrico de Prontidão de Turno — NR-01, NR-17 & eSocial Compliance</p>
         </div>
         <div class="live-indicator">
             <div class="dot"></div>
-            <span>CONECTADO AO CCO</span>
+            PAINEL ATIVO EM TEMPO REAL
         </div>
     </div>
 
-    <!-- METRICS GRID -->
+    <!-- SELETOR DE DATAS E FILTROS -->
+    <div class="filter-panel">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="startDate">Data Início:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label for="endDate">Data Fim:</label>
+                <input type="date" id="endDate">
+            </div>
+
+            <button class="btn-quick" onclick="setPeriod('today')">Hoje</button>
+            <button class="btn-quick" onclick="setPeriod('7days')">Últimos 7 Dias</button>
+            <button class="btn-quick" onclick="setPeriod('30days')">Últimos 30 Dias</button>
+            <button class="btn-quick active" id="btnAll" onclick="setPeriod('all')">🌐 Todo o Histórico</button>
+
+            <button class="btn-action" onclick="fetchAndRenderData()">🔄 Aplicar Filtro / Atualizar</button>
+        </div>
+
+        <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
+            <span style="font-size:12px; color:#94a3b8; font-weight:700;">Filtrar por Status:</span>
+            <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
+            <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
+            <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
+            <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Roxo</button>
+            <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
+        </div>
+    </div>
+
+    <!-- CARDS DE MÉTRICAS DO PERÍODO SELECIONADO -->
     <div class="metrics-grid">
         <div class="card-metric">
-            <div class="label">Total Check-ins</div>
-            <div class="value val-total" id="lblTotal">0</div>
+            <div class="label">Check-ins no Período</div>
+            <div class="value val-total" id="mTotal">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟢 Liberados</div>
-            <div class="value val-green" id="lblGreen">0</div>
+            <div class="label">🟢 Liberações (Verde)</div>
+            <div class="value val-verde" id="mVerde">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟡 Pausa Tática (15m)</div>
-            <div class="value val-yellow" id="lblYellow">0</div>
+            <div class="label">🟡 Pausa Tática (Amarelo)</div>
+            <div class="value val-amarelo" id="mAmarelo">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🔴 Veto Operacional</div>
-            <div class="value val-red" id="lblRed">0</div>
+            <div class="label">🟣 Exaustão/Sono (Roxo)</div>
+            <div class="value val-roxo" id="mRoxo">0</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">🔴 Inaptos / Veto (Vermelho)</div>
+            <div class="value val-vermelho" id="mVermelho">0</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">⚡ Média de Latência</div>
+            <div class="value val-tempo" id="mTempo">0 ms</div>
         </div>
     </div>
 
-    <!-- NAVIGATION TABS -->
-    <div class="tab-buttons">
-        <button class="tab-btn active" onclick="switchTab('tabCheckins', this)">📊 Monitoramento ao Vivo</button>
-        <button class="tab-btn" onclick="switchTab('tabMotoristas', this)">👥 Cadastro de Motoristas / WhatsApp</button>
-        <button class="tab-btn" onclick="sincronizarSupabase()">🔄 Atualizar Dados</button>
-    </div>
-
-    <!-- TAB 1: CHECKINS -->
-    <div id="tabCheckins" class="tab-content active">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Data/Hora</th>
-                        <th>Motorista / WhatsApp</th>
-                        <th>Empresa / Setor</th>
-                        <th>Reação (ms)</th>
-                        <th>Voz VSI</th>
-                        <th>Pupilometria EP</th>
-                        <th>Status</th>
-                        <th>Ação CCO</th>
-                    </tr>
-                </thead>
-                <tbody id="tblCheckins">
-                    <tr><td colspan="9" style="text-align:center; color:#38bdf8;">🔄 Conectando ao CCO Supabase...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- TAB 2: CADASTRO MOTORISTAS -->
-    <div id="tabMotoristas" class="tab-content">
-        <div style="background:#151c2c; padding:20px; border-radius:12px; border:1px solid #2a364f; margin-bottom:20px;">
-            <h3 style="color:#38bdf8; margin-bottom:12px;">Cadastrar Novo Motorista</h3>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:12px;">
-                <input type="text" id="addNome" class="form-control" placeholder="Nome Completo">
-                <input type="text" id="addWA" class="form-control" placeholder="WhatsApp (ex: 11999998888)">
-                <select id="addCat" class="form-control">
-                    <option value="🚚 Caminhão">🚚 Caminhão / Frota Pesada</option>
-                    <option value="🚌 Ônibus">🚌 Ônibus / Passageiros</option>
-                    <option value="🚗 Van / Leve">🚗 Van / Utilitário Leve</option>
-                </select>
-                <input type="text" id="addEmpresa" class="form-control" placeholder="Empresa (Ex: TransLog)">
-                <input type="text" id="addSetor" class="form-control" placeholder="Setor / Rota">
-            </div>
-            <button class="btn" onclick="cadastrarMotoristaManual()">➕ Adicionar Motorista</button>
+    <!-- TABELA DE REGISTROS -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title" id="lblTableTitle">Registros de Prontidão Telemétrica</div>
         </div>
 
-        <div style="background:#151c2c; padding:20px; border-radius:12px; border:1px solid #2a364f; margin-bottom:20px;">
-            <h3 style="color:#38bdf8; margin-bottom:8px;">Importação em Massa (CSV)</h3>
-            <input type="file" id="fileCsv" accept=".csv" style="color:#94a3b8; margin-bottom:10px;">
-            <br>
-            <button class="btn" onclick="processarCSV()">📥 Processar CSV</button>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>WhatsApp</th>
-                        <th>Categoria</th>
-                        <th>Empresa / Setor</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="tblMotoristasCadastrados">
-                    <tr><td colspan="5" style="text-align:center; color:#94a3b8;">Nenhum motorista cadastrado ainda.</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- MODAL DE AUDITORIA / OVERRIDE MANUAL -->
-    <div class="modal-overlay" id="modalAudit">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>🔍 Auditoria & Liberação Manual CCO</h3>
-                <button class="modal-close" onclick="fecharModal()">✕</button>
-            </div>
-            <div style="text-align:center; margin-bottom:16px;">
-                <img id="imgAtualModal" src="" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid #f87171; margin-bottom:10px;">
-                <h4 id="mdlNome" style="color:#fff;">Motorista</h4>
-                <p style="color:#f87171; font-weight:700; font-size:12px; margin-top:4px;">⚠️ VETO AUTOMÁTICO DO SISTEMA</p>
-            </div>
-
-            <div style="background:#0f172a; padding:12px; border-radius:8px; margin-bottom:16px; font-size:12px; line-height:1.6;">
-                <div><b>Reação Visuomotora:</b> <span id="mdlReacao" style="color:#f87171;">--</span> ms</div>
-                <div><b>Voz VSI:</b> <span id="mdlVoz">--</span></div>
-                <div><b>Pupilometria:</b> <span id="mdlPupila">--</span></div>
-            </div>
-
-            <div class="form-group">
-                <label>Justificativa do Supervisor (Obrigatório para Audit Trail):</label>
-                <textarea id="txtMotivoOverride" class="form-control" rows="3" placeholder="Ex: Re-teste presencial realizado pelo CCO. Motorista apto após intervalo suplementar."></textarea>
-            </div>
-
-            <div style="display:flex; gap:10px;">
-                <button class="btn" style="background:#ef4444; flex:1;" onclick="autorizarOverrideManual()">🔓 Desbloquear & Liberar</button>
-                <button class="btn" style="background:#475569; flex:1;" onclick="fecharModal()">Cancelar</button>
-            </div>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data / Horário</th>
+                    <th>Operador / Condutor</th>
+                    <th>Setor / GHE / Frota</th>
+                    <th>Biometria Vocal (VSI)</th>
+                    <th>Latência / Reação</th>
+                    <th>Status / Veredito</th>
+                    <th>Encaminhamento Operacional</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">Carregando registros do banco de dados...</td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
-        // Configurações do Supabase
-        const SUPABASE_BASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
-        const TABLE_NAME = 'srt_checkins';
+        const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-        let rawCheckins = [];
-        let motoristasCadastrados = JSON.parse(localStorage.getItem('srt_drivers_list') || '[]');
-        let itemEmAudit = null;
+        let allRecords = [];
+        let selectedStatus = 'ALL';
 
-        window.onload = () => {
-            sincronizarSupabase();
-            renderizarMotoristas();
-        };
+        function setPeriod(period) {
+            document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
+            const today = new Date();
 
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            if (btnElement) {
-                btnElement.classList.add('active');
+            if (period === 'today') {
+                const dateStr = today.toISOString().split('T')[0];
+                document.getElementById('startDate').value = dateStr;
+                document.getElementById('endDate').value = dateStr;
+            } else if (period === '7days') {
+                const past = new Date(); past.setDate(today.getDate() - 7);
+                document.getElementById('startDate').value = past.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            } else if (period === '30days') {
+                const past = new Date(); past.setDate(today.getDate() - 30);
+                document.getElementById('startDate').value = past.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            } else if (period === 'all') {
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('btnAll').classList.add('active');
             }
-            document.getElementById(tabId).classList.add('active');
+            fetchAndRenderData();
         }
 
-        async function sincronizarSupabase() {
-            const tbody = document.getElementById('tblCheckins');
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#38bdf8;">🔄 Conectando ao CCO Supabase...</td></tr>';
+        function setStatusFilter(status) {
+            selectedStatus = status;
+            ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+
+            if (status === 'ALL') document.getElementById('stAll').classList.add('active');
+            if (status === 'GREEN') document.getElementById('stVerde').classList.add('active');
+            if (status === 'YELLOW') document.getElementById('stAmarelo').classList.add('active');
+            if (status === 'PURPLE') document.getElementById('stRoxo').classList.add('active');
+            if (status === 'RED') document.getElementById('stVermelho').classList.add('active');
+
+            renderFilteredData();
+        }
+
+        async function fetchAndRenderData() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando dados no Supabase...</td></tr>';
 
             try {
-                const endpoint = `${SUPABASE_BASE_URL}/rest/v1/${TABLE_NAME}?select=*&order=id.desc&limit=100`;
-                const res = await fetch(endpoint, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
+                let url = `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`;
+                let res = await fetch(url, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
 
+                if (!res.ok) {
+                    // Fallback para tabela alternativa se srt_checkins tiver nome diferente
+                    url = `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`;
+                    res = await fetch(url, {
+                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                    });
+                }
+
                 if (res.ok) {
-                    rawCheckins = await res.json();
-                    console.log("Check-ins recebidos do Supabase:", rawCheckins);
-                    renderizarCheckins();
-                    atualizarMetricas();
+                    const data = await res.json();
+                    allRecords = data || [];
                 } else {
-                    const errText = await res.text();
-                    console.error("Erro na resposta do Supabase:", res.status, errText);
-                    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#f87171;">⚠️ Erro ao buscar dados (${res.status}). Verifique as permissões de RLS no Supabase.</td></tr>`;
+                    allRecords = [];
                 }
-            } catch (e) {
-                console.error('Falha de conexão com o Supabase:', e);
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#f87171;">❌ Falha na conexão com o banco de dados.</td></tr>';
+            } catch (err) {
+                console.warn('Erro na busca Supabase:', err);
+                allRecords = [];
             }
+
+            renderFilteredData();
         }
 
-        function renderizarCheckins() {
-            const tbody = document.getElementById('tblCheckins');
-            if (!rawCheckins || rawCheckins.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#94a3b8;">Nenhum check-in registrado no banco de dados ainda.</td></tr>';
-                return;
-            }
+        function renderFilteredData() {
+            const startVal = document.getElementById('startDate').value;
+            const endVal = document.getElementById('endDate').value;
 
-            let html = '';
-            rawCheckins.forEach((item, idx) => {
-                let badgeClass = 'badge-green';
-                let badgeText = '🟢 LIBERADO';
+            let filtered = allRecords.filter(row => {
+                const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
+                if (startVal && rowDate < startVal) return false;
+                if (endVal && rowDate > endVal) return false;
 
-                if (item.status === 'RED') {
-                    badgeClass = 'badge-red';
-                    badgeText = '🔴 VETO CCO';
-                } else if (item.status === 'YELLOW') {
-                    badgeClass = 'badge-yellow';
-                    badgeText = '🟡 PAUSA 15m';
+                if (selectedStatus !== 'ALL') {
+                    const st = (row.status || '').toUpperCase();
+                    if (selectedStatus === 'GREEN' && !st.includes('VERDE') && !st.includes('GREEN') && !st.includes('APTO')) return false;
+                    if (selectedStatus === 'YELLOW' && !st.includes('AMARELO') && !st.includes('YELLOW') && !st.includes('ATENCAO')) return false;
+                    if (selectedStatus === 'PURPLE' && !st.includes('ROXO') && !st.includes('PURPLE') && !st.includes('EXAUSTAO')) return false;
+                    if (selectedStatus === 'RED' && !st.includes('VERMELHO') && !st.includes('RED') && !st.includes('INAPTO')) return false;
                 }
-
-                const avatarSrc = (item.photo_base64 && item.photo_base64.length > 500)
-                    ? item.photo_base64 
-                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'Motorista')}&background=0f172a&color=38bdf8`;
-
-                const pupilDisplay = item.pupil_status 
-                    ? item.pupil_status 
-                    : '🟢 Pupila Estável (EP 4.5)';
-
-                html += `
-                    <tr>
-                        <td><img src="${avatarSrc}" class="avatar-thumb" alt="Foto"></td>
-                        <td><b>${item.timestamp || item.created_at || '--'}</b></td>
-                        <td><b>${item.name || 'Anônimo'}</b><br><small style="color:#94a3b8;">${item.whatsapp || ''}</small></td>
-                        <td>${item.company || '--'}<br><small style="color:#94a3b8;">${item.sector || ''}</small></td>
-                        <td><b>${item.reaction_ms || 0}</b> ms</td>
-                        <td><small>${item.vsi_status || '--'}</small></td>
-                        <td><small>${pupilDisplay}</small></td>
-                        <td><span class="status-badge ${badgeClass}">${badgeText}</span></td>
-                        <td>
-                            ${item.status === 'RED' 
-                                ? `<button class="btn" style="background:#ef4444; padding:6px 10px; font-size:11px;" onclick="abrirAuditModalByIndex(\${idx})">🔍 Auditar / Destravar</button>`
-                                : `<span style="color:#34d399; font-size:11px;">✅ OK</span>`
-                            }
-                        </td>
-                    </tr>
-                `;
+                return true;
             });
 
-            tbody.innerHTML = html;
-        }
+            // Atualizar Métrica Cards
+            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
+            filtered.forEach(r => {
+                const st = (r.status || '').toUpperCase();
+                if (st.includes('VERDE') || st.includes('GREEN') || st.includes('APTO')) cGreen++;
+                else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO')) cYellow++;
+                else if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO')) cPurple++;
+                else cRed++;
 
-        function atualizarMetricas() {
-            document.getElementById('lblTotal').innerText = rawCheckins.length;
-            document.getElementById('lblGreen').innerText = rawCheckins.filter(i => i.status === 'GREEN').length;
-            document.getElementById('lblYellow').innerText = rawCheckins.filter(i => i.status === 'YELLOW').length;
-            document.getElementById('lblRed').innerText = rawCheckins.filter(i => i.status === 'RED').length;
-        }
+                totalLat += (r.reaction_time_ms || r.latency || 650);
+            });
 
-        function cadastrarMotoristaManual() {
-            const name = document.getElementById('addNome').value.trim();
-            const wa = document.getElementById('addWA').value.trim();
-            const cat = document.getElementById('addCat').value;
-            const company = document.getElementById('addEmpresa').value.trim();
-            const sector = document.getElementById('addSetor').value.trim();
+            document.getElementById('mTotal').innerText = filtered.length;
+            document.getElementById('mVerde').innerText = cGreen;
+            document.getElementById('mAmarelo').innerText = cYellow;
+            document.getElementById('mRoxo').innerText = cPurple;
+            document.getElementById('mVermelho').innerText = cRed;
+            document.getElementById('mTempo').innerText = filtered.length > 0 ? `${Math.round(totalLat / filtered.length)} ms` : '0 ms';
 
-            if (!name || !wa) {
-                alert('Preencha pelo menos Nome e WhatsApp!');
+            // Renderizar Tabela
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro encontrado para o período/filtro selecionado.</td></tr>';
                 return;
             }
 
-            motoristasCadastrados.push({ name, whatsapp: wa, categoria: cat, company, sector });
-            localStorage.setItem('srt_drivers_list', JSON.stringify(motoristasCadastrados));
+            filtered.forEach(item => {
+                const dateObj = new Date(item.created_at || Date.now());
+                const formattedDate = dateObj.toLocaleString('pt-BR');
 
-            document.getElementById('addNome').value = '';
-            document.getElementById('addWA').value = '';
-            renderizarMotoristas();
-            alert('Motorista cadastrado com sucesso!');
-        }
+                let badgeClass = 'b-verde';
+                let statusText = '🟢 VERDE (APTO)';
+                const st = (item.status || '').toUpperCase();
 
-        function processarCSV() {
-            const fileInput = document.getElementById('fileCsv');
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert('Selecione um arquivo CSV!');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target.result;
-                const lines = text.split('\n');
-                let adicionados = 0;
-
-                for (let i = 1; i < lines.length; i++) {
-                    const cols = lines[i].split(',');
-                    if (cols.length >= 2) {
-                        motoristasCadastrados.push({
-                            name: cols[0] ? cols[0].trim() : '',
-                            whatsapp: cols[1] ? cols[1].trim() : '',
-                            categoria: cols[2] ? cols[2].trim() : '🚚 Caminhão',
-                            company: cols[3] ? cols[3].trim() : 'Geral',
-                            sector: cols[4] ? cols[4].trim() : 'Operacional'
-                        });
-                        adicionados++;
-                    }
+                if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO')) {
+                    badgeClass = 'b-amarelo'; statusText = '🟡 AMARELO (PAUSA)';
+                } else if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO')) {
+                    badgeClass = 'b-roxo'; statusText = '🟣 ROXO (EXAUSTÃO)';
+                } else if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO')) {
+                    badgeClass = 'b-vermelho'; statusText = '🔴 VERMELHO (VETO)';
                 }
 
-                localStorage.setItem('srt_drivers_list', JSON.stringify(motoristasCadastrados));
-                renderizarMotoristas();
-                alert(`Importação concluída! ${adicionados} motoristas adicionados.`);
-            };
-            reader.readAsText(fileInput.files);
-        }
-
-        function renderizarMotoristas() {
-            const tbody = document.getElementById('tblMotoristasCadastrados');
-            if (motoristasCadastrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Nenhum motorista na base. Use o formulário ou CSV acima.</td></tr>';
-                return;
-            }
-
-            let html = '';
-            motoristasCadastrados.forEach((m, idx) => {
-                const appUrl = `https://excelsilienceos-web.github.io/srt-bio-health/index.html?token=${idx + 100}`;
-                const msgWa = `Olá, ${m.name}! Está na hora do seu Check-in de Prontidão ExcelSilience SRT para a sua jornada (${m.categoria}). Acesse o link seguro de 30s: ${appUrl}`;
-                const waLink = `https://api.whatsapp.com/send?phone=${m.whatsapp.replace(/\D/g,'')}&text=${encodeURIComponent(msgWa)}`;
-
-                html += `
-                    <tr>
-                        <td><b>${m.name}</b></td>
-                        <td>${m.whatsapp}</td>
-                        <td><span class="status-badge badge-green">${m.categoria}</span></td>
-                        <td>${m.company} (${m.sector})</td>
-                        <td>
-                            <a href="${waLink}" target="_blank" class="btn btn-wa" style="padding:6px 12px; font-size:11px;">
-                                📲 Enviar Check-in via WhatsApp
-                            </a>
-                        </td>
-                    </tr>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:700; color:#f8fafc;">${formattedDate}</td>
+                    <td style="font-weight:600; color:#38bdf8;">${item.name || item.user || item.driver_id || 'Operador Anônimo'}</td>
+                    <td>${item.department || item.sector || item.ghe || 'GHE Geral'}</td>
+                    <td>${item.vsi_status || item.vsi || 'VSI Normal'}</td>
+                    <td style="color:#a855f7; font-weight:600;">${item.reaction_time_ms || item.latency || 650} ms</td>
+                    <td><span class="badge-status ${badgeClass}">${statusText}</span></td>
+                    <td style="font-size:12px;">${item.action || item.easy_stage || 'Catraca Liberada'}</td>
                 `;
+                tbody.appendChild(tr);
             });
-            tbody.innerHTML = html;
         }
 
-        function abrirAuditModalByIndex(index) {
-            const item = rawCheckins[index];
-            if (!item) return;
-
-            itemEmAudit = item;
-            document.getElementById('mdlNome').innerText = item.name || 'Desconhecido';
-            document.getElementById('mdlReacao').innerText = item.reaction_ms || 0;
-            document.getElementById('mdlVoz').innerText = item.vsi_status || '--';
-            document.getElementById('mdlPupila').innerText = item.pupil_status || '🟢 Pupila Estável (EP 4.5)';
-
-            if (item.photo_base64 && item.photo_base64.length > 500) {
-                document.getElementById('imgAtualModal').src = item.photo_base64;
-            } else {
-                document.getElementById('imgAtualModal').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'Motorista')}&background=0f172a&color=f87171`;
-            }
-
-            document.getElementById('modalAudit').classList.add('active');
-        }
-
-        function fecharModal() {
-            document.getElementById('modalAudit').classList.remove('active');
-        }
-
-        function autorizarOverrideManual() {
-            const motivo = document.getElementById('txtMotivoOverride').value.trim();
-            if (!motivo) {
-                alert('Por favor, informe o motivo da liberação manual!');
-                return;
-            }
-
-            alert(`Liberação Autorizada com Sucesso!\n\nMotorista: ${itemEmAudit ? itemEmAudit.name : 'Motorista'}\nMotivo: ${motivo}\nRegistrado no Audit Trail.`);
-            fecharModal();
-            sincronizarSupabase();
-        }
+        window.onload = () => {
+            fetchAndRenderData();
+        };
     </script>
 </body>
 </html>
