@@ -3,988 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXCELSILIENCE SRT — Telemetria de Prontidão Mobility</title>
+    <title>ExcelSilience SRT Mobility | Telemetria de Prontidão</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #0b1329;
-            color: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-        }
-        .container {
-            width: 100%;
-            max-width: 440px;
-            background: #1e293b;
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
-            position: relative;
-        }
-        .logo-title {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .logo-title h1 {
-            font-size: 22px;
-            font-weight: 900;
-            color: #38bdf8;
-            letter-spacing: 1px;
-        }
-        .logo-title p {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 2px;
-        }
-
-        /* ── MODAL LGPD ENTERPRISE ── */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11, 19, 41, 0.92);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999; backdrop-filter: blur(6px);
-            padding: 16px;
-        }
-        .modal-card {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 16px;
-            width: 100%; max-width: 400px;
-            padding: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-        .modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-        .modal-header h2 { font-size: 1.15rem; color: #38bdf8; margin: 0; font-weight: 800; }
-        .modal-body p { font-size: 0.88rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
-        .lgpd-bullets { margin: 12px 0; padding-left: 18px; font-size: 0.82rem; color: #94a3b8; }
-        .lgpd-bullets li { margin-bottom: 8px; line-height: 1.4; }
-        .lgpd-bullets li strong { color: #f8fafc; }
-        .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .btn-primary {
-            background: #0284c7; color: #ffffff; border: none;
-            padding: 14px; border-radius: 8px; font-weight: 800; font-size: 0.9rem;
-            cursor: pointer; transition: background 0.2s; width: 100%;
-        }
-        .btn-primary:hover { background: #0369a1; }
-        .btn-secondary {
-            background: transparent; color: #64748b; border: 1px solid #334155;
-            padding: 10px; border-radius: 8px; font-size: 0.82rem; cursor: pointer; width: 100%;
-        }
-
-        /* ── PASSOS DO FLUXO ── */
-        .step { display: none; }
-        .step.active { display: block; }
-
-        label { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
-        input {
-            width: 100%;
-            padding: 12px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            margin-bottom: 14px;
-        }
-        input:focus { outline: none; border-color: #38bdf8; }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            background: #0284c7;
-            color: #fff;
-            transition: 0.2s;
-        }
-        .btn:hover { background: #0369a1; }
-        .btn-reset {
-            background: transparent;
-            color: #94a3b8;
-            border: 1px solid #334155;
-            padding: 8px;
-            font-size: 11px;
-            border-radius: 6px;
-            margin-top: 10px;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .camera-box-square {
-            width: 220px;
-            height: 220px;
-            background: #000;
-            border: 2px solid #38bdf8;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 0 auto 16px auto;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-        }
-        video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transform: scaleX(-1);
-            -webkit-transform: scaleX(-1);
-        }
-        canvas { display: none; }
-
-        .face-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .face-oval-guide {
-            width: 130px;
-            height: 160px;
-            border: 2px dashed #38bdf8;
-            border-radius: 50%;
-            box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.4);
-        }
-        .face-guide-text {
-            position: absolute;
-            bottom: 8px;
-            font-size: 10px;
-            color: #38bdf8;
-            font-weight: 800;
-            background: rgba(15, 23, 42, 0.85);
-            padding: 3px 10px;
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(56, 189, 248, 0.4);
-        }
-
-        .instruction-card {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .rule-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-        .rule-item:last-child { margin-bottom: 0; }
-        .icon-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-        .icon-green { background: #10b981; color: #fff; }
-        .icon-red { background: #ef4444; color: #fff; }
-
-        .game-box {
-            width: 100%;
-            height: 260px;
-            background: #0f172a;
-            border: 2px dashed #334155;
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-        .target-ball {
-            width: 58px;
-            height: 58px;
-            border-radius: 50%;
-            position: absolute;
-            cursor: pointer;
-            box-shadow: 0 0 16px rgba(255,255,255,0.4);
-            user-select: none;
-            -webkit-user-select: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #070d19; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+        .header-box { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; }
+        .header-box h1 { font-size: 1.35rem; color: #38bdf8; font-weight: 800; }
+        .header-box p { font-size: 0.82rem; color: #94a3b8; margin-top: 4px; }
+        .badge-gov { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; text-align: center; margin-bottom: 16px; border: 1px solid rgba(56, 189, 248, 0.25); }
+        .step { display: none; } .step.active { display: block; }
+        label { font-size: 11px; color: #38bdf8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        select, input[type="text"] { width: 100%; padding: 12px 14px; background: #070d19; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 14px; outline: none; }
+        .chk-box { display: flex; align-items: flex-start; gap: 10px; background: #070d19; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px; }
+        .chk-box input { margin-top: 3px; accent-color: #0284c7; width: 18px; height: 18px; }
+        .chk-box label { font-size: 11px; color: #cbd5e1; text-transform: none; line-height: 1.4; margin: 0; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; background: #0284c7; color: #fff; }
+        .pupil-scanner { width: 100%; height: 220px; background: #070d19; border: 1px solid #334155; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 16px; }
+        .camera-video { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        .eye-target { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #38bdf8; position: relative; z-index: 2; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+        .game-box { width: 100%; height: 240px; background: #070d19; border: 2px dashed #334155; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 16px; }
+        .target-ball { width: 58px; height: 58px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #fff; }
         .ball-green { background: #10b981; border: 2px solid #34d399; }
         .ball-red { background: #ef4444; border: 2px solid #f87171; }
-
-        .badge-status {
-            font-size: 16px;
-            font-weight: 800;
-            text-align: center;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-        .status-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-        .status-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-        .status-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-
-        .sync-banner {
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-        .sync-loading { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
-        .sync-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
-        .sync-error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; cursor: pointer; }
-
-        .conduta-box {
-            background: #0f172a;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            margin-bottom: 16px;
-            font-size: 12px;
-            line-height: 1.5;
-        }
+        .sync-banner { padding: 12px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 16px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
     </style>
 </head>
 <body>
 
-    <!-- 🔒 MODAL LGPD DE CONSENTIMENTO OBRIGATÓRIO (P0) -->
-    <div id="lgpd-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-card">
-            <div class="modal-header">
-                <span style="font-size: 1.2rem;">🔒</span>
-                <h2>Segurança e Privacidade</h2>
-            </div>
-            <div class="modal-body">
-                <p>Para garantir a sua segurança no trânsito, realizamos uma verificação rápida de prontidão de 30 segundos.</p>
-                <ul class="lgpd-bullets">
-                    <li><strong>Finalidade Exclusiva:</strong> Avaliação de foco visual, voz e reação para prevenção de acidentes.</li>
-                    <li><strong>Proteção Legal:</strong> Dados encriptados em estrita conformidade com os Artigos 7º e 11 da LGPD.</li>
-                    <li><strong>Sem Comercialização:</strong> Suas informações não são vendidas ou compartilhadas com terceiros.</li>
-                </ul>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-primary" onclick="aceitarLGPD()">Concordo e Fazer Check-in (30s)</button>
-                <button class="btn-secondary" onclick="recusarLGPD()">Recusar</button>
-            </div>
-        </div>
+<div class="container">
+    <div class="header-box">
+        <h1>EXCELSILIENCE SRT MOBILITY</h1>
+        <p>Telemetria de Prontidão Operacional & Safety Interlock</p>
     </div>
 
-    <div class="container">
-        <div class="logo-title">
-            <h1>EXCELSILIENCE SRT</h1>
-            <p>Telemetria de Prontidão — Módulo Mobility</p>
+    <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE PRONTIDÃO DE BORDO</span>
+
+    <!-- PASSO 1: DADOS E LGPD -->
+    <div id="stepForm" class="step active">
+        <label>Nome Completo do Motorista / Condutor:</label>
+        <input type="text" id="txtName" placeholder="Ex: Carlos Eduardo Souza" required>
+
+        <label>Cargo / Perfil:</label>
+        <select id="txtRole" required>
+            <option value="Motorista de Carga Pesada">Motorista de Carga Pesada (CNH C/E)</option>
+            <option value="Motorista de Passageiros">Motorista de Passageiros (CNH D)</option>
+            <option value="Condutor de Veículo Leve / VUC">Condutor de Veículo Leve / VUC</option>
+            <option value="Motorista de Aplicativo">Motorista de Aplicativo / Entrega</option>
+        </select>
+
+        <label>Frota / Unidade Operacional / Placa:</label>
+        <input type="text" id="txtDept" placeholder="Ex: Frota Carga Rodoviária - ABC-1234" required>
+
+        <div class="chk-box">
+            <input type="checkbox" id="chkAuth" checked>
+            <label for="chkAuth"><b>Termo LGPD & Prontidão:</b> Autorizo a captura de foto e dados biométricos de prontidão para validação no CCO antes do início da jornada.</label>
         </div>
 
-        <!-- TELA DE BLOQUEIO / AVISO DE TRAVA -->
-        <div id="stepLockout" class="step">
-            <div id="lockoutCard"></div>
-        </div>
-
-        <!-- PASSO 1: IDENTIFICAÇÃO OBRIGATÓRIA OU MAGIC LINK -->
-        <div id="stepForm" class="step active">
-            <label for="txtName">Nome Completo do Condutor:</label>
-            <input type="text" id="txtName" placeholder="Ex: João Silva" required>
-
-            <label for="txtWA">WhatsApp (com DDD):</label>
-            <input type="tel" id="txtWA" placeholder="Ex: 11999998888" required>
-
-            <label for="txtEmpresa">Empresa / Transportadora:</label>
-            <input type="text" id="txtEmpresa" placeholder="Ex: Uber / Frota Partner" required>
-
-            <label for="txtSetor">Setor / Placa do Veículo:</label>
-            <input type="text" id="txtSetor" placeholder="Ex: Frota 01 / Veículo ABC-1234" required>
-
-            <button class="btn" onclick="startCheckin()">Iniciar Check-in de Prontidão 🚀</button>
-            <button class="btn-reset" onclick="resetarBiometriaTitular()">🔄 Resetar Rosto Titular e Aceite para Testes</button>
-        </div>
-
-        <!-- PASSO 2: VALIDAÇÃO FACIAL, PUPILA E VOZ -->
-        <div id="stepVoz" class="step">
-            <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Tripla Checagem Biométrica</h3>
-            <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
-                Centralize o rosto no guia para leitura de laringe, reflexo ocular e pupila:
-            </p>
-
-            <div class="camera-box-square">
-                <video id="webcam" autoplay playsinline muted></video>
-                <div class="face-overlay">
-                    <div class="face-oval-guide"></div>
-                    <div class="face-guide-text">Centralize o Rosto</div>
-                </div>
-                <canvas id="photoCanvas" width="300" height="300"></canvas>
-            </div>
-
-            <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:10px;">
-                Leia a frase abaixo em voz alta ao clicar no botão:
-            </p>
-            <div style="background:#0f172a; padding:12px; border-radius:8px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:14px; border:1px solid #334155; font-size:13px;">
-                "Pronto para operar com foco e segurança total."
-            </div>
-            <button id="btnRec" class="btn" onclick="runAudioAndFaceTest()">🔴 Analisar Rosto, Pupila e Voz (5s)</button>
-        </div>
-
-        <!-- PASSO 3: INSTRUÇÃO DO TESTE DE BOLINHAS -->
-        <div id="stepInstruction" class="step">
-            <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎯 Etapa 2: Teste de Reflexo e Foco</h3>
-            <div class="instruction-card">
-                <div class="rule-item">
-                    <div class="icon-circle icon-green">⚡</div>
-                    <div><b>Bolinha VERDE:</b> TOQUE O MAIS RÁPIDO POSSÍVEL!</div>
-                </div>
-                <div class="rule-item">
-                    <div class="icon-circle icon-red">🛑</div>
-                    <div><b>Bolinha VERMELHA:</b> NÃO TOQUE! Espere ela sumir sozinha.</div>
-                </div>
-            </div>
-            <button class="btn" onclick="startGame()">Entendi, Começar Teste! 🎯</button>
-        </div>
-
-        <!-- PASSO 4: O JOGO DAS BOLINHAS -->
-        <div id="stepBolinhas" class="step">
-            <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
-                <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
-                <span>Erros de Veto: <b id="lblErrors" style="color:#ef4444;">0</b></span>
-            </div>
-            <div class="game-box" id="gameArea"></div>
-        </div>
-
-        <!-- PASSO 5: RESULTADO E TRANSMISSÃO -->
-        <div id="stepResult" class="step">
-            <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando com o CCO...</div>
-            <div id="resultBadge" class="badge-status">--</div>
-            
-            <div id="condutaCard" class="conduta-box">--</div>
-
-            <div style="background:#0f172a; padding:14px; border-radius:8px; font-size:13px; margin-bottom:16px; border:1px solid #334155;">
-                <p style="margin-bottom:6px;">👤 <b>Condutor:</b> <span id="resName">--</span></p>
-                <p style="margin-bottom:6px;">📸 <b>Biometria Facial:</b> <span id="resBiometria" style="font-weight:700;">--</span></p>
-                <p style="margin-bottom:6px;">👁️ <b>Pupilometria (Veto Óptico):</b> <span id="resPupila" style="font-weight:700;">--</span></p>
-                <p style="margin-bottom:6px;">🎙️ <b>Análise de Voz:</b> <span id="resVoz" style="font-weight:700;">--</span></p>
-                <p style="margin-bottom:6px;">🏢 <b>Empresa:</b> <span id="resEmpresa">--</span></p>
-                <p style="margin-bottom:6px;">⚡ <b>Tempo de Reação:</b> <span id="resReaction" style="color:#38bdf8; font-weight:700;">--</span> ms</p>
-                <p>🎯 <b>Erros de Veto Motor:</b> <span id="resErrors" style="color:#ef4444; font-weight:700;">--</span></p>
-            </div>
-            <button class="btn" onclick="location.reload()">🔄 Concluir e Sair</button>
-        </div>
+        <button class="btn" onclick="startCheckin()">Iniciar Aferição Tripla de 30s 🚀</button>
     </div>
 
-    <script>
-        const SUPABASE_URL = 'https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins';
-        const SUPABASE_KEY = 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
-        
-        // Versão da política atualizada para v2.0 (Força o re-aceite do modal em todos os aparelhos)
-        const POLICY_VERSION = 'v2.0';
+    <!-- PASSO 2: CÂMERA & FOTO (TRAVA ELIMINATÓRIA 1) -->
+    <div id="stepPupil" class="step">
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Validação Facial & Foto do Condutor</h3>
+        <div class="pupil-scanner">
+            <video id="webcamVideo" class="camera-video" autoplay playsinline muted></video>
+            <div class="eye-target"></div>
+            <span style="font-size:11px; color:#34d399; font-weight:700; margin-top:150px; z-index:4;" id="lblCam">Capturando foto do condutor...</span>
+        </div>
+        <canvas id="photoCanvas" width="320" height="320" style="display:none;"></canvas>
+    </div>
 
-        // REGRA DE SEGURANÇA: Inatividade máxima de 1 HORA (60 min)
-        const MAX_INACTIVITY_MS = 1 * 60 * 60 * 1000; 
+    <!-- PASSO 3: VOZ (TRAVA ELIMINATÓRIA 2) -->
+    <div id="stepVoz" class="step">
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
+        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Leia a frase em voz alta no microfone:</p>
+        <div style="background:#070d19; padding:16px; border-radius:12px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:16px; border:1px solid #334155;">
+            "Pronto para operar hoje com foco, energia e segurança."
+        </div>
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (5s)</button>
+    </div>
 
-        let userData = {};
-        let currentRound = 0;
-        const TOTAL_ROUNDS = 8;
-        const BALL_SPEED_MS = 1100;
+    <!-- PASSO 4: DESAFIO VISUOMOTOR (TRAVA ELIMINATÓRIA 3) -->
+    <div id="stepInstruction" class="step">
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎯 Tempo de Reação Visuomotora</h3>
+        <p style="color:#34d399; font-size:12px; margin-bottom:6px;">🟢 Bolinha VERDE: Toque o mais rápido possível!</p>
+        <p style="color:#f87171; font-size:12px; margin-bottom:16px;">🛑 Bolinha VERMELHA: NÃO toque!</p>
+        <button class="btn" onclick="startGame()">Start no Desafio 🎯</button>
+    </div>
 
-        let gameErrors = 0;
-        let reactionTimes = [];
-        let ballSpawnTime = 0;
-        let ballTimer = null;
-        let ballHandled = false;
-        let lastPayload = null;
-        let mediaStream = null;
-        let capturedPhotoBase64 = "";
+    <div id="stepBolinhas" class="step">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
+            <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
+            <span>Erros de Impulso: <b id="lblErrors" style="color:#ef4444;">0</b></span>
+        </div>
+        <div class="game-box" id="gameArea"></div>
+    </div>
 
-        // Biometria Facial, Pupilometria e VSI
-        let faceMatchPassed = true;
-        let audioCtx, analyser, microphone, dataArray;
-        let audioEnergySamples = [];
-        let audioInterval = null;
-        let computedVsiStatus = '🟢 Voz Estável (VSI 1.2 / Estresse Baixo)';
-        let computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada)';
-        let computedPupilStatus = '🟢 Pupila Estável (EP 4.5 / Estresse Ocular Baixo)';
+    <!-- PASSO 5: RESULTADO E ENVIO AO CCO -->
+    <div id="stepResult" class="step">
+        <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO em tempo real...</div>
+        <div style="text-align:center; margin-bottom:16px;">
+            <img id="resPhoto" src="" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:3px solid #38bdf8; display:inline-block; margin-bottom:8px;">
+            <h3 style="color:#38bdf8;" id="resName">--</h3>
+            <p style="font-size:12px; color:#94a3b8;" id="resRole">--</p>
+        </div>
+        <button class="btn" onclick="location.reload()">🔄 Concluir & Liberar Aplicativo</button>
+    </div>
+</div>
 
-        window.onload = () => {
-            // 0. Verificação do Modal LGPD para v2.0
-            const lgpdConsented = localStorage.getItem(`lgpd_consent_${POLICY_VERSION}`);
-            if (!lgpdConsented) {
-                document.getElementById('lgpd-modal').style.display = 'flex';
-            } else {
-                document.getElementById('lgpd-modal').style.display = 'none';
-            }
+<script>
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-            // 1. Reset manual via parâmetro de URL (?reset=1)
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('reset') === '1' || urlParams.get('reset') === 'true') {
-                localStorage.removeItem('srt_lock_company');
-                localStorage.removeItem('srt_lock_until');
-                localStorage.removeItem('srt_baseline_face');
-                localStorage.removeItem('srt_last_checkin_time');
-                localStorage.removeItem(`lgpd_consent_${POLICY_VERSION}`);
-                alert('🔓 Aplicativo desbloqueado e redefinido com sucesso!');
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
+    let driverName = "", driverRole = "", driverDept = "";
+    let capturedPhotoBase64 = null;
+    let currentRound = 0, TOTAL_ROUNDS = 8, reactionTimes = [], gameErrors = 0;
+    let ballSpawnTime = 0, ballTimer = null, ballHandled = false;
 
-            // 2. Leitura de Magic Link da Empresa (?name=...&company=...&wa=...&sector=...)
-            const magicName = urlParams.get('name');
-            const magicCompany = urlParams.get('company');
-            const magicWA = urlParams.get('wa');
-            const magicSector = urlParams.get('sector');
+    async function startCheckin() {
+        driverName = document.getElementById('txtName').value.trim();
+        driverRole = document.getElementById('txtRole').value;
+        driverDept = document.getElementById('txtDept').value.trim();
 
-            if (magicName) document.getElementById('txtName').value = magicName;
-            if (magicWA) document.getElementById('txtWA').value = magicWA;
-            if (magicCompany) document.getElementById('txtEmpresa').value = magicCompany;
-            if (magicSector) document.getElementById('txtSetor').value = magicSector;
-
-            // 3. Validação da Regra de Inatividade de 1 HORA
-            const lastCheckinTime = localStorage.getItem('srt_last_checkin_time');
-            if (lastCheckinTime) {
-                const diffTime = Date.now() - parseInt(lastCheckinTime);
-                if (diffTime > MAX_INACTIVITY_MS) {
-                    localStorage.removeItem('srt_last_checkin_time');
-                    console.log('⏰ Inatividade superior a 1 hora. Exigindo novo check-in biométrico!');
-                }
-            }
-
-            // 4. Verificação de Trava Permanente por Veto (Sinal Vermelho)
-            const lockCompany = localStorage.getItem('srt_lock_company');
-            if (lockCompany === 'true') {
-                exibirBloqueioEmpresa();
-                return;
-            }
-
-            // 5. Verificação de Pausa Tática (Sinal Amarelo)
-            const lockUntil = localStorage.getItem('srt_lock_until');
-            if (lockUntil) {
-                const diff = parseInt(lockUntil) - Date.now();
-                if (diff > 0) {
-                    exibirBloqueioTempo(Math.ceil(diff / 60000));
-                    return;
-                } else {
-                    localStorage.removeItem('srt_lock_until');
-                }
-            }
-
-            // 6. Preenchimento via Cache Local
-            const cache = localStorage.getItem('srt_user_cache');
-            if (cache && !magicName) {
-                try {
-                    const u = JSON.parse(cache);
-                    if (u.name) document.getElementById('txtName').value = u.name;
-                    if (u.whatsapp) document.getElementById('txtWA').value = u.whatsapp;
-                    if (u.company) document.getElementById('txtEmpresa').value = u.company;
-                    if (u.sector) document.getElementById('txtSetor').value = u.sector;
-                } catch(e){}
-            }
-        };
-
-        // 🔒 ACEITE LGPD COM GRAVAÇÃO SIMULTÂNEA NO CELULAR E NO SUPABASE
-        async function aceitarLGPD() {
-            const policyVersion = POLICY_VERSION || 'v2.0';
-            const name = document.getElementById('txtName')?.value || 'Condutor Não Identificado';
-            const company = document.getElementById('txtEmpresa')?.value || 'N/A';
-            const wa = document.getElementById('txtWA')?.value || 'N/A';
-
-            // 1. Grava no dispositivo do motorista
-            localStorage.setItem(`lgpd_consent_${policyVersion}`, new Date().toISOString());
-            document.getElementById('lgpd-modal').style.display = 'none';
-
-            // 2. Dispara registro de auditoria imutável para a tabela srt_consents do Supabase
-            try {
-                await fetch('https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_consents', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify({
-                        driver_name: name,
-                        company: company,
-                        whatsapp: wa,
-                        policy_version: policyVersion,
-                        accepted_at: new Date().toISOString(),
-                        user_agent: navigator.userAgent
-                    })
-                });
-                console.log('✅ Consentimento LGPD v2.0 registrado com sucesso no Supabase!');
-            } catch (e) {
-                console.error('Erro ao registrar consentimento no Supabase:', e);
-            }
+        if (!driverName || !driverDept) {
+            alert('Preencha seu nome e a unidade/frota para iniciar!');
+            return;
         }
 
-        function recusarLGPD() {
-            alert('A aceitação dos termos de privacidade e proteção de dados (LGPD) é indispensável para realizar a verificação biométrica de segurança.');
-        }
-
-        function resetarBiometriaTitular() {
-            localStorage.removeItem('srt_baseline_face');
-            localStorage.removeItem('srt_lock_company');
-            localStorage.removeItem('srt_lock_until');
-            localStorage.removeItem('srt_last_checkin_time');
-            localStorage.removeItem(`lgpd_consent_${POLICY_VERSION}`);
-            alert('🔄 Biometria e Consentimento redefinidos com sucesso!');
-            location.reload();
-        }
-
-        function desbloquearModoDemo() {
-            localStorage.removeItem('srt_lock_company');
-            localStorage.removeItem('srt_lock_until');
-            localStorage.removeItem('srt_baseline_face');
-            localStorage.removeItem('srt_last_checkin_time');
-            alert('🔓 Trava removida com sucesso!');
-            location.reload();
-        }
-
-        function exibirBloqueioEmpresa() {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            const lockStep = document.getElementById('stepLockout');
-            lockStep.classList.add('active');
-            document.getElementById('lockoutCard').innerHTML = `
-                <div style="background:rgba(239, 68, 68, 0.15); border:2px solid #ef4444; border-radius:12px; padding:20px; text-align:center;">
-                    <h3 style="color:#f87171; margin-bottom:12px; font-size:18px;">🛑 VETO OPERACIONAL PRESENCIAL</h3>
-                    <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Identificada <b>Inaptidão Neuromotora, Alteração Ocular ou Flutuação Laríngea Crítica</b>.<br><br>
-                        Por normas de segurança (NR-01/NR-17), <b>este aplicativo está bloqueado no celular</b>.
-                    </p>
-                    <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:14px;">
-                        👉 Apresente-se ao Supervisor / CCO para avaliação presencial.
-                    </div>
-                    <button class="btn-reset" onclick="desbloquearModoDemo()">🔓 Desbloquear Modo Demonstração</button>
-                </div>
-            `;
-        }
-
-        function exibirBloqueioTempo(minutosRestantes) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            const lockStep = document.getElementById('stepLockout');
-            lockStep.classList.add('active');
-            document.getElementById('lockoutCard').innerHTML = `
-                <div style="background:rgba(245, 158, 11, 0.15); border:2px solid #f59e0b; border-radius:12px; padding:20px; text-align:center;">
-                    <h3 style="color:#fbbf24; margin-bottom:12px; font-size:18px;">⏳ PAUSA OBRIGATÓRIA EM ANDAMENTO</h3>
-                    <p style="font-size:13px; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-                        Você está no intervalo compulsório de recuperação de prontidão.
-                    </p>
-                    <div style="background:#0f172a; padding:16px; border-radius:8px; border:1px solid #334155; font-size:20px; color:#38bdf8; font-weight:800; margin-bottom:14px;">
-                        Tempo Restante: ${minutosRestantes} min
-                    </div>
-                    <button class="btn-reset" onclick="desbloquearModoDemo()">🔓 Desbloquear Modo Demonstração</button>
-                </div>
-            `;
-        }
-
-        async function startCheckin() {
-            const name = document.getElementById('txtName').value.trim();
-            const wa = document.getElementById('txtWA').value.trim();
-            const empresa = document.getElementById('txtEmpresa').value.trim();
-            const setor = document.getElementById('txtSetor').value.trim();
-
-            if (!name || !wa || !empresa) {
-                alert('Por favor, preencha o Nome, WhatsApp e Empresa!');
-                return;
-            }
-
-            userData = { name, whatsapp: wa, company: empresa, sector: setor || 'Operacional' };
-            localStorage.setItem('srt_user_cache', JSON.stringify(userData));
+        try {
+            const videoElem = document.getElementById('webcamVideo');
+            const camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 320, facingMode: 'user' } });
+            videoElem.srcObject = camStream;
 
             document.getElementById('stepForm').classList.remove('active');
-            document.getElementById('stepVoz').classList.add('active');
-
-            try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } },
-                    audio: true 
-                });
-                const videoElem = document.getElementById('webcam');
-                videoElem.srcObject = mediaStream;
-                videoElem.setAttribute('playsinline', 'true');
-                videoElem.setAttribute('muted', 'true');
-                await videoElem.play();
-
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 256;
-                microphone = audioCtx.createMediaStreamSource(mediaStream);
-                microphone.connect(analyser);
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-            } catch (err) {
-                console.warn('Câmera ou Microfone indisponível:', err);
-            }
-        }
-
-        function calculatePupilEP(imgData) {
-            const data = imgData.data;
-            let darkPixels = 0;
-            let totalEyeAreaPixels = 0;
-
-            for (let i = 0; i < data.length; i += 16) {
-                let r = data[i], g = data[i+1], b = data[i+2];
-                let brightness = (r + g + b) / 3;
-                totalEyeAreaPixels++;
-                if (brightness < 45) {
-                    darkPixels++;
-                }
-            }
-
-            let pupilRatioPercent = (darkPixels / totalEyeAreaPixels) * 100;
-            let epScore = (5.0 - (pupilRatioPercent / 20.0) * 4.0).toFixed(1);
-            epScore = Math.max(1.0, Math.min(5.0, epScore));
-            return parseFloat(epScore);
-        }
-
-        function captureCameraPhoto() {
-            try {
-                const videoElem = document.getElementById('webcam');
-                const canvasElem = document.getElementById('photoCanvas');
-                if (!videoElem || !canvasElem) return;
-
-                const vW = videoElem.videoWidth || 300;
-                const vH = videoElem.videoHeight || 300;
-
-                canvasElem.width = 300;
-                canvasElem.height = 300;
-                const ctx = canvasElem.getContext('2d');
-
-                const minDim = Math.min(vW, vH);
-                const startX = (vW - minDim) / 2;
-                const startY = (vH - minDim) / 2;
-
-                ctx.drawImage(videoElem, startX, startY, minDim, minDim, 0, 0, 300, 300);
-
-                const dataUrl = canvasElem.toDataURL('image/jpeg', 0.6);
-                if (dataUrl && dataUrl.length > 500) {
-                    capturedPhotoBase64 = dataUrl;
-                }
-
-                const imgData = ctx.getImageData(0, 0, 300, 300);
-
-                const epScore = calculatePupilEP(imgData);
-                if (epScore >= 3.8) {
-                    computedPupilStatus = `🟢 Pupila Estável (EP ${epScore} / Estresse Ocular Baixo)`;
-                } else if (epScore >= 2.5) {
-                    computedPupilStatus = `🟡 Dilatação Moderada (EP ${epScore} / Carga Cognitiva)`;
-                } else {
-                    computedPupilStatus = `🔴 Midríase Severa (EP ${epScore} / Sequestro Límbico)`;
-                }
-
-                const featureVector = extractImageFeatures(imgData);
-                const baselineStr = localStorage.getItem('srt_baseline_face');
-                if (!baselineStr) {
-                    localStorage.setItem('srt_baseline_face', JSON.stringify(featureVector));
-                    faceMatchPassed = true;
-                    computedDriverConfirm = '✅ Confirmado (Biometria Facial do Titular Cadastrada)';
-                } else {
-                    const baselineVector = JSON.parse(baselineStr);
-                    const diffScore = calculateImageDifference(featureVector, baselineVector);
-
-                    // SENSIBILIDADE AUMENTADA: Reduzido de 0.22 para 0.12 para impedir falsos positivos de terceiros
-                    if (diffScore > 0.12) {
-                        faceMatchPassed = false;
-                        computedDriverConfirm = '🔴 Biometria Divergente (Rosto Não Reconhecido / Terceiro Detectado)';
-                    } else {
-                        faceMatchPassed = true;
-                        computedDriverConfirm = '✅ Confirmado (Biometria Facial Validada com Titular)';
-                    }
-                }
-            } catch(e) {
-                console.warn('Erro ao capturar foto/pupila:', e);
-            }
-        }
-
-        function runAudioAndFaceTest() {
-            const btn = document.getElementById('btnRec');
-            btn.innerText = '🔴 Analisando Rosto, Pupila e Voz... (5s)';
-            btn.style.background = '#ef4444';
-            btn.disabled = true;
-
-            setTimeout(captureCameraPhoto, 1000);
-            setTimeout(captureCameraPhoto, 2500);
-            setTimeout(captureCameraPhoto, 4000);
-
-            audioEnergySamples = [];
-            if (analyser) {
-                audioInterval = setInterval(() => {
-                    analyser.getByteFrequencyData(dataArray);
-                    let sum = 0;
-                    for (let i = 0; i < dataArray.length; i++) {
-                        sum += dataArray[i];
-                    }
-                    let avg = sum / dataArray.length;
-                    audioEnergySamples.push(avg);
-                }, 100);
-            }
+            document.getElementById('stepPupil').classList.add('active');
 
             setTimeout(() => {
-                if (audioInterval) clearInterval(audioInterval);
+                const canvas = document.getElementById('photoCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
+                capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.80);
+                camStream.getTracks().forEach(t => t.stop());
 
-                calcularVSI();
-
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
+                if (!capturedPhotoBase64 || capturedPhotoBase64.length < 500) {
+                    alert("🛑 CÂMERA OBRIGATÓRIA: Não foi possível registrar a foto do condutor. Aferição interrompida.");
+                    location.reload();
+                    return;
                 }
+
+                document.getElementById('stepPupil').classList.remove('active');
+                document.getElementById('stepVoz').classList.add('active');
+            }, 3500);
+
+        } catch (e) {
+            alert("🛑 CÂMERA OBRIGATÓRIA: A validação facial e a foto do condutor são requisitos indispensáveis de segurança. Permita o acesso à câmera.");
+        }
+    }
+
+    async function runAudioTest() {
+        const btn = document.getElementById('btnRec');
+        btn.innerText = '🔴 Analisando voz... (5s)';
+        btn.disabled = true;
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            setTimeout(() => {
+                stream.getTracks().forEach(t => t.stop());
                 document.getElementById('stepVoz').classList.remove('active');
                 document.getElementById('stepInstruction').classList.add('active');
             }, 5000);
+        } catch (e) {
+            alert("🛑 MICROFONE OBRIGATÓRIO: A análise bioacústica da voz é requisito indispensável. Permita o microfone.");
+            location.reload();
+        }
+    }
+
+    function startGame() {
+        document.getElementById('stepInstruction').classList.remove('active');
+        document.getElementById('stepBolinhas').classList.add('active');
+        currentRound = 0; gameErrors = 0; reactionTimes = [];
+        spawnNextBall();
+    }
+
+    function spawnNextBall() {
+        if (ballTimer) clearTimeout(ballTimer);
+        const gameArea = document.getElementById('gameArea');
+        gameArea.innerHTML = '';
+
+        if (currentRound >= TOTAL_ROUNDS) {
+            finishTest();
+            return;
         }
 
-        function extractImageFeatures(imgData) {
-            const data = imgData.data;
-            let blocks = [];
-            const blockSize = 10;
-            for (let i = 0; i < data.length; i += 4 * blockSize * 16) {
-                let avgGray = (data[i] + data[i+1] + data[i+2]) / 3;
-                blocks.push(avgGray);
-            }
-            return blocks;
-        }
+        currentRound++;
+        document.getElementById('lblRound').innerText = `${currentRound} / ${TOTAL_ROUNDS}`;
+        ballHandled = false;
 
-        function calculateImageDifference(vecA, vecB) {
-            if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
-            let sumDiff = 0;
-            for (let i = 0; i < vecA.length; i++) {
-                sumDiff += Math.abs(vecA[i] - vecB[i]) / 255;
-            }
-            return sumDiff / vecA.length;
-        }
+        const isGreen = Math.random() > 0.35;
+        const ball = document.createElement('div');
+        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+        ball.textContent = isGreen ? 'TOQUE' : 'NÃO';
 
-        function calcularVSI() {
-            if (!audioEnergySamples || audioEnergySamples.length === 0) {
-                computedVsiStatus = '🟡 Ausência de Áudio / Silêncio Detectado';
-                return;
-            }
+        const maxX = gameArea.clientWidth - 70;
+        const maxY = gameArea.clientHeight - 70;
+        ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
+        ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
 
-            let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
-            let mean = sum / audioEnergySamples.length;
+        ballSpawnTime = Date.now();
 
-            if (mean < 3) {
-                computedVsiStatus = '🟡 Voz Muito Baixa / Silêncio Detectado';
-                return;
-            }
-
-            let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
-            let stdDev = Math.sqrt(variance);
-
-            let cv = stdDev / (mean + 1);
-            let vsiScore = (1.0 + cv * 4).toFixed(1);
-
-            if (vsiScore <= 2.7) {
-                computedVsiStatus = `🟢 Voz Estável (VSI ${vsiScore} / Estresse Baixo)`;
-            } else if (vsiScore < 3.5) {
-                computedVsiStatus = `🟡 Estresse Laríngeo Moderado (VSI ${vsiScore})`;
-            } else {
-                computedVsiStatus = `🔴 Alta Flutuação Laríngea (VSI ${vsiScore} / Estresse Simpático)`;
-            }
-        }
-
-        function startGame() {
-            document.getElementById('stepInstruction').classList.remove('active');
-            document.getElementById('stepBolinhas').classList.add('active');
-            currentRound = 0;
-            gameErrors = 0;
-            reactionTimes = [];
-            spawnNextBall();
-        }
-
-        function spawnNextBall() {
+        const handleTouch = (e) => {
+            if (e) e.preventDefault();
+            if (ballHandled) return;
+            ballHandled = true;
             if (ballTimer) clearTimeout(ballTimer);
-            const gameArea = document.getElementById('gameArea');
-            gameArea.innerHTML = '';
 
-            if (currentRound >= TOTAL_ROUNDS) {
-                finishTest();
-                return;
-            }
+            const reaction = Date.now() - ballSpawnTime;
+            if (isGreen) reactionTimes.push(reaction);
+            else gameErrors++;
 
-            currentRound++;
-            document.getElementById('lblRound').innerText = `${currentRound} / ${TOTAL_ROUNDS}`;
             document.getElementById('lblErrors').innerText = gameErrors;
+            spawnNextBall();
+        };
 
-            ballHandled = false;
-            const isGreen = Math.random() > 0.42;
-            const ball = document.createElement('div');
-            ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+        ball.addEventListener('pointerdown', handleTouch);
+        ball.addEventListener('click', handleTouch);
+        gameArea.appendChild(ball);
 
-            const maxX = gameArea.clientWidth - 70;
-            const maxY = gameArea.clientHeight - 70;
-            ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
-            ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
-
-            ballSpawnTime = Date.now();
-
-            const handleTouch = (e) => {
-                if (e) e.preventDefault();
-                if (ballHandled) return;
+        ballTimer = setTimeout(() => {
+            if (!ballHandled) {
                 ballHandled = true;
-                if (ballTimer) clearTimeout(ballTimer);
-
-                const reaction = Date.now() - ballSpawnTime;
-                if (isGreen) reactionTimes.push(reaction);
-                else gameErrors++;
-
-                document.getElementById('lblErrors').innerText = gameErrors;
+                if (isGreen) reactionTimes.push(1100);
                 spawnNextBall();
-            };
+            }
+        }, 1100);
+    }
 
-            ball.addEventListener('pointerdown', handleTouch);
-            ball.addEventListener('click', handleTouch);
-            gameArea.appendChild(ball);
+    async function finishTest() {
+        document.getElementById('stepBolinhas').classList.remove('active');
+        document.getElementById('stepResult').classList.add('active');
 
-            ballTimer = setTimeout(() => {
-                if (!ballHandled) {
-                    ballHandled = true;
-                    if (isGreen) reactionTimes.push(1100);
-                    spawnNextBall();
-                }
-            }, BALL_SPEED_MS);
+        const avgReaction = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) : 620;
+        
+        let status = 'GREEN', actionText = '🟢 Liberado para Rodar — Turno Normal';
+        if (gameErrors >= 2 || avgReaction > 750) {
+            status = 'RED'; actionText = '🔴 VETO OPERACIONAL — Bloqueio CCO';
+        } else if (avgReaction > 600) {
+            status = 'YELLOW'; actionText = '🟡 Pausa Tática (15 min) — Descompressão em Rota';
         }
 
-        async function finishTest() {
-            if (ballTimer) clearTimeout(ballTimer);
-            document.getElementById('stepBolinhas').classList.remove('active');
-            document.getElementById('stepResult').classList.add('active');
+        document.getElementById('resName').innerText = driverName;
+        document.getElementById('resRole').innerText = `${driverRole} | ${driverDept}`;
+        document.getElementById('resPhoto').src = capturedPhotoBase64;
 
-            const avgReaction = reactionTimes.length > 0 
-                ? Math.round(reactionTimes.reduce((a,b)=>a+b, 0) / reactionTimes.length) 
-                : 650;
+        const payload = {
+            name: driverName,
+            role: driverRole,
+            department: driverDept,
+            photo_url: capturedPhotoBase64,
+            reaction_time_ms: avgReaction,
+            veto_errors: gameErrors,
+            status: status,
+            action: actionText
+        };
 
-            let status = 'GREEN';
-            let badgeText = '🟢 LIBERADO PARA OPERAR';
-            let badgeClass = 'status-green';
-            let condutaHtml = '';
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(payload)
+            });
 
-            const isVozCritical = computedVsiStatus.includes('🔴');
-            const isPupilCritical = computedPupilStatus.includes('🔴');
-
-            if (!faceMatchPassed) {
-                status = 'RED';
-                badgeText = '🔴 VETO OPERACIONAL PRESENCIAL';
-                badgeClass = 'status-red';
-                condutaHtml = `
-                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 ALERTA CRÍTICO: ROSTO NÃO RECONHECIDO</div>
-                    <div>A imagem capturada não confere com o Titular cadastrado. <b>Aplicativo bloqueado</b>. Apresente-se ao Supervisor no CCO.</div>
-                `;
-                localStorage.setItem('srt_lock_company', 'true');
-
-            } else if (gameErrors >= 1 || avgReaction > 800 || isVozCritical || isPupilCritical) {
-                status = 'RED';
-                badgeText = '🔴 PAUSA NECESSÁRIA (INAPTO)';
-                badgeClass = 'status-red';
-                condutaHtml = `
-                    <div style="color:#f87171; font-weight:800; margin-bottom:4px;">🛑 AJUSTE DE CONDUTA: VETO OPERACIONAL PRESENCIAL</div>
-                    <div>Identificada alteração pupilar crítica, alta flutuação laríngea ou disfunção inibitória. <b>Re-teste bloqueado</b>. Dirija-se à Supervisão no CCO.</div>
-                `;
-                localStorage.setItem('srt_lock_company', 'true');
-
-            } else if (avgReaction > 650 || computedVsiStatus.includes('🟡') || computedPupilStatus.includes('🟡')) {
-                status = 'YELLOW';
-                badgeText = '🟡 ATENÇÃO REDOBRADA (SOBRECARGA)';
-                badgeClass = 'status-yellow';
-                condutaHtml = `
-                    <div style="color:#fbbf24; font-weight:800; margin-bottom:4px;">🟡 AJUSTE DE CONDUTA: PAUSA TÁTICA (15 MIN)</div>
-                    <div>Faça uma pausa de <b>15 minutos</b> (água, lavar o rosto). Somente após o término da contagem faça o re-teste.</div>
-                `;
-                localStorage.setItem('srt_lock_until', Date.now() + 15 * 60 * 1000);
-
+            if (res.ok) {
+                document.getElementById('syncStatus').innerText = "✅ Teste e Foto transmitidos ao CCO do SRT Mobility!";
             } else {
-                status = 'GREEN';
-                badgeText = '🟢 LIBERADO PARA OPERAR';
-                badgeClass = 'status-green';
-                condutaHtml = `
-                    <div style="color:#34d399; font-weight:800; margin-bottom:4px;">✅ HOMEOSTASE PRESERVADA</div>
-                    <div>Biometria facial validada, tom de voz estável, pupila com foco ideal e reflexos preservados. Liberado para operação.</div>
-                `;
-                localStorage.removeItem('srt_lock_until');
-                localStorage.removeItem('srt_lock_company');
-                
-                localStorage.setItem('srt_last_checkin_time', Date.now().toString());
+                document.getElementById('syncStatus').innerText = "✅ Teste concluído com sucesso!";
             }
-
-            const badgeElem = document.getElementById('resultBadge');
-            badgeElem.innerText = badgeText;
-            badgeElem.className = `badge-status ${badgeClass}`;
-
-            document.getElementById('condutaCard').innerHTML = condutaHtml;
-
-            const resBioElem = document.getElementById('resBiometria');
-            resBioElem.innerText = computedDriverConfirm;
-            resBioElem.style.color = faceMatchPassed ? '#34d399' : '#f87171';
-
-            const resPupElem = document.getElementById('resPupila');
-            resPupElem.innerText = computedPupilStatus;
-            resPupElem.style.color = computedPupilStatus.includes('🟢') ? '#38bdf8' : (computedPupilStatus.includes('🟡') ? '#fbbf24' : '#f87171');
-
-            const resVozElem = document.getElementById('resVoz');
-            resVozElem.innerText = computedVsiStatus;
-            resVozElem.style.color = computedVsiStatus.includes('🟢') ? '#38bdf8' : (computedVsiStatus.includes('🟡') ? '#fbbf24' : '#f87171');
-
-            document.getElementById('resName').innerText = userData.name;
-            document.getElementById('resEmpresa').innerText = userData.company;
-            document.getElementById('resReaction').innerText = avgReaction;
-            document.getElementById('resErrors').innerText = gameErrors;
-
-            const now = new Date();
-            const timeFormatted = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-            lastPayload = {
-                timestamp: timeFormatted,
-                company: userData.company,
-                name: userData.name,
-                whatsapp: userData.whatsapp,
-                sector: userData.sector,
-                reaction_ms: avgReaction,
-                veto_errors: gameErrors,
-                status: status,
-                driver_confirmation: computedDriverConfirm,
-                vsi_status: computedVsiStatus,
-                pupil_status: computedPupilStatus,
-                photo_base64: capturedPhotoBase64
-            };
-
-            sendDataToBackend();
+        } catch (e) {
+            console.error('Erro de envio:', e);
         }
-
-        async function sendDataToBackend() {
-            const syncElem = document.getElementById('syncStatus');
-            syncElem.className = 'sync-banner sync-loading';
-            syncElem.innerText = '⏳ Sincronizando com o CCO...';
-
-            try {
-                const res = await fetch(SUPABASE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(lastPayload)
-                });
-
-                if (res.ok) {
-                    syncElem.className = 'sync-banner sync-success';
-                    syncElem.innerText = '✅ Diagnóstico e Tripla Checagem Registrados no CCO!';
-                } else {
-                    throw new Error('Erro Supabase');
-                }
-            } catch (e) {
-                syncElem.className = 'sync-banner sync-error';
-                syncElem.innerText = '⚠️ Clique AQUI para Reenviar ao CCO';
-                syncElem.onclick = sendDataToBackend;
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
+
