@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT Mobility — CCO Dashboard de Frotas & Motoristas</title>
+    <title>ExcelSilience SRT Mobility — CCO Dashboard</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #0b0f19; color: #e2e8f0; padding: 24px; }
@@ -11,9 +11,8 @@
         .header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px;
-            flex-wrap: wrap; gap: 12px;
         }
-        .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
+        .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; }
         .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
         
         .live-indicator {
@@ -22,74 +21,35 @@
             font-size: 12px; font-weight: 700; color: #34d399;
         }
         .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
-
-        /* PAINEL DE FILTROS DE DATA E STATUS */
-        .filter-panel {
-            background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px;
-            margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;
-        }
-        .filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .filter-group { display: flex; align-items: center; gap: 8px; }
-        .filter-group label { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
-        
-        input[type="date"] {
-            background: #0b0f19; border: 1px solid #334155; color: #f8fafc;
-            padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
-        }
-        input[type="date"]:focus { border-color: #38bdf8; }
-
-        .btn-quick {
-            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
-            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
-        }
-        .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
         .btn-action {
-            background: #10b981; border: none; color: #ffffff; padding: 8px 18px;
-            border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto;
+            background: #10b981; border: none; color: #ffffff; padding: 10px 20px;
+            border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s;
         }
         .btn-action:hover { background: #059669; }
 
-        /* CARDS DE MÉTRICAS */
         .metrics-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
             gap: 16px; margin-bottom: 28px;
         }
         .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; }
-        .card-metric .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 700; }
+        .card-metric .label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 8px; }
         .card-metric .value { font-size: 26px; font-weight: 800; }
-        .val-total { color: #f8fafc; }
-        .val-verde { color: #34d399; }
-        .val-amarelo { color: #fbbf24; }
-        .val-roxo { color: #c084fc; }
-        .val-vermelho { color: #f87171; }
-        .val-tempo { color: #38bdf8; }
+        .val-total { color: #f8fafc; } .val-verde { color: #34d399; } .val-amarelo { color: #fbbf24; }
+        .val-roxo { color: #c084fc; } .val-vermelho { color: #f87171; }
 
-        /* TABELA COMPLETA CCO MOBILITY */
         .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; overflow-x: auto; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-        .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
-
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 980px; }
-        th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 950px; }
+        th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; border-bottom: 1px solid #334155; }
         td { padding: 12px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
-        tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-        .user-photo {
-            width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
-            border: 2px solid #0284c7; background: #070d19; flex-shrink: 0;
-        }
-
+        .user-photo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #0284c7; background: #070d19; }
         .user-avatar-fallback {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: #ffffff; font-weight: 800; font-size: 18px;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid #38bdf8; text-transform: uppercase; flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+            width: 44px; height: 44px; border-radius: 50%; background: #0284c7; color: #fff;
+            font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center;
+            border: 2px solid #38bdf8; text-transform: uppercase;
         }
-
         .photo-container { display: flex; align-items: center; gap: 12px; }
 
         .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
@@ -97,12 +57,6 @@
         .b-amarelo { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
         .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
         .b-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
-
-        .badge-face {
-            font-size: 10px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.1);
-            padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block; margin-top: 2px;
-        }
-        .badge-voice { font-size: 11px; font-weight: 700; display: block; }
     </style>
 </head>
 <body>
@@ -110,93 +64,36 @@
     <div class="header">
         <div class="title-group">
             <h1>CENTRO DE CONTROLE OPERACIONAL (CCO) — SRT MOBILITY</h1>
-            <p>Telemetria de Prontidão Operacional de Frotas, Motoristas & Portaria — NR-01, NR-17 & eSocial</p>
+            <p>Telemetria de Prontidão Operacional em Tempo Real</p>
         </div>
-        <div class="live-indicator">
-            <div class="dot"></div>
-            CCO ATIVO EM TEMPO REAL
-        </div>
-    </div>
-
-    <!-- SELETOR DE DATAS E FILTROS DE STATUS -->
-    <div class="filter-panel">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="startDate">Data Início:</label>
-                <input type="date" id="startDate">
-            </div>
-            <div class="filter-group">
-                <label for="endDate">Data Fim:</label>
-                <input type="date" id="endDate">
-            </div>
-
-            <button class="btn-quick" onclick="setPeriod('today')">Hoje</button>
-            <button class="btn-quick" onclick="setPeriod('7days')">Últimos 7 Dias</button>
-            <button class="btn-quick" onclick="setPeriod('30days')">Últimos 30 Dias</button>
-            <button class="btn-quick active" id="btnAll" onclick="setPeriod('all')">🌐 Todo o Histórico</button>
-
-            <button class="btn-action" onclick="fetchAndRenderData()">🔄 Aplicar Filtro / Atualizar</button>
-        </div>
-
-        <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
-            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Status de Trava:</span>
-            <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
-            <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
-            <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
-            <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Roxo</button>
-            <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
+        <div style="display:flex; gap:16px; align-items:center;">
+            <button class="btn-action" onclick="fetchAndRenderData()">🔄 Atualizar Registros</button>
+            <div class="live-indicator"><div class="dot"></div> CCO ATIVO</div>
         </div>
     </div>
 
-    <!-- CARDS DE MÉTRICAS DA FROTA -->
     <div class="metrics-grid">
-        <div class="card-metric">
-            <div class="label">Aferições no Período</div>
-            <div class="value val-total" id="mTotal">0</div>
-        </div>
-        <div class="card-metric">
-            <div class="label">🟢 Liberados para Rodar</div>
-            <div class="value val-verde" id="mVerde">0</div>
-        </div>
-        <div class="card-metric">
-            <div class="label">🟡 Pausa Tática (15 min)</div>
-            <div class="value val-amarelo" id="mAmarelo">0</div>
-        </div>
-        <div class="card-metric">
-            <div class="label">🟣 Exaustão / Sono (45 min)</div>
-            <div class="value val-roxo" id="mRoxo">0</div>
-        </div>
-        <div class="card-metric">
-            <div class="label">🔴 Safety Interlock (Veto)</div>
-            <div class="value val-vermelho" id="mVermelho">0</div>
-        </div>
-        <div class="card-metric">
-            <div class="label">⚡ Reação Média da Frota</div>
-            <div class="value val-tempo" id="mTempo">0 ms</div>
-        </div>
+        <div class="card-metric"><div class="label">Total de Testes</div><div class="value val-total" id="mTotal">0</div></div>
+        <div class="card-metric"><div class="label">🟢 Liberados</div><div class="value val-verde" id="mVerde">0</div></div>
+        <div class="card-metric"><div class="label">🟡 Pausa 15 min</div><div class="value val-amarelo" id="mAmarelo">0</div></div>
+        <div class="card-metric"><div class="label">🟣 Pausa 45 min (Exaustão)</div><div class="value val-roxo" id="mRoxo">0</div></div>
+        <div class="card-metric"><div class="label">🔴 Veto (Bloqueio)</div><div class="value val-vermelho" id="mVermelho">0</div></div>
     </div>
 
-    <!-- TABELA COMPLETA CCO MOBILITY -->
     <div class="panel">
-        <div class="panel-header">
-            <div class="panel-title">Fila de Registro de Prontidão de Condutores em Tempo Real</div>
-        </div>
-
         <table>
             <thead>
                 <tr>
                     <th>Horário / Data</th>
-                    <th>Condutor / Motorista (Foto & Perfil)</th>
+                    <th>Condutor / Motorista</th>
                     <th>Validação Facial</th>
-                    <th>Frota / Setor / Veículo</th>
-                    <th>Conferência de Voz (VSI)</th>
-                    <th>Latência / Veto Motor</th>
+                    <th>Frota / Unidade</th>
                     <th>Status / Trava</th>
-                    <th>Encaminhamento Operacional (CCO)</th>
+                    <th>Encaminhamento CCO</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Conectando ao banco de dados Supabase e buscando registros de frotas...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">Carregando registros do Supabase...</td></tr>
             </tbody>
         </table>
     </div>
@@ -205,272 +102,78 @@
         const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
         const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-        let allRecords = [];
-        let selectedStatus = 'ALL';
-
-        function resolveName(item) {
-            let possible = [
-                item.name, item.nome, item.full_name, item.driver_name, item.operator_name,
-                item.condutor, item.operador, item.user, item.usuario, item.user_name
-            ];
-            for (let val of possible) {
-                if (val && typeof val === 'string') {
-                    let v = val.trim();
-                    if (v && v !== 'null' && v !== 'undefined' && v !== 'OP' && !v.toLowerCase().startsWith('sessão') && !v.toLowerCase().startsWith('session')) {
-                        return v;
-                    }
-                }
-            }
-            return 'Condutor Profissional';
-        }
-
-        function resolvePhotoHtml(item, nameStr) {
-            let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.image;
-            
-            let initial = (nameStr && nameStr.length > 0) ? nameStr.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase() : 'C';
-            if (!initial) initial = 'C';
-
-            let sessInfo = item.session_count || item.session_id || item.id;
-            let subLabel = item.vehicle_plate || item.plate || item.role || item.cargo || (sessInfo ? `Sessão #${sessInfo}` : 'Condutor Profissional');
-
-            if (raw && typeof raw === 'string' && raw.trim().length > 20) {
-                raw = raw.trim();
-                let src = raw;
-                if (!raw.startsWith('http') && !raw.startsWith('data:')) {
-                    src = `data:image/jpeg;base64,${raw}`;
-                }
-                return `
-                    <div class="photo-container">
-                        <img src="${src}" class="user-photo" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="user-avatar-fallback" style="display:none;">${initial}</div>
-                        <div>
-                            <b style="color:#38bdf8; font-size:13px;">${nameStr}</b>
-                            <br><small style="color:#94a3b8; font-size:11px;">${subLabel}</small>
-                        </div>
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="photo-container">
-                    <div class="user-avatar-fallback">${initial}</div>
-                    <div>
-                        <b style="color:#38bdf8; font-size:13px;">${nameStr}</b>
-                        <br><small style="color:#94a3b8; font-size:11px;">${subLabel}</small>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getStatusCategory(item) {
-            let st = (item.status || item.profile_key || item.weakest_link || '').toString().toUpperCase();
-            
-            if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO') || st.includes('EXAUSTÃO') || st.includes('BURNED_CHASSIS')) {
-                return 'PURPLE';
-            }
-            if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('IMPULSIVE_REACTOR') || st.includes('VETO')) {
-                return 'RED';
-            }
-            if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO') || st.includes('PACK_MULE')) {
-                return 'YELLOW';
-            }
-            return 'GREEN';
-        }
-
-        function resolveAction(item, category) {
-            const defaultActions = {
-                'GREEN': '🟢 Liberado para Rodar — Turno Normal',
-                'YELLOW': '🟡 Pausa Tática (15 min) — Descompressão em Rota',
-                'PURPLE': '🟣 Pausa Compulsória (45 min) — Trava por Exaustão / Sono',
-                'RED': '🔴 VETO OPERACIONAL — Bloqueio CCO / Encaminhado ao SESMT'
-            };
-
-            let stdAction = defaultActions[category] || defaultActions['GREEN'];
-
-            let dbAction = item.action || item.easy_stage || '';
-            if (dbAction && typeof dbAction === 'string') {
-                dbAction = dbAction.trim();
-                let dbUpper = dbAction.toUpperCase();
-                
-                if (category !== 'GREEN' && (dbUpper.includes('LIBERADA') || dbUpper.includes('TURNO NORMAL') || dbUpper.includes('APTO'))) {
-                    return stdAction;
-                }
-                
-                if (dbAction.length > 5 && !dbUpper.includes('CATRACA LIBERADA')) {
-                    return dbAction;
-                }
-            }
-
-            return stdAction;
-        }
-
-        function setPeriod(period) {
-            document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
-            const today = new Date();
-
-            if (period === 'today') {
-                const dateStr = today.toISOString().split('T');
-                document.getElementById('startDate').value = dateStr;
-                document.getElementById('endDate').value = dateStr;
-            } else if (period === '7days') {
-                const past = new Date(); past.setDate(today.getDate() - 7);
-                document.getElementById('startDate').value = past.toISOString().split('T');
-                document.getElementById('endDate').value = today.toISOString().split('T');
-            } else if (period === '30days') {
-                const past = new Date(); past.setDate(today.getDate() - 30);
-                document.getElementById('startDate').value = past.toISOString().split('T');
-                document.getElementById('endDate').value = today.toISOString().split('T');
-            } else if (period === 'all') {
-                document.getElementById('startDate').value = '';
-                document.getElementById('endDate').value = '';
-                document.getElementById('btnAll').classList.add('active');
-            }
-            fetchAndRenderData();
-        }
-
-        function setStatusFilter(status) {
-            selectedStatus = status;
-            ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('active');
-            });
-
-            if (status === 'ALL') document.getElementById('stAll').classList.add('active');
-            if (status === 'GREEN') document.getElementById('stVerde').classList.add('active');
-            if (status === 'YELLOW') document.getElementById('stAmarelo').classList.add('active');
-            if (status === 'PURPLE') document.getElementById('stRoxo').classList.add('active');
-            if (status === 'RED') document.getElementById('stVermelho').classList.add('active');
-
-            renderFilteredData();
-        }
-
         async function fetchAndRenderData() {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando registros da frota no Supabase...</td></tr>';
-
-            allRecords = [];
-            const tables = ['srt_checkins', 'srt_mobility_checkins', 'srt_consents'];
-            
-            const fetchPromises = tables.map(table => 
-                fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&order=created_at.desc`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                }).then(res => res.ok ? res.json() : []).catch(() => [])
-            );
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando registros no Supabase...</td></tr>';
 
             try {
-                const results = await Promise.all(fetchPromises);
-                let combined = [];
-                results.forEach(arr => {
-                    if (Array.isArray(arr)) combined.push(...arr);
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
 
-                const seen = new Set();
-                allRecords = combined.filter(item => {
-                    const key = `${item.id}-${item.created_at}-${item.name || item.driver_name || item.user || ''}`;
-                    if (seen.has(key)) return false;
-                    seen.add(key);
-                    return true;
-                });
-
-                allRecords.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                renderTable(data || []);
             } catch (err) {
-                console.warn('Erro ao conectar com o Supabase:', err);
+                console.error('Erro:', err);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#f87171;">⚠️ Falha ao conectar com o Supabase (${err.message}). Execute o comando SQL de RLS no painel do Supabase.</td></tr>`;
             }
-
-            renderFilteredData();
         }
 
-        function renderFilteredData() {
-            const startVal = document.getElementById('startDate').value;
-            const endVal = document.getElementById('endDate').value;
+        function renderTable(records) {
+            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0;
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
 
-            let filtered = allRecords.filter(row => {
-                const rowDate = row.created_at ? row.created_at.split('T') : '';
-                if (startVal && rowDate < startVal) return false;
-                if (endVal && rowDate > endVal) return false;
+            document.getElementById('mTotal').innerText = records.length;
 
-                if (selectedStatus !== 'ALL') {
-                    const category = getStatusCategory(row);
-                    if (selectedStatus !== category) return false;
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum teste registrado na tabela `srt_checkins`. Realize um teste no aplicativo.</td></tr>';
+                return;
+            }
+
+            records.forEach(item => {
+                const dateObj = new Date(item.created_at || Date.now());
+                const formattedDate = dateObj.toLocaleString('pt-BR');
+                const name = item.name || item.driver_name || 'Condutor Profissional';
+                const initial = name.charAt(0).toUpperCase();
+
+                let photoHtml = `<div class="user-avatar-fallback">${initial}</div>`;
+                let photoRaw = item.photo_url || item.photo || item.photo_base64;
+                if (photoRaw && photoRaw.length > 30) {
+                    let src = photoRaw.startsWith('http') || photoRaw.startsWith('data:') ? photoRaw : `data:image/jpeg;base64,${photoRaw}`;
+                    photoHtml = `<img src="${src}" class="user-photo" onerror="this.outerHTML='<div class=\\'user-avatar-fallback\\'>${initial}</div>'">`;
                 }
-                return true;
+
+                let st = (item.status || item.profile_key || '').toString().toUpperCase();
+                let badgeClass = 'b-verde', label = '🟢 VERDE', action = '🟢 Liberado para Rodar';
+                if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO')) {
+                    badgeClass = 'b-roxo'; label = '🟣 ROXO (EXAUSTÃO)'; action = '🟣 Pausa Compulsória (45 min) — Trava por Exaustão / Sono'; cPurple++;
+                } else if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO')) {
+                    badgeClass = 'b-vermelho'; label = '🔴 VERMELHO (VETO)'; action = '🔴 VETO OPERACIONAL — Bloqueio CCO'; cRed++;
+                } else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO')) {
+                    badgeClass = 'b-amarelo'; label = '🟡 AMARELO'; action = '🟡 Pausa Tática (15 min)'; cYellow++;
+                } else { cGreen++; }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:700; color:#f8fafc;">${formattedDate}</td>
+                    <td><div class="photo-container">${photoHtml}<div><b style="color:#38bdf8;">${name}</b><br><small style="color:#94a3b8;">${item.role || 'Condutor'}</small></div></div></td>
+                    <td><span style="color:#34d399; font-weight:700;">🟢 Match OK</span></td>
+                    <td>${item.department || item.fleet || 'Frota Geral'}</td>
+                    <td><span class="badge-status ${badgeClass}">${label}</span></td>
+                    <td style="font-weight:700;">${action}</td>
+                `;
+                tbody.appendChild(tr);
             });
 
-            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
-            filtered.forEach(r => {
-                const category = getStatusCategory(r);
-                if (category === 'GREEN') cGreen++;
-                else if (category === 'YELLOW') cYellow++;
-                else if (category === 'PURPLE') cPurple++;
-                else if (category === 'RED') cRed++;
-
-                totalLat += (r.reaction_time_ms || r.latency || 620);
-            });
-
-            document.getElementById('mTotal').innerText = filtered.length;
             document.getElementById('mVerde').innerText = cGreen;
             document.getElementById('mAmarelo').innerText = cYellow;
             document.getElementById('mRoxo').innerText = cPurple;
             document.getElementById('mVermelho').innerText = cRed;
-            document.getElementById('mTempo').innerText = filtered.length > 0 ? `${Math.round(totalLat / filtered.length)} ms` : '0 ms';
-
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro encontrado para o período/filtro selecionado.</td></tr>';
-                return;
-            }
-
-            filtered.forEach((item) => {
-                const dateObj = new Date(item.created_at || Date.now());
-                const formattedDate = dateObj.toLocaleString('pt-BR');
-
-                const displayName = resolveName(item);
-                const photoColumnHtml = resolvePhotoHtml(item, displayName);
-                const faceCheckStatus = item.face_match || "🟢 Match 1:1 OK (99%)";
-
-                let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável</span>`;
-                const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
-                if (vsiText.includes('amarelo') || vsiText.includes('atenção') || vsiText.includes('moderada')) {
-                    voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Moderada</span>`;
-                } else if (vsiText.includes('vermelho') || vsiText.includes('alta') || vsiText.includes('crítica') || vsiText.includes('roxo')) {
-                    voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica</span>`;
-                }
-
-                const category = getStatusCategory(item);
-                let badgeClass = 'b-verde';
-                let statusLabel = '🟢 VERDE (APTO)';
-
-                if (category === 'YELLOW') {
-                    badgeClass = 'b-amarelo'; statusLabel = '🟡 AMARELO (PAUSA)';
-                } else if (category === 'PURPLE') {
-                    badgeClass = 'b-roxo'; statusLabel = '🟣 ROXO (EXAUSTÃO)';
-                } else if (category === 'RED') {
-                    badgeClass = 'b-vermelho'; statusLabel = '🔴 VERMELHO (VETO)';
-                }
-
-                const finalAction = resolveAction(item, category);
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight:700; color:#f8fafc; font-size:12px;">${formattedDate}</td>
-                    <td>${photoColumnHtml}</td>
-                    <td><span class="badge-face">${faceCheckStatus}</span></td>
-                    <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || item.fleet || 'Frota Geral / Operações'}</td>
-                    <td>${voiceStatusHtml}</td>
-                    <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 620} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
-                    <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
-                    <td style="font-size:12px; font-weight:700;">${finalAction}</td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
 
-        window.onload = () => {
-            fetchAndRenderData();
-        };
+        window.onload = fetchAndRenderData;
     </script>
 </body>
 </html>
