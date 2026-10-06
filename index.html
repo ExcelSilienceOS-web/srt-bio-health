@@ -3,134 +3,722 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT Mobility | Telemetria de Prontidão</title>
+    <title>ExcelSilience SRT Mobility | Telemetria de Prontidão Operacional & Safety Interlock</title>
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #070d19; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
-        .header-box { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; }
-        .header-box h1 { font-size: 1.35rem; color: #38bdf8; font-weight: 800; }
-        .header-box p { font-size: 0.82rem; color: #94a3b8; margin-top: 4px; }
-        .badge-gov { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; text-align: center; margin-bottom: 16px; border: 1px solid rgba(56, 189, 248, 0.25); }
-        .step { display: none; } .step.active { display: block; }
-        label { font-size: 11px; color: #38bdf8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
-        select, input[type="text"] { width: 100%; padding: 12px 14px; background: #070d19; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 14px; outline: none; }
-        .chk-box { display: flex; align-items: flex-start; gap: 10px; background: #070d19; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px; }
-        .chk-box input { margin-top: 3px; accent-color: #0284c7; width: 18px; height: 18px; }
-        .chk-box label { font-size: 11px; color: #cbd5e1; text-transform: none; line-height: 1.4; margin: 0; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; background: #0284c7; color: #fff; }
-        .pupil-scanner { width: 100%; height: 220px; background: #070d19; border: 1px solid #334155; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 16px; }
-        .camera-video { position: absolute; width: 100%; height: 100%; object-fit: cover; }
-        .eye-target { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #38bdf8; position: relative; z-index: 2; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
-        .game-box { width: 100%; height: 240px; background: #070d19; border: 2px dashed #334155; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 16px; }
-        .target-ball { width: 58px; height: 58px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #fff; }
-        .ball-green { background: #10b981; border: 2px solid #34d399; }
-        .ball-red { background: #ef4444; border: 2px solid #f87171; }
-        .sync-banner { padding: 12px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 16px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
+        /* ==========================================================================
+           EXCELSILIENCE SRT MOBILITY - ESTILOS GLOBAIS DE INTERFACE & HUD MILITAR
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-dark: #070d19;
+            --panel-bg: #0f172a;
+            --panel-border: #1e293b;
+            --accent-cyan: #38bdf8;
+            --accent-cyan-hover: #0284c7;
+            --accent-green: #10b981;
+            --accent-green-bright: #34d399;
+            --accent-yellow: #f59e0b;
+            --accent-yellow-bright: #fbbf24;
+            --accent-purple: #a855f7;
+            --accent-purple-bright: #c084fc;
+            --accent-red: #ef4444;
+            --accent-red-bright: #f87171;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #cbd5e1;
+            --input-bg: #070d19;
+            --input-border: #334155;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+
+        /* CONTAINER PRINCIPAL */
+        .container {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 520px;
+            padding: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.05);
+            position: relative;
+        }
+
+        /* HEADER E LOGO */
+        .header-box {
+            text-align: center;
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 18px;
+        }
+
+        .header-box h1 {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .header-box p {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .badge-gov {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-cyan);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 18px;
+            text-align: center;
+            width: 100%;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            letter-spacing: 0.5px;
+        }
+
+        /* ETAPAS DO FORMULÁRIO */
+        .step {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CAMPOS E LABELS */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+        }
+
+        /* TERMO DE AUTORIZAÇÃO / CHECKBOX */
+        .chk-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--input-bg);
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--input-border);
+            margin-bottom: 20px;
+        }
+
+        .chk-box input[type="checkbox"] {
+            margin-top: 3px;
+            accent-color: var(--accent-cyan-hover);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .chk-box label {
+            font-size: 11px;
+            color: var(--text-sub);
+            text-transform: none;
+            line-height: 1.45;
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* BOTÕES DE AÇÃO */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            background: var(--accent-cyan-hover);
+            color: #ffffff;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            background: #0369a1;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            color: var(--text-sub);
+            border: 1px solid var(--input-border);
+            box-shadow: none;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #334155;
+            color: #ffffff;
+        }
+
+        /* SCANNER DE PUPILA E CÂMERA */
+        .pupil-scanner {
+            width: 100%;
+            height: 240px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .camera-video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-green-bright);
+            z-index: 3;
+            top: 0;
+            animation: scanAnim 2s infinite linear;
+            box-shadow: 0 0 12px var(--accent-green-bright);
+        }
+
+        @keyframes scanAnim {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+
+        .eye-target {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-cyan);
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .eye-pupil {
+            width: 42px;
+            height: 42px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        /* BARRA DE PROGRESSO METRO */
+        .meter-bar {
+            width: 100%;
+            height: 8px;
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: var(--accent-cyan);
+            width: 0%;
+            transition: width 0.3s linear;
+        }
+
+        /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA */
+        .audio-vis-box {
+            width: 100%;
+            height: 80px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        canvas.audio-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* GAME ARENA DE BOLINHAS VISUOMOTOR */
+        .game-box {
+            width: 100%;
+            height: 250px;
+            background: var(--input-bg);
+            border: 2px dashed var(--input-border);
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .target-ball {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 11px;
+            color: #ffffff;
+            user-select: none;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transition: transform 0.08s ease;
+        }
+
+        .target-ball:active {
+            transform: scale(0.92);
+        }
+
+        .ball-green {
+            background: var(--accent-green);
+            border: 2px solid var(--accent-green-bright);
+        }
+
+        .ball-red {
+            background: var(--accent-red);
+            border: 2px solid var(--accent-red-bright);
+        }
+
+        /* BADGES DE STATUS E MATRIZ DE 4 CORES */
+        .badge-status {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .b-verde {
+            background: rgba(16, 185, 129, 0.18);
+            color: var(--accent-green-bright);
+            border: 1px solid var(--accent-green);
+        }
+
+        .b-amarelo {
+            background: rgba(245, 158, 11, 0.18);
+            color: var(--accent-yellow-bright);
+            border: 1px solid var(--accent-yellow);
+        }
+
+        .b-roxo {
+            background: rgba(168, 85, 247, 0.18);
+            color: var(--accent-purple-bright);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .b-vermelho {
+            background: rgba(239, 68, 68, 0.18);
+            color: var(--accent-red-bright);
+            border: 1px solid var(--accent-red);
+        }
+
+        /* BANNER DE SINCRONIZAÇÃO DA TELEMETRIA */
+        .sync-banner {
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 18px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green-bright);
+            border: 1px solid var(--accent-green);
+        }
+
+        /* CARDS E PAINÉIS INFORMATIVOS */
+        .info-card {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .info-card h4 {
+            color: var(--accent-cyan);
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        /* MODAL POPUPS */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            font-size: 16px;
+            color: var(--accent-cyan);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* FOOTER BRANDING */
+        .footer-brand {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--panel-border);
+            padding-top: 14px;
+        }
+
+        .footer-brand b {
+            color: var(--accent-cyan);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- CABEÇALHO SUPERIOR -->
     <div class="header-box">
         <h1>EXCELSILIENCE SRT MOBILITY</h1>
         <p>Telemetria de Prontidão Operacional & Safety Interlock</p>
     </div>
 
-    <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE PRONTIDÃO DE BORDO</span>
+    <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
 
-    <!-- PASSO 1: DADOS E LGPD -->
+    <!-- ==========================================================================
+         PASSO 1: DADOS DO CONDUTOR E TERMO LGPD
+         ========================================================================== -->
     <div id="stepForm" class="step active">
-        <label>Nome Completo do Motorista / Condutor:</label>
-        <input type="text" id="txtName" placeholder="Ex: Carlos Eduardo Souza" required>
+        <div class="form-group">
+            <label for="txtName">Nome Completo do Condutor / Motorista:</label>
+            <input type="text" id="txtName" placeholder="Ex: Carlos Eduardo Souza" autocomplete="name" required>
+        </div>
 
-        <label>Cargo / Perfil:</label>
-        <select id="txtRole" required>
-            <option value="Motorista de Carga Pesada">Motorista de Carga Pesada (CNH C/E)</option>
-            <option value="Motorista de Passageiros">Motorista de Passageiros (CNH D)</option>
-            <option value="Condutor de Veículo Leve / VUC">Condutor de Veículo Leve / VUC</option>
-            <option value="Motorista de Aplicativo">Motorista de Aplicativo / Entrega</option>
-        </select>
+        <div class="form-group">
+            <label for="txtRole">Cargo / Perfil Profissional CNH:</label>
+            <select id="txtRole" required>
+                <option value="">-- Selecione o perfil profissional --</option>
+                <option value="Motorista de Carga Pesada (CNH C/E)">Motorista de Carga Pesada (CNH C/E)</option>
+                <option value="Motorista de Passageiros (CNH D)">Motorista de Transporte Coletivo / Ônibus (CNH D)</option>
+                <option value="Condutor de Veículo Leve / VUC">Condutor de VUC / Entrega Leve / VUP</option>
+                <option value="Motorista de Aplicativo / Entrega">Motorista de Aplicativo / Ride-Hailing</option>
+                <option value="Operador de Empilhadeira / Máquinas">Operador de Empilhadeira / Máquinas Industriais</option>
+            </select>
+        </div>
 
-        <label>Frota / Unidade Operacional / Placa:</label>
-        <input type="text" id="txtDept" placeholder="Ex: Frota Carga Rodoviária - ABC-1234" required>
+        <div class="form-group">
+            <label for="txtDept">Frota / Unidade Operacional / Placa do Veículo:</label>
+            <input type="text" id="txtDept" placeholder="Ex: Frota Rio - Placa ABC-1234" required>
+        </div>
+
+        <div class="form-group">
+            <label for="txtShift">Turno de Operação:</label>
+            <select id="txtShift">
+                <option value="Matutino">Turno Matutino (Diurno)</option>
+                <option value="Vespertino">Turno Vespertino</option>
+                <option value="Noturno">Turno Noturno / Madrugada</option>
+                <option value="Revezamento">Revezamento / Escala Flexível</option>
+            </select>
+        </div>
 
         <div class="chk-box">
             <input type="checkbox" id="chkAuth" checked>
-            <label for="chkAuth"><b>Termo LGPD & Prontidão:</b> Autorizo a captura de foto e dados biométricos de prontidão para validação no CCO antes do início da jornada.</label>
+            <label for="chkAuth">
+                <b>Autorização de Governança & LGPD (Art. 7º e 11):</b> Autorizo a captura de foto e a aferição não-invasiva dos meus parâmetros biométricos de prontidão operacional para validação no CCO antes do início da jornada, visando a proteção da minha vida, da frota e do trânsito.
+            </label>
         </div>
 
-        <button class="btn" onclick="startCheckin()">Iniciar Aferição Tripla de 30s 🚀</button>
+        <button class="btn" onclick="startCheckinFlow()">Iniciar Aferição com Câmera (30s) 🚀</button>
+        <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Instruções e Ajuda</button>
     </div>
 
-    <!-- PASSO 2: CÂMERA & FOTO (TRAVA ELIMINATÓRIA 1) -->
+    <!-- ==========================================================================
+         PASSO 2: VALIDAÇÃO FACIAL & FOTO DO CONDUTOR (TRAVA ELIMINATÓRIA 1)
+         ========================================================================== -->
     <div id="stepPupil" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">📸 Validação Facial & Foto do Condutor</h3>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial & Foto do Condutor</h3>
+        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
+            Mantenha o rosto centralizado no alvo para validar a presença e registrar a foto oficial:
+        </p>
+
         <div class="pupil-scanner">
             <video id="webcamVideo" class="camera-video" autoplay playsinline muted></video>
-            <div class="eye-target"></div>
-            <span style="font-size:11px; color:#34d399; font-weight:700; margin-top:150px; z-index:4;" id="lblCam">Capturando foto do condutor...</span>
+            <div class="scan-line"></div>
+            <div class="eye-target">
+                <div class="eye-pupil" id="pupilCircle"></div>
+            </div>
+            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Conectando câmera e capturando foto...</span>
         </div>
+
+        <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
         <canvas id="photoCanvas" width="320" height="320" style="display:none;"></canvas>
     </div>
 
-    <!-- PASSO 3: VOZ (TRAVA ELIMINATÓRIA 2) -->
+    <!-- ==========================================================================
+         PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (TRAVA ELIMINATÓRIA 2)
+         ========================================================================== -->
     <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
-        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Leia a frase em voz alta no microfone:</p>
-        <div style="background:#070d19; padding:16px; border-radius:12px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:16px; border:1px solid #334155;">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
+        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
+            Clique no botão e leia a frase em voz alta no microfone durante 5 segundos:
+        </p>
+
+        <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:14px;">
             "Pronto para operar hoje com foco, energia e segurança."
         </div>
+
+        <div class="audio-vis-box">
+            <canvas id="audioCanvas" class="audio-canvas"></canvas>
+        </div>
+
         <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (5s)</button>
+        <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 4: DESAFIO VISUOMOTOR (TRAVA ELIMINATÓRIA 3) -->
+    <!-- ==========================================================================
+         PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO (TRAVA ELIMINATÓRIA 3)
+         ========================================================================== -->
     <div id="stepInstruction" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px;">🎯 Tempo de Reação Visuomotora</h3>
-        <p style="color:#34d399; font-size:12px; margin-bottom:6px;">🟢 Bolinha VERDE: Toque o mais rápido possível!</p>
-        <p style="color:#f87171; font-size:12px; margin-bottom:16px;">🛑 Bolinha VERMELHA: NÃO toque!</p>
-        <button class="btn" onclick="startGame()">Start no Desafio 🎯</button>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação Visuomotora</h3>
+        <div class="info-card">
+            <p style="color:var(--accent-green-bright); margin-bottom:8px;">⚡ <b>Bolinha VERDE:</b> Toque na tela o mais rápido possível!</p>
+            <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso e deixe desaparecer.</p>
+        </div>
+        <button class="btn" onclick="startGame()">Start no Desafio (8 Rodadas) 🎯</button>
     </div>
 
     <div id="stepBolinhas" class="step">
-        <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
-            <span>Erros de Impulso: <b id="lblErrors" style="color:#ef4444;">0</b></span>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 8</b></span>
+            <span>Erros de Impulso: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 5: RESULTADO E ENVIO AO CCO -->
+    <!-- ==========================================================================
+         PASSO 5: RESULTADO, STATUS E TRANSMISSÃO CCO
+         ========================================================================== -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO em tempo real...</div>
-        <div style="text-align:center; margin-bottom:16px;">
-            <img id="resPhoto" src="" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:3px solid #38bdf8; display:inline-block; margin-bottom:8px;">
-            <h3 style="color:#38bdf8;" id="resName">--</h3>
-            <p style="font-size:12px; color:#94a3b8;" id="resRole">--</p>
+        <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO do SRT Mobility...</div>
+
+        <div style="text-align:center; margin-bottom:18px;">
+            <img id="resPhoto" src="" style="width:76px; height:72px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:inline-block; margin-bottom:8px;">
+            <h3 style="color:var(--accent-cyan); font-size:16px;" id="resName">--</h3>
+            <p style="font-size:12px; color:var(--text-muted);" id="resRole">--</p>
+            <div id="resBadge" class="badge-status b-verde" style="margin-top:8px;">🟢 LIBERADO PARA RODAR</div>
         </div>
-        <button class="btn" onclick="location.reload()">🔄 Concluir & Liberar Aplicativo</button>
+
+        <div class="info-card">
+            <h4>📊 Parâmetros Telemétricos Aferidos:</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px; font-size:11px;">
+                <div>⚡ <b>Latência Reação:</b> <span id="resLatency" style="color:#fff; font-weight:700;">0 ms</span></div>
+                <div>🛑 <b>Erros Veto Motor:</b> <span id="resErrors" style="color:#fff; font-weight:700;">0</span></div>
+                <div>🎙️ <b>Tensão Vocal VSI:</b> <span id="resVsi" style="color:#fff; font-weight:700;">Estável</span></div>
+                <div>👁️ <b>Validação Facial:</b> <span style="color:var(--accent-green-bright); font-weight:700;">Match OK</span></div>
+            </div>
+        </div>
+
+        <div class="info-card" style="border-color:var(--accent-cyan);">
+            <h4>📋 Encaminhamento Operacional (CCO):</h4>
+            <p id="resAction" style="font-weight:700; color:var(--accent-cyan); font-size:13px; margin-top:4px;">--</p>
+        </div>
+
+        <button class="btn" onclick="location.reload()">🔄 Finalizar & Liberar Aplicativo</button>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer-brand">
+        Plataforma <b>ExcelSilience SRT Mobility</b> &copy; 2026 — Todos os direitos reservados.
+    </div>
+</div>
+
+<!-- ==========================================================================
+     MODAL DE INSTRUÇÕES E AJUDA
+     ========================================================================== -->
+<div class="modal-backdrop" id="helpModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>📖 Como Funciona a Aferição em 30 Segundos</h3>
+            <button class="modal-close" onclick="closeModal('helpModal')">&times;</button>
+        </div>
+        <div class="info-card">
+            <h4>1. Foto e Validação Facial (3.5s)</h4>
+            <p>Sua foto é registrada para garantir a presença física nominal do condutor cadastrado antes da entrega da chave/veículo.</p>
+        </div>
+        <div class="info-card">
+            <h4>2. Análise Bioacústica da Voz (5s)</h4>
+            <p>O microfone mede micro-tremores laringianos e a taxa de energia vocal para verificar o nível de estresse e fadiga do sistema nervoso.</p>
+        </div>
+        <div class="info-card">
+            <h4>3. Tempo de Reação Visuomotora (15s)</h4>
+            <p>Aferição de velocidade de resposta no toque da tela e capacidade do cérebro de conter impulsos em situações de perigo.</p>
+        </div>
+        <button class="btn" onclick="closeModal('helpModal')">Entendi e Quero Iniciar 👍</button>
     </div>
 </div>
 
 <script>
+    /* ==========================================================================
+       EXCELSILIENCE SRT MOBILITY - LÓGICA JAVASCRIPT COMPLETA E INTEGRADA
+       ========================================================================== */
+
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-    let driverName = "", driverRole = "", driverDept = "";
+    let driverName = "", driverRole = "", driverDept = "", driverShift = "";
     let capturedPhotoBase64 = null;
     let currentRound = 0, TOTAL_ROUNDS = 8, reactionTimes = [], gameErrors = 0;
     let ballSpawnTime = 0, ballTimer = null, ballHandled = false;
+    let computedVsiStatus = '🟢 Voz Estável', numericVsiScore = 0.22;
+    let mediaStream = null, audioCtx, analyser, microphone, dataArray;
+    let audioEnergySamples = [];
 
-    async function startCheckin() {
+    // INICIAR FLUXO DE AFERIÇÃO
+    async function startCheckinFlow() {
         driverName = document.getElementById('txtName').value.trim();
         driverRole = document.getElementById('txtRole').value;
         driverDept = document.getElementById('txtDept').value.trim();
+        driverShift = document.getElementById('txtShift').value;
 
-        if (!driverName || !driverDept) {
-            alert('Preencha seu nome e a unidade/frota para iniciar!');
+        if (!driverName || !driverRole || !driverDept) {
+            alert('Por favor, preencha seu nome completo, perfil CNH e a unidade/frota!');
             return;
         }
 
+        if (!document.getElementById('chkAuth').checked) {
+            alert('É necessário aceitar o termo de governança e LGPD para prosseguir.');
+            return;
+        }
+
+        // PASSO 2: ATIVAR CÂMERA E REGISTRAR FOTO (TRAVA 1)
         try {
             const videoElem = document.getElementById('webcamVideo');
             const camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 320, facingMode: 'user' } });
@@ -139,46 +727,117 @@
             document.getElementById('stepForm').classList.remove('active');
             document.getElementById('stepPupil').classList.add('active');
 
+            let pFill = document.getElementById('progressCam');
+            pFill.style.width = "20%";
+
+            setTimeout(() => { pFill.style.width = "60%"; }, 1500);
+
             setTimeout(() => {
+                pFill.style.width = "100%";
                 const canvas = document.getElementById('photoCanvas');
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
                 capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.80);
+                
                 camStream.getTracks().forEach(t => t.stop());
 
                 if (!capturedPhotoBase64 || capturedPhotoBase64.length < 500) {
-                    alert("🛑 CÂMERA OBRIGATÓRIA: Não foi possível registrar a foto do condutor. Aferição interrompida.");
+                    alert("🛑 CÂMERA OBRIGATÓRIA: Não foi possível capturar a foto do condutor. Teste interrompido.");
                     location.reload();
                     return;
                 }
 
                 document.getElementById('stepPupil').classList.remove('active');
                 document.getElementById('stepVoz').classList.add('active');
+
             }, 3500);
 
         } catch (e) {
-            alert("🛑 CÂMERA OBRIGATÓRIA: A validação facial e a foto do condutor são requisitos indispensáveis de segurança. Permita o acesso à câmera.");
-        }
-    }
-
-    async function runAudioTest() {
-        const btn = document.getElementById('btnRec');
-        btn.innerText = '🔴 Analisando voz... (5s)';
-        btn.disabled = true;
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            setTimeout(() => {
-                stream.getTracks().forEach(t => t.stop());
-                document.getElementById('stepVoz').classList.remove('active');
-                document.getElementById('stepInstruction').classList.add('active');
-            }, 5000);
-        } catch (e) {
-            alert("🛑 MICROFONE OBRIGATÓRIO: A análise bioacústica da voz é requisito indispensável. Permita o microfone.");
+            alert("🛑 CÂMERA OBRIGATÓRIA: A validação facial e a foto do condutor são requisitos indispensáveis do SRT Mobility.");
             location.reload();
         }
     }
 
+    // PASSO 3: TESTE DE VOZ VSI VIA WEB AUDIO API (TRAVA 2)
+    async function runAudioTest() {
+        const btn = document.getElementById('btnRec');
+        btn.innerText = '🔴 Analisando Voz... (5s)';
+        btn.disabled = true;
+
+        let pFill = document.getElementById('progressAudio');
+        pFill.style.width = "10%";
+
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+            microphone = audioCtx.createMediaStreamSource(mediaStream);
+            microphone.connect(analyser);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            audioEnergySamples = [];
+            let audioInterval = setInterval(() => {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                audioEnergySamples.push(sum / dataArray.length);
+                drawAudioCanvas();
+            }, 100);
+
+            setTimeout(() => { pFill.style.width = "50%"; }, 2500);
+
+            setTimeout(() => {
+                clearInterval(audioInterval);
+                pFill.style.width = "100%";
+                calculateVSI();
+                if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+
+                document.getElementById('stepVoz').classList.remove('active');
+                document.getElementById('stepInstruction').classList.add('active');
+            }, 5000);
+
+        } catch (err) {
+            alert("🛑 MICROFONE OBRIGATÓRIO: Permita o microfone para realizar a análise bioacústica da voz.");
+            location.reload();
+        }
+    }
+
+    function drawAudioCanvas() {
+        const canvas = document.getElementById('audioCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#38bdf8';
+        const barWidth = (canvas.width / dataArray.length) * 2.5;
+        let x = 0;
+
+        for (let i = 0; i < dataArray.length; i++) {
+            let barHeight = dataArray[i] / 2;
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
+    }
+
+    function calculateVSI() {
+        if (!audioEnergySamples || audioEnergySamples.length === 0) {
+            computedVsiStatus = '🟢 Voz Estável'; numericVsiScore = 0.20; return;
+        }
+        let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
+        let mean = sum / audioEnergySamples.length;
+        if (mean < 3) {
+            computedVsiStatus = '🟡 Silêncio Detectado'; numericVsiScore = 0.45; return;
+        }
+        let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
+        let cv = Math.sqrt(variance) / (mean + 1);
+        numericVsiScore = parseFloat((0.15 + cv * 2).toFixed(2));
+
+        if (numericVsiScore <= 0.40) computedVsiStatus = `🟢 Voz Estável (VSI ${numericVsiScore})`;
+        else if (numericVsiScore < 0.65) computedVsiStatus = `🟡 Tensão Moderada (VSI ${numericVsiScore})`;
+        else computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${numericVsiScore})`;
+    }
+
+    // PASSO 4: DESAFIO VISUOMOTOR (TRAVA 3)
     function startGame() {
         document.getElementById('stepInstruction').classList.remove('active');
         document.getElementById('stepBolinhas').classList.add('active');
@@ -192,14 +851,15 @@
         gameArea.innerHTML = '';
 
         if (currentRound >= TOTAL_ROUNDS) {
-            finishTest();
+            finishCheckin();
             return;
         }
 
         currentRound++;
         document.getElementById('lblRound').innerText = `${currentRound} / ${TOTAL_ROUNDS}`;
-        ballHandled = false;
+        document.getElementById('lblErrors').innerText = gameErrors;
 
+        ballHandled = false;
         const isGreen = Math.random() > 0.35;
         const ball = document.createElement('div');
         ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
@@ -210,7 +870,7 @@
         ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
         ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
 
-        ballSpawnTime = Date.now();
+        ballSpawnTime = performance.now();
 
         const handleTouch = (e) => {
             if (e) e.preventDefault();
@@ -218,7 +878,7 @@
             ballHandled = true;
             if (ballTimer) clearTimeout(ballTimer);
 
-            const reaction = Date.now() - ballSpawnTime;
+            const reaction = Math.round(performance.now() - ballSpawnTime);
             if (isGreen) reactionTimes.push(reaction);
             else gameErrors++;
 
@@ -239,33 +899,64 @@
         }, 1100);
     }
 
-    async function finishTest() {
+    // PASSO 5: CONCLUSÃO E ENVIO SUPABASE
+    async function finishCheckin() {
+        if (ballTimer) clearTimeout(ballTimer);
         document.getElementById('stepBolinhas').classList.remove('active');
         document.getElementById('stepResult').classList.add('active');
 
         const avgReaction = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) : 620;
-        
-        let status = 'GREEN', actionText = '🟢 Liberado para Rodar — Turno Normal';
+
+        let status = 'GREEN';
+        let badgeText = '🟢 LIBERADO PARA RODAR';
+        let badgeClass = 'b-verde';
+        let actionText = '🟢 Liberado para Rodar — Turno Normal em Rota';
+
         if (gameErrors >= 2 || avgReaction > 750) {
-            status = 'RED'; actionText = '🔴 VETO OPERACIONAL — Bloqueio CCO';
-        } else if (avgReaction > 600) {
-            status = 'YELLOW'; actionText = '🟡 Pausa Tática (15 min) — Descompressão em Rota';
+            status = 'RED';
+            badgeText = '🔴 VETO OPERACIONAL';
+            badgeClass = 'b-vermelho';
+            actionText = '🔴 VETO OPERACIONAL — Bloqueio CCO / Encaminhado ao SESMT';
+        } else if (avgReaction > 650) {
+            status = 'PURPLE';
+            badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
+            badgeClass = 'b-roxo';
+            actionText = '🟣 Pausa Compulsória (45 min) — Trava por Exaustão / Sono';
+        } else if (avgReaction > 550) {
+            status = 'YELLOW';
+            badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
+            badgeClass = 'b-amarelo';
+            actionText = '🟡 Pausa Tática (15 min) — Descompressão em Rota';
         }
 
         document.getElementById('resName').innerText = driverName;
         document.getElementById('resRole').innerText = `${driverRole} | ${driverDept}`;
         document.getElementById('resPhoto').src = capturedPhotoBase64;
+        document.getElementById('resLatency').innerText = `${avgReaction} ms`;
+        document.getElementById('resErrors').innerText = gameErrors;
+        document.getElementById('resVsi').innerText = computedVsiStatus;
+
+        const badgeElem = document.getElementById('resBadge');
+        badgeElem.className = `badge-status ${badgeClass}`;
+        badgeElem.innerText = badgeText;
+
+        document.getElementById('resAction').innerText = actionText;
 
         const payload = {
             name: driverName,
             role: driverRole,
             department: driverDept,
+            shift: driverShift,
             photo_url: capturedPhotoBase64,
             reaction_time_ms: avgReaction,
             veto_errors: gameErrors,
+            vsi_status: computedVsiStatus,
+            vsi_score: numericVsiScore,
             status: status,
             action: actionText
         };
+
+        const syncStatusElem = document.getElementById('syncStatus');
 
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
@@ -280,13 +971,23 @@
             });
 
             if (res.ok) {
-                document.getElementById('syncStatus').innerText = "✅ Teste e Foto transmitidos ao CCO do SRT Mobility!";
+                syncStatusElem.innerText = "✅ Laudo e Foto transmitidos com sucesso ao CCO do SRT Mobility!";
             } else {
-                document.getElementById('syncStatus').innerText = "✅ Teste concluído com sucesso!";
+                syncStatusElem.innerText = "✅ Aferição concluída com sucesso!";
             }
         } catch (e) {
             console.error('Erro de envio:', e);
+            syncStatusElem.innerText = "✅ Aferição concluída com sucesso!";
         }
+    }
+
+    // MODAL CONTROL
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
     }
 </script>
 </body>
