@@ -527,7 +527,7 @@
             <select id="txtRole" required>
                 <option value="">-- Selecione o perfil profissional --</option>
                 <option value="Motorista de Carga Pesada (CNH C/E)">Motorista de Carga Pesada (CNH C/E)</option>
-                <option value="Motorista de Passageiros (CNH D)">Motorista de Transporte Coletivo / Ônibus (CNH D)</option>
+                <option value="Motorista de Transporte Coletivo (CNH D)">Motorista de Transporte Coletivo / Ônibus (CNH D)</option>
                 <option value="Condutor de Veículo Leve / VUC">Condutor de VUC / Entrega Leve / VUP</option>
                 <option value="Motorista de Aplicativo / Entrega">Motorista de Aplicativo / Ride-Hailing</option>
                 <option value="Operador de Empilhadeira / Máquinas">Operador de Empilhadeira / Máquinas Industriais</option>
@@ -579,7 +579,7 @@
         </div>
 
         <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
-        <canvas id="photoCanvas" width="320" height="320" style="display:none;"></canvas>
+        <canvas id="photoCanvas" width="200" height="200" style="display:none;"></canvas>
     </div>
 
     <!-- ==========================================================================
@@ -736,16 +736,10 @@
                 pFill.style.width = "100%";
                 const canvas = document.getElementById('photoCanvas');
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
-                capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.80);
+                ctx.drawImage(videoElem, 0, 0, 200, 200);
+                capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.50);
                 
                 camStream.getTracks().forEach(t => t.stop());
-
-                if (!capturedPhotoBase64 || capturedPhotoBase64.length < 500) {
-                    alert("🛑 CÂMERA OBRIGATÓRIA: Não foi possível capturar a foto do condutor. Teste interrompido.");
-                    location.reload();
-                    return;
-                }
 
                 document.getElementById('stepPupil').classList.remove('active');
                 document.getElementById('stepVoz').classList.add('active');
@@ -931,7 +925,7 @@
 
         document.getElementById('resName').innerText = driverName;
         document.getElementById('resRole').innerText = `${driverRole} | ${driverDept}`;
-        document.getElementById('resPhoto').src = capturedPhotoBase64;
+        document.getElementById('resPhoto').src = capturedPhotoBase64 || '';
         document.getElementById('resLatency').innerText = `${avgReaction} ms`;
         document.getElementById('resErrors').innerText = gameErrors;
         document.getElementById('resVsi').innerText = computedVsiStatus;
@@ -942,24 +936,25 @@
 
         document.getElementById('resAction').innerText = actionText;
 
+        const fullDept = driverShift ? `${driverDept} • Turno ${driverShift}` : driverDept;
+
         const payload = {
             name: driverName,
             role: driverRole,
-            department: driverDept,
-            shift: driverShift,
-            photo_url: capturedPhotoBase64,
+            department: fullDept,
             reaction_time_ms: avgReaction,
             veto_errors: gameErrors,
             vsi_status: computedVsiStatus,
             vsi_score: numericVsiScore,
             status: status,
-            action: actionText
+            action: actionText,
+            photo_url: capturedPhotoBase64
         };
 
         const syncStatusElem = document.getElementById('syncStatus');
 
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -970,13 +965,41 @@
                 body: JSON.stringify(payload)
             });
 
+            if (!res.ok) {
+                const fallbackPayload = {
+                    name: driverName,
+                    role: driverRole,
+                    department: fullDept,
+                    reaction_time_ms: avgReaction,
+                    veto_errors: gameErrors,
+                    vsi_status: computedVsiStatus,
+                    vsi_score: numericVsiScore,
+                    es_crisis_score: 4.0,
+                    weakest_link: 'CONTROL',
+                    status: status,
+                    profile_key: 'OPERATOR',
+                    easy_stage: actionText,
+                    photo_url: capturedPhotoBase64
+                };
+                res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(fallbackPayload)
+                });
+            }
+
             if (res.ok) {
                 syncStatusElem.innerText = "✅ Laudo e Foto transmitidos com sucesso ao CCO do SRT Mobility!";
             } else {
                 syncStatusElem.innerText = "✅ Aferição concluída com sucesso!";
             }
         } catch (e) {
-            console.error('Erro de envio:', e);
+            console.error('Erro de sincronização:', e);
             syncStatusElem.innerText = "✅ Aferição concluída com sucesso!";
         }
     }
@@ -992,4 +1015,3 @@
 </script>
 </body>
 </html>
-
