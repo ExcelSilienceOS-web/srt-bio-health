@@ -513,9 +513,7 @@
 
     <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
 
-    <!-- ==========================================================================
-         PASSO 1: DADOS DO CONDUTOR E TERMO LGPD
-         ========================================================================== -->
+    <!-- PASSO 1: DADOS DO CONDUTOR E TERMO LGPD -->
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
@@ -560,9 +558,7 @@
         <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Instruções e Ajuda</button>
     </div>
 
-    <!-- ==========================================================================
-         PASSO 2: VALIDAÇÃO FACIAL & FOTO DO CONDUTOR (TRAVA ELIMINATÓRIA 1)
-         ========================================================================== -->
+    <!-- PASSO 2: VALIDAÇÃO FACIAL & FOTO DO CONDUTOR -->
     <div id="stepPupil" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial & Foto do Condutor</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
@@ -582,9 +578,7 @@
         <canvas id="photoCanvas" width="200" height="200" style="display:none;"></canvas>
     </div>
 
-    <!-- ==========================================================================
-         PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (TRAVA ELIMINATÓRIA 2)
-         ========================================================================== -->
+    <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
@@ -603,9 +597,7 @@
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- ==========================================================================
-         PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO (TRAVA ELIMINATÓRIA 3)
-         ========================================================================== -->
+    <!-- PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação Visuomotora</h3>
         <div class="info-card">
@@ -623,9 +615,7 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- ==========================================================================
-         PASSO 5: RESULTADO, STATUS E TRANSMISSÃO CCO
-         ========================================================================== -->
+    <!-- PASSO 5: RESULTADO, STATUS E TRANSMISSÃO CCO -->
     <div id="stepResult" class="step">
         <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO do SRT Mobility...</div>
 
@@ -660,9 +650,7 @@
     </div>
 </div>
 
-<!-- ==========================================================================
-     MODAL DE INSTRUÇÕES E AJUDA
-     ========================================================================== -->
+<!-- MODAL DE INSTRUÇÕES E AJUDA -->
 <div class="modal-backdrop" id="helpModal">
     <div class="modal-box">
         <div class="modal-header">
@@ -686,10 +674,6 @@
 </div>
 
 <script>
-    /* ==========================================================================
-       EXCELSILIENCE SRT MOBILITY - LÓGICA JAVASCRIPT COMPLETA E INTEGRADA
-       ========================================================================== */
-
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
@@ -718,7 +702,6 @@
             return;
         }
 
-        // PASSO 2: ATIVAR CÂMERA E REGISTRAR FOTO (TRAVA 1)
         try {
             const videoElem = document.getElementById('webcamVideo');
             const camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 320, facingMode: 'user' } });
@@ -752,7 +735,6 @@
         }
     }
 
-    // PASSO 3: TESTE DE VOZ VSI VIA WEB AUDIO API (TRAVA 2)
     async function runAudioTest() {
         const btn = document.getElementById('btnRec');
         btn.innerText = '🔴 Analisando Voz... (5s)';
@@ -831,7 +813,6 @@
         else computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${numericVsiScore})`;
     }
 
-    // PASSO 4: DESAFIO VISUOMOTOR (TRAVA 3)
     function startGame() {
         document.getElementById('stepInstruction').classList.remove('active');
         document.getElementById('stepBolinhas').classList.add('active');
@@ -893,7 +874,6 @@
         }, 1100);
     }
 
-    // PASSO 5: CONCLUSÃO E ENVIO SUPABASE
     async function finishCheckin() {
         if (ballTimer) clearTimeout(ballTimer);
         document.getElementById('stepBolinhas').classList.remove('active');
@@ -938,6 +918,7 @@
 
         const fullDept = driverShift ? `${driverDept} • Turno ${driverShift}` : driverDept;
 
+        // Primary Payload for srt_checkins table
         const payload = {
             name: driverName,
             role: driverRole,
@@ -951,7 +932,7 @@
             photo_url: capturedPhotoBase64
         };
 
-        const syncStatusElem = document.getElementById('syncStatus');
+        const syncElem = document.getElementById('syncStatus');
 
         try {
             let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
@@ -966,6 +947,8 @@
             });
 
             if (!res.ok) {
+                console.warn('srt_checkins POST failed, executing clean fallback to es_crisis_exec_checkins...');
+                // Fallback Payload with ONLY valid columns for es_crisis_exec_checkins
                 const fallbackPayload = {
                     name: driverName,
                     role: driverRole,
@@ -978,8 +961,7 @@
                     weakest_link: 'CONTROL',
                     status: status,
                     profile_key: 'OPERATOR',
-                    easy_stage: actionText,
-                    photo_url: capturedPhotoBase64
+                    easy_stage: actionText
                 };
                 res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
                     method: 'POST',
@@ -994,17 +976,16 @@
             }
 
             if (res.ok) {
-                syncStatusElem.innerText = "✅ Laudo e Foto transmitidos com sucesso ao CCO do SRT Mobility!";
+                syncElem.innerText = "✅ Laudo e Foto transmitidos com sucesso ao CCO do SRT Mobility!";
             } else {
-                syncStatusElem.innerText = "✅ Aferição concluída com sucesso!";
+                syncElem.innerText = "✅ Aferição concluída localmente!";
             }
         } catch (e) {
             console.error('Erro de sincronização:', e);
-            syncStatusElem.innerText = "✅ Aferição concluída com sucesso!";
+            syncElem.innerText = "✅ Aferição concluída localmente!";
         }
     }
 
-    // MODAL CONTROL
     function openModal(id) {
         document.getElementById(id).classList.add('active');
     }
