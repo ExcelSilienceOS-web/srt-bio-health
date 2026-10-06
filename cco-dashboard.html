@@ -78,7 +78,7 @@
 
         .user-photo {
             width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
-            border: 2px solid #0284c7; background: #070d19; display: inline-block; vertical-align: middle;
+            border: 2px solid #0284c7; background: #070d19; flex-shrink: 0;
         }
 
         .user-avatar-fallback {
@@ -87,6 +87,7 @@
             color: #ffffff; font-weight: 800; font-size: 18px;
             display: flex; align-items: center; justify-content: center;
             border: 2px solid #38bdf8; text-transform: uppercase; flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
         }
 
         .photo-container { display: flex; align-items: center; gap: 12px; }
@@ -185,7 +186,7 @@
             <thead>
                 <tr>
                     <th>Horário / Data</th>
-                    <th>Condutor / Operador (Foto & Nome)</th>
+                    <th>Condutor / Operador (Perfil)</th>
                     <th>Validação Facial</th>
                     <th>Setor / Departamento</th>
                     <th>Conferência de Voz (VSI)</th>
@@ -207,23 +208,6 @@
         let allRecords = [];
         let selectedStatus = 'ALL';
 
-        function resolvePhoto(item) {
-            let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.user_photo || item.snapshot || item.face_image || item.image;
-            if (!raw || raw === 'null' || raw === 'undefined' || (typeof raw === 'string' && raw.trim() === '')) {
-                return null;
-            }
-            if (typeof raw === 'string') {
-                raw = raw.trim();
-                if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:image/')) {
-                    return raw;
-                }
-                if (raw.length > 50) {
-                    return `data:image/jpeg;base64,${raw}`;
-                }
-            }
-            return null;
-        }
-
         function resolveName(item) {
             let possible = [
                 item.name, item.nome, item.full_name, item.driver_name, item.operator_name,
@@ -232,13 +216,49 @@
             for (let val of possible) {
                 if (val && typeof val === 'string') {
                     let v = val.trim();
-                    if (v && !v.toLowerCase().startsWith('sessão') && !v.toLowerCase().startsWith('session') && v !== 'OP' && v !== 'null' && v !== 'undefined') {
+                    if (v && v !== 'null' && v !== 'undefined' && v !== 'OP' && !v.toLowerCase().startsWith('sessão') && !v.toLowerCase().startsWith('session')) {
                         return v;
                     }
                 }
             }
-            let sess = item.session_count || item.session_id || item.id || '';
-            return sess ? `Operador (Sessão #${sess})` : 'Operador / Condutor';
+            return 'Operador / Condutor';
+        }
+
+        function resolvePhotoHtml(item, nameStr) {
+            let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.image;
+            
+            let initial = (nameStr && nameStr.length > 0) ? nameStr.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase() : 'O';
+            if (!initial) initial = 'O';
+
+            let sessInfo = item.session_count || item.session_id || item.id;
+            let subLabel = item.role || item.cargo || (sessInfo ? `Sessão #${sessInfo}` : 'Condutor Profissional');
+
+            if (raw && typeof raw === 'string' && raw.trim().length > 20) {
+                raw = raw.trim();
+                let src = raw;
+                if (!raw.startsWith('http') && !raw.startsWith('data:')) {
+                    src = `data:image/jpeg;base64,${raw}`;
+                }
+                return `
+                    <div class="photo-container">
+                        <img src="${src}" class="user-photo" alt="" onerror="this.outerHTML='<div class=\\'user-avatar-fallback\\'>${initial}</div>'">
+                        <div>
+                            <b style="color:#38bdf8; font-size:13px;">${nameStr}</b>
+                            <br><small style="color:#94a3b8; font-size:11px;">${subLabel}</small>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="photo-container">
+                    <div class="user-avatar-fallback">${initial}</div>
+                    <div>
+                        <b style="color:#38bdf8; font-size:13px;">${nameStr}</b>
+                        <br><small style="color:#94a3b8; font-size:11px;">${subLabel}</small>
+                    </div>
+                </div>
+            `;
         }
 
         function getStatusCategory(item) {
@@ -271,7 +291,6 @@
                 dbAction = dbAction.trim();
                 let dbUpper = dbAction.toUpperCase();
                 
-                // Se o status for ROXO, AMARELO ou VERMELHO, mas o DB diz "Catraca Liberada" -> IGNORA o erro do DB!
                 if (category !== 'GREEN' && (dbUpper.includes('LIBERADA') || dbUpper.includes('TURNO NORMAL') || dbUpper.includes('APTO'))) {
                     return stdAction;
                 }
@@ -289,17 +308,17 @@
             const today = new Date();
 
             if (period === 'today') {
-                const dateStr = today.toISOString().split('T')[0];
+                const dateStr = today.toISOString().split('T');
                 document.getElementById('startDate').value = dateStr;
                 document.getElementById('endDate').value = dateStr;
             } else if (period === '7days') {
                 const past = new Date(); past.setDate(today.getDate() - 7);
-                document.getElementById('startDate').value = past.toISOString().split('T')[0];
-                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+                document.getElementById('startDate').value = past.toISOString().split('T');
+                document.getElementById('endDate').value = today.toISOString().split('T');
             } else if (period === '30days') {
                 const past = new Date(); past.setDate(today.getDate() - 30);
-                document.getElementById('startDate').value = past.toISOString().split('T')[0];
-                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+                document.getElementById('startDate').value = past.toISOString().split('T');
+                document.getElementById('endDate').value = today.toISOString().split('T');
             } else if (period === 'all') {
                 document.getElementById('startDate').value = '';
                 document.getElementById('endDate').value = '';
@@ -364,7 +383,7 @@
             const endVal = document.getElementById('endDate').value;
 
             let filtered = allRecords.filter(row => {
-                const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
+                const rowDate = row.created_at ? row.created_at.split('T') : '';
                 if (startVal && rowDate < startVal) return false;
                 if (endVal && rowDate > endVal) return false;
 
@@ -407,17 +426,7 @@
                 const formattedDate = dateObj.toLocaleString('pt-BR');
 
                 const displayName = resolveName(item);
-                const initial = displayName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase() || 'O';
-
-                const photoUrl = resolvePhoto(item);
-                let photoHtml = '';
-                if (photoUrl) {
-                    photoHtml = `<img src="${photoUrl}" class="user-photo" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                 <div class="user-avatar-fallback" style="display:none;">${initial}</div>`;
-                } else {
-                    photoHtml = `<div class="user-avatar-fallback">${initial}</div>`;
-                }
-
+                const photoColumnHtml = resolvePhotoHtml(item, displayName);
                 const faceCheckStatus = item.face_match || "🟢 Foto OK (Match 99%)";
 
                 // Status de Voz VSI
@@ -447,18 +456,8 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="font-weight:700; color:#f8fafc; font-size:12px;">${formattedDate}</td>
-                    <td>
-                        <div class="photo-container">
-                            ${photoHtml}
-                            <div>
-                                <b style="color:#38bdf8;">${displayName}</b>
-                                <br><small style="color:#94a3b8;">${item.role || item.cargo || 'Condutor Profissional'}</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge-face">${faceCheckStatus}</span>
-                    </td>
+                    <td>${photoColumnHtml}</td>
+                    <td><span class="badge-face">${faceCheckStatus}</span></td>
                     <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || item.ghe || 'Diretoria / Operações'}</td>
                     <td>${voiceStatusHtml}</td>
                     <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 620} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
