@@ -71,19 +71,19 @@
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
         .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 950px; }
         th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
         td { padding: 12px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
         tr:hover { background: rgba(255, 255, 255, 0.02); }
 
         .user-photo {
-            width: 42px; height: 42px; border-radius: 50%; object-fit: cover;
+            width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
             border: 2px solid #0284c7; background: #070d19; display: inline-block; vertical-align: middle;
         }
 
-        .photo-container { display: flex; align-items: center; gap: 10px; }
+        .photo-container { display: flex; align-items: center; gap: 12px; }
 
-        .badge-status { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
+        .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
         .b-verde { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
         .b-amarelo { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
         .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
@@ -91,11 +91,9 @@
 
         .badge-face {
             font-size: 10px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.1);
-            padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3); display: block; margin-top: 2px;
+            padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block; margin-top: 2px;
         }
-        .badge-voice {
-            font-size: 11px; font-weight: 700; color: #fbbf24; display: block;
-        }
+        .badge-voice { font-size: 11px; font-weight: 700; display: block; }
     </style>
 </head>
 <body>
@@ -172,7 +170,7 @@
     <!-- TABELA COMPLETA CCO -->
     <div class="panel">
         <div class="panel-header">
-            <div class="panel-title" id="lblTableTitle">Fila de Registro de Prontidão e Biometria em Tempo Real</div>
+            <div class="panel-title">Fila de Registro de Prontidão e Biometria em Tempo Real</div>
         </div>
 
         <table>
@@ -200,6 +198,17 @@
 
         let allRecords = [];
         let selectedStatus = 'ALL';
+
+        function resolvePhoto(item) {
+            let raw = item.photo_url || item.photo || item.avatar_url || item.image_url || item.photo_base64 || item.foto || item.user_photo;
+            if (!raw) {
+                return `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || item.user || item.role || 'OP')}&background=0284c7&color=fff&size=80`;
+            }
+            if (raw.startsWith('http') || raw.startsWith('data:')) {
+                return raw;
+            }
+            return `data:image/jpeg;base64,${raw}`;
+        }
 
         function setPeriod(period) {
             document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
@@ -246,7 +255,6 @@
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando registros e biometrias no Supabase...</td></tr>';
 
             try {
-                // Tenta buscar primeiro srt_consents ou srt_checkins ou es_crisis_exec_checkins
                 let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
@@ -323,15 +331,11 @@
                 return;
             }
 
-            filtered.forEach((item, idx) => {
+            filtered.forEach((item) => {
                 const dateObj = new Date(item.created_at || Date.now());
                 const formattedDate = dateObj.toLocaleString('pt-BR');
 
-                // Foto de perfil real ou avatar padrão elegante
-                const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || item.user || 'OP')}&background=0284c7&color=fff&size=80`;
-                const photoSrc = item.photo_url || item.avatar_url || defaultAvatar;
-
-                // Status da foto / Liveness
+                const photoSrc = resolvePhoto(item);
                 const faceCheckStatus = item.face_match || "🟢 Foto OK (Match 99%)";
 
                 // Status de Voz VSI
@@ -339,29 +343,39 @@
                 const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
                 if (vsiText.includes('amarelo') || vsiText.includes('atenção') || vsiText.includes('moderada')) {
                     voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Moderada</span>`;
-                } else if (vsiText.includes('vermelho') || vsiText.includes('alta') || vsiText.includes('crítica')) {
+                } else if (vsiText.includes('vermelho') || vsiText.includes('alta') || vsiText.includes('crítica') || vsiText.includes('roxo')) {
                     voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica</span>`;
                 }
 
-                // Badges do Status Geral
+                // Determinação Rígida de Status e Ação Operacional
                 let badgeClass = 'b-verde';
                 let statusText = '🟢 VERDE (APTO)';
+                let defaultAction = '🟢 Catraca Liberada — Turno Normal';
+
                 const st = (item.status || '').toUpperCase();
 
                 if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO')) {
-                    badgeClass = 'b-amarelo'; statusText = '🟡 AMARELO (PAUSA)';
+                    badgeClass = 'b-amarelo';
+                    statusText = '🟡 AMARELO (PAUSA)';
+                    defaultAction = '🟡 Pausa Tática (15 min) — Descompressão / Hidratação';
                 } else if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO')) {
-                    badgeClass = 'b-roxo'; statusText = '🟣 ROXO (EXAUSTÃO)';
+                    badgeClass = 'b-roxo';
+                    statusText = '🟣 ROXO (EXAUSTÃO)';
+                    defaultAction = '🟣 Pausa Compulsória (45 min) — Trava por Exaustão / Sono';
                 } else if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO')) {
-                    badgeClass = 'b-vermelho'; statusText = '🔴 VERMELHO (VETO)';
+                    badgeClass = 'b-vermelho';
+                    statusText = '🔴 VERMELHO (VETO)';
+                    defaultAction = '🔴 VETO OPERACIONAL — Bloqueio CCO / Encaminhado ao SESMT';
                 }
+
+                const finalAction = item.action || defaultAction;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="font-weight:700; color:#f8fafc; font-size:12px;">${formattedDate}</td>
                     <td>
                         <div class="photo-container">
-                            <img src="${photoSrc}" class="user-photo" alt="Foto do Condutor" onerror="this.src='${defaultAvatar}'">
+                            <img src="${photoSrc}" class="user-photo" alt="Foto do Condutor" onerror="this.src='https://ui-avatars.com/api/?name=OP&background=0284c7&color=fff'">
                             <div>
                                 <b style="color:#38bdf8;">${item.name || item.user || item.role || 'Operador'}</b>
                                 <br><small style="color:#94a3b8;">${item.role || 'Condutor Profissional'}</small>
@@ -375,7 +389,7 @@
                     <td>${voiceStatusHtml}</td>
                     <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 620} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
                     <td><span class="badge-status ${badgeClass}">${statusText}</span></td>
-                    <td style="font-size:12px;">${item.action || item.easy_stage || 'Catraca Liberada — Turno Normal'}</td>
+                    <td style="font-size:12px; font-weight:600;">${finalAction}</td>
                 `;
                 tbody.appendChild(tr);
             });
