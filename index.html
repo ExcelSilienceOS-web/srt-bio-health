@@ -50,7 +50,7 @@
             overflow-x: hidden;
         }
 
-        /* CONTAINER PRINCIPAL */
+        /* CONTAINER PRINCIPAL DO COCKPIT */
         .container {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
@@ -100,7 +100,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ETAPAS DO FORMULÁRIO */
+        /* ETAPAS DO FORMULÁRIO DE AFERIÇÃO */
         .step {
             display: none;
             animation: fadeIn 0.3s ease-in-out forwards;
@@ -111,8 +111,14 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* CAMPOS E LABELS */
@@ -147,7 +153,7 @@
             box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
         }
 
-        /* TERMO DE AUTORIZAÇÃO / CHECKBOX */
+        /* TERMO DE AUTORIZAÇÃO / CHECKBOX GOVERNANÇA */
         .chk-box {
             display: flex;
             align-items: flex-start;
@@ -229,7 +235,7 @@
             color: #ffffff;
         }
 
-        /* SCANNER DE PUPILA E CÂMERA */
+        /* SCANNER DE PUPILA E CÂMERA DE BIOMETRIA FACIAL */
         .pupil-scanner {
             width: 100%;
             height: 240px;
@@ -264,9 +270,15 @@
         }
 
         @keyframes scanAnim {
-            0% { top: 0; }
-            50% { top: 100%; }
-            100% { top: 0; }
+            0% {
+                top: 0;
+            }
+            50% {
+                top: 100%;
+            }
+            100% {
+                top: 0;
+            }
         }
 
         .eye-target {
@@ -307,7 +319,7 @@
             transition: width 0.3s linear;
         }
 
-        /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA */
+        /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA DA VOZ (VSI) */
         .audio-vis-box {
             width: 100%;
             height: 80px;
@@ -437,11 +449,14 @@
             font-weight: 700;
         }
 
-        /* MODAL POPUPS */
+        /* MODAL POPUPS E INSTRUÇÕES DE BORDO */
         .modal-backdrop {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background: rgba(0, 0, 0, 0.85);
             z-index: 999;
             align-items: center;
@@ -460,7 +475,7 @@
             max-width: 480px;
             width: 100%;
             padding: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
             max-height: 85vh;
             overflow-y: auto;
         }
@@ -631,7 +646,7 @@
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px; font-size:11px;">
                 <div>⚡ <b>Latência Reação:</b> <span id="resLatency" style="color:#fff; font-weight:700;">0 ms</span></div>
                 <div>🛑 <b>Erros Veto Motor:</b> <span id="resErrors" style="color:#fff; font-weight:700;">0</span></div>
-                <div>🎙️ <b>Tensão Vocal VSI:</b> <span id="resVsi" style="color:#fff; font-weight:700;">Estável</span></div>
+                <div>🎙️ <b>Tension Vocal VSI:</b> <span id="resVsi" style="color:#fff; font-weight:700;">Estável</span></div>
                 <div>👁️ <b>Validação Facial:</b> <span style="color:var(--accent-green-bright); font-weight:700;">Match OK</span></div>
             </div>
         </div>
@@ -644,7 +659,7 @@
         <button class="btn" onclick="location.reload()">🔄 Finalizar & Liberar Aplicativo</button>
     </div>
 
-    <!-- FOOTER -->
+    <!-- FOOTER BRANDING -->
     <div class="footer-brand">
         Plataforma <b>ExcelSilience SRT Mobility</b> &copy; 2026 — Todos os direitos reservados.
     </div>
@@ -674,15 +689,32 @@
 </div>
 
 <script>
+    /* ==========================================================================
+       EXCELSILIENCE SRT MOBILITY - LÓGICA JAVASCRIPT COMPLETA E INTEGRADA
+       ========================================================================== */
+
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-    let driverName = "", driverRole = "", driverDept = "", driverShift = "";
+    let driverName = "";
+    let driverRole = "";
+    let driverDept = "";
+    let driverShift = "";
     let capturedPhotoBase64 = null;
-    let currentRound = 0, TOTAL_ROUNDS = 8, reactionTimes = [], gameErrors = 0;
-    let ballSpawnTime = 0, ballTimer = null, ballHandled = false;
-    let computedVsiStatus = '🟢 Voz Estável', numericVsiScore = 0.22;
-    let mediaStream = null, audioCtx, analyser, microphone, dataArray;
+    let currentRound = 0;
+    let TOTAL_ROUNDS = 8;
+    let reactionTimes = [];
+    let gameErrors = 0;
+    let ballSpawnTime = 0;
+    let ballTimer = null;
+    let ballHandled = false;
+    let computedVsiStatus = '🟢 Voz Estável';
+    let numericVsiScore = 0.22;
+    let mediaStream = null;
+    let audioCtx;
+    let analyser;
+    let microphone;
+    let dataArray;
     let audioEnergySamples = [];
 
     // INICIAR FLUXO DE AFERIÇÃO
@@ -704,7 +736,13 @@
 
         try {
             const videoElem = document.getElementById('webcamVideo');
-            const camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 320, facingMode: 'user' } });
+            const camStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: 320,
+                    height: 320,
+                    facingMode: 'user'
+                }
+            });
             videoElem.srcObject = camStream;
 
             document.getElementById('stepForm').classList.remove('active');
@@ -713,7 +751,9 @@
             let pFill = document.getElementById('progressCam');
             pFill.style.width = "20%";
 
-            setTimeout(() => { pFill.style.width = "60%"; }, 1500);
+            setTimeout(() => {
+                pFill.style.width = "60%";
+            }, 1500);
 
             setTimeout(() => {
                 pFill.style.width = "100%";
@@ -756,18 +796,24 @@
             let audioInterval = setInterval(() => {
                 analyser.getByteFrequencyData(dataArray);
                 let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
                 audioEnergySamples.push(sum / dataArray.length);
                 drawAudioCanvas();
             }, 100);
 
-            setTimeout(() => { pFill.style.width = "50%"; }, 2500);
+            setTimeout(() => {
+                pFill.style.width = "50%";
+            }, 2500);
 
             setTimeout(() => {
                 clearInterval(audioInterval);
                 pFill.style.width = "100%";
                 calculateVSI();
-                if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                }
 
                 document.getElementById('stepVoz').classList.remove('active');
                 document.getElementById('stepInstruction').classList.add('active');
@@ -797,31 +843,43 @@
 
     function calculateVSI() {
         if (!audioEnergySamples || audioEnergySamples.length === 0) {
-            computedVsiStatus = '🟢 Voz Estável'; numericVsiScore = 0.20; return;
+            computedVsiStatus = '🟢 Voz Estável';
+            numericVsiScore = 0.20;
+            return;
         }
         let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
         let mean = sum / audioEnergySamples.length;
         if (mean < 3) {
-            computedVsiStatus = '🟡 Silêncio Detectado'; numericVsiScore = 0.45; return;
+            computedVsiStatus = '🟡 Silêncio Detectado';
+            numericVsiScore = 0.45;
+            return;
         }
         let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
         let cv = Math.sqrt(variance) / (mean + 1);
         numericVsiScore = parseFloat((0.15 + cv * 2).toFixed(2));
 
-        if (numericVsiScore <= 0.40) computedVsiStatus = `🟢 Voz Estável (VSI ${numericVsiScore})`;
-        else if (numericVsiScore < 0.65) computedVsiStatus = `🟡 Tensão Moderada (VSI ${numericVsiScore})`;
-        else computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${numericVsiScore})`;
+        if (numericVsiScore <= 0.40) {
+            computedVsiStatus = `🟢 Voz Estável (VSI ${numericVsiScore})`;
+        } else if (numericVsiScore < 0.65) {
+            computedVsiStatus = `🟡 Tensão Moderada (VSI ${numericVsiScore})`;
+        } else {
+            computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${numericVsiScore})`;
+        }
     }
 
     function startGame() {
         document.getElementById('stepInstruction').classList.remove('active');
         document.getElementById('stepBolinhas').classList.add('active');
-        currentRound = 0; gameErrors = 0; reactionTimes = [];
+        currentRound = 0;
+        gameErrors = 0;
+        reactionTimes = [];
         spawnNextBall();
     }
 
     function spawnNextBall() {
-        if (ballTimer) clearTimeout(ballTimer);
+        if (ballTimer) {
+            clearTimeout(ballTimer);
+        }
         const gameArea = document.getElementById('gameArea');
         gameArea.innerHTML = '';
 
@@ -848,14 +906,23 @@
         ballSpawnTime = performance.now();
 
         const handleTouch = (e) => {
-            if (e) e.preventDefault();
-            if (ballHandled) return;
+            if (e) {
+                e.preventDefault();
+            }
+            if (ballHandled) {
+                return;
+            }
             ballHandled = true;
-            if (ballTimer) clearTimeout(ballTimer);
+            if (ballTimer) {
+                clearTimeout(ballTimer);
+            }
 
             const reaction = Math.round(performance.now() - ballSpawnTime);
-            if (isGreen) reactionTimes.push(reaction);
-            else gameErrors++;
+            if (isGreen) {
+                reactionTimes.push(reaction);
+            } else {
+                gameErrors++;
+            }
 
             document.getElementById('lblErrors').innerText = gameErrors;
             spawnNextBall();
@@ -868,14 +935,18 @@
         ballTimer = setTimeout(() => {
             if (!ballHandled) {
                 ballHandled = true;
-                if (isGreen) reactionTimes.push(1100);
+                if (isGreen) {
+                    reactionTimes.push(1100);
+                }
                 spawnNextBall();
             }
         }, 1100);
     }
 
     async function finishCheckin() {
-        if (ballTimer) clearTimeout(ballTimer);
+        if (ballTimer) {
+            clearTimeout(ballTimer);
+        }
         document.getElementById('stepBolinhas').classList.remove('active');
         document.getElementById('stepResult').classList.add('active');
 
@@ -918,8 +989,8 @@
 
         const fullDept = driverShift ? `${driverDept} • Turno ${driverShift}` : driverDept;
 
-        // Primary Payload for srt_checkins table
-        const payload = {
+        // ENVIO EXCLUSIVO PARA A TABELA srt_checkins
+        const srtPayload = {
             name: driverName,
             role: driverRole,
             department: fullDept,
@@ -943,46 +1014,19 @@
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
                     'Prefer': 'return=minimal'
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(srtPayload)
             });
-
-            if (!res.ok) {
-                console.warn('srt_checkins POST failed, executing clean fallback to es_crisis_exec_checkins...');
-                // Fallback Payload with ONLY valid columns for es_crisis_exec_checkins
-                const fallbackPayload = {
-                    name: driverName,
-                    role: driverRole,
-                    department: fullDept,
-                    reaction_time_ms: avgReaction,
-                    veto_errors: gameErrors,
-                    vsi_status: computedVsiStatus,
-                    vsi_score: numericVsiScore,
-                    es_crisis_score: 4.0,
-                    weakest_link: 'CONTROL',
-                    status: status,
-                    profile_key: 'OPERATOR',
-                    easy_stage: actionText
-                };
-                res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(fallbackPayload)
-                });
-            }
 
             if (res.ok) {
                 syncElem.innerText = "✅ Laudo e Foto transmitidos com sucesso ao CCO do SRT Mobility!";
             } else {
-                syncElem.innerText = "✅ Aferição concluída localmente!";
+                let errText = await res.text();
+                console.error("Erro Supabase SRT:", errText);
+                syncElem.innerText = "⚠️ Erro ao salvar no Supabase (" + res.status + "). Certifique-se que a tabela srt_checkins foi criada.";
             }
         } catch (e) {
-            console.error('Erro de sincronização:', e);
-            syncElem.innerText = "✅ Aferição concluída localmente!";
+            console.error('Erro de conexão:', e);
+            syncElem.innerText = "⚠️ Erro de conexão ao enviar para o CCO.";
         }
     }
 
