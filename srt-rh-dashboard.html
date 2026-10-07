@@ -8,54 +8,31 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #0b0f19; color: #e2e8f0; padding: 24px; }
         
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px;
-            flex-wrap: wrap; gap: 12px;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
         .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
         .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
         
-        .live-indicator {
-            display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;
-            font-size: 12px; font-weight: 700; color: #34d399;
-        }
-        .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        .btn-header-group { display: flex; gap: 10px; align-items: center; }
 
-        /* CONTROLE DE DATAS E FILTROS */
-        .filter-panel {
-            background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px;
-            margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;
-        }
+        .btn-wsp { background: #25d366; color: #000; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-wsp:hover { background: #1da851; color: #fff; }
+
+        .btn-settings { background: #334155; color: #f8fafc; border: 1px solid #475569; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
+        .btn-settings:hover { background: #475569; }
+
+        .filter-panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px; }
         .filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .filter-group { display: flex; align-items: center; gap: 8px; }
         .filter-group label { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
         
-        input[type="date"] {
-            background: #0b0f19; border: 1px solid #334155; color: #f8fafc;
-            padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
-        }
-        input[type="date"]:focus { border-color: #38bdf8; }
+        input[type="date"], select, input[type="text"], input[type="number"] { background: #0b0f19; border: 1px solid #334155; color: #f8fafc; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
 
-        .btn-quick {
-            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
-            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
-        }
+        .btn-quick { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; }
 
-        .btn-action {
-            background: #10b981; border: none; color: #ffffff; padding: 8px 18px;
-            border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto;
-        }
-        .btn-action:hover { background: #059669; }
+        .btn-action { background: #10b981; border: none; color: #ffffff; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto; }
 
-        /* CARDS DE MÉTRICAS */
-        .metrics-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 16px; margin-bottom: 28px;
-        }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 28px; }
         .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; }
         .card-metric .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 700; }
         .card-metric .value { font-size: 26px; font-weight: 800; }
@@ -66,8 +43,7 @@
         .val-vermelho { color: #f87171; }
         .val-tempo { color: #38bdf8; }
 
-        /* TABELA DE PEOPLE ANALYTICS */
-        .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; overflow-x: auto; }
+        .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; overflow-x: auto; margin-bottom: 24px; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
         .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
 
@@ -82,23 +58,27 @@
         .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
         .b-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
 
-        .badge-voice { font-size: 11px; font-weight: 700; display: block; }
+        /* MODAL DE CONFIGURAÇÕES */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 999; }
+        .modal-content { background: #151c2c; border: 1px solid #334155; border-radius: 16px; width: 90%; max-width: 500px; padding: 24px; color: #f8fafc; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #334155; padding-bottom: 12px; }
+        .modal-close { cursor: pointer; font-size: 20px; font-weight: 800; color: #94a3b8; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="title-group">
-            <h1>PAINEL EXECUTIVO SRT-RH — PEOPLE ANALYTICS</h1>
-            <p>Mapeamento Anônimo de Estresse, Carga Cognitiva & Prevenção de Burnout — NR-01, NR-17 & eSocial</p>
+            <h1 id="companyNameDisplay">PAINEL EXECUTIVO SRT-RH — GROU</h1>
+            <p>People Analytics, Prevenção de Burnout & Compliance (NR-01, NR-17 e eSocial)</p>
         </div>
-        <div class="live-indicator">
-            <div class="dot"></div>
-            PAINEL RH EM TEMPO REAL
+        <div class="btn-header-group">
+            <button class="btn-wsp" onclick="triggerWhatsAppDisparo()">📲 Disparar Lembrete via WhatsApp</button>
+            <button class="btn-settings" onclick="openModal()">⚙️ Gestão de Setores</button>
         </div>
     </div>
 
-    <!-- PAINEL DE DATAS E FILTROS -->
+    <!-- CONTROLE DE DATAS -->
     <div class="filter-panel">
         <div class="filter-row">
             <div class="filter-group">
@@ -116,15 +96,6 @@
             <button class="btn-quick active" id="btnAll" onclick="setPeriod('all')">🌐 Todo o Histórico</button>
 
             <button class="btn-action" onclick="fetchAndRenderData()">🔄 Filtrar Período</button>
-        </div>
-
-        <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
-            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Nível de Estresse:</span>
-            <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
-            <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Excelente</button>
-            <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Atenção</button>
-            <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Exaustão</button>
-            <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Alerta Preventivo</button>
         </div>
     </div>
 
@@ -156,7 +127,7 @@
         </div>
     </div>
 
-    <!-- TABELA -->
+    <!-- TABELA PRINCIPAL -->
     <div class="panel">
         <div class="panel-header">
             <div class="panel-title">Mapeamento Anônimo de Saúde Ocupacional por Setor</div>
@@ -180,12 +151,44 @@
         </table>
     </div>
 
+    <!-- MODAL DE GESTÃO SELF-SERVICE DE SETORES -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ Gestão Self-Service de Setores</h3>
+                <span class="modal-close" onclick="closeModal()">✕</span>
+            </div>
+            <div style="margin-bottom:16px;">
+                <label>Cadastrar Novo Setor na Empresa:</label>
+                <div style="display:flex; gap:8px; margin-top:6px;">
+                    <input type="text" id="newDeptName" placeholder="Ex: Vendas - SP" style="flex:1;">
+                    <button class="btn-action" onclick="addNewDepartment()">+ Adicionar</button>
+                </div>
+            </div>
+            <div>
+                <label>Setores Ativos Atualmente:</label>
+                <ul id="deptList" style="list-style:none; margin-top:8px; max-height:200px; overflow-y:auto;">
+                    <li style="padding:8px; background:#0b0f19; border-radius:6px; margin-bottom:6px; color:#94a3b8;">Carregando...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
         const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const companyId = urlParams.get('company') || urlParams.get('c') || 'grou';
+
         let allRecords = [];
-        let selectedStatus = 'ALL';
+
+        function triggerWhatsAppDisparo() {
+            const appUrl = `https://${window.location.hostname}/index-rh.html?company=${companyId}`;
+            const message = `*ExcelSilience SRT-RH — Lembrete de Prontidão Diária*%0A%0AOlá equipe! Por favor, dedique 30 segundos para realizar sua aferição anônima de bem-estar e saúde hoje:%0A%0A👉 ${encodeURIComponent(appUrl)}%0A%0A_100%20anônimo%20e%20sem%20câmera._`;
+            
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+        }
 
         function getStatusCategory(item) {
             let st = (item.status || '').toString().toUpperCase();
@@ -193,66 +196,22 @@
             let vsiScore = parseFloat(item.vsi_score || 0);
 
             if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO')) return 'PURPLE';
-            // SE A VOZ FOR CRÍTICA (🔴 OU SCORE >= 0.65), O STATUS É OBRIGATORIAMENTE 'RED'
-            if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('ALERTA') || vsi.includes('CRÍTICA') || vsi.includes('CRITICA') || vsi.includes('ALTA') || vsi.includes('🔴') || vsiScore >= 0.65) return 'RED';
-            if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || vsi.includes('MODERADA') || vsi.includes('🟡') || vsiScore > 0.40) return 'YELLOW';
+            if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('ALERTA') || vsi.includes('CRÍTICA') || vsi.includes('CRITICA') || vsi.includes('🔴') || vsiScore > 0.72) return 'RED';
+            if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || vsi.includes('MODERADA') || vsi.includes('🟡') || vsiScore > 0.45) return 'YELLOW';
             return 'GREEN';
-        }
-
-        function setPeriod(period) {
-            document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
-            const today = new Date();
-
-            if (period === 'today') {
-                const dateStr = today.toISOString().split('T')[0];
-                document.getElementById('startDate').value = dateStr;
-                document.getElementById('endDate').value = dateStr;
-            } else if (period === '7days') {
-                const past = new Date(); past.setDate(today.getDate() - 7);
-                document.getElementById('startDate').value = past.toISOString().split('T')[0];
-                document.getElementById('endDate').value = today.toISOString().split('T')[0];
-            } else if (period === '30days') {
-                const past = new Date(); past.setDate(today.getDate() - 30);
-                document.getElementById('startDate').value = past.toISOString().split('T')[0];
-                document.getElementById('endDate').value = today.toISOString().split('T')[0];
-            } else if (period === 'all') {
-                document.getElementById('startDate').value = '';
-                document.getElementById('endDate').value = '';
-                document.getElementById('btnAll').classList.add('active');
-            }
-            fetchAndRenderData();
-        }
-
-        function setStatusFilter(status) {
-            selectedStatus = status;
-            ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('active');
-            });
-
-            if (status === 'ALL') document.getElementById('stAll').classList.add('active');
-            if (status === 'GREEN') document.getElementById('stVerde').classList.add('active');
-            if (status === 'YELLOW') document.getElementById('stAmarelo').classList.add('active');
-            if (status === 'PURPLE') document.getElementById('stRoxo').classList.add('active');
-            if (status === 'RED') document.getElementById('stVermelho').classList.add('active');
-
-            renderFilteredData();
         }
 
         async function fetchAndRenderData() {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando registros de RH no Supabase...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando registros no Supabase...</td></tr>';
 
             try {
-                let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`, {
+                let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins?company_id=eq.${companyId}&select=*&order=created_at.desc`, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
 
                 if (res.ok) {
-                    const data = await res.json();
-                    allRecords = data || [];
-                } else {
-                    allRecords = [];
+                    allRecords = await res.json() || [];
                 }
             } catch (err) {
                 allRecords = [];
@@ -266,17 +225,9 @@
             const endVal = document.getElementById('endDate').value;
 
             let filtered = allRecords.filter(row => {
-                const isRhRecord = (row.module === 'SRT-RH' || row.role === 'Corporativo / RH' || (!row.photo_url && !row.role));
-                if (!isRhRecord) return false;
-
                 const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
                 if (startVal && rowDate < startVal) return false;
                 if (endVal && rowDate > endVal) return false;
-
-                if (selectedStatus !== 'ALL') {
-                    const category = getStatusCategory(row);
-                    if (selectedStatus !== category) return false;
-                }
                 return true;
             });
 
@@ -287,7 +238,6 @@
                 else if (category === 'YELLOW') cYellow++;
                 else if (category === 'PURPLE') cPurple++;
                 else if (category === 'RED') cRed++;
-
                 totalLat += (r.reaction_time_ms || 620);
             });
 
@@ -302,7 +252,7 @@
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro anônimo do RH encontrado no período/filtro selecionado.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro anônimo encontrado para o período.</td></tr>';
                 return;
             }
 
@@ -310,28 +260,21 @@
                 const dateObj = new Date(item.created_at || Date.now());
                 const formattedDate = dateObj.toLocaleString('pt-BR');
 
-                // EXIBIÇÃO DO VALOR/SCORE DO VSI
                 const scoreText = item.vsi_score ? ` (VSI: ${item.vsi_score})` : '';
                 let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável${scoreText}</span>`;
                 const vsiText = (item.vsi_status || '').toLowerCase();
                 
                 if (vsiText.includes('amarelo') || vsiText.includes('moderada')) {
                     voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Moderada${scoreText}</span>`;
-                } else if (vsiText.includes('vermelho') || vsiText.includes('crítica') || vsiText.includes('critica') || vsiText.includes('alta') || vsiText.includes('🔴')) {
+                } else if (vsiText.includes('vermelho') || vsiText.includes('crítica') || vsiText.includes('critica') || vsiText.includes('🔴')) {
                     voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica${scoreText}</span>`;
                 }
 
                 const category = getStatusCategory(item);
-                let badgeClass = 'b-verde';
-                let statusLabel = '🟢 EXCELENTE';
-
-                if (category === 'YELLOW') {
-                    badgeClass = 'b-amarelo'; statusLabel = '🟡 ATENÇÃO';
-                } else if (category === 'PURPLE') {
-                    badgeClass = 'b-roxo'; statusLabel = '🟣 EXAUSTÃO';
-                } else if (category === 'RED') {
-                    badgeClass = 'b-vermelho'; statusLabel = '🔴 ALERTA PREVENTIVO';
-                }
+                let badgeClass = 'b-verde', statusLabel = '🟢 EXCELENTE';
+                if (category === 'YELLOW') { badgeClass = 'b-amarelo'; statusLabel = '🟡 ATENÇÃO'; }
+                else if (category === 'PURPLE') { badgeClass = 'b-roxo'; statusLabel = '🟣 EXAUSTÃO'; }
+                else if (category === 'RED') { badgeClass = 'b-vermelho'; statusLabel = '🔴 ALERTA PREVENTIVO'; }
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -347,9 +290,60 @@
             });
         }
 
-        window.onload = () => {
-            fetchAndRenderData();
-        };
+        function openModal() {
+            document.getElementById('settingsModal').style.display = 'flex';
+            loadDepartmentsModal();
+        }
+        function closeModal() { document.getElementById('settingsModal').style.display = 'none'; }
+
+        async function loadDepartmentsModal() {
+            const list = document.getElementById('deptList');
+            list.innerHTML = '<li>Carregando setores...</li>';
+            try {
+                let res = await fetch(`${SUPABASE_URL}/rest/v1/departments?company_id=eq.${companyId}&select=*`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                if (res.ok) {
+                    const depts = await res.json();
+                    list.innerHTML = '';
+                    depts.forEach(d => {
+                        const li = document.createElement('li');
+                        li.style.cssText = 'padding:8px; background:#0b0f19; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;';
+                        li.innerHTML = `<span>${d.name}</span><button onclick="deleteDepartment('${d.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">✕</button>`;
+                        list.appendChild(li);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        async function addNewDepartment() {
+            const input = document.getElementById('newDeptName');
+            const name = input.value.trim();
+            if (!name) return;
+
+            await fetch(`${SUPABASE_URL}/rest/v1/departments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                },
+                body: JSON.stringify({ company_id: companyId, name: name })
+            });
+
+            input.value = '';
+            loadDepartmentsModal();
+        }
+
+        async function deleteDepartment(id) {
+            await fetch(`${SUPABASE_URL}/rest/v1/departments?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            loadDepartmentsModal();
+        }
+
+        window.onload = fetchAndRenderData;
     </script>
 </body>
 </html>
