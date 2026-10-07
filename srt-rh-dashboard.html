@@ -167,7 +167,7 @@
                 <tr>
                     <th>Data / Horário</th>
                     <th>Setor / Departamento</th>
-                    <th>Tensão Vocal (VSI)</th>
+                    <th>Tensão Vocal (VSI & Score)</th>
                     <th>Tempo de Resposta</th>
                     <th>Erros de Impulso</th>
                     <th>Nível de Estresse</th>
@@ -189,9 +189,13 @@
 
         function getStatusCategory(item) {
             let st = (item.status || '').toString().toUpperCase();
+            let vsi = (item.vsi_status || '').toString().toUpperCase();
+            let vsiScore = parseFloat(item.vsi_score || 0);
+
             if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO')) return 'PURPLE';
-            if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('ALERTA')) return 'RED';
-            if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO')) return 'YELLOW';
+            // SE A VOZ FOR CRÍTICA (🔴 OU SCORE >= 0.65), O STATUS É OBRIGATORIAMENTE 'RED'
+            if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('ALERTA') || vsi.includes('CRÍTICA') || vsi.includes('CRITICA') || vsi.includes('ALTA') || vsi.includes('🔴') || vsiScore >= 0.65) return 'RED';
+            if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || vsi.includes('MODERADA') || vsi.includes('🟡') || vsiScore > 0.40) return 'YELLOW';
             return 'GREEN';
         }
 
@@ -200,17 +204,17 @@
             const today = new Date();
 
             if (period === 'today') {
-                const dateStr = today.toISOString().split('T');
+                const dateStr = today.toISOString().split('T')[0];
                 document.getElementById('startDate').value = dateStr;
                 document.getElementById('endDate').value = dateStr;
             } else if (period === '7days') {
                 const past = new Date(); past.setDate(today.getDate() - 7);
-                document.getElementById('startDate').value = past.toISOString().split('T');
-                document.getElementById('endDate').value = today.toISOString().split('T');
+                document.getElementById('startDate').value = past.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
             } else if (period === '30days') {
                 const past = new Date(); past.setDate(today.getDate() - 30);
-                document.getElementById('startDate').value = past.toISOString().split('T');
-                document.getElementById('endDate').value = today.toISOString().split('T');
+                document.getElementById('startDate').value = past.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
             } else if (period === 'all') {
                 document.getElementById('startDate').value = '';
                 document.getElementById('endDate').value = '';
@@ -261,12 +265,11 @@
             const startVal = document.getElementById('startDate').value;
             const endVal = document.getElementById('endDate').value;
 
-            // SEPARAÇÃO INTELIGENTE: Pega apenas dados do RH e descarta os motoristas da frota
             let filtered = allRecords.filter(row => {
                 const isRhRecord = (row.module === 'SRT-RH' || row.role === 'Corporativo / RH' || (!row.photo_url && !row.role));
                 if (!isRhRecord) return false;
 
-                const rowDate = row.created_at ? row.created_at.split('T') : '';
+                const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
                 if (startVal && rowDate < startVal) return false;
                 if (endVal && rowDate > endVal) return false;
 
@@ -307,12 +310,15 @@
                 const dateObj = new Date(item.created_at || Date.now());
                 const formattedDate = dateObj.toLocaleString('pt-BR');
 
-                let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável</span>`;
+                // EXIBIÇÃO DO VALOR/SCORE DO VSI
+                const scoreText = item.vsi_score ? ` (VSI: ${item.vsi_score})` : '';
+                let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável${scoreText}</span>`;
                 const vsiText = (item.vsi_status || '').toLowerCase();
+                
                 if (vsiText.includes('amarelo') || vsiText.includes('moderada')) {
-                    voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Moderada</span>`;
-                } else if (vsiText.includes('vermelho') || vsiText.includes('crítica') || vsiText.includes('alta')) {
-                    voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica</span>`;
+                    voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Moderada${scoreText}</span>`;
+                } else if (vsiText.includes('vermelho') || vsiText.includes('crítica') || vsiText.includes('critica') || vsiText.includes('alta') || vsiText.includes('🔴')) {
+                    voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica${scoreText}</span>`;
                 }
 
                 const category = getStatusCategory(item);
