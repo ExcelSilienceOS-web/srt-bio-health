@@ -12,7 +12,7 @@
         .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
         .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
         
-        .btn-header-group { display: flex; gap: 10px; align-items: center; }
+        .btn-header-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
         .btn-wsp { background: #25d366; color: #000; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-wsp:hover { background: #1da851; color: #fff; }
@@ -25,12 +25,14 @@
         .filter-group { display: flex; align-items: center; gap: 8px; }
         .filter-group label { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
         
-        input[type="date"], select, input[type="text"], input[type="number"] { background: #0b0f19; border: 1px solid #334155; color: #f8fafc; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
+        input[type="date"], select, input[type="text"], input[type="number"], textarea { background: #0b0f19; border: 1px solid #334155; color: #f8fafc; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
+        textarea { width: 100%; resize: vertical; min-height: 75px; font-family: inherit; }
 
         .btn-quick { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; }
 
-        .btn-action { background: #10b981; border: none; color: #ffffff; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto; }
+        .btn-action { background: #10b981; border: none; color: #ffffff; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-action:hover { background: #059669; }
 
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 28px; }
         .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; }
@@ -60,9 +62,12 @@
 
         /* MODAL DE CONFIGURAÇÕES */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 999; }
-        .modal-content { background: #151c2c; border: 1px solid #334155; border-radius: 16px; width: 90%; max-width: 500px; padding: 24px; color: #f8fafc; }
+        .modal-content { background: #151c2c; border: 1px solid #334155; border-radius: 16px; width: 92%; max-width: 580px; padding: 24px; color: #f8fafc; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #334155; padding-bottom: 12px; }
         .modal-close { cursor: pointer; font-size: 20px; font-weight: 800; color: #94a3b8; }
+        .modal-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #2a364f; }
+        .modal-section h4 { font-size: 13px; color: #38bdf8; text-transform: uppercase; margin-bottom: 8px; font-weight: 800; }
+        .form-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -74,7 +79,7 @@
         </div>
         <div class="btn-header-group">
             <button class="btn-wsp" onclick="triggerWhatsAppDisparo()">📲 Disparar Lembrete via WhatsApp</button>
-            <button class="btn-settings" onclick="openModal()">⚙️ Gestão de Setores</button>
+            <button class="btn-settings" onclick="openModal()">⚙️ Configurações & Setores</button>
         </div>
     </div>
 
@@ -95,7 +100,7 @@
             <button class="btn-quick" onclick="setPeriod('30days')">Últimos 30 Dias</button>
             <button class="btn-quick active" id="btnAll" onclick="setPeriod('all')">🌐 Todo o Histórico</button>
 
-            <button class="btn-action" onclick="fetchAndRenderData()">🔄 Filtrar Período</button>
+            <button class="btn-action" style="margin-left:auto;" onclick="fetchAndRenderData()">🔄 Filtrar Período</button>
         </div>
     </div>
 
@@ -151,25 +156,45 @@
         </table>
     </div>
 
-    <!-- MODAL DE GESTÃO SELF-SERVICE DE SETORES -->
+    <!-- MODAL DE CONFIGURAÇÕES, SETORES & MENSAGEM DO WHATSAPP -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>⚙️ Gestão Self-Service de Setores</h3>
+                <h3>⚙️ Configurações & Gestão da Empresa</h3>
                 <span class="modal-close" onclick="closeModal()">✕</span>
             </div>
-            <div style="margin-bottom:16px;">
-                <label>Cadastrar Novo Setor na Empresa:</label>
-                <div style="display:flex; gap:8px; margin-top:6px;">
-                    <input type="text" id="newDeptName" placeholder="Ex: Vendas - SP" style="flex:1;">
-                    <button class="btn-action" onclick="addNewDepartment()">+ Adicionar</button>
+
+            <!-- SEÇÃO 1: MENSAGEM DO WHATSAPP -->
+            <div class="modal-section">
+                <h4>💬 Mensagem Personalizada do WhatsApp</h4>
+                <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">
+                    Escreva o texto que preferir. O link direto do teste da sua empresa será anexado ao final automaticamente.
+                </p>
+                <textarea id="txtWspMessage" placeholder="Digite aqui a mensagem personalizada da sua empresa..."></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                    <button class="btn-quick" onclick="resetDefaultWspMessage()">🔄 Restaurar Padrão</button>
+                    <button class="btn-action" onclick="saveWspMessage()">💾 Salvar Mensagem</button>
                 </div>
             </div>
-            <div>
-                <label>Setores Ativos Atualmente:</label>
-                <ul id="deptList" style="list-style:none; margin-top:8px; max-height:200px; overflow-y:auto;">
-                    <li style="padding:8px; background:#0b0f19; border-radius:6px; margin-bottom:6px; color:#94a3b8;">Carregando...</li>
-                </ul>
+
+            <!-- SEÇÃO 2: CADASTRO DE SETORES E HEADCOUNT -->
+            <div class="modal-section" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                <h4>🏢 Setores Ativos & Nº de Colaboradores (Headcount)</h4>
+                <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">
+                    Cadastre cada departamento com o número de pessoas para cálculo automático de quórum (N >= 5).
+                </p>
+                <div class="form-row">
+                    <input type="text" id="newDeptName" placeholder="Nome do Setor (ex: Consultoria PDA)" style="flex:2; min-width:180px;">
+                    <input type="number" id="newDeptHeadcount" placeholder="Nº Pessoas" min="1" value="10" style="flex:1; min-width:90px;">
+                    <button class="btn-action" onclick="addNewDepartment()">+ Adicionar</button>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <label style="font-size:11px; color:#94a3b8; font-weight:700;">Setores Atualmente Cadastrados:</label>
+                    <ul id="deptList" style="list-style:none; margin-top:8px; max-height:220px; overflow-y:auto;">
+                        <li style="padding:8px; background:#0b0f19; border-radius:6px; margin-bottom:6px; color:#94a3b8;">Carregando setores...</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -182,12 +207,74 @@
         const companyId = urlParams.get('company') || urlParams.get('c') || 'grou';
 
         let allRecords = [];
+        let customWspTemplate = "";
+
+        const DEFAULT_WSP_MESSAGE = "ExcelSilience SRT-RH — Lembrete de Prontidão Diária\n\nOlá equipe! Por favor, dedique 30 segundos para realizar sua aferição anônima de bem-estar e saúde hoje:\n\n👉 {LINK}\n\n100% anônimo e sem câmera.";
+
+        async function loadCompanySettings() {
+            try {
+                let res = await fetch(`${SUPABASE_URL}/rest/v1/companies?id=eq.${companyId}&select=*`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        const company = data[0];
+                        if (company.name) {
+                            document.getElementById('companyNameDisplay').innerText = `PAINEL EXECUTIVO SRT-RH — ${company.name.toUpperCase()}`;
+                        }
+                        if (company.wsp_message) {
+                            customWspTemplate = company.wsp_message;
+                        }
+                    }
+                }
+            } catch (e) {}
+
+            if (!customWspTemplate) {
+                customWspTemplate = localStorage.getItem(`wsp_msg_${companyId}`) || DEFAULT_WSP_MESSAGE;
+            }
+            document.getElementById('txtWspMessage').value = customWspTemplate;
+        }
+
+        async function saveWspMessage() {
+            const txt = document.getElementById('txtWspMessage').value.trim();
+            if (!txt) return;
+
+            customWspTemplate = txt;
+            localStorage.setItem(`wsp_msg_${companyId}`, txt);
+
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/companies?id=eq.${companyId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({ wsp_message: txt })
+                });
+            } catch (e) {}
+
+            alert("✅ Mensagem do WhatsApp salva com sucesso!");
+        }
+
+        function resetDefaultWspMessage() {
+            document.getElementById('txtWspMessage').value = DEFAULT_WSP_MESSAGE;
+            saveWspMessage();
+        }
 
         function triggerWhatsAppDisparo() {
             const appUrl = `https://${window.location.hostname}/index-rh.html?company=${companyId}`;
-            const message = `*ExcelSilience SRT-RH — Lembrete de Prontidão Diária*%0A%0AOlá equipe! Por favor, dedique 30 segundos para realizar sua aferição anônima de bem-estar e saúde hoje:%0A%0A👉 ${encodeURIComponent(appUrl)}%0A%0A_100%20anônimo%20e%20sem%20câmera._`;
-            
-            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+            let msg = customWspTemplate || DEFAULT_WSP_MESSAGE;
+
+            if (msg.includes('{LINK}')) {
+                msg = msg.replace('{LINK}', appUrl);
+            } else {
+                msg = `${msg}\n\n👉 ${appUrl}`;
+            }
+
+            const encodedMsg = encodeURIComponent(msg);
+            window.open(`https://api.whatsapp.com/send?text=${encodedMsg}`, '_blank');
         }
 
         function getStatusCategory(item) {
@@ -225,7 +312,7 @@
             const endVal = document.getElementById('endDate').value;
 
             let filtered = allRecords.filter(row => {
-                const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
+                const rowDate = row.created_at ? row.created_at.split('T') : '';
                 if (startVal && rowDate < startVal) return false;
                 if (endVal && rowDate > endVal) return false;
                 return true;
@@ -298,7 +385,7 @@
 
         async function loadDepartmentsModal() {
             const list = document.getElementById('deptList');
-            list.innerHTML = '<li>Carregando setores...</li>';
+            list.innerHTML = '<li style="padding:8px; color:#94a3b8;">Carregando setores...</li>';
             try {
                 let res = await fetch(`${SUPABASE_URL}/rest/v1/departments?company_id=eq.${companyId}&select=*`, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -306,10 +393,21 @@
                 if (res.ok) {
                     const depts = await res.json();
                     list.innerHTML = '';
+                    if (!depts || depts.length === 0) {
+                        list.innerHTML = '<li style="padding:8px; color:#64748b;">Nenhum setor cadastrado ainda.</li>';
+                        return;
+                    }
                     depts.forEach(d => {
+                        const count = d.headcount || d.headcount_target || 10;
                         const li = document.createElement('li');
-                        li.style.cssText = 'padding:8px; background:#0b0f19; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;';
-                        li.innerHTML = `<span>${d.name}</span><button onclick="deleteDepartment('${d.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">✕</button>`;
+                        li.style.cssText = 'padding:10px; background:#0b0f19; border:1px solid #1e293b; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;';
+                        li.innerHTML = `
+                            <div>
+                                <b style="color:#38bdf8; font-size:13px;">${d.name}</b>
+                                <span style="font-size:11px; color:#94a3b8; margin-left:10px;">👥 ${count} colaboradores</span>
+                            </div>
+                            <button onclick="deleteDepartment('${d.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold; font-size:14px;" title="Excluir Setor">✕</button>
+                        `;
                         list.appendChild(li);
                     });
                 }
@@ -317,33 +415,45 @@
         }
 
         async function addNewDepartment() {
-            const input = document.getElementById('newDeptName');
-            const name = input.value.trim();
+            const nameInput = document.getElementById('newDeptName');
+            const headcountInput = document.getElementById('newDeptHeadcount');
+            
+            const name = nameInput.value.trim();
+            const count = parseInt(headcountInput.value) || 10;
+            
             if (!name) return;
 
-            await fetch(`${SUPABASE_URL}/rest/v1/departments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`
-                },
-                body: JSON.stringify({ company_id: companyId, name: name })
-            });
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/departments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({ company_id: companyId, name: name, headcount: count })
+                });
+            } catch (e) {}
 
-            input.value = '';
+            nameInput.value = '';
             loadDepartmentsModal();
         }
 
         async function deleteDepartment(id) {
-            await fetch(`${SUPABASE_URL}/rest/v1/departments?id=eq.${id}`, {
-                method: 'DELETE',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
+            if (!confirm("Deseja realmente remover este setor?")) return;
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/departments?id=eq.${id}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+            } catch (e) {}
             loadDepartmentsModal();
         }
 
-        window.onload = fetchAndRenderData;
+        window.onload = function() {
+            loadCompanySettings();
+            fetchAndRenderData();
+        };
     </script>
 </body>
 </html>
