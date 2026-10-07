@@ -554,6 +554,7 @@
         const syncElem = document.getElementById('syncStatus');
 
         try {
+            // 1ª Tentativa de envio com a etiqueta 'module'
             let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
@@ -564,6 +565,21 @@
                 },
                 body: JSON.stringify(rhPayload)
             });
+
+            // 2ª Tentativa (Salvamento Garantido): Se o Supabase recusar por falta da coluna 'module', remove o campo e grava imediatamente
+            if (!res.ok) {
+                delete rhPayload.module;
+                res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(rhPayload)
+                });
+            }
 
             if (res.ok) {
                 syncElem.className = "sync-banner";
