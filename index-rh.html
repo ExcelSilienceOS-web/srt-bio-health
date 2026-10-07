@@ -511,22 +511,23 @@
 
         const avgReaction = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) : 620;
 
-        // VERIFICAÇÃO DE TENSÃO VOCAL (VSI)
-        const isVsiRed = numericVsiScore >= 0.65 || computedVsiStatus.includes('Crítica') || computedVsiStatus.includes('Alta');
-        const isVsiYellow = numericVsiScore > 0.40 || computedVsiStatus.includes('Moderada');
+        // AVALIAÇÃO OBRIGATÓRIA DA VOZ (VSI)
+        const vsiUpper = computedVsiStatus.toUpperCase();
+        const isVsiRed = numericVsiScore >= 0.65 || vsiUpper.includes('CRÍTICA') || vsiUpper.includes('CRITICA') || vsiUpper.includes('ALTA') || vsiUpper.includes('🔴');
+        const isVsiYellow = numericVsiScore > 0.40 || vsiUpper.includes('MODERADA') || vsiUpper.includes('AMARELO') || vsiUpper.includes('🟡') || vsiUpper.includes('SILÊNCIO');
 
         let status = 'GREEN';
         let badgeText = '🟢 NÍVEL EXCELENTE DE PRONTIDÃO';
         let badgeClass = 'status-green';
-        let condutaText = 'Sua disposição e foco estão excelentes! Você está em estado ideal para realizar suas atividades com clareza mental.';
+        let condutaText = 'Sua disposition e foco estão excelentes! Você está em estado ideal para realizar suas atividades com clareza mental.';
 
-        // REGRA DO ELO MAIS FRACO: O resultado final pega o pior indicador entre Voz e Reação
+        // REGRA DO ELO MAIS FRACO: O resultado final adota rigorosamente o pior indicador entre Voz e Reação
         if (gameErrors >= 2 || avgReaction > 750 || isVsiRed) {
             status = 'RED';
             badgeText = '🔴 ALERTA PREVENTIVO (TENSÃO / CANSAÇO ELEVADO)';
             badgeClass = 'status-red';
             condutaText = isVsiRed 
-                ? 'Identificamos alta tensão vocal/estresse bioacústico. Recomendamos realizar uma pausa curta de 15 minutos, aplicar o protocolo de respiração e hidratação antes de refazer a aferição.'
+                ? `Identificamos alta tensão vocal/estresse bioacústico (VSI ${numericVsiScore}). Recomendamos realizar uma pausa curta de 15 minutos, aplicar o protocolo de respiração e hidratação antes de refazer a aferição.`
                 : 'Identificamos uma queda no tempo de reação neuromuscular. Faça uma pausa curta de 15 minutos, respire fundo e hidrate-se antes de refazer a aferição.';
         } else if (avgReaction > 650) {
             status = 'PURPLE';
@@ -537,7 +538,7 @@
             status = 'YELLOW';
             badgeText = '🟡 ATENÇÃO / ESTRESSE MODERADO';
             badgeClass = 'status-yellow';
-            condutaText = 'Tensão vocal ou estresse moderado detectados. Recomendamos beber um copo d\'água e realizar o exercício de respiração abaixo durante 2 minutos.';
+            condutaText = `Tensão vocal ou estresse moderado detectados (VSI ${numericVsiScore}). Recomendamos beber um copo d'água e realizar o exercício de respiração por 2 minutos.`;
         }
 
         const badgeElem = document.getElementById('resultBadge');
