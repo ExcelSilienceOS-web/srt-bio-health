@@ -29,7 +29,7 @@
             border: 1px solid #1e293b;
             border-radius: 20px;
             width: 100%;
-            max-width: 440px;
+            max-width: 460px;
             padding: 26px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
@@ -214,15 +214,46 @@
             border: 1px solid #0284c7;
         }
 
-        .conduta-box {
+        .wellness-card {
             background: #070d19;
-            padding: 16px;
+            padding: 18px;
             border-radius: 12px;
             border: 1px solid #334155;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             font-size: 13px;
             line-height: 1.5;
             color: #cbd5e1;
+        }
+
+        .wellness-card h4 {
+            color: #38bdf8;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wellness-steps {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .wellness-steps li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+            font-size: 12px;
+        }
+
+        .wellness-steps li::before {
+            content: "➔";
+            position: absolute;
+            left: 0;
+            color: #38bdf8;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -297,13 +328,29 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- ETAPA 5: RESULTADO -->
+    <!-- ETAPA 5: RESULTADO & PROTOCOLO DE BEM-ESTAR -->
     <div id="stepResult" class="step">
         <div id="syncStatus" class="sync-banner">⏳ Enviando dados anônimos ao painel do setor...</div>
         <div id="resultBadge" class="badge-status status-green">--</div>
-        <div id="condutaCard" class="conduta-box">--</div>
 
-        <button class="btn" onclick="location.reload()">🔄 Concluir Aferição</button>
+        <div class="wellness-card">
+            <h4>🌿 Protocolo Recomendado de Bem-Estar:</h4>
+            <p id="condutaCard">--</p>
+            
+            <h4 style="margin-top:14px;">🧘 Passos para Restaurar sua Energia:</h4>
+            <ul class="wellness-steps" id="wellnessSteps">
+                <li><b>Respiração 4-7-8:</b> Puxe o ar pelo nariz por 4s, segure por 7s e solte lentamente pela boca por 8s (repita 3 vezes).</li>
+                <li><b>Pausa Ocular:</b> Olhe para um ponto distante (a mais de 6 metros) por 20 segundos para relaxar o músculo dos olhos.</li>
+                <li><b>Hidratação:</b> Beba um copo de água fresca para reidratar as cordas vocais e o cérebro.</li>
+                <li><b>Pausa Ativa:</b> Levante-se e faça um alongamento suave nos ombros e no pescoço.</li>
+            </ul>
+        </div>
+
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed #0284c7; padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
+            ⏱️ <b>Para refazer o teste:</b> Aguarde de 10 a 15 minutos aplicando as dicas acima e depois clique no botão abaixo.
+        </div>
+
+        <button class="btn" onclick="location.reload()">🔄 Refazer Aferição de Prontidão</button>
     </div>
 </div>
 
@@ -467,23 +514,23 @@
         let status = 'GREEN';
         let badgeText = '🟢 NÍVEL EXCELENTE DE PRONTIDÃO';
         let badgeClass = 'status-green';
-        let condutaText = '💡 <b>Recomendação:</b> Sua disposição e foco estão ótimos para o dia de trabalho!';
+        let condutaText = 'Sua disposição e foco estão excelentes! Você está em estado ideal para realizar suas atividades com clareza mental.';
 
         if (gameErrors >= 2 || avgReaction > 750) {
             status = 'RED';
             badgeText = '🔴 ALERTA PREVENTIVO DE CANSAÇO';
             badgeClass = 'status-red';
-            condutaText = '💡 <b>Recomendação:</b> Atenção redobrada. Se possível, faça uma pausa curta para organizar as tarefas antes de tomar decisões complexas.';
+            condutaText = 'Identificamos uma queda temporária no tempo de reação. Faça uma pausa curta de 15 minutos, respire fundo e hidrate-se antes de refazer a aferição.';
         } else if (avgReaction > 650) {
             status = 'PURPLE';
             badgeText = '🟣 PAUSA RECOMENDADA (CANSAÇO ACUMULADO)';
             badgeClass = 'status-purple';
-            condutaText = '💡 <b>Recomendação:</b> Seu tempo de resposta indica fadiga ou sono. Aproveite um intervalo de 15 a 20 minutos para tomar água e relaxar a vista.';
+            condutaText = 'Seu tempo de resposta indica fadiga visual ou física. Aproveite um intervalo de 15 a 20 minutos para relaxar os olhos e afastar-se das telas.';
         } else if (avgReaction > 550) {
             status = 'YELLOW';
             badgeText = '🟡 ATENÇÃO / ESTRESSE MODERADO';
             badgeClass = 'status-yellow';
-            condutaText = '💡 <b>Recomendação:</b> Tensão moderada detectada. Respire fundo por 2 minutos e hidrate-se.';
+            condutaText = 'Tensão ou estresse moderado detectados. Recomendamos beber um copo d\'água e realizar o exercício de respiração abaixo durante 2 minutos.';
         }
 
         const badgeElem = document.getElementById('resultBadge');
@@ -491,7 +538,6 @@
         badgeElem.innerText = badgeText;
         document.getElementById('condutaCard').innerHTML = condutaText;
 
-        // ETIQUETA DO RH (Garante a separação dos motoristas)
         const rhPayload = {
             name: "Colaborador Anônimo",
             role: "Corporativo / RH",
