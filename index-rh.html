@@ -440,7 +440,7 @@
 
         if (numericVsiScore <= 0.40) computedVsiStatus = '🟢 Voz Estável';
         else if (numericVsiScore < 0.65) computedVsiStatus = '🟡 Tensão Moderada';
-        else computedVsiStatus = '🔴 Alta Tensão Vocal';
+        else computedVsiStatus = '🔴 Tensão Crítica';
     }
 
     function startGame() {
@@ -511,26 +511,33 @@
 
         const avgReaction = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) : 620;
 
+        // VERIFICAÇÃO DE TENSÃO VOCAL (VSI)
+        const isVsiRed = numericVsiScore >= 0.65 || computedVsiStatus.includes('Crítica') || computedVsiStatus.includes('Alta');
+        const isVsiYellow = numericVsiScore > 0.40 || computedVsiStatus.includes('Moderada');
+
         let status = 'GREEN';
         let badgeText = '🟢 NÍVEL EXCELENTE DE PRONTIDÃO';
         let badgeClass = 'status-green';
         let condutaText = 'Sua disposição e foco estão excelentes! Você está em estado ideal para realizar suas atividades com clareza mental.';
 
-        if (gameErrors >= 2 || avgReaction > 750) {
+        // REGRA DO ELO MAIS FRACO: O resultado final pega o pior indicador entre Voz e Reação
+        if (gameErrors >= 2 || avgReaction > 750 || isVsiRed) {
             status = 'RED';
-            badgeText = '🔴 ALERTA PREVENTIVO DE CANSAÇO';
+            badgeText = '🔴 ALERTA PREVENTIVO (TENSÃO / CANSAÇO ELEVADO)';
             badgeClass = 'status-red';
-            condutaText = 'Identificamos uma queda temporária no tempo de reação. Faça uma pausa curta de 15 minutos, respire fundo e hidrate-se antes de refazer a aferição.';
+            condutaText = isVsiRed 
+                ? 'Identificamos alta tensão vocal/estresse bioacústico. Recomendamos realizar uma pausa curta de 15 minutos, aplicar o protocolo de respiração e hidratação antes de refazer a aferição.'
+                : 'Identificamos uma queda no tempo de reação neuromuscular. Faça uma pausa curta de 15 minutos, respire fundo e hidrate-se antes de refazer a aferição.';
         } else if (avgReaction > 650) {
             status = 'PURPLE';
             badgeText = '🟣 PAUSA RECOMENDADA (CANSAÇO ACUMULADO)';
             badgeClass = 'status-purple';
             condutaText = 'Seu tempo de resposta indica fadiga visual ou física. Aproveite um intervalo de 15 a 20 minutos para relaxar os olhos e afastar-se das telas.';
-        } else if (avgReaction > 550) {
+        } else if (avgReaction > 550 || isVsiYellow) {
             status = 'YELLOW';
             badgeText = '🟡 ATENÇÃO / ESTRESSE MODERADO';
             badgeClass = 'status-yellow';
-            condutaText = 'Tensão ou estresse moderado detectados. Recomendamos beber um copo d\'água e realizar o exercício de respiração abaixo durante 2 minutos.';
+            condutaText = 'Tensão vocal ou estresse moderado detectados. Recomendamos beber um copo d\'água e realizar o exercício de respiração abaixo durante 2 minutos.';
         }
 
         const badgeElem = document.getElementById('resultBadge');
@@ -554,7 +561,6 @@
         const syncElem = document.getElementById('syncStatus');
 
         try {
-            // 1ª Tentativa de envio com a etiqueta 'module'
             let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
@@ -566,7 +572,6 @@
                 body: JSON.stringify(rhPayload)
             });
 
-            // 2ª Tentativa (Salvamento Garantido): Se o Supabase recusar por falta da coluna 'module', remove o campo e grava imediatamente
             if (!res.ok) {
                 delete rhPayload.module;
                 res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
