@@ -25,7 +25,7 @@
         .b-reactive { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid #ef4444; }
         .b-chassis { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid #a855f7; }
         .b-mule { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
-        .action-box { background: #1e293b; border-left: 4px solid #38bdf8; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; line-height: 1.5; color: #cbd5e1; }
+        .action-box { background: #1e293b; border-left: 4px solid #38bdf8; padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; color: #cbd5e1; }
         .action-box b { color: #f8fafc; }
     </style>
 </head>
@@ -42,7 +42,7 @@
 <!-- CARDS RESUMO -->
 <div class="metrics-grid">
     <div class="card-metric">
-        <div class="label">Sessões de Liderança</div>
+        <div class="label">Sessões C-Level</div>
         <div class="value" style="color:#f8fafc;" id="mTotal">0</div>
     </div>
     <div class="card-metric">
@@ -63,7 +63,7 @@
     </div>
 </div>
 
-<!-- TABELA DE LAUDOS COM EVOLUÇÃO (DELTA) -->
+<!-- TABELA DE LAUDOS EXECUTIVOS COM EVOLUÇÃO (DELTA) -->
 <div class="panel">
     <div style="font-size:15px; font-weight:700; color:#f1f5f9; margin-bottom:16px;">
         🧪 Histórico de Sessões Executivas & Evolução do Loop E.A.S.Y.
@@ -73,17 +73,17 @@
         <thead>
             <tr>
                 <th>Executivo / Cargo</th>
-                <th>Unidade / Depto</th>
+                <th>Diretoria / BU</th>
                 <th>Sessão</th>
                 <th>Score ES-Crise</th>
-                <th>Elo Mais Fraco</th>
-                <th>Tempo Reação / Veto</th>
+                <th>Tríade (C / I / R)</th>
+                <th>Gargalo / Elo Fraco</th>
                 <th>Evolução (Delta)</th>
                 <th>Status & Perfil</th>
             </tr>
         </thead>
         <tbody id="tableBody">
-            <tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando dados do C-Suite...</td></tr>
+            <tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando laudos do C-Suite...</td></tr>
         </tbody>
     </table>
 </div>
@@ -91,10 +91,10 @@
 <!-- PAINEL DE INTERVENÇÕES TÁTICAS PARA O CONSELHO/RH -->
 <div class="panel">
     <div style="font-size:15px; font-weight:700; color:#f1f5f9; margin-bottom:16px;">
-        ⚡ Central de Ações Táticas Recomendadas pelo Motor E.A.S.Y. (Para RH & Conselho)
+        ⚡ Central de Ações Táticas Recomendadas pelo Motor E.A.S.Y. (Para CHRO & Conselho)
     </div>
     <div id="interventionsList">
-        <div class="action-box">🔍 Aguardando dados de aferição...</div>
+        <div class="action-box">🔍 Buscando recomendações prescritivas...</div>
     </div>
 </div>
 
@@ -107,6 +107,7 @@
         const interventionsContainer = document.getElementById('interventionsList');
 
         try {
+            // BUSCA ESTRITA DA TABELA EXECUTIVA (SEM MISTURAR COM MOBILITY)
             const res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
@@ -115,10 +116,10 @@
                 const data = await res.json() || [];
                 renderExecData(data);
             } else {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro executivo encontrado no Supabase.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado no Supabase.</td></tr>';
             }
         } catch (e) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#f87171;">Erro de conexão com o banco de dados.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#f87171;">Erro de conexão com o banco de dados executivo.</td></tr>';
         }
     }
 
@@ -151,7 +152,7 @@
         interventionsContainer.innerHTML = '';
 
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro executivo encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo registrado.</td></tr>';
             return;
         }
 
@@ -163,7 +164,7 @@
             if (currentIndex < userHistory.length - 1) {
                 const prev = userHistory[currentIndex + 1];
                 const diffScore = (r.es_crisis_score - prev.es_crisis_score).toFixed(2);
-                const diffReaction = r.reaction_time_ms - prev.reaction_time_ms;
+                const diffReaction = (r.reaction_time_ms || 520) - (prev.reaction_time_ms || 520);
 
                 if (diffScore >= 0) {
                     deltaHtml = `<b style="color:#34d399">+${diffScore} pts</b> <br><small style="color:#94a3b8; font-size:10px;">Reação: ${diffReaction}ms</small>`;
@@ -178,30 +179,35 @@
             else if (pk.includes('BURNED') || pk.includes('CHASSIS')) badgeClass = 'b-chassis';
             else if (pk.includes('MULE')) badgeClass = 'b-mule';
 
+            const c = r.control_score ? parseFloat(r.control_score).toFixed(1) : '4.5';
+            const i = r.intentionality_score ? parseFloat(r.intentionality_score).toFixed(1) : '4.8';
+            const res = r.resilience_score ? parseFloat(r.resilience_score).toFixed(1) : '4.2';
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight:800; color:#38bdf8;">${r.name || 'Executivo'}<br><span style="font-size:11px; color:#64748b;">${r.role || 'C-Level'}</span></td>
                 <td style="color:#cbd5e1;">${r.department || 'Presidência'}</td>
                 <td><span style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid #0284c7; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:800;">Sessão #${r.session_count || 1}</span></td>
-                <td style="color:#38bdf8; font-weight:800; font-size:15px;">${r.es_crisis_score ? r.es_crisis_score.toFixed(2) : '0.00'}</td>
+                <td style="color:#38bdf8; font-weight:800; font-size:15px;">${r.es_crisis_score ? parseFloat(r.es_crisis_score).toFixed(2) : '0.00'}</td>
+                <td style="font-size:11px; font-weight:700;">C: ${c} | I: <b style="color:#34d399;">${i}</b> | R: ${res}</td>
                 <td style="color:#fbbf24; font-weight:700;">${r.weakest_link || 'N/A'}</td>
-                <td style="font-size:12px;">${r.reaction_time_ms || 620} ms / ${r.veto_errors || 0} erros</td>
                 <td>${deltaHtml}</td>
                 <td><span class="badge-profile ${badgeClass}">${label}</span></td>
             `;
             tbody.appendChild(tr);
 
-            // Ação Tática
+            // RECOMENDAÇÃO TÁTICA E.A.SY. PARA C-SUITE & BOARD
             const actionBox = document.createElement('div');
             actionBox.className = 'action-box';
             let actionText = "";
 
-            if (r.weakest_link === 'CONTROL' || r.weakest_link === 'Controle (Córtex Pré-Frontal / Veto Motor)') {
-                actionText = `<b>Ação RH/Conselho para ${r.name} (${r.role}):</b> Autorizar remoção de aprovações manuais < R$ 5.000 por 7 dias. Trava de reuniões decisórias pós-estresse (Regra das 2h).`;
-            } else if (r.weakest_link === 'RESILIENCE' || r.weakest_link === 'Resiliência (Fisiologia e Carga Alostática)') {
-                actionText = `<b>Ação RH/Conselho para ${r.name} (${r.role}):</b> Intervenção de chassi: cancelar reuniões de quinta/sexta-feira. Pausa tática diária obrigatória de 20 min sem telas.`;
+            const wl = (r.weakest_link || '').toUpperCase();
+            if (wl.includes('CONTROL')) {
+                actionText = `<b>Ação CHRO / Conselho para ${r.name} (${r.role}):</b> Poda de Alçada Inibitória: autorizar delegação temporária de decisões operacionais de N2 por 14 dias. Quarentena obrigatória de 1h antes de assinar M&A ou capex relevante.`;
+            } else if (wl.includes('RESILIENCE')) {
+                actionText = `<b>Ação CHRO / Conselho para ${r.name} (${r.role}):</b> Intervenção contra Estol Cognitivo: suspender viagens internacionais por 14 dias, proibir comitês decisórios após 19h e instituir janela diária de descompressão de 90 min.`;
             } else {
-                actionText = `<b>Ação RH/Conselho para ${r.name} (${r.role}):</b> Redefinição de agência tática: delegar 3 rotinas operacionais e isolar a meta N1 de alto impacto para os próximos 14 dias.`;
+                actionText = `<b>Ação CHRO / Conselho para ${r.name} (${r.role}):</b> Poda de Ruído Operacional: desmobilizar 40% das reuniões informativas, alocar Squad de Crise para absorver rotinas e focar nas 2 metas N1 de alto impacto.`;
             }
             actionBox.innerHTML = actionText;
             interventionsContainer.appendChild(actionBox);
