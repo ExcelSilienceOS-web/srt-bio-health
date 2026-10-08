@@ -24,7 +24,6 @@
         .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* PAINEL DE FILTROS DE DATA E STATUS */
         .filter-panel {
             background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px;
             margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;
@@ -51,7 +50,6 @@
         }
         .btn-action:hover { background: #059669; }
 
-        /* METRICS CARDS */
         .metrics-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
             gap: 16px; margin-bottom: 28px;
@@ -66,7 +64,6 @@
         .val-vermelho { color: #f87171; }
         .val-tempo { color: #38bdf8; }
 
-        /* TABELA */
         .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; overflow-x: auto; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
         .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
@@ -331,11 +328,8 @@
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando registros do SRT-Mobility...</td></tr>';
 
             try {
-                // FILTRO DE SEGURAÇA: Exclui expressamente o módulo SRT-RH da busca no Supabase
-                let queryUrl = `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&module=neq.SRT-RH&order=created_at.desc`;
-                if (companyId) {
-                    queryUrl = `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&company_id=eq.${companyId}&module=neq.SRT-RH&order=created_at.desc`;
-                }
+                // BUSCA COMPLETA SEM EXCLUIR NULLS DO SQL
+                let queryUrl = `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`;
 
                 let res = await fetch(queryUrl, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -360,8 +354,12 @@
             const endVal = document.getElementById('endDate').value;
 
             let filtered = allRecords.filter(row => {
-                // TRAVA DE SEGURANÇA NO JAVASCRIPT: Ignora qualquer registro do SRT-RH
+                // FILTRO EM JS: Só descarta se for explicitamente do módulo SRT-RH
                 if (row.module === 'SRT-RH' || row.name === 'Colaborador Anônimo') return false;
+
+                if (companyId && row.company_id && row.company_id !== companyId && row.company_id !== 'default') {
+                    return false;
+                }
 
                 const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
                 if (startVal && rowDate < startVal) return false;
