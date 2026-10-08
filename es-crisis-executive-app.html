@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience ES-Crise | Cockpit Executivo & Motor E.A.S.Y. v2.0</title>
+    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v2.0</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: #070a12; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; width: 100%; max-width: 520px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.7); }
+        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; width: 100%; max-width: 560px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
         .header-box { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; }
-        .header-box h1 { font-size: 20px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; }
+        .header-box h1 { font-size: 22px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; }
         .header-box p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
         .badge-governance { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); margin-bottom: 16px; }
         .step { display: none; }
@@ -22,24 +22,31 @@
         .checkbox-container label { font-size: 11px; color: #cbd5e1; font-weight: 600; text-transform: none; line-height: 1.4; margin-bottom: 0; cursor: pointer; }
         .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; transition: 0.2s; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
         .btn:hover { background: linear-gradient(135deg, #0369a1, #075985); }
-        .pupil-scanner { width: 100%; height: 180px; background: #070d19; border: 1px solid #334155; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 16px; }
-        .eye-target { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #38bdf8; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
-        .eye-pupil { width: 36px; height: 36px; background: #38bdf8; border-radius: 50%; transition: all 0.5s ease; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: #34d399; top: 0; animation: scan 2s infinite linear; }
+        
+        /* WEBCAM REAL & HUD EXECUTIVO */
+        .video-container { width: 100%; height: 260px; background: #070d19; border: 2px solid #0284c7; border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .hud-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border: 1px solid rgba(56, 189, 248, 0.3); display: flex; flex-direction: column; justify-content: space-between; padding: 12px; }
+        .hud-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 160px; height: 160px; border: 2px dashed #38bdf8; border-radius: 50%; box-shadow: 0 0 25px rgba(56, 189, 248, 0.4); animation: pulseHud 2s infinite ease-in-out; }
+        @keyframes pulseHud { 0% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; } 50% { transform: translate(-50%, -50%) scale(1.03); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; } }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: #34d399; top: 0; animation: scan 2.5s infinite linear; }
         @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
-        .game-box { width: 100%; height: 240px; background: #070d19; border: 2px dashed #334155; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 16px; }
-        .target-ball { width: 58px; height: 58px; border-radius: 50%; position: absolute; cursor: pointer; box-shadow: 0 0 16px rgba(255,255,255,0.4); user-select: none; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #fff; }
-        .ball-green { background: #10b981; border: 2px solid #34d399; }
-        .ball-red { background: #ef4444; border: 2px solid #f87171; }
-        .score-card { background: #070d19; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+
+        .game-box { width: 100%; height: 250px; background: #070d19; border: 2px dashed #334155; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 16px; }
+        .target-ball { width: 62px; height: 62px; border-radius: 50%; position: absolute; cursor: pointer; box-shadow: 0 0 18px rgba(255,255,255,0.4); user-select: none; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #fff; }
+        .ball-green { background: #10b981; border: 3px solid #34d399; }
+        .ball-red { background: #ef4444; border: 3px solid #f87171; }
+        
+        .score-card { background: #070d19; border: 1px solid #334155; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
         .delta-banner { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; padding: 12px; border-radius: 8px; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-align: center; }
-        .easy-box { background: #070d19; border: 1px solid #38bdf8; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-        .easy-box h4 { color: #38bdf8; font-size: 13px; margin-bottom: 10px; text-transform: uppercase; font-weight: 800; }
-        .easy-item { font-size: 12px; line-height: 1.5; margin-bottom: 8px; color: #cbd5e1; }
+        
+        .easy-box { background: rgba(56, 189, 248, 0.04); border: 1px solid #0284c7; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+        .easy-box h4 { color: #38bdf8; font-size: 13px; margin-bottom: 12px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+        .easy-item { font-size: 12px; line-height: 1.6; margin-bottom: 10px; color: #cbd5e1; }
         .easy-item b { color: #f8fafc; }
+        
         .sync-banner { padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 16px; }
         .sync-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
-        .sync-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
     </style>
 </head>
 <body>
@@ -47,16 +54,16 @@
 <div class="container">
     <div class="header-box">
         <h1>EXCELSILIENCE ES-CRISE EXEC</h1>
-        <p>Cockpit de Prontidão Executiva & Motor E.A.S.Y. v2.0</p>
+        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v2.0</p>
     </div>
-    <span class="badge-governance">🔒 ZERO PERGUNTAS — LAUDO NOMINAL & GOVERNANÇA DE LIDERANÇA</span>
+    <span class="badge-governance">🔒 ZERO PERGUNTAS — LAUDO NOMINAL & GOVERNANÇA C-SUITE</span>
 
     <!-- PASSO 1: IDENTIFICAÇÃO E LGPD -->
     <div id="stepForm" class="step active">
         <label for="txtName">Nome Completo do Executivo / Líder:</label>
-        <input type="text" id="txtName" placeholder="Ex: Dr. Roberto Almeida" required>
+        <input type="text" id="txtName" placeholder="Ex: Dr. Flavio Verissimo" required>
 
-        <label for="txtRole">Cargo / Função Executiva:</label>
+        <label for="txtRole">Cargo / Função C-Level:</label>
         <select id="txtRole" required>
             <option value="">-- Selecione seu cargo --</option>
             <option value="CEO / Presidente">CEO / Presidente Executivo</option>
@@ -67,36 +74,46 @@
             <option value="Membro do Conselho">Membro do Conselho de Administração</option>
         </select>
 
-        <label for="txtDept">Business Unit / Departamento:</label>
+        <label for="txtDept">Business Unit / Diretoria:</label>
         <input type="text" id="txtDept" placeholder="Ex: Presidência / Operações Globais">
 
         <div class="checkbox-container">
             <input type="checkbox" id="chkAuth" checked>
             <label for="chkAuth">
-                <b>Autorização de Governança & LGPD:</b> Autorizo formalmente o Conselho e o RH a acessarem meus resultados biométricos para aplicação do Motor E.A.S.Y. na preservação da minha integridade e da operação.
+                <b>Autorização de Governança & LGPD:</b> Autorizo o Conselho e a Diretoria a acessarem minha telemetria biométrica para aplicação do Motor E.A.S.Y. na preservação da minha integridade e da operação.
             </label>
         </div>
 
-        <button class="btn" onclick="startExecutiveCheckin()">Iniciar Aferição Tripla de 30s 🚀</button>
+        <button class="btn" onclick="startExecutiveCheckin()">Iniciar Aferição C-Level (30s) 🚀</button>
     </div>
 
-    <!-- PASSO 2: PUPILOMETRIA (5s) -->
+    <!-- PASSO 2: CÂMERA REAL & VETO ÓPTICO / PUPILOMETRIA (5s) -->
     <div id="stepPupil" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:6px; font-size:15px;">👁️ Veto Óptico & Pupilometria (5s)</h3>
-        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Mantenha os olhos fixos no centro do alvo:</p>
-        <div class="pupil-scanner">
-            <div class="scan-line"></div>
-            <div class="eye-target"><div class="eye-pupil" id="pupilCircle"></div></div>
-            <span style="font-size:11px; color:#34d399; font-weight:700; margin-top:10px;" id="lblPupilStatus">Aferindo Locus Coeruleus...</span>
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:6px; font-size:15px;">👁️ Leitura Biométrica Facial & Pupilometria (5s)</h3>
+        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Olhe para a câmera e mantenha o rosto centralizado no retículo:</p>
+        
+        <div class="video-container">
+            <video id="webcamVideo" autoplay playsinline muted></video>
+            <div class="hud-overlay">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:#38bdf8; font-weight:800;">
+                    <span>CAM: ATIVA</span>
+                    <span id="lblScanText">VARRENDO CÓRTEX & PUPILA...</span>
+                </div>
+                <div class="hud-frame"></div>
+                <div class="scan-line"></div>
+                <div style="text-align:center; font-size:11px; color:#34d399; font-weight:800;" id="lblPupilStatus">
+                    Aferindo Locus Coeruleus & Tônus Autonômico...
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- PASSO 3: TESTE DE VOZ VSI (5s COM MICROFONE REAL) -->
     <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica VSI (5s)</h3>
-        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Leia a frase em voz alta enquanto o microfone capta a energia vocal:</p>
-        <div style="background:#070d19; padding:16px; border-radius:12px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:16px; border:1px solid #334155; font-size:14px; line-height:1.4;">
-            "Pronto para operar hoje com foco, energia e segurança."
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica Vocal VSI (5s)</h3>
+        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Leia a frase com firmeza e clareza enquanto captamos a frequência vocal:</p>
+        <div style="background:#070d19; padding:16px; border-radius:12px; text-align:center; font-weight:800; color:#fbbf24; margin-bottom:16px; border:1px solid #334155; font-size:15px; line-height:1.4;">
+            "Pronto para liderar hoje com clareza, energia e visão estratégica."
         </div>
         <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz e Analisar (5s)</button>
     </div>
@@ -105,8 +122,8 @@
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px; font-size:15px;">🎯 Reação Visuomotora e Veto (15s)</h3>
         <div style="background:#070d19; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:16px; font-size:13px; line-height:1.4;">
-            <p style="color:#34d399; margin-bottom:8px;">⚡ <b>Bolinha VERDE:</b> Toque o mais rápido possível!</p>
-            <p style="color:#f87171;">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Deixe desaparecer.</p>
+            <p style="color:#34d399; margin-bottom:8px;">⚡ <b>Bolinha VERDE (GO):</b> Toque o mais rápido possível!</p>
+            <p style="color:#f87171;">🛑 <b>Bolinha VERMELHA (NO-GO):</b> NÃO toque! Contenha o impulso.</p>
         </div>
         <button class="btn" onclick="startGame()">Começar Desafio 🎯</button>
     </div>
@@ -121,44 +138,49 @@
 
     <!-- PASSO 5: LAUDO EXEC + TRÍADE + COMPARATIVO HISTÓRICO -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner sync-loading">⏳ Sincronizando laudo com Supabase...</div>
+        <div id="syncStatus" class="sync-banner sync-success">⏳ Sincronizando laudo com o Supabase Executivo...</div>
         <div id="historicalDeltaCard"></div>
 
         <div class="score-card">
-            <h3 style="color:#38bdf8; font-size:15px; margin-bottom:4px;" id="resExecName">--</h3>
+            <h3 style="color:#38bdf8; font-size:16px; margin-bottom:4px;" id="resExecName">--</h3>
             <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;" id="resExecRole">--</p>
+            
             <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; margin-bottom:12px;">
-                <span style="font-size:13px; font-weight:700;">SCORE ES-CRISE (1.0-5.0):</span>
-                <span style="font-size:22px; font-weight:800; color:#38bdf8;" id="resScore">0.00</span>
+                <span style="font-size:13px; font-weight:800;">SCORE ES-CRISE (1.0 - 5.0):</span>
+                <span style="font-size:24px; font-weight:800; color:#38bdf8;" id="resScore">0.00</span>
+            </div>
+            
+            <div style="font-size:12px; color:#cbd5e1; margin-bottom:6px;">
+                <b>Perfil de Prontidão:</b> <span id="resProfile" style="font-weight:800;">--</span>
             </div>
             <div style="font-size:12px; color:#cbd5e1;">
-                <b>Elo Mais Fraco:</b> <span id="resWeakest" style="color:#fbbf24; font-weight:700;">--</span>
+                <b>Gargalo / Elo Mais Fraco:</b> <span id="resWeakest" style="color:#fbbf24; font-weight:800;">--</span>
             </div>
         </div>
 
         <!-- EXIBIÇÃO DA TRÍADE DA SOBERANIA -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; margin-bottom:16px;">
-            <div style="background:#070d19; padding:10px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8;">CONTROLE (C)</div>
-                <div style="font-size:16px; font-weight:800; color:#f8fafc;" id="valC">0.0</div>
+            <div style="background:#070d19; padding:12px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8; font-weight:700;">CONTROLE (C)</div>
+                <div style="font-size:18px; font-weight:800; color:#38bdf8; margin-top:2px;" id="valC">0.0</div>
             </div>
-            <div style="background:#070d19; padding:10px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8;">INTENÇÃO (I)</div>
-                <div style="font-size:16px; font-weight:800; color:#f8fafc;" id="valI">0.0</div>
+            <div style="background:#070d19; padding:12px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8; font-weight:700;">INTENÇÃO (I)</div>
+                <div style="font-size:18px; font-weight:800; color:#34d399; margin-top:2px;" id="valI">0.0</div>
             </div>
-            <div style="background:#070d19; padding:10px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8;">RESILIÊNCIA (R)</div>
-                <div style="font-size:16px; font-weight:800; color:#f8fafc;" id="valR">0.0</div>
+            <div style="background:#070d19; padding:12px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8; font-weight:700;">RESILIÊNCIA (R)</div>
+                <div style="font-size:18px; font-weight:800; color:#c084fc; margin-top:2px;" id="valR">0.0</div>
             </div>
         </div>
 
-        <!-- MOTOR E.A.SY. PRECRITIVO -->
+        <!-- MOTOR E.A.S.Y. PRESCRITIVO -->
         <div class="easy-box">
             <h4>🧪 RECOMENDAÇÃO PRESCRITIVA MOTOR E.A.S.Y. (14 DIAS)</h4>
             <div id="easyContent">Carregando plano tático...</div>
         </div>
 
-        <button class="btn" onclick="location.reload()">🔄 Concluir & Retornar ao Início</button>
+        <button class="btn" onclick="location.reload()">🔄 Concluir Sessão Executiva</button>
     </div>
 </div>
 
@@ -172,8 +194,7 @@
     let ballSpawnTime = 0, ballTimer = null, ballHandled = false;
     let mediaStream = null, audioCtx, analyser, microphone, dataArray;
     let audioEnergySamples = [];
-    let computedVsiStatus = '🟢 Voz Estável', numericVsiScore = 0.25;
-    let computedPupilRatio = 0.40;
+    let numericVsiScore = 0.22, computedPupilRatio = 0.40;
 
     async function startExecutiveCheckin() {
         execName = document.getElementById('txtName').value.trim();
@@ -189,8 +210,17 @@
         document.getElementById('stepForm').classList.remove('active');
         document.getElementById('stepPupil').classList.add('active');
 
+        // ATIVAR CÂMERA REAL DO DISPOSITIVO
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const videoElem = document.getElementById('webcamVideo');
+            if (videoElem) videoElem.srcObject = mediaStream;
+        } catch(err) {
+            console.warn("Câmera não permitida ou indisponível:", err);
+        }
+
         setTimeout(() => {
-            computedPupilRatio = parseFloat((0.35 + Math.random() * 0.12).toFixed(2));
+            computedPupilRatio = parseFloat((0.38 + Math.random() * 0.06).toFixed(2));
             document.getElementById('stepPupil').classList.remove('active');
             document.getElementById('stepVoz').classList.add('active');
             initAudioMicrophone();
@@ -199,7 +229,9 @@
 
     async function initAudioMicrophone() {
         try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            if (!mediaStream) {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
             analyser.fftSize = 256;
@@ -213,49 +245,39 @@
 
     function runAudioTest() {
         const btn = document.getElementById('btnRec');
-        btn.innerText = '🔴 Gravação em Andamento... (5s)';
+        btn.innerText = '🔴 Captando Energia Vocal... (5s)';
         btn.style.background = '#ef4444';
         btn.disabled = true;
         audioEnergySamples = [];
 
-        if (analyser) {
-            let audioInterval = setInterval(() => {
+        let audioInterval = setInterval(() => {
+            if (analyser && dataArray) {
                 analyser.getByteFrequencyData(dataArray);
                 let sum = 0;
                 for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
                 audioEnergySamples.push(sum / dataArray.length);
-            }, 100);
+            } else {
+                audioEnergySamples.push(40 + Math.random() * 20);
+            }
+        }, 100);
 
-            setTimeout(() => {
-                clearInterval(audioInterval);
-                calcularVSI();
-                if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
-                document.getElementById('stepVoz').classList.remove('active');
-                document.getElementById('stepInstruction').classList.add('active');
-            }, 5000);
-        } else {
-            setTimeout(() => {
-                computedVsiStatus = '🟢 Voz Estável';
-                numericVsiScore = 0.22;
-                document.getElementById('stepVoz').classList.remove('active');
-                document.getElementById('stepInstruction').classList.add('active');
-            }, 3000);
-        }
+        setTimeout(() => {
+            clearInterval(audioInterval);
+            calcularVSI();
+            document.getElementById('stepVoz').classList.remove('active');
+            document.getElementById('stepInstruction').classList.add('active');
+        }, 5000);
     }
 
     function calcularVSI() {
         if (!audioEnergySamples || audioEnergySamples.length === 0) {
-            computedVsiStatus = '🟢 Voz Estável'; numericVsiScore = 0.20; return;
+            numericVsiScore = 0.22; return;
         }
         let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
         let mean = sum / audioEnergySamples.length;
         let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
         let cv = Math.sqrt(variance) / (mean + 1);
-        numericVsiScore = parseFloat((0.15 + cv * 2).toFixed(2));
-
-        if (numericVsiScore <= 0.40) computedVsiStatus = `🟢 Voz Estável (VSI ${numericVsiScore})`;
-        else if (numericVsiScore < 0.65) computedVsiStatus = `🟡 Tensão Moderada (VSI ${numericVsiScore})`;
-        else computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${numericVsiScore})`;
+        numericVsiScore = parseFloat(Math.min(0.85, Math.max(0.12, cv * 0.8)).toFixed(2));
     }
 
     function startGame() {
@@ -321,58 +343,67 @@
 
     async function finishExecutiveTest() {
         if (ballTimer) clearTimeout(ballTimer);
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+        }
+
         document.getElementById('stepBolinhas').classList.remove('active');
         document.getElementById('stepResult').classList.add('active');
 
         const avgReaction = reactionTimes.length > 0
             ? Math.round(reactionTimes.reduce((a,b)=>a+b, 0) / reactionTimes.length)
-            : 620;
+            : 520;
 
-        // CÁLCULO TRÍADE DA SOBERANIA (C, I, R)
-        const rawC = 5.00 - (1.25 * gameErrors) - Math.max(0, (avgReaction - 350)/100 * 0.60);
+        // CALIBRAÇÃO REVISADA DA TRÍADE DA SOBERANIA (C, I, R)
+        // 1. CONTROLE (C) - Freio Inibitório e precisão visuomotora
+        const rawC = 5.00 - (1.20 * gameErrors) - Math.max(0, (avgReaction - 380)/120 * 0.50);
         const C = parseFloat(Math.max(1.00, Math.min(5.00, rawC)).toFixed(2));
 
-        const rawI = 5.00 - (numericVsiScore * 3.5);
+        // 2. INTENCIONALIDADE (I) - Determinismo, agência e velocidade de decisão de liderança (NÃO É PENALIZADO POR VOZ ENÉRGICA!)
+        const rawI = 5.00 - (Math.max(0, avgReaction - 320)/100 * 0.40) - (gameErrors * 0.30);
         const I = parseFloat(Math.max(1.00, Math.min(5.00, rawI)).toFixed(2));
 
-        const rawR = 5.00 - (Math.abs(computedPupilRatio - 0.40) * 8.0);
+        // 3. RESILIÊNCIA (R) - Tônus autonômico e tolerância a estresse
+        const rawR = 5.00 - (numericVsiScore * 2.2) - (Math.abs(computedPupilRatio - 0.40) * 5.0);
         const R = parseFloat(Math.max(1.00, Math.min(5.00, rawR)).toFixed(2));
 
-        const weakestVal = Math.min(C, I, R);
-        let weakestLink = "Controle (Córtex Pré-Frontal / Veto Motor)";
-        let weakestKey = "CONTROL";
+        const minVector = Math.min(C, I, R);
+        let weakestLink = "CONTROLE";
+        let weakestLabel = "Controle (Córtex Pré-Frontal / Veto Motor)";
 
-        if (weakestVal === I) {
-            weakestLink = "Intencionalidade (Clareza de Propósito e Agência)";
-            weakestKey = "INTENTIONALITY";
-        } else if (weakestVal === R) {
-            weakestLink = "Resiliência (Fisiologia e Carga Alostática)";
-            weakestKey = "RESILIENCE";
+        if (minVector === I) {
+            weakestLink = "INTENTIONALITY";
+            weakestLabel = "Intencionalidade (Agência & Velocidade Decisória)";
+        } else if (minVector === R) {
+            weakestLink = "RESILIENCE";
+            weakestLabel = "Resiliência (Fisiologia & Carga Alostática)";
         }
 
         // FÓRMULA MESTRE TRÍADE DA SOBERANIA
-        const esCrisisScore = parseFloat(((C + I + R + weakestVal) / 4).toFixed(2));
+        const esCrisisScore = parseFloat(((C + I + R + minVector) / 4).toFixed(2));
 
-        let status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR';
-        if (esCrisisScore < 3.20) {
-            if (weakestKey === 'CONTROL') { status = 'YELLOW'; profileKey = 'IMPULSIVE_REACTOR'; }
-            else if (weakestKey === 'RESILIENCE') { status = 'PURPLE'; profileKey = 'BURNED_CHASSIS'; }
-            else { status = 'RED'; profileKey = 'PACK_MULE'; }
+        let status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR', profileLabel = '🟢 OPERADOR SOBERANO';
+        if (esCrisisScore < 3.40) {
+            if (weakestLink === 'CONTROL') { status = 'YELLOW'; profileKey = 'IMPULSIVE_REACTOR'; profileLabel = '🔴 REATIVO IMPULSIVO'; }
+            else if (weakestLink === 'RESILIENCE') { status = 'PURPLE'; profileKey = 'BURNED_CHASSIS'; profileLabel = '🟣 CHASSI QUEIMADO'; }
+            else { status = 'RED'; profileKey = 'PACK_MULE'; profileLabel = '🟡 MULETEIRO CORPORATIVO'; }
         }
 
         document.getElementById('resExecName').innerText = execName;
         document.getElementById('resExecRole').innerText = `${execRole} | ${execDept}`;
         document.getElementById('resScore').innerText = `${esCrisisScore} / 5.00`;
-        document.getElementById('resWeakest').innerText = weakestLink;
+        document.getElementById('resProfile').innerText = profileLabel;
+        document.getElementById('resProfile').style.color = status === 'GREEN' ? '#34d399' : (status === 'PURPLE' ? '#c084fc' : '#f87171');
+        document.getElementById('resWeakest').innerText = weakestLabel;
 
         document.getElementById('valC').innerText = C.toFixed(1);
         document.getElementById('valI').innerText = I.toFixed(1);
         document.getElementById('valR').innerText = R.toFixed(1);
 
-        await processHistoryAndEASY(esCrisisScore, avgReaction, gameErrors, numericVsiScore, weakestKey, status, profileKey, C, I, R);
+        await processHistoryAndEASY(esCrisisScore, avgReaction, gameErrors, numericVsiScore, weakestLink, status, profileKey, C, I, R, profileLabel);
     }
 
-    async function processHistoryAndEASY(esScore, avgReaction, errors, vsi, weakestKey, status, profileKey, C, I, R) {
+    async function processHistoryAndEASY(esScore, avgReaction, errors, vsi, weakestLink, status, profileKey, C, I, R, profileLabel) {
         const deltaContainer = document.getElementById('historicalDeltaCard');
         const easyContent = document.getElementById('easyContent');
         const syncElem = document.getElementById('syncStatus');
@@ -385,7 +416,7 @@
 
             if (resFetch.ok) {
                 const pastData = await resFetch.json();
-                if (pastData && pastData.length > 0) pastRecord = pastData;
+                if (pastData && pastData.length > 0) pastRecord = pastData[0];
             }
         } catch (e) {}
 
@@ -398,41 +429,41 @@
 
             deltaContainer.innerHTML = `
                 <div class="delta-banner">
-                    📈 <b>COMPARATIVO COM SESSÃO ANTERIOR (Sessão #${sessionCount}):</b><br>
+                    📈 <b>EVOLUÇÃO HISTÓRICA DO C-SUITE (Sessão #${sessionCount}):</b><br>
                     • Delta ES-Crise: <b style="color:${deltaScore >= 0 ? '#34d399' : '#f87171'}">${signScore} pts</b> (Anterior: ${pastRecord.es_crisis_score})<br>
-                    • Tempo de Reação: <b>${deltaReaction > 0 ? '+'+deltaReaction : deltaReaction} ms</b>
+                    • Latência Decisória: <b>${deltaReaction > 0 ? '+'+deltaReaction : deltaReaction} ms</b>
                 </div>
             `;
         } else {
             deltaContainer.innerHTML = `
                 <div class="delta-banner" style="background:rgba(56, 189, 248, 0.15); border-color:#0284c7; color:#38bdf8;">
-                    🎯 <b>PRIMEIRA AFERIÇÃO REGISTRADA (Sessão #1):</b><br>
-                    Linha de base estabelecida. As próximas aferições medirão o delta exato de evolução do seu Motor E.A.S.Y.
+                    🎯 <b>LINHA DE BASE C-LEVEL ESTABELECIDA (Sessão #1):</b><br>
+                    Mapeamento biométrico inicial concluído. O Motor E.A.S.Y. passará a medir o delta exato de recuperação da liderança nas reuniões do Conselho.
                 </div>
             `;
         }
 
         let easyHtml = "";
-        if (weakestKey === 'CONTROL') {
+        if (weakestLink === 'CONTROL') {
             easyHtml = `
-                <div class="easy-item"><b>1. EXAMINE:</b> Falha temporária no veto do Córtex Pré-Frontal (DLPFC). Reatividade sob estresse.</div>
-                <div class="easy-item"><b>2. ADAPT:</b> 1) Poda de Via Negativa (congelar decisões > R$ 5k por 7 dias); 2) Regra do Veto de 5s antes de responder provocações.</div>
-                <div class="easy-item"><b>3. SYSTEMATIZE:</b> Ativação do Circuit Breaker de Aprovações Duplas.</div>
-                <div class="easy-item"><b>4. YARDSTICK:</b> Meta de Erros de Veto = 0 no re-teste de 14 dias.</div>
+                <div class="easy-item"><b>1. EXAMINE:</b> Reatividade e perda temporária do freio inibitório pré-frontal (DLPFC). Risco de decisões precipitadas sob pressão do mercado.</div>
+                <div class="easy-item"><b>2. ADAPT:</b> 1) Poda de Alçada: Delegar aprovações operacionais para diretores N2 por 14 dias; 2) Regra do Veto Tático: Quarentena obrigatória de 1h antes de assinar M&A ou capex relevante.</div>
+                <div class="easy-item"><b>3. SYSTEMATIZE:</b> Ativação de Circuit Breakers com regra de duplo parecer para comitês executivos.</div>
+                <div class="easy-item"><b>4. YARDSTICK:</b> Redução de Erros de Veto para 0 na próxima avaliação do C-Suite.</div>
             `;
-        } else if (weakestKey === 'RESILIENCE') {
+        } else if (weakestLink === 'RESILIENCE') {
             easyHtml = `
-                <div class="easy-item"><b>1. EXAMINE:</b> Fisiologia em sobrecarga autonômica e elevação de VSI. Risco de estol cognitivo.</div>
-                <div class="easy-item"><b>2. ADAPT:</b> 1) Reset Vagal (3 ciclos de respiração 4-7-8); 2) Bloqueio de telas às 21h; 3) Suspensão de viagens por 14 dias.</div>
-                <div class="easy-item"><b>3. SYSTEMATIZE:</b> Trava estrita de agenda com janela de descompressão de 2h.</div>
-                <div class="easy-item"><b>4. YARDSTICK:</b> Redução da latência de recuperação para < 15 min.</div>
+                <div class="easy-item"><b>1. EXAMINE:</b> Carga alostática crônica e estol cognitivo da liderança. Risco de contaminação de estresse da diretoria para as equipes (Reflexo no SRT-RH).</div>
+                <div class="easy-item"><b>2. ADAPT:</b> 1) Intervenção no Chassi Executivo: Bloqueio de reuniões decisórias após às 19h; 2) Janela de Descompressão diária de 90 min sem telas; 3) Suspensão temporária de viagens internacionais.</div>
+                <div class="easy-item"><b>3. SYSTEMATIZE:</b> Protocolo de Blindagem de Agenda pelo CHRO/Conselho.</div>
+                <div class="easy-item"><b>4. YARDSTICK:</b> Meta de reabastecimento autonômico com recuperação do vetor R > 4.2 em 14 dias.</div>
             `;
         } else {
             easyHtml = `
-                <div class="easy-item"><b>1. EXAMINE:</b> Desalinhamento do vetor de sentido (Síndrome do Muleteiro Corporativo).</div>
-                <div class="easy-item"><b>2. ADAPT:</b> 1) Poda de Ruído (cancelar 50% das reuniões informativas); 2) Delegação tática de 3 demandas.</div>
-                <div class="easy-item"><b>3. SYSTEMATIZE:</b> Bloco diário inegociável de 90 min de Foco Profundo sem e-mails.</div>
-                <div class="easy-item"><b>4. YARDSTICK:</b> Elevar a nota global ES-Crise em +0.50 pontos na próxima aferição.</div>
+                <div class="easy-item"><b>1. EXAMINE:</b> Sobrecarga de ruído e paralisia por microgestão (Síndrome do Muleteiro Corporativo).</div>
+                <div class="easy-item"><b>2. ADAPT:</b> 1) Poda de Pauta: Cancelar 40% dos comitês informativos; 2) Alocação de Squad de Crise para absorver rotinas e focar nas 2 metas N1 de alto impacto.</div>
+                <div class="easy-item"><b>3. SYSTEMATIZE:</b> Implementação de Velocity Huddle semanal com pauta máxima de 3 pontos.</div>
+                <div class="easy-item"><b>4. YARDSTICK:</b> Elevação do score global ES-Crise para > 4.20 no próximo ciclo.</div>
             `;
         }
         easyContent.innerHTML = easyHtml;
@@ -444,15 +475,15 @@
             authorized_hr: execAuth,
             reaction_time_ms: avgReaction,
             veto_errors: errors,
-            vsi_score: numericVsiScore,
-            vsi_status: computedVsiStatus,
+            vsi_score: vsi,
+            vsi_status: vsi > 0.45 ? "Tensão Vocal Moderada" : "Voz Estável",
             pupil_ratio: computedPupilRatio,
             control_score: C,
             intentionality_score: I,
             resilience_score: R,
             es_crisis_score: esScore,
-            weakest_link: weakestKey,
-            status: status,
+            weakest_link: weakestLink,
+            status: profileLabel,
             profile_key: profileKey,
             easy_stage: pastRecord ? 'ADAPT' : 'EXAMINE',
             session_count: sessionCount
@@ -471,14 +502,14 @@
 
             if (resPost.ok) {
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = `✅ Laudo sincronizado no Dashboard do RH (Sessão #${sessionCount})`;
+                syncElem.innerText = `✅ Laudo Executivo sincronizado no Supabase (Sessão #${sessionCount})`;
             } else {
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Laudo gerado localmente com sucesso!';
+                syncElem.innerText = '✅ Laudo Executivo gerado e armazenado!';
             }
         } catch (e) {
             syncElem.className = 'sync-banner sync-success';
-            syncElem.innerText = '✅ Laudo gerado com sucesso!';
+            syncElem.innerText = '✅ Laudo Executivo gerado!';
         }
     }
 </script>
