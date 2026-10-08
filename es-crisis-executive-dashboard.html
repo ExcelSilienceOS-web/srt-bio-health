@@ -1,213 +1,215 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ExcelSilience ES-Crise | Painel de Governança Executiva & Loop E.A.S.Y.</title>
-  <style>
-    :root {
-      --bg: #070d19;
-      --card: #0f172a;
-      --card-inner: #1e293b;
-      --border: #334155;
-      --accent: #38bdf8;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --green: #10b981;
-      --yellow: #f59e0b;
-      --purple: #a855f7;
-      --red: #ef4444;
-    }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 24px; }
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
-    h1 { font-size: 22px; color: #fff; margin: 0; }
-    .subtitle { color: var(--muted); font-size: 12px; margin-top: 4px; }
-    
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-    .card h3 { font-size: 15px; color: var(--accent); margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: var(--card-inner); color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 11px; }
-    
-    .badge { padding: 4px 10px; border-radius: 12px; font-weight: 800; font-size: 11px; display: inline-block; }
-    .badge-green { background: rgba(16,185,129,0.2); color: var(--green); border: 1px solid var(--green); }
-    .badge-yellow { background: rgba(245,158,11,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
-    .badge-purple { background: rgba(168,85,247,0.2); color: var(--purple); border: 1px solid var(--purple); }
-    .badge-red { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid var(--red); }
-
-    .easy-tag { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-    button { padding: 10px 16px; border-radius: 8px; border: none; background: #0284c7; color: #fff; font-weight: 800; cursor: pointer; transition: 0.2s; }
-    button:hover { background: #0369a1; }
-    
-    .action-box { background: var(--card-inner); border-left: 4px solid var(--accent); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; line-height: 1.5; }
-    .action-box b { color: #fff; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES-Crise Executivo — Dashboard de Governança C-Level & Conselho</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #070a12; color: #e2e8f0; padding: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
+        .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
+        .live-badge { background: rgba(56, 189, 248, 0.1); border: 1px solid #0284c7; color: #38bdf8; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .card-metric { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 18px; }
+        .card-metric .label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 8px; }
+        .card-metric .value { font-size: 26px; font-weight: 800; }
+        .panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; overflow-x: auto; margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 950px; }
+        th { background: #1e293b; color: #38bdf8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; border-bottom: 1px solid #334155; }
+        td { padding: 12px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
+        .badge-profile { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
+        .b-sovereign { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid #10b981; }
+        .b-reactive { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid #ef4444; }
+        .b-chassis { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid #a855f7; }
+        .b-mule { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
+        .action-box { background: #1e293b; border-left: 4px solid #38bdf8; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; line-height: 1.5; color: #cbd5e1; }
+        .action-box b { color: #f8fafc; }
+    </style>
 </head>
 <body>
 
 <div class="header">
-  <div>
-    <h1>🏛️ ExcelSilience ES-Crise | Painel de Governança Executiva & Loop E.A.S.Y.</h1>
-    <div class="subtitle">Ações Táticas de Alta Velocidade & Acompanhamento de Evolução da C-Suite (Sem Guesswork)</div>
-  </div>
-  <button onclick="loadExecutiveData()">🔄 Atualizar Dados</button>
+    <div class="title-group">
+        <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL</h1>
+        <p>Telemetria Biométrica de Alta Performance, Risco de Estafa & Motor E.A.S.Y. (Zero Perguntas)</p>
+    </div>
+    <div class="live-badge">⚡ PAINEL C-SUITE / BOARD ATIVO</div>
 </div>
 
 <!-- CARDS RESUMO -->
-<div class="grid">
-  <div class="card">
-    <h3>📊 Índice Geral de Prontidão da Liderança</h3>
-    <div style="font-size: 28px; font-weight: 800; color: var(--accent);" id="lblAvgScore">0.00 / 5.00</div>
-    <div style="font-size: 12px; color: var(--muted); margin-top: 6px;" id="lblAvgStatus">Carregando média do conselho...</div>
-  </div>
-
-  <div class="card">
-    <h3>🛡️ Autorização do RH / Governança</h3>
-    <div style="font-size: 20px; font-weight: 800; color: var(--green);" id="lblAuthCount">100% Autorizado</div>
-    <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">Executivos com termo LGPD assinado para intervenção imediata</div>
-  </div>
-
-  <div class="card">
-    <h3>🔄 Estágio do Loop E.A.S.Y.</h3>
-    <div style="font-size: 20px; font-weight: 800; color: #38bdf8;" id="lblEasyLoopStatus">Motor Ativo (Ciclo de 14 Dias)</div>
-    <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">Evolução de deltas e re-testes automáticos ativos</div>
-  </div>
-</div>
-
-<!-- TABELA DE LAUDOS INDIVIDUAIS E COMPARATIVO HISTÓRICO -->
-<div class="card" style="margin-bottom:24px;">
-  <h3>🧪 Histórico de Sessões Executivas & Evolução do Loop E.A.S.Y.</h3>
-  <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
-    Abaixo estão listados os laudos autorizados nominativamente pela C-Suite. Cada novo teste compara automaticamente os deltas biológicos para avaliar a eficácia do tratamento tático sem necessidade de anos de terapia passiva:
-  </p>
-  <table>
-    <thead>
-      <tr>
-        <th>Executivo / Cargo</th>
-        <th>Unidade / Depto</th>
-        <th>Sessão</th>
-        <th>Score ES-Crise</th>
-        <th>Elo Mais Fraco</th>
-        <th>Tempo Reação / Veto</th>
-        <th>Evolução (Delta)</th>
-        <th>Status & Ação Recomendada</th>
-      </tr>
-    </thead>
-    <tbody id="tbodyExec">
-      <tr><td colspan="8" style="text-align:center; padding:20px; color:var(--muted);">Carregando dados dos executivos...</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- PAINEL DE INTERVENÇÕES RÁPIDAS (AÇÕES QUE O RH/CONSELHO DEVE EXECUTAR) -->
-<div class="card">
-  <h3>⚡ Central de Ações Táticas Recomendadas pelo Motor E.A.S.Y. (Ação Rápida)</h3>
-  <div id="interventionsList">
-    <div class="action-box">
-      <b>🔍 Aguardando dados de aferição...</b><br>
-      As recomendações táticas personalizadas para cada líder aparecerão aqui assim que as aferições forem concluídas.
+<div class="metrics-grid">
+    <div class="card-metric">
+        <div class="label">Sessões de Liderança</div>
+        <div class="value" style="color:#f8fafc;" id="mTotal">0</div>
     </div>
-  </div>
+    <div class="card-metric">
+        <div class="label">Média Score ES-Crise</div>
+        <div class="value" style="color:#38bdf8;" id="mScore">0.00</div>
+    </div>
+    <div class="card-metric">
+        <div class="label">🟢 Operadores Soberanos</div>
+        <div class="value" style="color:#34d399;" id="mSov">0</div>
+    </div>
+    <div class="card-metric">
+        <div class="label">🟣 Chassi Queimado (Exaustão)</div>
+        <div class="value" style="color:#c084fc;" id="mChassis">0</div>
+    </div>
+    <div class="card-metric">
+        <div class="label">🔴 Reativos Impulsivos</div>
+        <div class="value" style="color:#f87171;" id="mReact">0</div>
+    </div>
+</div>
+
+<!-- TABELA DE LAUDOS COM EVOLUÇÃO (DELTA) -->
+<div class="panel">
+    <div style="font-size:15px; font-weight:700; color:#f1f5f9; margin-bottom:16px;">
+        🧪 Histórico de Sessões Executivas & Evolução do Loop E.A.S.Y.
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Executivo / Cargo</th>
+                <th>Unidade / Depto</th>
+                <th>Sessão</th>
+                <th>Score ES-Crise</th>
+                <th>Elo Mais Fraco</th>
+                <th>Tempo Reação / Veto</th>
+                <th>Evolução (Delta)</th>
+                <th>Status & Perfil</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando dados do C-Suite...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- PAINEL DE INTERVENÇÕES TÁTICAS PARA O CONSELHO/RH -->
+<div class="panel">
+    <div style="font-size:15px; font-weight:700; color:#f1f5f9; margin-bottom:16px;">
+        ⚡ Central de Ações Táticas Recomendadas pelo Motor E.A.S.Y. (Para RH & Conselho)
+    </div>
+    <div id="interventionsList">
+        <div class="action-box">🔍 Aguardando dados de aferição...</div>
+    </div>
 </div>
 
 <script>
-  const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-  async function loadExecutiveData() {
-    const tbody = document.getElementById('tbodyExec');
-    const interventionsContainer = document.getElementById('interventionsList');
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--muted);">Carregando laudos e histórico...</td></tr>';
+    async function fetchExecData() {
+        const tbody = document.getElementById('tableBody');
+        const interventionsContainer = document.getElementById('interventionsList');
 
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      });
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
 
-      if (!res.ok) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--red);">Aguardando sincronização de dados ou tabela. Faça um teste pelo celular para visualizar aqui!</td></tr>';
-        return;
-      }
-
-      const data = await res.json();
-      if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--muted);">Nenhum laudo executivo encontrado. Realize o teste no aplicativo para visualizar o histórico aqui.</td></tr>';
-        return;
-      }
-
-      const execMap = {};
-      data.forEach(row => {
-        if (!execMap[row.name]) execMap[row.name] = [];
-        execMap[row.name].push(row);
-      });
-
-      tbody.innerHTML = '';
-      interventionsContainer.innerHTML = '';
-      let totalScores = 0;
-
-      data.forEach((row) => {
-        totalScores += row.es_crisis_score;
-        const userHistory = execMap[row.name];
-        
-        let deltaHtml = '<span style="color:var(--muted)">Linha de Base</span>';
-        const currentIndexInUserHistory = userHistory.findIndex(r => r.id === row.id);
-        
-        if (currentIndexInUserHistory < userHistory.length - 1) {
-          const previousRow = userHistory[currentIndexInUserHistory + 1];
-          const diffScore = (row.es_crisis_score - previousRow.es_crisis_score).toFixed(2);
-          const diffReaction = row.reaction_time_ms - previousRow.reaction_time_ms;
-          
-          if (diffScore >= 0) {
-            deltaHtml = `<b style="color:var(--green)">+${diffScore} pts</b> <br><small style="color:var(--muted); font-size:10px;">Reação: ${diffReaction}ms</small>`;
-          } else {
-            deltaHtml = `<b style="color:var(--red);">${diffScore} pts</b> <br><small style="color:var(--muted); font-size:10px;">Reação: +${diffReaction}ms</small>`;
-          }
+            if (res.ok) {
+                const data = await res.json() || [];
+                renderExecData(data);
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro executivo encontrado no Supabase.</td></tr>';
+            }
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#f87171;">Erro de conexão com o banco de dados.</td></tr>';
         }
-
-        const badgeClass = row.status === 'GREEN' ? 'badge-green' : row.status === 'YELLOW' ? 'badge-yellow' : row.status === 'PURPLE' ? 'badge-purple' : 'badge-red';
-        const statusLabel = row.status === 'GREEN' ? '🟢 Soberano' : row.status === 'YELLOW' ? '🟡 Impulsivo' : row.status === 'PURPLE' ? '🟣 Exaustão' : '🔴 Carga Crítica';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><b>${row.name}</b><br><small style="color:var(--muted)">${row.role}</small></td>
-          <td>${row.department}</td>
-          <td><span class="easy-tag">Sessão #${row.session_count || 1}</span></td>
-          <td><b style="font-size:15px; color:var(--accent);">${row.es_crisis_score.toFixed(2)}</b> / 5.00</td>
-          <td><span style="color:var(--yellow); font-weight:700;">${row.weakest_link}</span></td>
-          <td>${row.reaction_time_ms} ms / ${row.veto_errors} erros</td>
-          <td>${deltaHtml}</td>
-          <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
-        `;
-        tbody.appendChild(tr);
-
-        const actionBox = document.createElement('div');
-        actionBox.className = 'action-box';
-        
-        let actionText = "";
-        if (row.weakest_link === 'CONTROL') {
-          actionText = `<b>Ação RH/Conselho para ${row.name} (${row.role}):</b> Autorizar remoção de aprovações manuais &lt; R$ 5.000 por 7 dias. Aplicar trava de reuniões decisórias pós-estresse (Regra das 2h).`;
-        } else if (row.weakest_link === 'RESILIENCE') {
-          actionText = `<b>Ação RH/Conselho para ${row.name} (${row.role}):</b> Intervenção de chassi: cancelar reuniões de quinta/sexta. Pausa tática diária obrigatória de 20 min sem telas.`;
-        } else {
-          actionText = `<b>Ação RH/Conselho para ${row.name} (${row.role}):</b> Redefinição de agência tática: delegar 3 rotinas operacionais e isolar a meta N1 de alto impacto para os próximos 14 dias.`;
-        }
-
-        actionBox.innerHTML = actionText;
-        interventionsContainer.appendChild(actionBox);
-      });
-
-      const avgScore = (totalScores / data.length).toFixed(2);
-      document.getElementById('lblAvgScore').innerText = `${avgScore} / 5.00`;
-      document.getElementById('lblAvgStatus').innerText = `${data.length} laudos executivos analisados no sistema`;
-
-    } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--red);">Erro ao carregar dados: ${e.message}</td></tr>`;
     }
-  }
 
-  window.onload = loadExecutiveData;
+    function renderExecData(records) {
+        let total = records.length;
+        let sumScore = 0, countSov = 0, countChassis = 0, countReact = 0;
+
+        const execMap = {};
+        records.forEach(r => {
+            if (!execMap[r.name]) execMap[r.name] = [];
+            execMap[r.name].push(r);
+
+            const sc = parseFloat(r.es_crisis_score || 0);
+            sumScore += sc;
+            const pk = (r.profile_key || '').toUpperCase();
+            if (pk.includes('SOVEREIGN')) countSov++;
+            else if (pk.includes('BURNED') || pk.includes('CHASSIS')) countChassis++;
+            else if (pk.includes('IMPULSIVE') || pk.includes('REACT')) countReact++;
+        });
+
+        document.getElementById('mTotal').innerText = total;
+        document.getElementById('mScore').innerText = total > 0 ? (sumScore / total).toFixed(2) : '0.00';
+        document.getElementById('mSov').innerText = countSov;
+        document.getElementById('mChassis').innerText = countChassis;
+        document.getElementById('mReact').innerText = countReact;
+
+        const tbody = document.getElementById('tableBody');
+        const interventionsContainer = document.getElementById('interventionsList');
+        tbody.innerHTML = '';
+        interventionsContainer.innerHTML = '';
+
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro executivo encontrado.</td></tr>';
+            return;
+        }
+
+        records.forEach(r => {
+            const userHistory = execMap[r.name];
+            let deltaHtml = '<span style="color:#94a3b8">Linha de Base</span>';
+            const currentIndex = userHistory.findIndex(item => item.id === r.id);
+
+            if (currentIndex < userHistory.length - 1) {
+                const prev = userHistory[currentIndex + 1];
+                const diffScore = (r.es_crisis_score - prev.es_crisis_score).toFixed(2);
+                const diffReaction = r.reaction_time_ms - prev.reaction_time_ms;
+
+                if (diffScore >= 0) {
+                    deltaHtml = `<b style="color:#34d399">+${diffScore} pts</b> <br><small style="color:#94a3b8; font-size:10px;">Reação: ${diffReaction}ms</small>`;
+                } else {
+                    deltaHtml = `<b style="color:#f87171">${diffScore} pts</b> <br><small style="color:#94a3b8; font-size:10px;">Reação: +${diffReaction}ms</small>`;
+                }
+            }
+
+            const pk = (r.profile_key || '').toUpperCase();
+            let badgeClass = 'b-sovereign', label = r.status || '🟢 SOBERANO';
+            if (pk.includes('IMPULSIVE')) badgeClass = 'b-reactive';
+            else if (pk.includes('BURNED') || pk.includes('CHASSIS')) badgeClass = 'b-chassis';
+            else if (pk.includes('MULE')) badgeClass = 'b-mule';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:800; color:#38bdf8;">${r.name || 'Executivo'}<br><span style="font-size:11px; color:#64748b;">${r.role || 'C-Level'}</span></td>
+                <td style="color:#cbd5e1;">${r.department || 'Presidência'}</td>
+                <td><span style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid #0284c7; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:800;">Sessão #${r.session_count || 1}</span></td>
+                <td style="color:#38bdf8; font-weight:800; font-size:15px;">${r.es_crisis_score ? r.es_crisis_score.toFixed(2) : '0.00'}</td>
+                <td style="color:#fbbf24; font-weight:700;">${r.weakest_link || 'N/A'}</td>
+                <td style="font-size:12px;">${r.reaction_time_ms || 620} ms / ${r.veto_errors || 0} erros</td>
+                <td>${deltaHtml}</td>
+                <td><span class="badge-profile ${badgeClass}">${label}</span></td>
+            `;
+            tbody.appendChild(tr);
+
+            // Ação Tática
+            const actionBox = document.createElement('div');
+            actionBox.className = 'action-box';
+            let actionText = "";
+
+            if (r.weakest_link === 'CONTROL' || r.weakest_link === 'Controle (Córtex Pré-Frontal / Veto Motor)') {
+                actionText = `<b>Ação RH/Conselho para ${r.name} (${r.role}):</b> Autorizar remoção de aprovações manuais < R$ 5.000 por 7 dias. Trava de reuniões decisórias pós-estresse (Regra das 2h).`;
+            } else if (r.weakest_link === 'RESILIENCE' || r.weakest_link === 'Resiliência (Fisiologia e Carga Alostática)') {
+                actionText = `<b>Ação RH/Conselho para ${r.name} (${r.role}):</b> Intervenção de chassi: cancelar reuniões de quinta/sexta-feira. Pausa tática diária obrigatória de 20 min sem telas.`;
+            } else {
+                actionText = `<b>Ação RH/Conselho para ${r.name} (${r.role}):</b> Redefinição de agência tática: delegar 3 rotinas operacionais e isolar a meta N1 de alto impacto para os próximos 14 dias.`;
+            }
+            actionBox.innerHTML = actionText;
+            interventionsContainer.appendChild(actionBox);
+        });
+    }
+
+    window.onload = fetchExecData;
 </script>
+
 </body>
 </html>
