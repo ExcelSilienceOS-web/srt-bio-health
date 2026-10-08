@@ -2,52 +2,316 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v2.0</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #070a12; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; width: 100%; max-width: 580px; padding: 26px; box-shadow: 0 25px 50px rgba(0,0,0,0.85); }
-        .header-box { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; }
-        .header-box h1 { font-size: 22px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; }
-        .header-box p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-        .badge-governance { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); margin-bottom: 18px; }
+        
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background: #070a12;
+            color: #f8fafc;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 12px 8px;
+        }
+
+        .container {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            padding: 18px 14px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.85);
+            margin: auto 0;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 14px;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 10px;
+        }
+
+        .header-box h1 {
+            font-size: 18px;
+            color: #38bdf8;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .header-box p {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .badge-governance {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            display: block;
+            text-align: center;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            margin-bottom: 14px;
+        }
+
         .step { display: none; }
         .step.active { display: block; }
-        label { font-size: 11px; color: #38bdf8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
-        select, input[type="text"] { width: 100%; padding: 12px 14px; background: #070d19; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 14px; outline: none; }
+
+        label {
+            font-size: 10px;
+            color: #38bdf8;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            background: #070d19;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            margin-bottom: 10px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
         select:focus, input[type="text"]:focus { border-color: #38bdf8; }
-        .checkbox-container { display: flex; align-items: flex-start; gap: 10px; background: #070d19; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 18px; }
-        .checkbox-container input { margin-top: 3px; accent-color: #0284c7; width: 18px; height: 18px; cursor: pointer; }
-        .checkbox-container label { font-size: 11px; color: #cbd5e1; font-weight: 600; text-transform: none; line-height: 1.4; margin-bottom: 0; cursor: pointer; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; transition: 0.2s; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
-        .btn:hover { background: linear-gradient(135deg, #0369a1, #075985); }
-        
-        .video-container { width: 100%; height: 270px; background: #070d19; border: 2px solid #0284c7; border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; }
-        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .hud-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border: 1px solid rgba(56, 189, 248, 0.3); display: flex; flex-direction: column; justify-content: space-between; padding: 12px; }
-        .hud-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 165px; height: 165px; border: 2px dashed #38bdf8; border-radius: 50%; box-shadow: 0 0 25px rgba(56, 189, 248, 0.4); animation: pulseHud 2s infinite ease-in-out; }
-        @keyframes pulseHud { 0% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; } 50% { transform: translate(-50%, -50%) scale(1.03); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; } }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: #34d399; top: 0; animation: scan 2.5s infinite linear; }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: #070d19;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            margin-bottom: 14px;
+        }
+
+        .checkbox-container input {
+            margin-top: 2px;
+            accent-color: #0284c7;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-container label {
+            font-size: 10px;
+            color: #cbd5e1;
+            font-weight: 600;
+            text-transform: none;
+            line-height: 1.3;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            touch-action: manipulation;
+        }
+
+        .btn:hover, .btn:active { background: linear-gradient(135deg, #0369a1, #075985); }
+
+        .video-container {
+            width: 100%;
+            height: 200px;
+            max-height: 35vh;
+            background: #070d19;
+            border: 2px solid #0284c7;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+        }
+
+        .hud-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #38bdf8;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            animation: pulseHud 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseHud {
+            0% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.03); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; }
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #34d399;
+            top: 0;
+            animation: scan 2.5s infinite linear;
+        }
+
         @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
 
-        .game-box { width: 100%; height: 250px; background: #070d19; border: 2px dashed #334155; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 16px; }
-        .target-ball { width: 62px; height: 62px; border-radius: 50%; position: absolute; cursor: pointer; box-shadow: 0 0 18px rgba(255,255,255,0.4); user-select: none; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #fff; }
-        .ball-green { background: #10b981; border: 3px solid #34d399; }
-        .ball-red { background: #ef4444; border: 3px solid #f87171; }
-        
-        .score-card { background: #070d19; border: 1px solid #334155; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
-        .delta-banner { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; padding: 12px; border-radius: 8px; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-align: center; }
-        
-        .easy-box { background: rgba(56, 189, 248, 0.04); border: 1px solid #0284c7; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
-        .easy-box h4 { color: #38bdf8; font-size: 13px; margin-bottom: 12px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 8px; }
-        .easy-item { font-size: 12px; line-height: 1.6; margin-bottom: 12px; color: #cbd5e1; }
+        .game-box {
+            width: 100%;
+            height: 210px;
+            max-height: 38vh;
+            background: #070d19;
+            border: 2px dashed #334155;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 12px;
+            touch-action: none;
+        }
+
+        .target-ball {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(255,255,255,0.4);
+            user-select: none;
+            -webkit-user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 10px;
+            color: #fff;
+            touch-action: manipulation;
+        }
+
+        .ball-green { background: #10b981; border: 2.5px solid #34d399; }
+        .ball-red { background: #ef4444; border: 2.5px solid #f87171; }
+
+        .score-card {
+            background: #070d19;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .delta-banner {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #34d399;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .easy-box {
+            background: rgba(56, 189, 248, 0.04);
+            border: 1px solid #0284c7;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .easy-box h4 {
+            color: #38bdf8;
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            padding-bottom: 6px;
+        }
+
+        .easy-item {
+            font-size: 11px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+        }
+
         .easy-item b { color: #f8fafc; }
-        
-        .sync-banner { padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 16px; }
+
+        .sync-banner {
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
         .sync-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
-        .status-sovereign { color: #34d399; background: rgba(52, 211, 153, 0.15); border: 1px solid #10b981; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
-        .status-crisis { color: #f87171; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
+        .status-sovereign { color: #34d399; background: rgba(52, 211, 153, 0.15); border: 1px solid #10b981; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 11px; }
+        .status-crisis { color: #f87171; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 11px; }
+
+        @media (max-width: 480px) {
+            body { padding: 8px 4px; }
+            .container { padding: 14px 10px; border-radius: 12px; }
+            .header-box h1 { font-size: 16px; }
+            .video-container { height: 180px; }
+            .hud-frame { width: 100px; height: 100px; }
+            .game-box { height: 190px; }
+            .target-ball { width: 46px; height: 46px; font-size: 9px; }
+        }
     </style>
 </head>
 <body>
@@ -88,19 +352,19 @@
     </div>
 
     <div id="stepPupil" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:6px; font-size:15px;">👁️ Leitura Biométrica Facial & Pupilometria (5s)</h3>
-        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Olhe para a câmera e mantenha o rosto centralizado no retículo:</p>
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:4px; font-size:14px;">👁️ Leitura Biométrica Facial & Pupilometria (5s)</h3>
+        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Olhe para a câmera e mantenha o rosto centralizado no retículo:</p>
         
         <div class="video-container">
             <video id="webcamVideo" autoplay playsinline muted></video>
             <div class="hud-overlay">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#38bdf8; font-weight:800;">
+                <div style="display:flex; justify-content:space-between; font-size:9px; color:#38bdf8; font-weight:800;">
                     <span>CAM: ATIVA</span>
                     <span id="lblScanText">VARRENDO CÓRTEX & PUPILA...</span>
                 </div>
                 <div class="hud-frame"></div>
                 <div class="scan-line"></div>
-                <div style="text-align:center; font-size:11px; color:#34d399; font-weight:800;" id="lblPupilStatus">
+                <div style="text-align:center; font-size:10px; color:#34d399; font-weight:800;" id="lblPupilStatus">
                     Aferindo Locus Coeruleus & Tônus Autonômico...
                 </div>
             </div>
@@ -108,25 +372,25 @@
     </div>
 
     <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica Vocal VSI (5s)</h3>
-        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">Leia a frase com firmeza e clareza enquanto captamos a frequência vocal:</p>
-        <div style="background:#070d19; padding:16px; border-radius:12px; text-align:center; font-weight:800; color:#fbbf24; margin-bottom:16px; border:1px solid #334155; font-size:15px; line-height:1.4;">
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:6px; font-size:14px;">🎙️ Análise Bioacústica Vocal VSI (5s)</h3>
+        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Leia a frase com firmeza e clareza enquanto captamos a frequência vocal:</p>
+        <div style="background:#070d19; padding:14px; border-radius:10px; text-align:center; font-weight:800; color:#fbbf24; margin-bottom:12px; border:1px solid #334155; font-size:13px; line-height:1.4;">
             "Pronto para liderar hoje com clareza, energia e visão estratégica."
         </div>
         <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz e Analisar (5s)</button>
     </div>
 
     <div id="stepInstruction" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px; font-size:15px;">🎯 Reação Visuomotora e Veto (15s)</h3>
-        <div style="background:#070d19; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:16px; font-size:13px; line-height:1.4;">
-            <p style="color:#34d399; margin-bottom:8px;">⚡ <b>Bolinha VERDE (GO):</b> Toque o mais rápido possível!</p>
+        <h3 style="text-align:center; color:#38bdf8; margin-bottom:10px; font-size:14px;">🎯 Reação Visuomotora e Veto (15s)</h3>
+        <div style="background:#070d19; border:1px solid #334155; border-radius:10px; padding:12px; margin-bottom:12px; font-size:12px; line-height:1.4;">
+            <p style="color:#34d399; margin-bottom:6px;">⚡ <b>Bolinha VERDE (GO):</b> Toque o mais rápido possível!</p>
             <p style="color:#f87171;">🛑 <b>Bolinha VERMELHA (NO-GO):</b> NÃO toque! Contenha o impulso.</p>
         </div>
         <button class="btn" onclick="startGame()">Começar Desafio 🎯</button>
     </div>
 
     <div id="stepBolinhas" class="step">
-        <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-bottom:6px; font-weight:700;">
             <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
             <span>Erros de Veto: <b id="lblErrors" style="color:#ef4444;">0</b></span>
         </div>
@@ -138,34 +402,34 @@
         <div id="historicalDeltaCard"></div>
 
         <div class="score-card">
-            <h3 style="color:#38bdf8; font-size:16px; margin-bottom:4px;" id="resExecName">--</h3>
-            <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;" id="resExecRole">--</p>
+            <h3 style="color:#38bdf8; font-size:15px; margin-bottom:2px;" id="resExecName">--</h3>
+            <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;" id="resExecRole">--</p>
             
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155; margin-bottom:12px;">
-                <span style="font-size:13px; font-weight:800;">SCORE ES-CRISE (1.0 - 5.0):</span>
-                <span style="font-size:24px; font-weight:800; color:#38bdf8;" id="resScore">0.00</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px; border-radius:8px; border:1px solid #334155; margin-bottom:10px;">
+                <span style="font-size:12px; font-weight:800;">SCORE ES-CRISE (1.0 - 5.0):</span>
+                <span style="font-size:22px; font-weight:800; color:#38bdf8;" id="resScore">0.00</span>
             </div>
             
-            <div style="font-size:12px; color:#cbd5e1; margin-bottom:8px;">
+            <div style="font-size:11px; color:#cbd5e1; margin-bottom:6px;">
                 <b>Estado Neurofisiológico:</b> <span id="resProfile">--</span>
             </div>
-            <div style="font-size:12px; color:#cbd5e1;">
+            <div style="font-size:11px; color:#cbd5e1;">
                 <b>Vetor de Atenção Prioritária:</b> <span id="resWeakest" style="color:#fbbf24; font-weight:800;">--</span>
             </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; margin-bottom:16px;">
-            <div style="background:#070d19; padding:12px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8; font-weight:700;">CONTROLE (C)</div>
-                <div style="font-size:18px; font-weight:800; color:#38bdf8; margin-top:2px;" id="valC">0.0</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; text-align:center; margin-bottom:12px;">
+            <div style="background:#070d19; padding:10px 4px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:9px; color:#94a3b8; font-weight:700;">CONTROLE (C)</div>
+                <div style="font-size:16px; font-weight:800; color:#38bdf8; margin-top:2px;" id="valC">0.0</div>
             </div>
-            <div style="background:#070d19; padding:12px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8; font-weight:700;">INTENÇÃO (I)</div>
-                <div style="font-size:18px; font-weight:800; color:#34d399; margin-top:2px;" id="valI">0.0</div>
+            <div style="background:#070d19; padding:10px 4px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:9px; color:#94a3b8; font-weight:700;">INTENÇÃO (I)</div>
+                <div style="font-size:16px; font-weight:800; color:#34d399; margin-top:2px;" id="valI">0.0</div>
             </div>
-            <div style="background:#070d19; padding:12px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:10px; color:#94a3b8; font-weight:700;">RESILIÊNCIA (R)</div>
-                <div style="font-size:18px; font-weight:800; color:#c084fc; margin-top:2px;" id="valR">0.0</div>
+            <div style="background:#070d19; padding:10px 4px; border-radius:8px; border:1px solid #334155;">
+                <div style="font-size:9px; color:#94a3b8; font-weight:700;">RESILIÊNCIA (R)</div>
+                <div style="font-size:16px; font-weight:800; color:#c084fc; margin-top:2px;" id="valR">0.0</div>
             </div>
         </div>
 
@@ -204,6 +468,7 @@
 
         document.getElementById('stepForm').classList.remove('active');
         document.getElementById('stepPupil').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -217,6 +482,7 @@
             computedPupilRatio = parseFloat((0.38 + Math.random() * 0.06).toFixed(2));
             document.getElementById('stepPupil').classList.remove('active');
             document.getElementById('stepVoz').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             initAudioMicrophone();
         }, 5000);
     }
@@ -260,6 +526,7 @@
             calcularVSI();
             document.getElementById('stepVoz').classList.remove('active');
             document.getElementById('stepInstruction').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 5000);
     }
 
@@ -277,6 +544,7 @@
     function startGame() {
         document.getElementById('stepInstruction').classList.remove('active');
         document.getElementById('stepBolinhas').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         currentRound = 0; gameErrors = 0; reactionTimes = [];
         spawnNextBall();
     }
@@ -301,8 +569,8 @@
         ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
         ball.textContent = isGreen ? 'TOQUE' : 'NÃO';
 
-        const maxX = gameArea.clientWidth - 70;
-        const maxY = gameArea.clientHeight - 70;
+        const maxX = gameArea.clientWidth - 60;
+        const maxY = gameArea.clientHeight - 60;
         ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
         ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
 
@@ -343,12 +611,12 @@
 
         document.getElementById('stepBolinhas').classList.remove('active');
         document.getElementById('stepResult').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         const avgReaction = reactionTimes.length > 0
             ? Math.round(reactionTimes.reduce((a,b)=>a+b, 0) / reactionTimes.length)
             : 520;
 
-        // CALIBRAÇÃO DE ALTA RIGOROSIDADE DA TRÍADE DA SOBERANIA (C, I, R)
         const rawC = 5.00 - (1.30 * gameErrors) - Math.max(0, (avgReaction - 360)/110 * 0.55);
         const C = parseFloat(Math.max(1.00, Math.min(5.00, rawC)).toFixed(2));
 
@@ -372,7 +640,6 @@
 
         const esCrisisScore = parseFloat(((C + I + R + minVector) / 4).toFixed(2));
 
-        // RIGOROSO PONTO DE CORTE DE CRISE (Corte em 3.20)
         let status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR', profileLabel = '🟢 OPERADOR SOBERANO (HOMEOSTASE PRESERVADA)';
         let isCrisis = false;
 
@@ -409,7 +676,7 @@
 
             if (resFetch.ok) {
                 const pastData = await resFetch.json();
-                if (pastData && pastData.length > 0) pastRecord = pastData;
+                if (pastData && pastData.length > 0) pastRecord = pastData[0];
             }
         } catch (e) {}
 
@@ -560,4 +827,3 @@
 
 </body>
 </html>
-,TargetFile:/workspace/scratch/es-crisis-executive-app-v2.html}
