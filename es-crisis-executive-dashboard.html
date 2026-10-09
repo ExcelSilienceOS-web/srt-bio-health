@@ -16,7 +16,7 @@
             overflow-y: auto;
         }
 
-        body { padding: 16px 10px; }
+        body { padding: 16px 12px; }
 
         .header {
             display: flex;
@@ -30,14 +30,14 @@
         }
 
         .title-group h1 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
             color: #38bdf8;
             letter-spacing: 0.5px;
         }
 
         .title-group p {
-            font-size: 11px;
+            font-size: 12px;
             color: #64748b;
             margin-top: 2px;
         }
@@ -46,7 +46,7 @@
             background: rgba(56, 189, 248, 0.1);
             border: 1px solid #0284c7;
             color: #38bdf8;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 800;
@@ -54,16 +54,16 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .card-metric {
             background: #0f172a;
             border: 1px solid #1e293b;
-            border-radius: 10px;
-            padding: 12px 14px;
+            border-radius: 12px;
+            padding: 14px 16px;
         }
 
         .card-metric .label {
@@ -75,18 +75,51 @@
         }
 
         .card-metric .value {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
         }
 
         .panel {
             background: #0f172a;
             border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 16px;
-            overflow-x: auto;
-            margin-bottom: 20px;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 24px;
             -webkit-overflow-scrolling: touch;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .panel-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #f1f5f9;
+        }
+
+        .btn-export {
+            background: #0284c7;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-export:hover { background: #0369a1; }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
         }
 
         table {
@@ -108,7 +141,7 @@
         }
 
         td {
-            padding: 10px 12px;
+            padding: 12px;
             border-bottom: 1px solid #1e293b;
             color: #cbd5e1;
             vertical-align: middle;
@@ -129,24 +162,60 @@
         .b-chassis { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid #a855f7; }
         .b-mule { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
 
-        .action-box {
+        .action-card {
             background: #1e293b;
             border-left: 4px solid #38bdf8;
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 12px;
             line-height: 1.5;
             color: #cbd5e1;
         }
 
-        .action-box b { color: #f8fafc; }
+        .action-card b { color: #f8fafc; }
+        .action-card .exec-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 4px;
+        }
+
+        .dossier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .dossier-card {
+            background: #070d19;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .dossier-card h4 {
+            color: #38bdf8;
+            font-size: 13px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 6px;
+        }
+
+        .dossier-item {
+            font-size: 11px;
+            line-height: 1.5;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
 
         @media (max-width: 480px) {
             body { padding: 10px 6px; }
             .title-group h1 { font-size: 16px; }
             .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-            .panel { padding: 12px 10px; }
+            .panel { padding: 14px 10px; }
         }
     </style>
 </head>
@@ -155,7 +224,7 @@
 <div class="header">
     <div class="title-group">
         <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL</h1>
-        <p>Telemetria Biométrica de Alta Performance, Risco de Estafa & Motor E.A.S.Y. (Zero Perguntas)</p>
+        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y.</p>
     </div>
     <div class="live-badge">⚡ PAINEL C-SUITE / BOARD ATIVO</div>
 </div>
@@ -166,53 +235,86 @@
         <div class="value" style="color:#f8fafc;" id="mTotal">0</div>
     </div>
     <div class="card-metric">
-        <div class="label">Média Score ES-Crise</div>
+        <div class="label">Média do Índice de Prontidão</div>
         <div class="value" style="color:#38bdf8;" id="mScore">0.00</div>
     </div>
     <div class="card-metric">
-        <div class="label">🟢 Operadores Soberanos</div>
+        <div class="label">🟢 Prontidão Total</div>
         <div class="value" style="color:#34d399;" id="mSov">0</div>
     </div>
     <div class="card-metric">
-        <div class="label">🟣 Chassi Queimado (Exaustão)</div>
+        <div class="label">🟣 Cansaço Crítico</div>
         <div class="value" style="color:#c084fc;" id="mChassis">0</div>
     </div>
     <div class="card-metric">
-        <div class="label">🔴 Reativos Impulsivos</div>
+        <div class="label">🔴 Alerta de Impulsividade</div>
         <div class="value" style="color:#f87171;" id="mReact">0</div>
     </div>
 </div>
 
 <div class="panel">
-    <div style="font-size:14px; font-weight:700; color:#f1f5f9; margin-bottom:14px;">
-        🧪 Histórico de Sessões Executivas & Evolução do Loop E.A.S.Y.
+    <div class="panel-header">
+        <div class="panel-title">🧪 Histórico de Sessões Executivas & Evolução do Loop E.A.S.Y.</div>
+        <button class="btn-export" onclick="window.print()">🖨️ Imprimir / Exportar Relatório</button>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Executivo / Cargo</th>
-                <th>Diretoria / BU</th>
-                <th>Sessão</th>
-                <th>Score ES-Crise</th>
-                <th>Tríade (C / I / R)</th>
-                <th>Gargalo / Elo Fraco</th>
-                <th>Evolução (Delta)</th>
-                <th>Status & Perfil</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando laudos do C-Suite...</td></tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Executivo / Cargo</th>
+                    <th>Diretoria / BU</th>
+                    <th>Sessão</th>
+                    <th>Índice de Prontidão</th>
+                    <th>Vetores (C / I / R)</th>
+                    <th>Ponto de Atenção</th>
+                    <th>Evolução (Delta)</th>
+                    <th>Estado de Prontidão</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando laudos de liderança...</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="panel">
-    <div style="font-size:14px; font-weight:700; color:#f1f5f9; margin-bottom:14px;">
-        ⚡ Central de Ações Táticas Recomendadas pelo Motor E.A.S.Y. (Para CHRO & Conselho)
+    <div class="panel-header">
+        <div class="panel-title">🏛️ Dossiê Executivo de Liderança — Recomendações Táticas para o CHRO & Conselho</div>
     </div>
+    <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
+        Orientações personalizadas baseadas nos resultados do Motor E.A.S.Y. para preservação da energia dos executivos e prevenção do contágio do estresse para a equipe do SRT-RH.
+    </p>
+
     <div id="interventionsList">
-        <div class="action-box">🔍 Buscando recomendações prescritivas...</div>
+        <div class="action-card">🔍 Carregando recomendações da liderança...</div>
+    </div>
+</div>
+
+<div class="panel" style="background: rgba(15, 23, 42, 0.9); border: 1px solid #0284c7;">
+    <div class="panel-header">
+        <div class="panel-title" style="color:#38bdf8;">📋 Relatório Consolidado de Prontidão da Liderança (Visão RH / CHRO)</div>
+    </div>
+    <div class="dossier-grid" id="rhDossierGrid">
+        <div class="dossier-card">
+            <h4>📊 Diagnóstico de Saúde da Liderança</h4>
+            <div class="dossier-item" id="rhSummaryText">Carregando indicadores consolidados...</div>
+        </div>
+        <div class="dossier-card">
+            <h4>🛡️ Prevenção do Contágio no SRT-RH</h4>
+            <div class="dossier-item">
+                <b>Alinhamento com o SRT-RH:</b> O estresse e o cansaço acumulados na diretoria geram decisões apressadas e sobrecarga nos times operacionais. O acompanhamento do C-Level garante ambiente seguro e reduz o absenteísmo nos setores da empresa.
+            </div>
+        </div>
+        <div class="dossier-card">
+            <h4>🎯 Próximos Passos Recomendados</h4>
+            <div class="dossier-item">
+                • Realizar check-in biométrico quinzenal com os executivos diretos.<br>
+                • Aplicar a Poda de Reuniões para diretores em sinal de cansaço acumulado.<br>
+                • Instituir janelas inegociáveis de Foco Profundo para a alta liderança.
+            </div>
+        </div>
     </div>
 </div>
 
@@ -242,7 +344,7 @@
 
     function renderExecData(records) {
         let total = records.length;
-        let sumScore = 0, countSov = 0, countChassis = 0, countReact = 0;
+        let sumScore = 0, countSov = 0, countChassis = 0, countReact = 0, countMule = 0;
 
         const execMap = {};
         records.forEach(r => {
@@ -252,16 +354,30 @@
             const sc = parseFloat(r.es_crisis_score || 0);
             sumScore += sc;
             const pk = (r.profile_key || '').toUpperCase();
-            if (pk.includes('SOVEREIGN')) countSov++;
-            else if (pk.includes('BURNED') || pk.includes('CHASSIS')) countChassis++;
-            else if (pk.includes('IMPULSIVE') || pk.includes('REACT')) countReact++;
+            if (pk.includes('SOVEREIGN') || (!pk.includes('IMPULSIVE') && !pk.includes('BURNED') && !pk.includes('CHASSIS') && !pk.includes('MULE') && sc >= 3.2)) {
+                countSov++;
+            } else if (pk.includes('BURNED') || pk.includes('CHASSIS')) {
+                countChassis++;
+            } else if (pk.includes('IMPULSIVE') || pk.includes('REACT')) {
+                countReact++;
+            } else {
+                countMule++;
+            }
         });
 
         document.getElementById('mTotal').innerText = total;
-        document.getElementById('mScore').innerText = total > 0 ? (sumScore / total).toFixed(2) : '0.00';
+        let avgScore = total > 0 ? (sumScore / total).toFixed(2) : '0.00';
+        document.getElementById('mScore').innerText = avgScore;
         document.getElementById('mSov').innerText = countSov;
         document.getElementById('mChassis').innerText = countChassis;
         document.getElementById('mReact').innerText = countReact;
+
+        document.getElementById('rhSummaryText').innerHTML = `
+            • <b>Total de Aferições Realizadas:</b> ${total} sessões executivas.<br>
+            • <b>Índice Médio de Prontidão C-Suite:</b> <b style="color:#38bdf8;">${avgScore} / 5.00</b>.<br>
+            • <b>Líderes em Plena Prontidão:</b> <span style="color:#34d399; font-weight:800;">${countSov}</span> (${total > 0 ? Math.round((countSov/total)*100) : 0}%).<br>
+            • <b>Líderes Necessitando Ajuste de Cansaço/Foco:</b> <span style="color:#f87171; font-weight:800;">${countChassis + countReact + countMule}</span> líderes.
+        `;
 
         const tbody = document.getElementById('tableBody');
         const interventionsContainer = document.getElementById('interventionsList');
@@ -270,6 +386,7 @@
 
         if (records.length === 0) {
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo registrado.</td></tr>';
+            interventionsContainer.innerHTML = '<div class="action-card">Nenhuma sessão executiva registrada até o momento.</div>';
             return;
         }
 
@@ -290,45 +407,80 @@
                 }
             }
 
+            const sc = parseFloat(r.es_crisis_score || 0);
             const pk = (r.profile_key || '').toUpperCase();
-            let badgeClass = 'b-sovereign', label = r.status || '🟢 SOBERANO';
-            if (pk.includes('IMPULSIVE')) badgeClass = 'b-reactive';
-            else if (pk.includes('BURNED') || pk.includes('CHASSIS')) badgeClass = 'b-chassis';
-            else if (pk.includes('MULE')) badgeClass = 'b-mule';
+            let badgeClass = 'b-sovereign', label = '🟢 PRONTIDÃO TOTAL';
+            
+            if (sc < 3.20 || r.veto_errors >= 2) {
+                if (pk.includes('IMPULSIVE') || r.weakest_link === 'CONTROL') {
+                    badgeClass = 'b-reactive'; label = '🔴 ALERTA DE IMPULSIVIDADE';
+                } else if (pk.includes('BURNED') || pk.includes('CHASSIS') || r.weakest_link === 'RESILIENCE') {
+                    badgeClass = 'b-chassis'; label = '🟣 CANSAÇO CRÍTICO';
+                } else {
+                    badgeClass = 'b-mule'; label = '🟡 SOBRECARGA OPERACIONAL';
+                }
+            }
 
             const c = r.control_score ? parseFloat(r.control_score).toFixed(1) : '4.5';
             const i = r.intentionality_score ? parseFloat(r.intentionality_score).toFixed(1) : '4.8';
             const res = r.resilience_score ? parseFloat(r.resilience_score).toFixed(1) : '4.2';
+
+            let weakestText = "Autocontrole e Foco";
+            if (r.weakest_link === 'INTENTIONALITY') weakestText = "Clareza de Propósito";
+            else if (r.weakest_link === 'RESILIENCE') weakestText = "Reserva de Energia";
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight:800; color:#38bdf8;">${r.name || 'Executivo'}<br><span style="font-size:10px; color:#64748b;">${r.role || 'C-Level'}</span></td>
                 <td style="color:#cbd5e1;">${r.department || 'Presidência'}</td>
                 <td><span style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid #0284c7; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800;">Sessão #${r.session_count || 1}</span></td>
-                <td style="color:#38bdf8; font-weight:800; font-size:14px;">${r.es_crisis_score ? parseFloat(r.es_crisis_score).toFixed(2) : '0.00'}</td>
+                <td style="color:#38bdf8; font-weight:800; font-size:14px;">${sc.toFixed(2)}</td>
                 <td style="font-size:10px; font-weight:700;">C: ${c} | I: <b style="color:#34d399;">${i}</b> | R: ${res}</td>
-                <td style="color:#fbbf24; font-weight:700;">${r.weakest_link || 'N/A'}</td>
+                <td style="color:#fbbf24; font-weight:700;">${weakestText}</td>
                 <td>${deltaHtml}</td>
                 <td><span class="badge-profile ${badgeClass}">${label}</span></td>
             `;
             tbody.appendChild(tr);
 
-            const actionBox = document.createElement('div');
-            actionBox.className = 'action-box';
-            let actionText = "";
+            const actionCard = document.createElement('div');
+            actionCard.className = 'action-card';
+            let actionContent = "";
 
-            const wl = (r.weakest_link || '').toUpperCase();
-            if (pk.includes('SOVEREIGN')) {
-                actionText = `<b>Ação CHRO / Conselho para ${r.name} (${r.role}):</b> Homeostase e Soberania preservadas. Manter blindagem de agenda com blocos de Foco Profundo de 90 min e incentivar quarentena tática preventiva antes de aprovações de grande porte.`;
-            } else if (wl.includes('CONTROL')) {
-                actionText = `<b>Ação CHRO / Conselho para ${r.name} (${r.role}):</b> Poda de Alçada Inibitória: autorizar delegação temporária de decisões operacionais de N2 por 14 dias. Quarentena obrigatória de 1h antes de assinar M&A ou capex relevante.`;
-            } else if (wl.includes('RESILIENCE')) {
-                actionText = `<b>Ação CHRO / Conselho para ${r.name} (${r.role}):</b> Intervenção contra Estol Cognitivo: suspender viagens internacionais por 14 dias, proibir comitês decisórios após 19h e instituir janela diária de descompressão de 90 min.`;
+            if (sc >= 3.20 && r.veto_errors < 2) {
+                actionContent = `
+                    <div class="exec-header">
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span style="color:#34d399; font-weight:800;">🟢 EQUILÍBRIO PRESERVADO (${sc.toFixed(2)})</span>
+                    </div>
+                    <b>Recomendação do RH / Conselho:</b> Executivo em pleno estado de prontidão executiva. Manter a blindagem de agenda com blocos de Foco Profundo de 90 min diários e incentivar quarentena tática de reflexão de 30 min antes de assinar grandes investimentos.
+                `;
+            } else if (r.weakest_link === 'CONTROL' || pk.includes('IMPULSIVE')) {
+                actionContent = `
+                    <div class="exec-header">
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span style="color:#f87171; font-weight:800;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>
+                    </div>
+                    <b>Recomendação do RH / Conselho:</b> Identificada redução temporária na capacidade de autocontrole. Autorizar a delegação de assinaturas operacionais secundárias para diretores N2 por 14 dias e instituir quarentena obrigatória de 60 min entre reuniões intensas e decisões finais.
+                `;
+            } else if (r.weakest_link === 'RESILIENCE' || pk.includes('BURNED') || pk.includes('CHASSIS')) {
+                actionContent = `
+                    <div class="exec-header">
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span style="color:#c084fc; font-weight:800;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>
+                    </div>
+                    <b>Recomendação do RH / Conselho:</b> Sinais claros de cansaço acumulado. Recomenda-se proibir comitês decisórios após 18h30, instituir pausa noturna de telas a partir das 21h e evitar viagens internacionais longas nos próximos 14 dias.
+                `;
             } else {
-                actionText = `<b>Ação CHRO / Conselho para ${r.name} (${r.role}):</b> Poda de Ruído Operacional: desmobilizar 40% das reuniões informativas, alocar Squad de Crise para absorver rotinas e focar nas 2 metas N1 de alto impacto.`;
+                actionContent = `
+                    <div class="exec-header">
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span style="color:#fbbf24; font-weight:800;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>
+                    </div>
+                    <b>Recomendação do RH / Conselho:</b> Excesso de tarefas secundárias e microgestão. Reduzir em 40% as reuniões informativas da pauta do executivo e alocar equipe de apoio para absorver rotinas administrativas.
+                `;
             }
-            actionBox.innerHTML = actionText;
-            interventionsContainer.appendChild(actionBox);
+            actionCard.innerHTML = actionContent;
+            interventionsContainer.appendChild(actionCard);
         });
     }
 
