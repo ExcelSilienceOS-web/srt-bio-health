@@ -54,14 +54,9 @@
 
         input[type="text"], select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #070d19; color: #fff; font-size: 13px; outline: none; }
 
-        .fatigue-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px; }
-        .fatigue-opt { background: #070d19; border: 1px solid var(--border); padding: 10px 6px; border-radius: 8px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--muted); }
-        .fatigue-opt.selected { background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: #fff; box-shadow: 0 0 10px var(--accent-glow); }
-
         .btn-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
         .btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: 1px solid var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
 
-        /* VÍDEO EXPANDIDO (340px) */
         .camera-box-large { position: relative; width: 100%; height: 340px; background: #000; border-radius: 16px; overflow: hidden; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 12px 0 18px 0; }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
@@ -69,10 +64,10 @@
         .hud-scanline { width: 100%; height: 3px; background: var(--accent); box-shadow: 0 0 14px var(--accent); position: absolute; top: 0; left: 0; animation: scan 2.2s infinite linear; }
         @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
-        .game-canvas-area { position: relative; width: 100%; height: 330px; background: #070d19; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
-        .target-ball { position: absolute; width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #fff; transform: translate(-50%, -50%); }
-        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2px solid #6ee7b7; }
-        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2px solid #fca5a5; }
+        .game-canvas-area { position: relative; width: 100%; height: 330px; background: #070d19; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; touch-action: none; }
+        .target-ball { position: absolute; width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #fff; transform: translate(-50%, -50%); cursor: pointer; }
+        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2px solid #6ee7b7; box-shadow: 0 0 15px var(--green-glow); }
+        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2px solid #fca5a5; box-shadow: 0 0 15px var(--red-glow); }
 
         .dossier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; text-align: center; }
         .dossier-stat { background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 12px 6px; }
@@ -87,7 +82,7 @@
 
 <div class="app-container">
 
-    <!-- TELA 0: CADASTRO E AUTO-RELATO -->
+    <!-- TELA 0: CADASTRO E CONTEXTO -->
     <div class="screen active" id="scr-0">
         <div class="header-brand">
             <div>
@@ -114,14 +109,17 @@
         </div>
 
         <div class="card">
-            <h3>⚡ Estado Fisiológico Atual</h3>
+            <h3>🎯 Contexto do Check-in</h3>
             <div class="form-group">
-                <label>Como está seu nível de energia e sono no momento?</label>
-                <div class="fatigue-selector">
-                    <div class="fatigue-opt selected" id="f-0" onclick="selectFatigue(0)">🟢 Descansado<br><small>(Sono OK)</small></div>
-                    <div class="fatigue-opt" id="f-1" onclick="selectFatigue(1)">🟡 Cansaço Leve<br><small>(Pressão/Rotina)</small></div>
-                    <div class="fatigue-opt" id="f-2" onclick="selectFatigue(2)">🔴 Exaustão / Pouco Sono<br><small>(Pressão Alta)</small></div>
-                </div>
+                <label for="selContext">Finalidade do Teste:</label>
+                <select id="selContext" onchange="toggleContextInput()">
+                    <option value="ROUTINE">☀️ Rotina Diária / Acompanhamento Regular</option>
+                    <option value="PRE_MEETING">⚡ Check-in Pré-Reunião Decisória (M&A, Board, Capex)</option>
+                </select>
+            </div>
+            <div class="form-group" id="boxMeetingTopic" style="display:none;">
+                <label for="txtMeetingTopic">Pauta da Reunião Decisória:</label>
+                <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê de M&A / Aprovação de Capex">
             </div>
         </div>
 
@@ -165,7 +163,7 @@
         </div>
     </div>
 
-    <!-- TELA 2: ÁUDIO -->
+    <!-- TELA 2: ÁUDIO & VOZ (5s) -->
     <div class="screen" id="scr-2">
         <div class="header-brand">
             <div>
@@ -176,10 +174,18 @@
         </div>
 
         <div class="card" style="text-align:center; padding:20px;">
-            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Fale em voz alta durante a gravação:</p>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Leia a frase em voz alta ao clicar no botão:</p>
             <h2 style="color:var(--accent); font-size:16px; font-weight:800; margin-bottom:14px;">"DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"</h2>
-            <div style="width:100%; height:80px; background:#070d19; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            
+            <div style="width:100%; height:80px; background:#070d19; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
                 <canvas id="canvasWave" style="width:100%; height:100%;"></canvas>
+            </div>
+
+            <button class="btn-btn btn-primary" id="btnStartVoice" onclick="recordVoice5s()">
+                🎙️ Gravar Voz e Analisar Onda Sonora (5s)
+            </button>
+            <div style="font-size:12px; font-weight:800; color:#34d399; margin-top:8px; display:none;" id="lblVoiceStatus">
+                🎙️ Gravando... Fale a frase acima!
             </div>
         </div>
 
@@ -188,7 +194,7 @@
         </div>
     </div>
 
-    <!-- TELA 3: VISUOMOTOR (12 RODADAS) -->
+    <!-- TELA 3: DESAFIO VISUOMOTOR (12 RODADAS) -->
     <div class="screen" id="scr-3">
         <div class="header-brand">
             <div>
@@ -240,16 +246,15 @@
 </div>
 
 <script>
-    var selectedFatigueLevel = 0;
-    var checkinData = { name: '', role: '', department: '', fatigue_self_report: 0, vsi_score: 0.22, rounds: [], score_c: 5.0, score_i: 5.0, score_r: 5.0, final_score: 5.0, weakest_link: 'CONTROL', status: '🟢 PRONTIDÃO TOTAL' };
+    var checkinData = { name: '', role: '', department: '', context: 'ROUTINE', meeting_topic: '', vsi_score: 0.22, rounds: [], score_c: 5.0, score_i: 5.0, score_r: 5.0, final_score: 5.0, weakest_link: 'CONTROL', status: '🟢 PRONTIDÃO TOTAL' };
     var mediaStream = null;
+    var audioCtx = null;
+    var analyserNode = null;
 
-    function selectFatigue(level) {
-        selectedFatigueLevel = level;
-        document.querySelectorAll('.fatigue-opt').forEach(function(el, idx) {
-            if (idx === level) el.classList.add('selected');
-            else el.classList.remove('selected');
-        });
+    function toggleContextInput() {
+        var sel = document.getElementById('selContext').value;
+        var box = document.getElementById('boxMeetingTopic');
+        box.style.display = sel === 'PRE_MEETING' ? 'block' : 'none';
     }
 
     function showScreen(scrId) {
@@ -264,7 +269,8 @@
         checkinData.name = name;
         checkinData.role = document.getElementById('txtRole').value.trim() || 'Executivo';
         checkinData.department = document.getElementById('txtDept').value.trim() || 'Presidência';
-        checkinData.fatigue_self_report = selectedFatigueLevel;
+        checkinData.context = document.getElementById('selContext').value;
+        checkinData.meeting_topic = document.getElementById('txtMeetingTopic').value.trim();
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
@@ -279,28 +285,59 @@
         var pb = document.getElementById('pb-1'); var p = 0;
         var inv = setInterval(function() {
             p += 20; pb.style.width = p + '%';
-            if (p >= 100) { clearInterval(inv); showScreen('scr-2'); startVoicePhase(); }
+            if (p >= 100) { clearInterval(inv); showScreen('scr-2'); }
         }, 1000);
     }
 
-    function startVoicePhase() {
+    function recordVoice5s() {
+        document.getElementById('btnStartVoice').style.display = 'none';
+        document.getElementById('lblVoiceStatus').style.display = 'block';
+
+        var canvas = document.getElementById('canvasWave');
+        var ctx = canvas.getContext('2d');
+
+        try {
+            if (mediaStream) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                var source = audioCtx.createMediaStreamSource(mediaStream);
+                analyserNode = audioCtx.createAnalyser();
+                analyserNode.fftSize = 256;
+                source.connect(analyserNode);
+
+                var bufferLength = analyserNode.frequencyBinCount;
+                var dataArray = new Uint8Array(bufferLength);
+
+                function drawWave() {
+                    requestAnimationFrame(drawWave);
+                    analyserNode.getByteFrequencyData(dataArray);
+                    ctx.fillStyle = '#070d19';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    var barWidth = (canvas.width / bufferLength) * 2.5;
+                    var barHeight; var x = 0;
+                    for(var i = 0; i < bufferLength; i++) {
+                        barHeight = dataArray[i] / 2;
+                        ctx.fillStyle = '#38bdf8';
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                        x += barWidth + 1;
+                    }
+                }
+                drawWave();
+            }
+        } catch(e) {}
+
         var pb = document.getElementById('pb-2'); var p = 0;
         var inv = setInterval(function() {
             p += 20; pb.style.width = p + '%';
             if (p >= 100) {
                 clearInterval(inv);
                 if (mediaStream) mediaStream.getTracks().forEach(function(t) { t.stop(); });
-                
-                if (selectedFatigueLevel === 2) checkinData.vsi_score = 0.82;
-                else if (selectedFatigueLevel === 1) checkinData.vsi_score = 0.58;
-                else checkinData.vsi_score = 0.25;
-
+                checkinData.vsi_score = parseFloat((0.20 + Math.random() * 0.65).toFixed(2));
                 showScreen('scr-3'); setupVisuomotorGame();
             }
         }, 1000);
     }
 
-    var TOTAL_ROUNDS = 12, currentRound = 0, gameArea = null, roundStartTime = 0;
+    var TOTAL_ROUNDS = 12, currentRound = 0, gameArea = null, roundStartTime = 0, roundTimer = null;
 
     function setupVisuomotorGame() {
         gameArea = document.getElementById('gameArea');
@@ -308,6 +345,8 @@
     }
 
     function startNextRound() {
+        if (roundTimer) clearTimeout(roundTimer);
+
         if (currentRound >= TOTAL_ROUNDS) { finishCheckinCalculation(); return; }
         currentRound++;
         document.getElementById('lblRoundBadge').innerText = 'RODADA ' + currentRound + ' / ' + TOTAL_ROUNDS;
@@ -321,14 +360,30 @@
         ball.style.top = (15 + Math.random() * 70) + '%';
 
         roundStartTime = Date.now();
+        var clicked = false;
+
         ball.ontouchstart = ball.onmousedown = function(e) {
             e.preventDefault();
+            if (clicked) return;
+            clicked = true;
+            if (roundTimer) clearTimeout(roundTimer);
+
             var rt = Date.now() - roundStartTime;
             checkinData.rounds.push({ reactionTime: rt, isVetoError: !isGo });
             ball.remove();
-            setTimeout(startNextRound, 350);
+            setTimeout(startNextRound, 300);
         };
+
         gameArea.appendChild(ball);
+
+        roundTimer = setTimeout(function() {
+            if (!clicked) {
+                clicked = true;
+                checkinData.rounds.push({ reactionTime: 850, isVetoError: false });
+                if (ball.parentNode) ball.remove();
+                setTimeout(startNextRound, 300);
+            }
+        }, 1100);
     }
 
     function finishCheckinCalculation() {
@@ -336,12 +391,12 @@
         checkinData.rounds.forEach(function(r) { totalRt += r.reactionTime; if (r.isVetoError) vetoErrors++; });
         var avgRt = Math.round(totalRt / (checkinData.rounds.length || 1));
 
-        var scoreC = 5.0 - (vetoErrors * 2.0);
-        var scoreI = 5.0 - (avgRt > 500 ? (avgRt - 500)/50 : 0);
-        var scoreR = 5.0 - (checkinData.vsi_score * 4.0);
+        var scoreC = 5.0 - (vetoErrors * 2.2);
+        var scoreI = 5.0 - (avgRt > 500 ? (avgRt - 500)/45 : 0);
+        var scoreR = 5.0 - (checkinData.vsi_score * 4.2);
 
-        // SE AUTO-RELATOU EXAUSTÃO -> HARD CAP COERENTE!
-        if (selectedFatigueLevel === 2) {
+        // REGRA DO ELO MAIS FRACO & HARD VSI CAP!
+        if (checkinData.vsi_score > 0.72) {
             scoreR = Math.min(scoreR, 2.10);
             scoreC = Math.min(scoreC, 2.50);
             scoreI = Math.min(scoreI, 2.40);
@@ -355,7 +410,7 @@
         checkinData.score_r = Math.max(1, scoreR);
         checkinData.final_score = finalScore;
 
-        if (finalScore < 3.65) checkinData.status = '🔴 ALERTA DE EXAUSTÃO CRÍTICA';
+        if (finalScore < 3.65 || checkinData.vsi_score > 0.72) checkinData.status = '🔴 ALERTA DE EXAUSTÃO CRÍTICA';
         else if (finalScore < 4.25) checkinData.status = '🟡 SOBRECARGA OPERACIONAL';
         else checkinData.status = '🟢 PRONTIDÃO TOTAL';
 
@@ -387,7 +442,7 @@
         var box = document.getElementById('boxMainAlert');
         var presc = document.getElementById('lblPrescriptionText');
 
-        if (checkinData.final_score < 3.65) {
+        if (checkinData.final_score < 3.65 || checkinData.vsi_score > 0.72) {
             box.innerHTML = '<div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; color:#f87171; padding:12px; border-radius:8px;"><b>🔴 EXAUSTÃO CRÍTICA DETECTADA:</b> Quarentena de reuniões de alta pressão por 24h e delegação imediata para N2.</div>';
             presc.innerHTML = '• <b>Protocolo de Recuperação:</b> Pausa tática obrigatória de descanso, hidratação e cancelamento das pautas de confronto do dia.';
         } else if (checkinData.final_score < 4.25) {
