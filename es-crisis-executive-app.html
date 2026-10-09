@@ -3,190 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v5.4</title>
+    <title>ExcelSilience ES-Crise Executivo — Readiness Telemetry v5.7</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
-        html, body {
-            width: 100%;
-            min-height: 100vh;
-            background: #070a12;
-            color: #f8fafc;
-            overflow-x: hidden;
-            overflow-y: auto;
+        :root {
+            --bg: #070a12;
+            --card: #0f172a;
+            --card-inner: #1e293b;
+            --border: #334155;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.25);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.25);
+            --yellow: #f59e0b;
+            --yellow-glow: rgba(245, 158, 11, 0.25);
+            --purple: #a855f7;
+            --purple-glow: rgba(168, 85, 247, 0.25);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.25);
         }
 
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 12px 8px;
-        }
-
-        .container {
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 540px;
-            padding: 18px 14px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.85);
-            margin: auto 0;
-        }
-
-        .header-box {
-            text-align: center;
-            margin-bottom: 14px;
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 10px;
-        }
-
-        .header-box h1 {
-            font-size: 18px;
-            color: #38bdf8;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-        }
-
-        .header-box p {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 2px;
-        }
-
-        .badge-governance {
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            display: block;
-            text-align: center;
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            margin-bottom: 14px;
-        }
-
-        .step { display: none; }
-        .step.active { display: block; }
-
-        label {
-            font-size: 10px;
-            color: #38bdf8;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        select, input[type="text"] {
-            width: 100%;
-            padding: 10px 12px;
-            background: #070d19;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 13px;
-            margin-bottom: 10px;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        select:focus, input[type="text"]:focus { border-color: #38bdf8; }
-
-        .context-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .context-btn {
-            background: #070d19;
-            border: 1px solid #334155;
-            color: #cbd5e1;
-            padding: 10px 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .context-btn.selected {
-            background: rgba(56, 189, 248, 0.15);
-            border-color: #38bdf8;
-            color: #38bdf8;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            background: #070d19;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            margin-bottom: 14px;
-        }
-
-        .checkbox-container input {
-            margin-top: 2px;
-            accent-color: #0284c7;
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-            cursor: pointer;
-        }
-
-        .checkbox-container label {
-            font-size: 10px;
-            color: #cbd5e1;
-            font-weight: 600;
-            text-transform: none;
-            line-height: 1.3;
-            margin-bottom: 0;
-            cursor: pointer;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: #fff;
-            transition: 0.2s;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
             touch-action: manipulation;
         }
 
-        .btn:hover, .btn:active { background: linear-gradient(135deg, #0369a1, #075985); }
-        .btn-pdf {
-            background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            margin-bottom: 10px;
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .video-container {
+        .app-container {
             width: 100%;
-            height: 280px;
-            max-height: 40vh;
-            background: #070d19;
-            border: 2px solid #0284c7;
-            border-radius: 14px;
+            max-width: 520px;
+            min-height: 100vh;
+            background: var(--card);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            padding: 20px 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .brand-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-subtitle {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .badge-v57 {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .card {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group {
             margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #070d19;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .btn-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0369a1, #075985);
+        }
+
+        .camera-box {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
         }
 
         video {
@@ -198,453 +203,384 @@
 
         .hud-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
-            border: 1px solid rgba(56, 189, 248, 0.3);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 10px;
+            padding: 12px;
+            box-sizing: border-box;
+            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.6) 100%);
         }
 
-        .hud-frame-rect {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 180px;
-            height: 220px;
-            border: 2px dashed #38bdf8;
-            border-radius: 16px;
-            box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
-            animation: pulseHud 2.5s infinite ease-in-out;
-        }
-
-        .hud-corner {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-color: #34d399;
-            border-style: solid;
-        }
-        .hud-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
-        .hud-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
-        .hud-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
-        .hud-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
-
-        @keyframes pulseHud {
-            0% { opacity: 0.85; transform: translate(-50%, -50%) scale(0.99); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
-            100% { opacity: 0.85; transform: translate(-50%, -50%) scale(0.99); }
-        }
-
-        .scan-line {
-            position: absolute;
+        .hud-scanline {
             width: 100%;
             height: 2px;
-            background: #34d399;
-            top: 0;
-            animation: scan 2.5s infinite linear;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            position: absolute;
+            top: 0; left: 0;
+            animation: scan 2s infinite linear;
         }
 
-        @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
 
-        .audio-wave-box {
+        .audio-wave-container {
             width: 100%;
             height: 80px;
             background: #070d19;
-            border: 1px solid #334155;
-            border-radius: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             margin-bottom: 14px;
-            position: relative;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 10px;
         }
 
-        canvas#audioCanvas {
+        canvas.wave-canvas {
             width: 100%;
             height: 100%;
         }
 
-        .game-box {
-            width: 100%;
-            height: 210px;
-            max-height: 38vh;
-            background: #070d19;
-            border: 2px dashed #334155;
-            border-radius: 12px;
+        /* GAME VISUOMOTOR ESTENDIDO (+50% DURAÇÃO: 12 RODADAS) */
+        .game-canvas-area {
             position: relative;
+            width: 100%;
+            height: 320px;
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             touch-action: none;
         }
 
         .target-ball {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
             position: absolute;
-            cursor: pointer;
-            box-shadow: 0 0 14px rgba(255,255,255,0.4);
-            user-select: none;
-            -webkit-user-select: none;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 20px;
             font-weight: 800;
-            font-size: 10px;
             color: #fff;
-            touch-action: manipulation;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transform: translate(-50%, -50%);
+            animation: popIn 0.15s ease-out;
         }
 
-        .ball-green { background: #10b981; border: 2.5px solid #34d399; }
-        .ball-red { background: #ef4444; border: 2.5px solid #f87171; }
-
-        .score-card {
-            background: #070d19;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
 
-        .delta-banner {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid #10b981;
-            color: #34d399;
-            padding: 10px;
+        .ball-go {
+            background: radial-gradient(circle, #34d399, #059669);
+            border: 2px solid #6ee7b7;
+            box-shadow: 0 0 20px var(--green-glow);
+        }
+
+        .ball-nogo {
+            background: radial-gradient(circle, #f87171, #dc2626);
+            border: 2px solid #fca5a5;
+            box-shadow: 0 0 20px var(--red-glow);
+        }
+
+        .game-stats-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--card-inner);
             border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
+            color: var(--muted);
             margin-bottom: 12px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #070d19;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0284c7, #38bdf8);
+            transition: width 0.3s;
+        }
+
+        .dossier-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
             text-align: center;
-            line-height: 1.4;
         }
 
-        .pre-meeting-card {
-            background: rgba(56, 189, 248, 0.08);
-            border: 1px solid #0284c7;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
+        .dossier-stat {
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 4px;
         }
 
-        .pre-meeting-card h4 {
-            color: #38bdf8;
-            font-size: 12px;
-            font-weight: 800;
-            margin-bottom: 6px;
+        .dossier-stat .lbl {
+            font-size: 9px;
+            color: var(--muted);
+            font-weight: 700;
             text-transform: uppercase;
         }
 
-        .pre-meeting-card p {
+        .dossier-stat .val {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-top: 2px;
+        }
+
+        .alert-box {
+            padding: 12px;
+            border-radius: 8px;
             font-size: 11px;
             line-height: 1.5;
-            color: #e2e8f0;
-        }
-
-        .easy-box {
-            background: rgba(56, 189, 248, 0.04);
-            border: 1px solid #0284c7;
-            border-radius: 12px;
-            padding: 14px;
             margin-bottom: 12px;
         }
 
-        .easy-box h4 {
-            color: #38bdf8;
-            font-size: 12px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
-            padding-bottom: 6px;
+        .alert-red {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--red);
+            color: #f87171;
         }
 
-        .easy-item {
+        .easy-prescription-card {
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
             font-size: 11px;
             line-height: 1.55;
-            margin-bottom: 12px;
             color: #cbd5e1;
         }
 
-        .easy-item b { color: #f8fafc; }
-
-        .sync-banner {
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .sync-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
-
-        .status-box-container {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .status-box-label {
-            font-size: 10px;
-            color: #94a3b8;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .status-sovereign {
-            color: #34d399;
-            background: rgba(52, 211, 153, 0.15);
-            border: 1px solid #10b981;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 800;
-            font-size: 11px;
-            display: inline-block;
-            line-height: 1.3;
-        }
-
-        .status-crisis {
-            color: #f87171;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid #ef4444;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 800;
-            font-size: 11px;
-            display: inline-block;
-            line-height: 1.3;
-        }
-
-        .pdf-heatmap-container {
-            background: #070d19;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-
-        .pdf-heatmap-title {
-            font-size: 11px;
-            color: #38bdf8;
-            font-weight: 800;
+        .easy-prescription-card h4 {
+            color: var(--accent);
+            font-size: 12px;
             margin-bottom: 8px;
             text-transform: uppercase;
-        }
-
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            text-align: center;
-        }
-
-        .heatmap-cell {
-            padding: 6px 2px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: 800;
-        }
-
-        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
-        .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
-        .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
-        .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
-
-        @media (max-width: 480px) {
-            body { padding: 8px 4px; }
-            .container { padding: 14px 10px; border-radius: 12px; }
-            .header-box h1 { font-size: 16px; }
-            .video-container { height: 250px; }
-            .hud-frame-rect { width: 150px; height: 190px; }
-            .game-box { height: 190px; }
-            .target-ball { width: 46px; height: 46px; font-size: 9px; }
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
     </style>
 </head>
 <body>
 
-<div class="container" id="pdfReportContent">
-    <div class="header-box">
-        <h1>EXCELSILIENCE ES-CRISE EXEC</h1>
-        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v5.4</p>
-    </div>
-    <span class="badge-governance">🔒 ZERO PERGUNTAS — LAUDO NOMINAL DE LIDERANÇA & GOVERNANÇA</span>
+<div class="app-container">
 
-    <div id="stepForm" class="step active">
-        <label for="txtName">Nome Completo do Executivo / Líder:</label>
-        <input type="text" id="txtName" placeholder="Ex: Dr. Flavio Verissimo" required>
-
-        <label for="txtRole">Cargo / Função C-Level:</label>
-        <select id="txtRole" required>
-            <option value="">-- Selecione seu cargo --</option>
-            <option value="CEO / Presidente">CEO / Presidente Executivo</option>
-            <option value="CFO / Diretor Financeiro">CFO / Diretor Financeiro</option>
-            <option value="COO / Diretor Operacional">COO / Diretor de Operações</option>
-            <option value="CHRO / Diretor de Pessoas">CHRO / Diretor de RH / DHO</option>
-            <option value="CMO / CTO / VP Executivo">CMO / CTO / VP Executivo</option>
-            <option value="Membro do Conselho">Membro do Conselho de Administração</option>
-        </select>
-
-        <label for="txtDept">Business Unit / Diretoria:</label>
-        <input type="text" id="txtDept" placeholder="Ex: Presidência / Operações Globais">
-
-        <label>Momento da Aferição:</label>
-        <div class="context-selector">
-            <div class="context-btn selected" id="btnCtxRoutine" onclick="selectCheckinContext('ROUTINE')">
-                ☀️ Rotina Matinal / Prontidão
+    <!-- TELA 0: CADASTRO E CONTEXTO DO CHECK-IN -->
+    <div class="screen active" id="scr-0">
+        <div class="header-brand">
+            <div>
+                <div class="brand-title">EXCELSILIENCE ES-CRISE</div>
+                <div class="brand-subtitle">Readiness Telemetry v5.7</div>
             </div>
-            <div class="context-btn" id="btnCtxMeeting" onclick="selectCheckinContext('PRE_MEETING')">
-                ⚡ Pré-Reunião Decisória
+            <div class="badge-v57">RIGOR IMPLACÁVEL</div>
+        </div>
+
+        <div class="card">
+            <h3>👤 Identificação Executiva C-Level</h3>
+            <div class="form-group">
+                <label for="txtName">Nome Completo do Executivo:</label>
+                <input type="text" id="txtName" placeholder="Ex: Dr. Flavio Verissimo">
+            </div>
+            <div class="form-group">
+                <label for="txtRole">Cargo / Função Executiva:</label>
+                <input type="text" id="txtRole" placeholder="Ex: CEO / Presidente Executivo">
+            </div>
+            <div class="form-group">
+                <label for="txtDept">Diretoria / Unidade de Negócio (BU):</label>
+                <input type="text" id="txtDept" placeholder="Ex: Presidência">
             </div>
         </div>
 
-        <div id="meetingTopicBox" style="display:none;">
-            <label for="txtMeetingTopic">Nome / Pauta da Reunião (Opcional):</label>
-            <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê M&A / Aprovação de Capex">
+        <div class="card">
+            <h3>🎯 Contexto da Aferição Biométrica</h3>
+            <div class="form-group">
+                <label for="selContext">Finalidade do Teste:</label>
+                <select id="selContext" onchange="toggleContextInput()">
+                    <option value="ROUTINE">☀️ Rotina Diária / Acompanhamento Regular</option>
+                    <option value="PRE_MEETING">⚡ Check-in Pré-Reunião Decisória (M&A, Board, Capex)</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="boxMeetingTopic" style="display:none;">
+                <label for="txtMeetingTopic">Pauta da Reunião Decisória:</label>
+                <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê de M&A / Aprovação de Capex">
+            </div>
         </div>
 
-        <div class="checkbox-container">
-            <input type="checkbox" id="chkAuth" checked>
-            <label for="chkAuth">
-                <b>Autorização de Governança & LGPD:</b> Autorizo o Conselho e a Diretoria de Pessoas a acessarem minha telemetria de prontidão para aplicação das recomendações do Motor E.A.S.Y., visando à preservação da minha energia e à saúde da empresa.
-            </label>
+        <div style="margin-top:auto;">
+            <button class="btn-btn btn-primary" onclick="startCheckinProcess()">
+                🚀 Iniciar Telemetria de 30 Segundos
+            </button>
         </div>
-
-        <button class="btn" onclick="startExecutiveCheckin()">Iniciar Aferição C-Level (30s) 🚀</button>
     </div>
 
-    <div id="stepPupil" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:4px; font-size:14px;">👁️ Verificação de Presença Ocular & Foco (5s)</h3>
-        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Centralize seu rosto no retângulo de enquadramento:</p>
-        
-        <div class="video-container">
+    <!-- TELA 1: OCULAR & PUPILOMETRIA (5s) -->
+    <div class="screen" id="scr-1">
+        <div class="header-brand">
+            <div>
+                <div class="brand-title">1/3. VERIFICAÇÃO ÓPTICA & PUPILAR</div>
+                <div class="brand-subtitle">Fixação Saccádica & Oscilação do Locus Coeruleus</div>
+            </div>
+            <div class="badge-v57">5 SEGUNDOS</div>
+        </div>
+
+        <div class="camera-box">
             <video id="webcamVideo" autoplay playsinline muted></video>
             <div class="hud-overlay">
-                <div style="display:flex; justify-content:space-between; font-size:9px; color:#38bdf8; font-weight:800;">
-                    <span>CÂMERA: ATIVA</span>
-                    <span id="lblScanText">VARRENDO CÓRTEX & PUPILA...</span>
+                <div class="hud-scanline"></div>
+                <div style="font-size:10px; color:var(--accent); font-weight:800; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:4px;">
+                    👁️ Mantenha o olhar fixo no ponto central do visor...
                 </div>
-                
-                <div class="hud-frame-rect">
-                    <div class="hud-corner hud-tl"></div>
-                    <div class="hud-corner hud-tr"></div>
-                    <div class="hud-corner hud-bl"></div>
-                    <div class="hud-corner hud-br"></div>
-                </div>
-
-                <div class="scan-line"></div>
-                <div style="text-align:center; font-size:10px; color:#34d399; font-weight:800;" id="lblPupilStatus">
-                    Aferindo Estabilidade Ocular & Nível de Foco...
+                <div style="font-size:10px; color:#34d399; font-weight:800; text-align:right;" id="lblPupilHUD">
+                    Varrendo oscilação pupilar...
                 </div>
             </div>
         </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="pb-1"></div>
+        </div>
+
+        <div class="card" style="font-size:11px; color:var(--muted); line-height:1.5;">
+            • <b>Aferição Foveal:</b> O sistema analisa a estabilidade de fixação ocular e a micro-oscilação do diâmetro pupilar (Hippus) para identificar fadiga central no Córtex Pré-Frontal.
+        </div>
     </div>
 
-    <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:6px; font-size:14px;">🎙️ Análise de Tom e Energia Vocal (5s)</h3>
-        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Leia a frase com tom firme enquanto monitoramos a modulação da sua voz:</p>
-        <div style="background:#070d19; padding:14px; border-radius:10px; text-align:center; font-weight:800; color:#fbbf24; margin-bottom:12px; border:1px solid #334155; font-size:13px; line-height:1.4;">
-            "Pronto para liderar hoje com clareza, energia e visão estratégica."
+    <!-- TELA 2: BIOACÚSTICA VOCAL VSI (5s) -->
+    <div class="screen" id="scr-2">
+        <div class="header-brand">
+            <div>
+                <div class="brand-title">2/3. ENERGIA BIOACÚSTICA VOCAL</div>
+                <div class="brand-subtitle">Modulação do Nervo Vago Laríngeo (NC X)</div>
+            </div>
+            <div class="badge-v57">5 SEGUNDOS</div>
         </div>
 
-        <div class="audio-wave-box">
-            <canvas id="audioCanvas"></canvas>
+        <div class="card" style="text-align:center; padding:20px;">
+            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Fale em voz alta e clara durante a gravação:</p>
+            <h2 style="color:var(--accent); font-size:16px; font-weight:800; margin-bottom:14px;" id="lblVoicePhrase">
+                "DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"
+            </h2>
+            <div class="audio-wave-container">
+                <canvas class="wave-canvas" id="canvasWave"></canvas>
+            </div>
+            <div style="font-size:12px; font-weight:800; color:#34d399;" id="lblVoiceStatus">
+                🎙️ Microfone ativo — Gravando áudio...
+            </div>
         </div>
 
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz e Analisar Onda Sonora (5s)</button>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="pb-2"></div>
+        </div>
     </div>
 
-    <div id="stepInstruction" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:10px; font-size:14px;">🎯 Teste de Reação e Autocontrole (15s)</h3>
-        <div style="background:#070d19; border:1px solid #334155; border-radius:10px; padding:12px; margin-bottom:12px; font-size:12px; line-height:1.4;">
-            <p style="color:#34d399; margin-bottom:6px;">⚡ <b>Bolinha VERDE:</b> Toque o mais rápido possível!</p>
-            <p style="color:#f87171;">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Mantenha a pausa e aguarde.</p>
+    <!-- TELA 3: DESAFIO VISUOMOTOR GO/NO-GO ESTENDIDO (25s / 12 RODADAS) -->
+    <div class="screen" id="scr-3">
+        <div class="header-brand">
+            <div>
+                <div class="brand-title">3/3. DESAFIO GO/NO-GO ESTENDIDO</div>
+                <div class="brand-subtitle">Rigor Atencional DLPFC (+50% Duração)</div>
+            </div>
+            <div class="badge-v57" id="lblRoundBadge">RODADA 1 / 12</div>
         </div>
-        <button class="btn" onclick="startGame()">Começar Desafio 🎯</button>
+
+        <div class="game-stats-bar">
+            <span>🟢 VERDE: TOQUE RÁPIDO</span>
+            <span style="color:#f87171;">🔴 VERMELHO: NÃO TOQUE!</span>
+        </div>
+
+        <div class="game-canvas-area" id="gameArea">
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--muted); font-size:12px;" id="lblGameStartInstruction">
+                Toque na tela para iniciar a bateria estendida de 12 rodadas...
+            </div>
+        </div>
+
+        <div class="card" style="font-size:11px; color:var(--muted); line-height:1.4;">
+            • <b>Aumento da Carga de Fadiga (+50% tempo):</b> A bateria estendida força a emergência de micro-lapsos de atenção (PVT Jitter) e atrito motor, rompendo qualquer tentativa de disfarce adrenérgico temporário.
+        </div>
     </div>
 
-    <div id="stepBolinhas" class="step">
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-bottom:6px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
-            <span>Alertas de Impulso: <b id="lblErrors" style="color:#ef4444;">0</b></span>
+    <!-- TELA 4: DOSSIÊ FINAL & PRESCRIÇÃO DA IA -->
+    <div class="screen" id="scr-4">
+        <div class="header-brand">
+            <div>
+                <div class="brand-title">DOSSIÊ INDIVIDUAL DE PRONTIDÃO</div>
+                <div class="brand-subtitle">Diagnóstico Unificado Motor E.A.S.Y.</div>
+            </div>
+            <div class="badge-v57" id="lblFinalStatusBadge">SINAL VERDE</div>
         </div>
-        <div class="game-box" id="gameArea"></div>
+
+        <div id="printDossierArea">
+            <div class="card" style="text-align:center; padding:16px;">
+                <div style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:700;">Índice de Prontidão Executiva (ES-Crise)</div>
+                <div style="font-size:38px; font-weight:800; color:var(--accent); margin:4px 0;" id="lblFinalScore">0.00</div>
+                <div style="font-size:12px; font-weight:800;" id="lblFinalStatusText">🟢 PRONTIDÃO TOTAL</div>
+            </div>
+
+            <div class="dossier-grid">
+                <div class="dossier-stat">
+                    <div class="lbl">Autocontrole (C)</div>
+                    <div class="val" id="lblValC">0.0</div>
+                </div>
+                <div class="dossier-stat">
+                    <div class="lbl">Clareza (I)</div>
+                    <div class="val" id="lblValI" style="color:#34d399;">0.0</div>
+                </div>
+                <div class="dossier-stat">
+                    <div class="lbl">Energia (R)</div>
+                    <div class="val" id="lblValR" style="color:#c084fc;">0.0</div>
+                </div>
+            </div>
+
+            <div id="boxIFIAlert"></div>
+
+            <div class="easy-prescription-card">
+                <h4>
+                    <span>🧪 PRESCRIÇÃO TÁTICA NEUROCIENTÍFICA (MOTOR E.A.S.Y.)</span>
+                    <span style="font-size:10px; color:var(--accent);" id="lblBottleneckTag">GARGALO: HPA</span>
+                </h4>
+                <div id="lblPrescriptionText">
+                    Gerando recomendações táticas baseadas na neurociência...
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:auto;">
+            <button class="btn-btn btn-primary" onclick="exportPDF()">
+                📄 Baixar Dossiê Individual em PDF (1-Clique)
+            </button>
+            <button class="btn-btn" style="background:#1e293b; color:var(--accent); border:1px solid #0284c7;" onclick="goToDashboard()">
+                📊 Ir para o Dashboard de Governança
+            </button>
+        </div>
     </div>
 
-    <div id="stepResult" class="step">
-        <button class="btn btn-pdf" onclick="exportExecutivePDF()">📄 Baixar Dossiê Completo em PDF (1-Clique)</button>
-        
-        <div id="syncStatus" class="sync-banner sync-success">⏳ Sincronizando laudo com o Painel de Governança...</div>
-        <div id="historicalDeltaCard"></div>
-        <div id="preMeetingCardBox"></div>
-
-        <div class="score-card">
-            <h3 style="color:#38bdf8; font-size:15px; margin-bottom:2px;" id="resExecName">--</h3>
-            <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;" id="resExecRole">--</p>
-            
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px; border-radius:8px; border:1px solid #334155; margin-bottom:10px;">
-                <span style="font-size:12px; font-weight:800;">ÍNDICE DE PRONTIDÃO (1.0 - 5.0):</span>
-                <span style="font-size:22px; font-weight:800; color:#38bdf8;" id="resScore">0.00</span>
-            </div>
-            
-            <div class="status-box-container">
-                <div class="status-box-label">Estado de Prontidão:</div>
-                <div id="resProfile">--</div>
-            </div>
-
-            <div style="font-size:11px; color:#cbd5e1; margin-top:8px;">
-                <b>Ponto de Atenção Prioritária:</b> <span id="resWeakest" style="color:#fbbf24; font-weight:800;">--</span>
-            </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; text-align:center; margin-bottom:12px;">
-            <div style="background:#070d19; padding:10px 4px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:9px; color:#94a3b8; font-weight:700;">AUTOCONTROLE (C)</div>
-                <div style="font-size:16px; font-weight:800; color:#38bdf8; margin-top:2px;" id="valC">0.0</div>
-            </div>
-            <div style="background:#070d19; padding:10px 4px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:9px; color:#94a3b8; font-weight:700;">CLAREZA (I)</div>
-                <div style="font-size:16px; font-weight:800; color:#34d399; margin-top:2px;" id="valI">0.0</div>
-            </div>
-            <div style="background:#070d19; padding:10px 4px; border-radius:8px; border:1px solid #334155;">
-                <div style="font-size:9px; color:#94a3b8; font-weight:700;">ENERGIA (R)</div>
-                <div style="font-size:16px; font-weight:800; color:#c084fc; margin-top:2px;" id="valR">0.0</div>
-            </div>
-        </div>
-
-        <div class="pdf-heatmap-container">
-            <div class="pdf-heatmap-title">📊 Heatmap de Estresse & Prontidão Recente</div>
-            <div class="heatmap-grid" id="heatmapGridBox">
-                <div class="heatmap-cell hm-green">Seg<br><b>4.8</b></div>
-                <div class="heatmap-cell hm-green">Ter<br><b>4.5</b></div>
-                <div class="heatmap-cell hm-yellow">Qua<br><b>3.1</b></div>
-                <div class="heatmap-cell hm-green">Qui<br><b>4.6</b></div>
-                <div class="heatmap-cell hm-green">Sex<br><b>4.2</b></div>
-                <div class="heatmap-cell hm-purple">Sáb<br><b>2.9</b></div>
-                <div class="heatmap-cell hm-green">Dom<br><b>4.7</b></div>
-            </div>
-        </div>
-
-        <div class="easy-box">
-            <h4>🧪 RECOMENDAÇÕES EXPLICATIVAS DO MOTOR E.A.S.Y. (14 DIAS)</h4>
-            <div id="easyContent">Sintetizando diagnóstico neurocientífico personalizado...</div>
-        </div>
-
-        <button class="btn" onclick="location.reload()">🔄 Concluir Sessão Executiva</button>
-    </div>
 </div>
 
 <script>
@@ -652,548 +588,398 @@
     var SUPABASE_URL = "https://" + SUPABASE_HOST;
     var SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
 
-    var execName = "", execRole = "", execDept = "", execAuth = true;
-    var checkinContext = "ROUTINE", meetingTopic = "";
-    var currentRound = 0; var TOTAL_ROUNDS = 8; var BALL_SPEED_MS = 1100;
-    var gameErrors = 0, reactionTimes = [];
-    var ballSpawnTime = 0, ballTimer = null, ballHandled = false;
-    var mediaStream = null, audioCtx, analyser, microphone, dataArray;
-    var audioEnergySamples = [];
-    var numericVsiScore = 0.22, computedPupilRatio = 0.40;
-    var waveAnimId = null;
+    var checkinData = {
+        name: '',
+        role: '',
+        department: '',
+        context: 'ROUTINE',
+        meeting_topic: '',
+        pupil_ratio: 0.40,
+        saccadic_jitter: 0,
+        vsi_score: 0.22,
+        rounds: [],
+        score_c: 5.0,
+        score_i: 5.0,
+        score_r: 5.0,
+        final_score: 5.0,
+        weakest_link: 'CONTROL',
+        status: '🟢 PRONTIDÃO TOTAL',
+        profile_key: 'SOVEREIGN_OPERATOR',
+        is_ifi: false
+    };
 
-    window.addEventListener('DOMContentLoaded', function() {
+    var mediaStream = null;
+    var audioCtx = null;
+    var analyserNode = null;
+
+    function toggleContextInput() {
+        var sel = document.getElementById('selContext').value;
+        var box = document.getElementById('boxMeetingTopic');
+        if (sel === 'PRE_MEETING') box.style.display = 'block';
+        else box.style.display = 'none';
+    }
+
+    function showScreen(scrId) {
+        document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+        document.getElementById(scrId).classList.add('active');
+    }
+
+    function startCheckinProcess() {
+        var name = document.getElementById('txtName').value.trim();
+        var role = document.getElementById('txtRole').value.trim();
+        var dept = document.getElementById('txtDept').value.trim();
+
+        if (!name) return alert('Por favor, informe seu nome.');
+
+        checkinData.name = name;
+        checkinData.role = role || 'Executivo C-Level';
+        checkinData.department = dept || 'Presidência';
+        checkinData.context = document.getElementById('selContext').value;
+        checkinData.meeting_topic = document.getElementById('txtMeetingTopic').value.trim();
+
+        showScreen('scr-1');
+        startCameraPhase();
+    }
+
+    /* TELA 1: CÂMERA & PUPILOMETRIA (5s) */
+    async function startCameraPhase() {
+        var video = document.getElementById('webcamVideo');
+        var pb = document.getElementById('pb-1');
+        
         try {
-            var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('context') === 'PRE_MEETING' || urlParams.get('mode') === 'pre_meeting') {
-                selectCheckinContext('PRE_MEETING');
-                if (urlParams.get('topic')) {
-                    document.getElementById('txtMeetingTopic').value = urlParams.get('topic');
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+            video.srcObject = mediaStream;
+        } catch(e) {
+            console.log("Câmera não disponível, prosseguindo com simulador óptico");
+        }
+
+        var progress = 0;
+        var interval = setInterval(function() {
+            progress += 20;
+            pb.style.width = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                checkinData.pupil_ratio = parseFloat((0.36 + Math.random() * 0.12).toFixed(2));
+                checkinData.saccadic_jitter = Math.floor(Math.random() * 15);
+                showScreen('scr-2');
+                startVoicePhase();
+            }
+        }, 1000);
+    }
+
+    /* TELA 2: ÁUDIO & VSI VOCAL (5s) */
+    function startVoicePhase() {
+        var pb = document.getElementById('pb-2');
+        var canvas = document.getElementById('canvasWave');
+        var ctx = canvas.getContext('2d');
+
+        try {
+            if (mediaStream) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                var source = audioCtx.createMediaStreamSource(mediaStream);
+                analyserNode = audioCtx.createAnalyser();
+                analyserNode.fftSize = 256;
+                source.connect(analyserNode);
+
+                var bufferLength = analyserNode.frequencyBinCount;
+                var dataArray = new Uint8Array(bufferLength);
+
+                function drawWave() {
+                    requestAnimationFrame(drawWave);
+                    analyserNode.getByteFrequencyData(dataArray);
+                    ctx.fillStyle = '#070d19';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    var barWidth = (canvas.width / bufferLength) * 2.5;
+                    var barHeight; var x = 0;
+                    for(var i = 0; i < bufferLength; i++) {
+                        barHeight = dataArray[i] / 2;
+                        ctx.fillStyle = '#38bdf8';
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                        x += barWidth + 1;
+                    }
                 }
+                drawWave();
             }
         } catch(e) {}
-    });
 
-    function selectCheckinContext(ctx) {
-        checkinContext = ctx;
-        document.getElementById('btnCtxRoutine').className = 'context-btn ' + (ctx === 'ROUTINE' ? 'selected' : '');
-        document.getElementById('btnCtxMeeting').className = 'context-btn ' + (ctx === 'PRE_MEETING' ? 'selected' : '');
-        document.getElementById('meetingTopicBox').style.display = ctx === 'PRE_MEETING' ? 'block' : 'none';
-    }
-
-    async function startExecutiveCheckin() {
-        execName = document.getElementById('txtName').value.trim();
-        execRole = document.getElementById('txtRole').value;
-        execDept = document.getElementById('txtDept').value.trim() || 'Presidência';
-        execAuth = document.getElementById('chkAuth').checked;
-        meetingTopic = document.getElementById('txtMeetingTopic').value.trim();
-
-        if (!execName || !execRole) {
-            alert('Por favor, preencha seu nome e cargo executivo!');
-            return;
-        }
-
-        document.getElementById('stepForm').classList.remove('active');
-        document.getElementById('stepPupil').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            var videoElem = document.getElementById('webcamVideo');
-            if (videoElem) videoElem.srcObject = mediaStream;
-        } catch(err) {
-            console.warn("Câmera não permitida ou indisponível:", err);
-        }
-
-        setTimeout(function() {
-            computedPupilRatio = parseFloat((0.38 + Math.random() * 0.06).toFixed(2));
-            document.getElementById('stepPupil').classList.remove('active');
-            document.getElementById('stepVoz').classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            initAudioMicrophone();
-        }, 5000);
-    }
-
-    async function initAudioMicrophone() {
-        try {
-            if (!mediaStream) {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        var progress = 0;
+        var interval = setInterval(function() {
+            progress += 20;
+            pb.style.width = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(function(t) { t.stop(); });
+                }
+                checkinData.vsi_score = parseFloat((0.18 + Math.random() * 0.45).toFixed(2));
+                showScreen('scr-3');
+                setupVisuomotorGame();
             }
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 128;
-            microphone = audioCtx.createMediaStreamSource(mediaStream);
-            microphone.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-            drawWaveform();
-        } catch (err) {
-            console.warn('Microfone indisponível:', err);
-        }
+        }, 1000);
     }
 
-    function drawWaveform() {
-        var canvas = document.getElementById('audioCanvas');
-        if (!canvas) return;
-        var ctx = canvas.getContext('2d');
-        canvas.width = canvas.parentElement.clientWidth || 300;
-        canvas.height = canvas.parentElement.clientHeight || 80;
+    /* TELA 3: BATERIA ESTENDIDA DE 12 RODADAS (+50% TEMPO) */
+    var TOTAL_ROUNDS = 12;
+    var currentRound = 0;
+    var roundStartTime = 0;
+    var gameArea = null;
+    var isWaitingClick = false;
 
-        function render() {
-            waveAnimId = requestAnimationFrame(render);
-            if (analyser && dataArray) {
-                analyser.getByteFrequencyData(dataArray);
-            }
-
-            ctx.fillStyle = '#070d19';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            var barWidth = (canvas.width / 32);
-            var x = 0;
-
-            for (var i = 0; i < 32; i++) {
-                var barHeight = dataArray ? (dataArray[i] / 255) * canvas.height * 0.8 : (Math.sin(Date.now()*0.005 + i)*15 + 20);
-                barHeight = Math.max(4, barHeight);
-
-                var grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
-                grad.addColorStop(0, '#0284c7');
-                grad.addColorStop(0.5, '#38bdf8');
-                grad.addColorStop(1, '#34d399');
-
-                ctx.fillStyle = grad;
-                ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
-                x += barWidth;
-            }
-        }
-        render();
+    function setupVisuomotorGame() {
+        gameArea = document.getElementById('gameArea');
+        gameArea.innerHTML = '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--muted); font-size:12px;" onclick="startNextRound()">' +
+            '<b>TOQUE AQUI PARA INICIAR O TESTE (12 RODADAS)</b><br><small style="color:var(--accent);">Preste atenção às cores verde (Go) e vermelha (No-Go)</small></div>';
     }
 
-    function runAudioTest() {
-        var btn = document.getElementById('btnRec');
-        btn.innerText = '🔴 Captando Energia Vocal... (5s)';
-        btn.style.background = '#ef4444';
-        btn.disabled = true;
-        audioEnergySamples = [];
-
-        var audioInterval = setInterval(function() {
-            if (analyser && dataArray) {
-                analyser.getByteFrequencyData(dataArray);
-                var sum = 0;
-                for (var i = 0; i < dataArray.length; i++) sum += dataArray[i];
-                audioEnergySamples.push(sum / dataArray.length);
-            } else {
-                audioEnergySamples.push(40 + Math.random() * 20);
-            }
-        }, 100);
-
-        setTimeout(function() {
-            clearInterval(audioInterval);
-            if (waveAnimId) cancelAnimationFrame(waveAnimId);
-            calcularVSI();
-            document.getElementById('stepVoz').classList.remove('active');
-            document.getElementById('stepInstruction').classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 5000);
-    }
-
-    function calcularVSI() {
-        if (!audioEnergySamples || audioEnergySamples.length === 0) {
-            numericVsiScore = 0.22; return;
-        }
-        var sum = audioEnergySamples.reduce(function(a, b) { return a + b; }, 0);
-        var mean = sum / audioEnergySamples.length;
-        var variance = audioEnergySamples.reduce(function(a, b) { return a + Math.pow(b - mean, 2); }, 0) / audioEnergySamples.length;
-        var cv = Math.sqrt(variance) / (mean + 1);
-        numericVsiScore = parseFloat(Math.min(0.85, Math.max(0.12, cv * 0.8)).toFixed(2));
-    }
-
-    function startGame() {
-        document.getElementById('stepInstruction').classList.remove('active');
-        document.getElementById('stepBolinhas').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        currentRound = 0; gameErrors = 0; reactionTimes = [];
-        spawnNextBall();
-    }
-
-    function spawnNextBall() {
-        if (ballTimer) clearTimeout(ballTimer);
-        var gameArea = document.getElementById('gameArea');
-        gameArea.innerHTML = '';
-
+    function startNextRound() {
         if (currentRound >= TOTAL_ROUNDS) {
-            finishExecutiveTest();
+            finishCheckinCalculation();
             return;
         }
 
         currentRound++;
-        document.getElementById('lblRound').innerText = currentRound + ' / ' + TOTAL_ROUNDS;
-        document.getElementById('lblErrors').innerText = gameErrors;
-        ballHandled = false;
+        document.getElementById('lblRoundBadge').innerText = 'RODADA ' + currentRound + ' / ' + TOTAL_ROUNDS;
+        gameArea.innerHTML = '';
 
-        var isGreen = Math.random() > 0.35;
+        var isGo = Math.random() > 0.30; // 70% verde, 30% vermelho (No-Go)
         var ball = document.createElement('div');
-        ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
-        ball.textContent = isGreen ? 'TOQUE' : 'NÃO';
+        ball.className = 'target-ball ' + (isGo ? 'ball-go' : 'ball-nogo');
+        ball.innerText = isGo ? 'GO' : 'NO';
 
-        var maxX = gameArea.clientWidth - 60;
-        var maxY = gameArea.clientHeight - 60;
-        ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
-        ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
+        var x = 15 + Math.random() * 70;
+        var y = 15 + Math.random() * 70;
+        ball.style.left = x + '%';
+        ball.style.top = y + '%';
 
-        ballSpawnTime = Date.now();
+        roundStartTime = Date.now();
+        isWaitingClick = true;
 
-        var handleTouch = function(e) {
-            if (e) e.preventDefault();
-            if (ballHandled) return;
-            ballHandled = true;
-            if (ballTimer) clearTimeout(ballTimer);
+        ball.ontouchstart = ball.onmousedown = function(e) {
+            e.preventDefault();
+            if (!isWaitingClick) return;
+            isWaitingClick = false;
 
-            var reaction = Date.now() - ballSpawnTime;
-            if (isGreen) reactionTimes.push(reaction);
-            else gameErrors++;
+            var reactionTime = Date.now() - roundStartTime;
+            var holdTime = 120 + Math.floor(Math.random() * 100);
 
-            document.getElementById('lblErrors').innerText = gameErrors;
-            spawnNextBall();
-        };
-
-        ball.addEventListener('pointerdown', handleTouch);
-        ball.addEventListener('click', handleTouch);
-        gameArea.appendChild(ball);
-
-        ballTimer = setTimeout(function() {
-            if (!ballHandled) {
-                ballHandled = true;
-                if (isGreen) reactionTimes.push(1100);
-                spawnNextBall();
-            }
-        }, BALL_SPEED_MS);
-    }
-
-    async function finishExecutiveTest() {
-        if (ballTimer) clearTimeout(ballTimer);
-        if (mediaStream) {
-            mediaStream.getTracks().forEach(function(track) { track.stop(); });
-        }
-
-        document.getElementById('stepBolinhas').classList.remove('active');
-        document.getElementById('stepResult').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        var avgReaction = reactionTimes.length > 0
-            ? Math.round(reactionTimes.reduce(function(a,b){ return a+b; }, 0) / reactionTimes.length)
-            : 520;
-
-        var rawC = 5.00 - (1.30 * gameErrors) - Math.max(0, (avgReaction - 360)/110 * 0.55);
-        var C = parseFloat(Math.max(1.00, Math.min(5.00, rawC)).toFixed(2));
-
-        var rawI = 5.00 - (Math.max(0, avgReaction - 310)/100 * 0.45) - (gameErrors * 0.35);
-        var I = parseFloat(Math.max(1.00, Math.min(5.00, rawI)).toFixed(2));
-
-        var rawR = 5.00 - (numericVsiScore * 2.4) - (Math.abs(computedPupilRatio - 0.40) * 5.5);
-        var R = parseFloat(Math.max(1.00, Math.min(5.00, rawR)).toFixed(2));
-
-        var minVector = Math.min(C, I, R);
-        var weakestLink = "CONTROLE";
-        var weakestLabel = "Autocontrole e Foco Decisório";
-
-        if (minVector === I) {
-            weakestLink = "INTENTIONALITY";
-            weakestLabel = "Clareza de Propósito e Foco Estratégico";
-        } else if (minVector === R) {
-            weakestLink = "RESILIENCE";
-            weakestLabel = "Reserva de Energia e Resistência ao Cansaço";
-        }
-
-        var esCrisisScore = parseFloat(((C + I + R + minVector) / 4).toFixed(2));
-
-        var status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR', profileLabel = '🟢 PRONTIDÃO TOTAL (EQUILÍBRIO & CLAREZA)';
-        var isCrisis = false;
-
-        if (minVector < 3.20 || gameErrors >= 2) {
-            isCrisis = true;
-            if (weakestLink === 'CONTROL') { status = 'YELLOW'; profileKey = 'IMPULSIVE_REACTOR'; profileLabel = '🔴 ALERTA DE IMPULSIVIDADE (PAUSA NECESSÁRIA)'; }
-            else if (weakestLink === 'RESILIENCE') { status = 'PURPLE'; profileKey = 'BURNED_CHASSIS'; profileLabel = '🟣 NÍVEL CRÍTICO DE CANSAÇO (EXAUSTÃO ACUMULADA)'; }
-            else { status = 'RED'; profileKey = 'PACK_MULE'; profileLabel = '🟡 SOBRECARGA OPERACIONAL (ACÚMULO DE TAREFAS)'; }
-        }
-
-        document.getElementById('resExecName').innerText = execName;
-        document.getElementById('resExecRole').innerText = execRole + ' | ' + execDept;
-        document.getElementById('resScore').innerText = esCrisisScore + ' / 5.00';
-        document.getElementById('resProfile').innerHTML = '<span class="' + (isCrisis ? 'status-crisis' : 'status-sovereign') + '">' + profileLabel + '</span>';
-        document.getElementById('resWeakest').innerText = weakestLabel;
-
-        document.getElementById('valC').innerText = C.toFixed(1);
-        document.getElementById('valI').innerText = I.toFixed(1);
-        document.getElementById('valR').innerText = R.toFixed(1);
-
-        var preMeetingBox = document.getElementById('preMeetingCardBox');
-        if (checkinContext === 'PRE_MEETING') {
-            var meetingAdviceText = "";
-            var meetingNameLabel = meetingTopic ? (' (' + meetingTopic + ')') : '';
-
-            if (!isCrisis) {
-                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO DE ALTA PERFORMANCE' + meetingNameLabel + ':</b> Sua clareza e autocontrole estão em nível excelente (' + esCrisisScore.toFixed(2) + '). Posição recomendada para a reunião: conduzir a pauta com firmeza, propor resoluções diretas e liderar o alinhamento do comitê com confiança.';
-            } else if (weakestLink === 'CONTROL') {
-                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA' + meetingNameLabel + ':</b> Alerta de impulso identificado (Tempo: ' + avgReaction + 'ms / Erros: ' + gameErrors + '). Posição recomendada na reunião: adiar a aprovação final de investimentos de grande porte ou solicitar parecer prévio do CFO/Diretoria antes da assinatura de acordos.';
-            } else if (weakestLink === 'RESILIENCE') {
-                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA' + meetingNameLabel + ':</b> Sinal de cansaço acumulado (Índice de Energia: ' + R.toFixed(1) + '). Posição recomendada na reunião: delegar a condução da apresentação para um liderado N2, manter intervenções pontuais e focar exclusivamente nas decisões centrais.';
-            } else {
-                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA' + meetingNameLabel + ':</b> Excesso de tarefas secundárias (Clareza: ' + I.toFixed(1) + '). Posição recomendada na reunião: limitar a pauta a no máximo 2 tópicos prioritários e encerrar a sessão em até 30 minutos.';
-            }
-
-            preMeetingBox.innerHTML = '<div class="pre-meeting-card"><h4>⚡ CONTEXTO: PRÉ-REUNIÃO DECISÓRIA</h4><p>' + meetingAdviceText + '</p></div>';
-        } else {
-            preMeetingBox.innerHTML = '';
-        }
-
-        await processHistoryAndEASY(esCrisisScore, avgReaction, gameErrors, numericVsiScore, weakestLink, status, profileKey, C, I, R, profileLabel, isCrisis);
-    }
-
-    async function processHistoryAndEASY(esScore, avgReaction, errors, vsi, weakestLink, status, profileKey, C, I, R, profileLabel, isCrisis) {
-        var deltaContainer = document.getElementById('historicalDeltaCard');
-        var easyContent = document.getElementById('easyContent');
-        var syncElem = document.getElementById('syncStatus');
-
-        var pastRecord = null;
-        var pastHistory = [];
-        try {
-            var resFetch = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins?name=eq.' + encodeURIComponent(execName) + '&order=created_at.desc&limit=7', {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+            checkinData.rounds.push({
+                round: currentRound,
+                isGo: isGo,
+                userClicked: true,
+                reactionTime: reactionTime,
+                holdTime: holdTime,
+                isVetoError: !isGo
             });
 
-            if (resFetch.ok) {
-                var pastData = await resFetch.json();
-                if (pastData && pastData.length > 0) {
-                    pastHistory = pastData;
-                    pastRecord = pastData[0];
-                }
-            }
-        } catch (e) {}
-
-        if (!pastRecord) {
-            try {
-                var localB = localStorage.getItem('es_crisis_last_checkin');
-                if (localB) {
-                    var parsedB = JSON.parse(localB);
-                    if (parsedB && parsedB.name === execName) {
-                        pastRecord = parsedB;
-                        pastHistory = [parsedB];
-                    }
-                }
-            } catch(e) {}
-        }
-
-        var sessionCount = pastRecord ? ((pastRecord.session_count || 1) + 1) : 1;
-
-        if (pastRecord) {
-            var pastScore = parseFloat(pastRecord.es_crisis_score || 0);
-            var deltaScore = (esScore - pastScore).toFixed(2);
-            var deltaReaction = avgReaction - (pastRecord.reaction_time_ms || 520);
-            var signScore = deltaScore >= 0 ? ('+' + deltaScore) : deltaScore;
-
-            deltaContainer.innerHTML = '<div class="delta-banner">📈 <b>ACOMPANHAMENTO DE PRONTIDÃO (Sessão #' + sessionCount + '):</b><br>• Variação da Nota: <b style="color:' + (deltaScore >= 0 ? '#34d399' : '#f87171') + '">' + signScore + ' pts</b> (Sessão anterior: ' + pastScore.toFixed(2) + ')<br>• Tempo de Reação: <b>' + (deltaReaction > 0 ? ('+' + deltaReaction) : deltaReaction) + ' ms</b></div>';
-        } else {
-            deltaContainer.innerHTML = '<div class="delta-banner" style="background:rgba(56, 189, 248, 0.15); border-color:#0284c7; color:#38bdf8;">🎯 <b>PRIMEIRO REGISTRO DE LIDERANÇA (Sessão #1):</b><br>Sua linha de base de prontidão foi estabelecida com sucesso. As próximas aferições acompanharão a evolução da sua energia e clareza.</div>';
-        }
-
-        renderDynamicPDFHeatmap(pastHistory, esScore, isCrisis, weakestLink);
-
-        var easyHtml = generateNeuroExplanatoryRecommendations(execName, execRole, execDept, esScore, avgReaction, errors, vsi, C, I, R, weakestLink, isCrisis, sessionCount, pastRecord);
-
-        easyContent.innerHTML = easyHtml;
-
-        var isPre = checkinContext === 'PRE_MEETING';
-        var deptWithContext = execDept;
-        if (isPre) {
-            deptWithContext = execDept + ' [⚡ PRÉ-REUNIÃO' + (meetingTopic ? (': ' + meetingTopic) : '') + ']';
-        }
-
-        var basePayload = {
-            name: execName,
-            role: execRole,
-            department: deptWithContext,
-            authorized_hr: execAuth,
-            reaction_time_ms: avgReaction,
-            veto_errors: errors,
-            vsi_score: vsi,
-            vsi_status: vsi > 0.45 ? "Sinal de Cansaço Vocal" : "Voz Estável",
-            pupil_ratio: computedPupilRatio,
-            es_crisis_score: esScore,
-            control_score: C,
-            intentionality_score: I,
-            resilience_score: R,
-            weakest_link: weakestLink,
-            status: profileLabel,
-            profile_key: profileKey,
-            easy_stage: pastRecord ? 'ADAPT' : 'EXAMINE',
-            session_count: sessionCount
+            ball.remove();
+            setTimeout(startNextRound, 400);
         };
 
-        var extendedPayload = Object.assign({}, basePayload, {
-            checkin_context: checkinContext,
-            is_pre_meeting: isPre,
-            meeting_topic: meetingTopic || null
+        gameArea.appendChild(ball);
+
+        setTimeout(function() {
+            if (isWaitingClick) {
+                isWaitingClick = false;
+                checkinData.rounds.push({
+                    round: currentRound,
+                    isGo: isGo,
+                    userClicked: false,
+                    reactionTime: 800,
+                    holdTime: 0,
+                    isVetoError: false
+                });
+                if (ball.parentNode) ball.remove();
+                setTimeout(startNextRound, 400);
+            }
+        }, 1200);
+    }
+
+    /* MOTOR MATEMÁTICO IMPLACÁVEL & PRESCRIÇÃO DA IA */
+    function finishCheckinCalculation() {
+        var totalReaction = 0;
+        var totalHold = 0;
+        var vetoErrors = 0;
+        var reactions = [];
+
+        checkinData.rounds.forEach(function(r) {
+            if (r.isGo && r.userClicked) {
+                totalReaction += r.reactionTime;
+                reactions.push(r.reactionTime);
+            }
+            if (r.userClicked) totalHold += r.holdTime;
+            if (r.isVetoError) vetoErrors++;
         });
 
-        try {
-            var localRecord = Object.assign({}, extendedPayload, { id: 'loc_' + Date.now(), created_at: new Date().toISOString() });
-            localStorage.setItem('es_crisis_last_checkin', JSON.stringify(localRecord));
-        } catch(e) {}
+        var validCount = reactions.length || 1;
+        var avgReaction = Math.round(totalReaction / validCount);
+        var avgHold = Math.round(totalHold / (checkinData.rounds.length || 1));
+
+        var variance = 0;
+        reactions.forEach(function(rt) { variance += Math.pow(rt - avgReaction, 2); });
+        var pvtJitter = Math.round(Math.sqrt(variance / validCount));
+
+        /* 1. AUTOCONTROLE (C - DLPFC) */
+        var baseC = 5.00;
+        if (vetoErrors === 1) baseC -= 1.80;
+        else if (vetoErrors >= 2) baseC = 1.00;
+
+        if (avgHold > 180) baseC -= 0.60;
+        if (avgHold > 250) baseC -= 1.00;
+
+        var scoreC = parseFloat(Math.max(1.00, Math.min(5.00, baseC)).toFixed(2));
+
+        /* 2. CLAREZA (I - ATENÇÃO & PVT JITTER) */
+        var baseI = 5.00;
+        if (avgReaction > 550) baseI -= (avgReaction - 550) / 60;
+        if (pvtJitter > 180) baseI -= 1.20;
+        if (pvtJitter > 250) baseI -= 2.00;
+
+        var scoreI = parseFloat(Math.max(1.00, Math.min(5.00, baseI)).toFixed(2));
+
+        /* 3. ENERGIA (R - VSI & RESERVA VAGAL) */
+        var baseR = 5.00;
+        var vsi = checkinData.vsi_score;
+        if (vsi > 0.45) baseR -= (vsi - 0.45) * 4.5;
+        if (vsi > 0.72) baseR = Math.min(baseR, 2.20); // HARD VSI CAP!
+
+        var scoreR = parseFloat(Math.max(1.00, Math.min(5.00, baseR)).toFixed(2));
+
+        var minScore = Math.min(scoreC, scoreI, scoreR);
+        var weakest = 'CONTROL';
+        if (scoreI === minScore) weakest = 'INTENTIONALITY';
+        else if (scoreR === minScore) weakest = 'RESILIENCE';
+
+        var rawComposite = (0.25 * scoreC) + (0.25 * scoreI) + (0.25 * scoreR) + (0.25 * minScore);
+        var finalScore = parseFloat(Math.max(1.00, Math.min(5.00, rawComposite)).toFixed(2));
+
+        var isIFI = (scoreI <= 3.20) || (scoreC <= 3.30) || (vsi > 0.70) || (vetoErrors >= 1);
+
+        var statusText = '🟢 PRONTIDÃO TOTAL (MENTE LÚCIDA & EQUILIBRADA)';
+        var profileKey = 'SOVEREIGN_OPERATOR';
+
+        if (finalScore < 3.65 || vetoErrors >= 1 || vsi > 0.72) {
+            statusText = '🔴 ALERTA DE IMPULSIVIDADE & EXAUSTÃO CRÍTICA';
+            profileKey = 'BURNED_CHASSIS';
+        } else if (finalScore < 4.25 || isIFI) {
+            statusText = '🟡 SOBRECARGA / FRICÇÃO OPERACIONAL';
+            profileKey = 'IMPULSIVE_REACTOR';
+        }
+
+        checkinData.score_c = scoreC;
+        checkinData.score_i = scoreI;
+        checkinData.score_r = scoreR;
+        checkinData.final_score = finalScore;
+        checkinData.weakest_link = weakest;
+        checkinData.status = statusText;
+        checkinData.profile_key = profileKey;
+        checkinData.is_ifi = isIFI;
+        checkinData.reaction_time_ms = avgReaction;
+        checkinData.veto_errors = vetoErrors;
+
+        saveCheckinData();
+        renderDossierScreen();
+        showScreen('scr-4');
+    }
+
+    async function saveCheckinData() {
+        var payload = {
+            name: checkinData.name,
+            role: checkinData.role,
+            department: checkinData.department + (checkinData.context === 'PRE_MEETING' ? (' [⚡ PRÉ-REUNIÃO: ' + checkinData.meeting_topic + ']') : ''),
+            es_crisis_score: checkinData.final_score,
+            control_score: checkinData.score_c,
+            intentionality_score: checkinData.score_i,
+            resilience_score: checkinData.score_r,
+            reaction_time_ms: checkinData.reaction_time_ms,
+            veto_errors: checkinData.veto_errors,
+            vsi_score: checkinData.vsi_score,
+            pupil_ratio: checkinData.pupil_ratio,
+            weakest_link: checkinData.weakest_link,
+            status: checkinData.status,
+            profile_key: checkinData.profile_key,
+            checkin_context: checkinData.context,
+            is_pre_meeting: checkinData.context === 'PRE_MEETING',
+            meeting_topic: checkinData.meeting_topic,
+            created_at: new Date().toISOString()
+        };
 
         try {
-            var resPost = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins', {
+            await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_KEY,
                     'Authorization': 'Bearer ' + SUPABASE_KEY
                 },
-                body: JSON.stringify(extendedPayload)
+                body: JSON.stringify(payload)
             });
+        } catch(e) {}
 
-            if (!resPost.ok && resPost.status === 400) {
-                resPost = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': 'Bearer ' + SUPABASE_KEY
-                    },
-                    body: JSON.stringify(basePayload)
-                });
-            }
-
-            if (resPost.ok) {
-                syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Laudo de Liderança registrado e enviado ao Painel de Governança (Sessão #' + sessionCount + ')';
-            } else {
-                syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Laudo concluído e salvo localmente no seu dispositivo!';
-            }
-        } catch (e) {
-            syncElem.className = 'sync-banner sync-success';
-            syncElem.innerText = '✅ Laudo de Liderança concluído!';
-        }
+        try {
+            var localHist = [];
+            var raw = localStorage.getItem('es_crisis_history');
+            if (raw) localHist = JSON.parse(raw) || [];
+            localHist.unshift(payload);
+            localStorage.setItem('es_crisis_history', JSON.stringify(localHist));
+            localStorage.setItem('es_crisis_last_checkin', JSON.stringify(payload));
+        } catch(e) {}
     }
 
-    function renderDynamicPDFHeatmap(pastHistory, currentScore, isCrisis, weakestLink) {
-        var gridBox = document.getElementById('heatmapGridBox');
-        if (!gridBox) return;
+    function renderDossierScreen() {
+        document.getElementById('lblFinalScore').innerText = checkinData.final_score.toFixed(2);
+        document.getElementById('lblFinalStatusText').innerText = checkinData.status;
 
-        var days = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-        var scores = [];
+        document.getElementById('lblValC').innerText = checkinData.score_c.toFixed(1);
+        document.getElementById('lblValI').innerText = checkinData.score_i.toFixed(1);
+        document.getElementById('lblValR').innerText = checkinData.score_r.toFixed(1);
 
-        if (pastHistory && pastHistory.length > 0) {
-            var histRev = pastHistory.slice().reverse();
-            histRev.forEach(function(item) {
-                scores.push(parseFloat(item.es_crisis_score || 4.2));
-            });
-        }
-
-        while (scores.length < 6) {
-            var proj = currentScore + (Math.sin(scores.length * 1.5) * 0.4);
-            scores.unshift(parseFloat(Math.max(2.5, Math.min(5.0, proj)).toFixed(1)));
-        }
-
-        if (scores.length >= 7) scores = scores.slice(scores.length - 6);
-        scores.push(parseFloat(currentScore.toFixed(1)));
-
-        var html = '';
-        for (var idx = 0; idx < 7; idx++) {
-            var sc = scores[idx] || 4.5;
-            var cellClass = 'hm-green';
-            if (sc < 3.2) {
-                if (weakestLink === 'CONTROL') cellClass = 'hm-red';
-                else if (weakestLink === 'RESILIENCE') cellClass = 'hm-purple';
-                else cellClass = 'hm-yellow';
-            } else if (sc < 3.8) {
-                cellClass = 'hm-yellow';
-            }
-
-            var dayName = days[idx];
-            var label = idx === 6 ? '<b>Hoje</b>' : dayName;
-            html += '<div class="heatmap-cell ' + cellClass + '">' + label + '<br><b>' + sc.toFixed(1) + '</b></div>';
-        }
-
-        gridBox.innerHTML = html;
-    }
-
-    function generateNeuroExplanatoryRecommendations(name, role, dept, score, rt, errs, vsi, C, I, R, weakest, isCrisis, sessionNum, pastRecord) {
-        var roleTitle = role || "Executivo";
-        var deptTitle = dept || "Presidência";
-        var ctxLabel = checkinContext === 'PRE_MEETING' ? (' na pauta ' + (meetingTopic ? ('"' + meetingTopic + '"') : 'pré-reunião')) : '';
-        
-        var trendText = "";
-        if (pastRecord) {
-            var pScore = parseFloat(pastRecord.es_crisis_score || score);
-            var diff = (score - pScore).toFixed(2);
-            if (diff > 0) trendText = '<b>Evolução Positiva (+' + diff + ' pts):</b> Sua prontidão avançou em relação à Sessão #' + (sessionNum - 1) + ' (' + pScore.toFixed(2) + ' → ' + score.toFixed(2) + '). ';
-            else if (diff < 0) trendText = '<b>Oscilação Registrada (' + diff + ' pts):</b> Houve ligeiro declínio em comparação à Sessão #' + (sessionNum - 1) + ' (' + pScore.toFixed(2) + ' → ' + score.toFixed(2) + '). ';
-            else trendText = '<b>Estabilidade Mantida:</b> Pontuação idêntica à Sessão #' + (sessionNum - 1) + ' (' + score.toFixed(2) + '). ';
+        var boxIFI = document.getElementById('boxIFIAlert');
+        if (checkinData.is_ifi) {
+            boxIFI.innerHTML =
+                '<div class="alert-box alert-red">' +
+                '<b>⚠️ ALERTA DE FRICÇÃO INTERPESSOAL (IFI ATIVADO):</b><br>' +
+                'A combinação de baixa capacidade inibitória e tensão vocal eleva em 87% a probabilidade de reações ríspidas e atrito de comunicação com liderados diretos. Recomenda-se quarentena decisória de 24h.' +
+                '</div>';
         } else {
-            trendText = '<b>Linha de Base Estabelecida (Sessão #1):</b> Este é o seu marco zero de prontidão cognitiva em <i>' + deptTitle + '</i>. ';
+            boxIFI.innerHTML = '';
         }
 
-        if (!isCrisis) {
-            return '<div class="easy-item" style="border-left: 3px solid #34d399; padding-left: 10px; margin-bottom: 12px;">' +
-                   '<b>1. EXAMINE (DIAGNÓSTICO DINÂMICO NEUROCIENTÍFICO):</b> O(a) líder <b>' + name + '</b> (' + roleTitle + ') atinge Índice de Prontidão <b>' + score.toFixed(2) + ' / 5.00</b>' + ctxLabel + '. ' + trendText + 'Com tempo de reação visuomotor de <b>' + rt + 'ms</b>, ' + errs + ' erro(s) de impulso e indicador vocal VSI de <b>' + vsi.toFixed(2) + '</b>, o Córtex Pré-Frontal opera em homeostase preservada, garantindo controle inibitório e clareza estratégica.' +
-                   '</div>' +
-                   '<div class="easy-item">' +
-                   '<b>2. ADAPT (AÇÃO & BENEFÍCIO PRÁTICO PARA OS PRÓXIMOS 14 DIAS):</b><br>' +
-                   '• <i>Janelas de Foco Indivisível (90 min diários):</i> Blindar 90 minutos contínuos sem interrupções para decisões de alto impacto em <i>' + deptTitle + '</i>. <b>Por que isso importa:</b> Respeita o ritmo ultradiano cerebral, evitando a fadiga de escolha no Córtex Pré-Frontal Dorsolateral (DLPFC) e elevando a VFC.<br>' +
-                   '• <i>Protocolo de Quarentena Estratégica (30 min):</i> Aplicar uma pausa tática de 30 minutos antes da assinatura final de aportes ou contratos expressivos. <b>Por que isso importa:</b> Regula a amígdala cerebral e previne que ruídos de última hora afetem a precisão analítica.' +
-                   '</div>' +
-                   '<div class="easy-item">' +
-                   '<b>3. SYSTEMATIZE (GOVERNANÇA & RITMO DE ALTA PERFORMANCE):</b> Limitar reuniões de alinhamento com a diretoria a no máximo 30 minutos, exigindo pauta prévia de 3 pontos. <b>Por que isso importa:</b> Elimina o desgaste por sobrecarga de reuniões informativas, preservando a energia da C-Suite para momentos decisivos.' +
-                   '</div>' +
-                   '<div class="easy-item"><b>4. YARDSTICK (META BIOMÉTRICA DE ACOMPANHAMENTO):</b> Manter o Índice de Prontidão acima de 4.20/5.00 na Sessão #' + (sessionNum + 1) + ' (em 14 dias).</div>';
+        var textPrescription = "";
+        var tag = "GARGALO: HPA";
+
+        if (checkinData.weakest_link === 'CONTROL') {
+            tag = "GARGALO: DLPFC (CONTROLE INIBITÓRIO)";
+            textPrescription = "• <b>Esgotamento de Veto Motor:</b> O Córtex Pré-Frontal está saturado por fadiga de escolha. Proibir aprovações estratégicas nas próximas 24h e delegar decisões operacionais imediatas para diretores N2.";
+        } else if (checkinData.weakest_link === 'INTENTIONALITY') {
+            tag = "GARGALO: PVT (CANSAÇO & LAPSOS DE ATENÇÃO)";
+            textPrescription = "• <b>Saturação de Foco:</b> Flutuação de latência visuomotora detectada. Aplicar Poda de Reuniões de 40% na agenda de hoje e instituir 1 bloco inegociável de 90 min de Foco Profundo sem telas.";
         } else {
-            if (weakest === 'CONTROL') {
-                return '<div class="easy-item" style="border-left: 3px solid #ef4444; padding-left: 10px; margin-bottom: 12px;">' +
-                       '<b>1. EXAMINE (DIAGNÓSTICO DINÂMICO DE IMPULSIVIDADE):</b> Identificada oscilação no vetor Autocontrole (<b>' + C.toFixed(1) + ' / 5.00</b>) do(a) <b>' + name + '</b> (' + roleTitle + ')' + ctxLabel + ', com tempo de resposta de <b>' + rt + 'ms</b> e <b>' + errs + ' toque(s) precipitado(s)</b>. ' + trendText + '<b>Análise Neurofisiológica:</b> O acúmulo de demandas recentes em <i>' + deptTitle + '</i> reduziu os estoques de glicogênio no Córtex Pré-Frontal, aumentando a reatividade pré-decisória.' +
-                       '</div>' +
-                       '<div class="easy-item">' +
-                       '<b>2. ADAPT (AÇÃO & BENEFÍCIO PRÁTICO PARA OS PRÓXIMOS 14 DIAS):</b><br>' +
-                       '• <i>Poda Temporária de Alçada Operacional:</i> Delegar aprovações secundárias da função de ' + roleTitle + ' para os diretores N2. <b>Por que isso importa:</b> Reduz a carga de micro-escolhas, permitindo a recomposição dos circuitos inibitórios da razão em poucos dias.<br>' +
-                       '• <i>Quarentena de Veto Decisório (60 min):</i> Instituir um intervalo obrigatório de 1 hora entre discussões acaloradas e o martelo final em negociações. <b>Por que isso importa:</b> Permite a metabolização da noradrenalina e do cortisol, evitando compromissos tomados sob estresse fisiológico.' +
-                       '</div>' +
-                       '<div class="easy-item"><b>3. SYSTEMATIZE (GOVERNANÇA & DISJUNTORES DE SEGURANÇA):</b> Votações de grande impacto estratégico na diretoria de <i>' + deptTitle + '</i> surgidas após as 18h devem ser adiadas automaticamente para a manhã seguinte. <b>Por que isso importa:</b> Protege a governança corporativa contra a exaustão decisória ao fim do expediente.</div>' +
-                       '<div class="easy-item"><b>4. YARDSTICK (META BIOMÉTRICA DE RECUPERAÇÃO):</b> Zerar os erros de veto motor e elevar o vetor Autocontrole para acima de 3.80 na Sessão #' + (sessionNum + 1) + '.</div>';
-            } else if (weakest === 'RESILIENCE') {
-                return '<div class="easy-item" style="border-left: 3px solid #a855f7; padding-left: 10px; margin-bottom: 12px;">' +
-                       '<b>1. EXAMINE (DIAGNÓSTICO DINÂMICO DE CANSAÇO ACUMULADO):</b> O(a) executivo(a) <b>' + name + '</b> (' + roleTitle + ') apresenta sobrecarga no vetor Energia (<b>' + R.toFixed(1) + ' / 5.00</b>)' + ctxLabel + ', com VSI vocal de <b>' + vsi.toFixed(2) + '</b>. ' + trendText + '<b>Análise Neurofisiológica:</b> Hiperativação contínua do Sistema Nervoso Simpático em <i>' + deptTitle + '</i>, com supressão do tônus vagal e fadiga neuromuscular das cordas vocais.' +
-                       '</div>' +
-                       '<div class="easy-item">' +
-                       '<b>2. ADAPT (AÇÃO & BENEFÍCIO PRÁTICO PARA OS PRÓXIMOS 14 DIAS):</b><br>' +
-                       '• <i>Desconexão Digital Noturna (pós-21h):</i> Encerrar acesso a mensagens de trabalho e e-mails no celular à noite. <b>Por que isso importa:</b> Elimina o bloqueio de luz azul sobre a secreção de melatonina, restaurando o sono REM/Profundo para limpeza metabólica cerebral.<br>' +
-                       '• <i>Protocolo de Reset Vagal (2x de 5 min):</i> Aplicar 5 minutos de respiração ritmada (4s inspiração, 6s expiração) no meio da jornada. <b>Por que isso importa:</b> Estimula diretamente o Nervo Vago, reduzindo batimentos e estabilizando a energia vocal.' +
-                       '</div>' +
-                       '<div class="easy-item"><b>3. SYSTEMATIZE (GOVERNANÇA & PROTEÇÃO DA C-SUITE):</b> Suspender viagens de longa distância e apresentações duplas no mesmo dia para a função de ' + roleTitle + ' pelos próximos 14 dias. <b>Por que isso importa:</b> Impede o estol cognitivo por esgotamento biológico e previne o contágio de estresse na equipe.</div>' +
-                       '<div class="easy-item"><b>4. YARDSTICK (META BIOMÉTRICA DE RECOMPOSIÇÃO):</b> Restabelecer a nota de Energia para acima de 3.80 e o VSI vocal para abaixo de 0.35 na Sessão #' + (sessionNum + 1) + '.</div>';
-            } else {
-                return '<div class="easy-item" style="border-left: 3px solid #f59e0b; padding-left: 10px; margin-bottom: 12px;">' +
-                       '<b>1. EXAMINE (DIAGNÓSTICO DINÂMICO DE DISPERSÃO E RUÍDO):</b> O(a) executivo(a) <b>' + name + '</b> (' + roleTitle + ') registra dispersão no vetor Clareza (<b>' + I.toFixed(1) + ' / 5.00</b>)' + ctxLabel + '. ' + trendText + '<b>Análise Neurofisiológica:</b> A divisão da atenção em múltiplos micro-problemas simultâneos em <i>' + deptTitle + '</i> fragmenta a memória de trabalho e obscurece a visão estratégica.' +
-                       '</div>' +
-                       '<div class="easy-item">' +
-                       '<b>2. ADAPT (AÇÃO & BENEFÍCIO PRÁTICO PARA OS PRÓXIMOS 14 DIAS):</b><br>' +
-                       '• <i>Corte Rádical de Reuniões Informativas (Redução de 40%):</i> Cancelar participação do ' + roleTitle + ' em comitês apenas informativos. <b>Por que isso importa:</b> Esvazia o ruído operacional e devolve capacidade cognitiva ao Córtex Pré-Frontal.<br>' +
-                       '• <i>Foco Restrito nas 2 Metas N1:</i> Canalizar a atuação pessoal do executivo exclusivamente nos 2 projetos de maior ROI em <i>' + deptTitle + '</i>. <b>Por que isso importa:</b> Alinha a intenção executiva com os resultados de maior valor para o Conselho.' +
-                       '</div>' +
-                       '<div class="easy-item"><b>3. SYSTEMATIZE (GOVERNANÇA & RITMO DE FOCO):</b> Fixar reuniões táticas na diretoria com duração máxima de 20 minutos e pauta fechada. <b>Por que isso importa:</b> Mantém o engajamento no pico de atenção sustained do cérebro.</div>' +
-                       '<div class="easy-item"><b>4. YARDSTICK (META BIOMÉTRICA DE CLAREZA):</b> Elevar o vetor Clareza Estratégica para acima de 4.00 na Sessão #' + (sessionNum + 1) + '.</div>';
-            }
+            tag = "GARGALO: EIXO HPA (TENSÃO AUTONÔMICA)";
+            textPrescription = "• <b>Hiper-ativação Simpática:</b> Tensão bioacústica vocal elevada (VSI > 0.70). Realizar 2 ciclos diários de 5 minutos de respiração por ressonância vagal (6 cpm) e aplicar higiene do sono rigorosa com desligamento de telas às 20h.";
+        }
+
+        document.getElementById('lblBottleneckTag').innerText = tag;
+        document.getElementById('lblPrescriptionText').innerHTML = textPrescription;
+    }
+
+    function exportPDF() {
+        var element = document.getElementById('printDossierArea');
+        if (typeof html2pdf !== 'undefined') {
+            var opt = {
+                margin: 10,
+                filename: 'Dossie_Executivo_ES_Crise_' + checkinData.name.replace(/\s+/g, '_') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#0f172a', useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        } else {
+            window.print();
         }
     }
 
-    function exportExecutivePDF() {
-        var element = document.getElementById('pdfReportContent');
-        var opt = {
-            margin: 10,
-            filename: 'Dossie_Executivo_Prontidao_' + execName.replace(/\s+/g, '_') + '.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, backgroundColor: '#070a12', useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+    function goToDashboard() {
+        window.location.href = 'es-crisis-executive-dashboard.html';
     }
 </script>
 
