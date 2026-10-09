@@ -155,6 +155,7 @@
             font-size: 10px;
             font-weight: 800;
             display: inline-block;
+            line-height: 1.3;
         }
 
         .b-sovereign { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid #10b981; }
@@ -169,7 +170,7 @@
             border-radius: 8px;
             margin-bottom: 12px;
             font-size: 12px;
-            line-height: 1.5;
+            line-height: 1.55;
             color: #cbd5e1;
         }
 
@@ -177,9 +178,9 @@
         .action-card .exec-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             border-bottom: 1px solid #334155;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
         }
 
         .dossier-grid {
@@ -284,7 +285,7 @@
         <div class="panel-title">🏛️ Dossiê Executivo de Liderança — Recomendações Táticas para o CHRO & Conselho</div>
     </div>
     <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
-        Orientações personalizadas baseadas nos resultados do Motor E.A.S.Y. para preservação da energia dos executivos e prevenção do contágio do estresse para a equipe do SRT-RH.
+        Orientações táticas explicativas baseadas no Motor E.A.S.Y., detalhando a ação recomendada e o benefício neurocientífico para a decisão da alta administração.
     </p>
 
     <div id="interventionsList">
@@ -304,7 +305,7 @@
         <div class="dossier-card">
             <h4>🛡️ Prevenção do Contágio no SRT-RH</h4>
             <div class="dossier-item">
-                <b>Alinhamento com o SRT-RH:</b> O estresse e o cansaço acumulados na diretoria geram decisões apressadas e sobrecarga nos times operacionais. O acompanhamento do C-Level garante ambiente seguro e reduz o absenteísmo nos setores da empresa.
+                <b>Alinhamento com o SRT-RH:</b> O estresse e a fadiga acumulados na diretoria geram decisões apressadas e sobrecarga nos times operacionais. O acompanhamento contínuo da alta liderança protege o clima organizacional, eleva a Variabilidade da Frequência Cardíaca (VFC) da equipe e reduz o absenteísmo na empresa.
             </div>
         </div>
         <div class="dossier-card">
@@ -312,7 +313,7 @@
             <div class="dossier-item">
                 • Realizar check-in biométrico quinzenal com os executivos diretos.<br>
                 • Aplicar a Poda de Reuniões para diretores em sinal de cansaço acumulado.<br>
-                • Instituir janelas inegociáveis de Foco Profundo para a alta liderança.
+                • Instituir janelas inegociáveis de Foco Profundo de 90 min para a alta liderança.
             </div>
         </div>
     </div>
@@ -452,7 +453,7 @@
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
                         <span style="color:#34d399; font-weight:800;">🟢 EQUILÍBRIO PRESERVADO (${sc.toFixed(2)})</span>
                     </div>
-                    <b>Recomendação do RH / Conselho:</b> Executivo em pleno estado de prontidão executiva. Manter a blindagem de agenda com blocos de Foco Profundo de 90 min diários e incentivar quarentena tática de reflexão de 30 min antes de assinar grandes investimentos.
+                    <b>Recomendação Tática RH / Conselho:</b> Executivo em plena prontidão. Manter o bloco inegociável de 90 min de Foco Profundo diários (o que restaura estoques de glicogênio no Córtex Pré-Frontal e eleva a VFC) e manter a quarentena preventiva de 30 min antes de aprovações de alto impacto.
                 `;
             } else if (r.weakest_link === 'CONTROL' || pk.includes('IMPULSIVE')) {
                 actionContent = `
@@ -460,7 +461,7 @@
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
                         <span style="color:#f87171; font-weight:800;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>
                     </div>
-                    <b>Recomendação do RH / Conselho:</b> Identificada redução temporária na capacidade de autocontrole. Autorizar a delegação de assinaturas operacionais secundárias para diretores N2 por 14 dias e instituir quarentena obrigatória de 60 min entre reuniões intensas e decisões finais.
+                    <b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório. Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).
                 `;
             } else if (r.weakest_link === 'RESILIENCE' || pk.includes('BURNED') || pk.includes('CHASSIS')) {
                 actionContent = `
@@ -468,7 +469,7 @@
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
                         <span style="color:#c084fc; font-weight:800;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>
                     </div>
-                    <b>Recomendação do RH / Conselho:</b> Sinais claros de cansaço acumulado. Recomenda-se proibir comitês decisórios após 18h30, instituir pausa noturna de telas a partir das 21h e evitar viagens internacionais longas nos próximos 14 dias.
+                    <b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado. Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).
                 `;
             } else {
                 actionContent = `
@@ -476,7 +477,7 @@
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
                         <span style="color:#fbbf24; font-weight:800;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>
                     </div>
-                    <b>Recomendação do RH / Conselho:</b> Excesso de tarefas secundárias e microgestão. Reduzir em 40% as reuniões informativas da pauta do executivo e alocar equipe de apoio para absorver rotinas administrativas.
+                    <b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.
                 `;
             }
             actionCard.innerHTML = actionContent;
