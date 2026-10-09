@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v5.6</title>
+    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v5.7</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -408,6 +408,27 @@
         .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
         .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
 
+        .team-spillover-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #0284c7;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .team-spillover-box h4 {
+            color: #38bdf8;
+            font-size: 12px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         @media (max-width: 480px) {
             body { padding: 10px 6px; }
             .title-group h1 { font-size: 16px; }
@@ -420,8 +441,8 @@
 
 <div class="header">
     <div class="title-group">
-        <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL</h1>
-        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y. v5.6</p>
+        <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL v5.7</h1>
+        <p>Prontidão Executiva, Prevenção do Estresse da Liderança & Espelho de Impacto no SRT-RH (Motor E.A.S.Y.)</p>
     </div>
     <div class="header-actions">
         <button class="btn-refresh" onclick="fetchExecData()">🔄 Atualizar Tabela</button>
@@ -512,7 +533,7 @@
         <div class="panel-title">🏛️ Dossiê Executivo de Liderança — Recomendações Táticas para o CHRO & Conselho</div>
     </div>
     <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
-        Orientações táticas explicativas baseadas no Motor E.A.S.Y., detalhando a ação recomendada e o benefício neurocientífico para a decisão da alta administração.
+        Orientações táticas explicativas baseadas no Motor E.A.S.Y., detalhando a ação recomendada, o benefício neurocientífico e o contágio na equipe.
     </p>
 
     <div id="interventionsList">
@@ -560,9 +581,9 @@
     var SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
 
     var globalRecords = [];
+    var globalSrtCheckins = [];
     var currentFilter = 'ALL';
 
-    // Função utilitária para limpar textos de departamento sem exceções de tipo
     function cleanDeptString(str) {
         if (!str) return 'Presidência';
         var s = String(str);
@@ -603,6 +624,7 @@
 
         var localData = getLocalRecords();
         var supabaseData = [];
+        var srtData = [];
         var isSupabaseSuccess = false;
 
         var controller = new AbortController();
@@ -622,6 +644,17 @@
         } catch (e) {
             clearTimeout(timeoutId);
         }
+
+        try {
+            var resSrt = await fetch(SUPABASE_URL + '/rest/v1/srt_checkins?select=*&order=created_at.desc', {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+            });
+            if (resSrt.ok) {
+                srtData = await resSrt.json() || [];
+            }
+        } catch(e) {}
+
+        globalSrtCheckins = srtData;
 
         var combined = [].concat(supabaseData);
         localData.forEach(function(loc) {
@@ -821,6 +854,42 @@
         container.innerHTML = html;
     }
 
+    function getTeamStressInfoForDept(deptName) {
+        if (!globalSrtCheckins || globalSrtCheckins.length === 0) {
+            return { hasModule: false, reason: 'Módulo SRT-RH de People Analytics não ativado ou aguardando exames para este setor.' };
+        }
+
+        var clean = cleanDeptString(deptName).toLowerCase();
+        var teamData = globalSrtCheckins.filter(function(item) {
+            var d = (item.department || item.role || '').toLowerCase();
+            return d.indexOf(clean) !== -1 || clean.indexOf(d) !== -1;
+        });
+
+        if (teamData.length < 5) {
+            return { hasModule: false, count: teamData.length, reason: '🔒 Módulo SRT-RH ativo no setor, aguardando quórum de blindagem (mínimo de 5 respostas para exibição).' };
+        }
+
+        var total = teamData.length;
+        var red = 0, yellow = 0, green = 0;
+        teamData.forEach(function(t) {
+            var st = t.status || 'GREEN';
+            if (st === 'GREEN') green++;
+            else if (st === 'RED') red++;
+            else yellow++;
+        });
+
+        var pRed = Math.round((red / total) * 100);
+        var pYellow = Math.round((yellow / total) * 100);
+
+        return {
+            hasModule: true,
+            total: total,
+            pRed: pRed,
+            pYellow: pYellow,
+            pGreen: Math.round((green / total) * 100)
+        };
+    }
+
     function renderExecData(records) {
         var total = records.length;
         var sumScore = 0, countSov = 0, countChassis = 0, countReact = 0, countMule = 0, countPreMeeting = 0;
@@ -945,34 +1014,52 @@
 
             var meetingTagText = isPreMeeting ? (' [⚡ AFERIÇÃO PRÉ-REUNIÃO' + (r.meeting_topic ? (': ' + r.meeting_topic) : '') + ']') : '';
 
+            var teamInfo = getTeamStressInfoForDept(displayDept);
+            var teamSpilloverHtml = '';
+            if (teamInfo.hasModule) {
+                if (sc < 3.20 && teamInfo.pRed > 15) {
+                    teamSpilloverHtml = '<div style="margin-top:8px; padding:8px; background:rgba(239,68,68,0.15); border:1px solid #ef4444; border-radius:6px; font-size:11px; color:#f87171;">' +
+                        '<b>🔴 IMPACTO SISTÊMICO NO SRT-RH (CONTÁGIO TOP-DOWN):</b> A equipe do setor ' + displayDept + ' (' + teamInfo.total + ' colaboradores) apresenta ' + teamInfo.pRed + '% de exaustão (Sinal Vermelho). O estresse do líder está contaminando o ritmo do time.' +
+                        '</div>';
+                } else if (sc >= 3.80 && teamInfo.pRed > 15) {
+                    teamSpilloverHtml = '<div style="margin-top:8px; padding:8px; background:rgba(245,158,11,0.15); border:1px solid #f59e0b; border-radius:6px; font-size:11px; color:#fbbf24;">' +
+                        '<b>🟡 FRICÇÃO OPERACIONAL NO SRT-RH:</b> O líder está em alta prontidão (' + sc.toFixed(2) + '), mas a equipe do setor apresenta ' + teamInfo.pRed + '% de exaustão. Indicativo de gargalo de processos/ferramentas.' +
+                        '</div>';
+                }
+            }
+
             if (sc >= 3.20 && r.veto_errors < 2) {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#34d399; font-weight:800; margin-right:8px;">🟢 EQUILÍBRIO PRESERVADO (' + sc.toFixed(2) + ')</span>' +
                     '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
-                    '<b>Recomendação Tática RH / Conselho:</b> Executivo em plena prontidão. Manter o bloco inegociável de 90 min de Foco Profundo diários (o que restaura estoques de glicogênio no Córtex Pré-Frontal e eleva a VFC) e manter a quarentena preventiva de 30 min antes de aprovações de alto impacto.';
+                    '<b>Recomendação Tática RH / Conselho:</b> Executivo em plena prontidão. Manter o bloco inegociável de 90 min de Foco Profundo diários (o que restaura estoques de glicogênio no Córtex Pré-Frontal e eleva a VFC) e manter a quarentena preventiva de 30 min antes de aprovações de alto impacto.' +
+                    teamSpilloverHtml;
             } else if (r.weakest_link === 'CONTROL' || pk.indexOf('IMPULSIVE') !== -1) {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#f87171; font-weight:800; margin-right:8px;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>' +
                     '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
-                    '<b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório (Tempo: ' + (r.reaction_time_ms || 520) + 'ms / Erros: ' + (r.veto_errors || 0) + '). Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).';
+                    '<b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório (Tempo: ' + (r.reaction_time_ms || 520) + 'ms / Erros: ' + (r.veto_errors || 0) + '). Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).' +
+                    teamSpilloverHtml;
             } else if (r.weakest_link === 'RESILIENCE' || pk.indexOf('BURNED') !== -1 || pk.indexOf('CHASSIS') !== -1) {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#c084fc; font-weight:800; margin-right:8px;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>' +
                     '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
-                    '<b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado (Índice R: ' + res + ' / VSI Vocal: ' + (r.vsi_score || 0.22) + '). Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).';
+                    '<b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado (Índice R: ' + res + ' / VSI Vocal: ' + (r.vsi_score || 0.22) + '). Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).' +
+                    teamSpilloverHtml;
             } else {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#fbbf24; font-weight:800; margin-right:8px;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>' +
                     '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
-                    '<b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão e ruído. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.';
+                    '<b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão e ruído. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.' +
+                    teamSpilloverHtml;
             }
             actionCard.innerHTML = actionContent;
             interventionsContainer.appendChild(actionCard);
@@ -996,12 +1083,32 @@
         var preMeetingText = isPreMeeting ? ('<div style="background:rgba(56, 189, 248, 0.15); border:1px solid #0284c7; padding:10px; border-radius:8px; margin-bottom:12px; font-size:11px; color:#38bdf8;">⚡ <b>AFERIÇÃO PRÉ-REUNIÃO DECISÓRIA</b>' + (r.meeting_topic ? (': ' + r.meeting_topic) : '') + '</div>') : '';
 
         var displayDept = cleanDeptString(r.department);
+        var teamInfo = getTeamStressInfoForDept(displayDept);
+
+        var teamModuleHtml = '';
+        if (teamInfo.hasModule) {
+            teamModuleHtml =
+                '<div class="team-spillover-box">' +
+                '<h4>👥 ESPELHO DE IMPACTO NO SETOR (SRT-RH) — ' + displayDept + '</h4>' +
+                '<div>' +
+                '• <b>Amostra Anônima da Equipe:</b> ' + teamInfo.total + ' colaboradores aferidos.<br>' +
+                '• <b>Taxa de Homeostase (Verde):</b> ' + teamInfo.pGreen + '% | <b>Sobrecarga (Amarelo):</b> ' + teamInfo.pYellow + '% | <b>Exaustão (Vermelho):</b> <b style="color:#f87171;">' + teamInfo.pRed + '%</b><br>' +
+                (sc < 3.20 && teamInfo.pRed > 15 
+                    ? '<span style="color:#f87171; font-weight:800;">⚠️ ALERTA DE CONTÁGIO TOP-DOWN: A fadiga do líder reflete diretamente na elevação de estresse da equipe.</span>' 
+                    : '<span style="color:#34d399;">✅ Clima do setor sob controle operacional.</span>') +
+                '</div></div>';
+        } else {
+            teamModuleHtml =
+                '<div style="background:rgba(255,255,255,0.03); border:1px dashed #334155; border-radius:8px; padding:10px; margin-bottom:12px; font-size:10px; color:#94a3b8;">' +
+                'ℹ️ ' + teamInfo.reason +
+                '</div>';
+        }
 
         body.innerHTML =
             '<div id="singleModalPrintArea">' +
             '<div style="text-align:center; border-bottom:1px solid #1e293b; padding-bottom:10px; margin-bottom:14px;">' +
             '<h2 style="color:#38bdf8; font-size:16px;">DOSSIÊ INDIVIDUAL DE PRONTIDÃO DE LIDERANÇA</h2>' +
-            '<p style="font-size:11px; color:#94a3b8;">Laudo Nominal do Motor E.A.S.Y. — ExcelSilience ES-Crise</p>' +
+            '<p style="font-size:11px; color:#94a3b8;">Laudo Nominal do Motor E.A.S.Y. — ExcelSilience ES-Crise v5.7</p>' +
             '</div>' +
             preMeetingText +
             '<div style="background:#070d19; border:1px solid #334155; padding:12px; border-radius:10px; margin-bottom:12px;">' +
@@ -1027,6 +1134,7 @@
             '<div style="background:#070d19; padding:8px 4px; border-radius:8px; border:1px solid #334155;">' +
             '<div style="font-size:9px; color:#94a3b8; font-weight:700;">ENERGIA</div>' +
             '<div style="font-size:16px; font-weight:800; color:#c084fc; margin-top:2px;">' + res + '</div></div></div>' +
+            teamModuleHtml +
             '<div style="background:rgba(56, 189, 248, 0.04); border:1px solid #0284c7; border-radius:10px; padding:12px; margin-bottom:12px;">' +
             '<h4 style="color:#38bdf8; font-size:11px; margin-bottom:8px; text-transform:uppercase;">🧪 ORIENTAÇÃO TÁTICA NEUROCIENTÍFICA (MOTOR E.A.S.Y.)</h4>' +
             '<div style="font-size:11px; line-height:1.5; color:#cbd5e1;">' +
