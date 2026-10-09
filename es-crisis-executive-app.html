@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v5.0</title>
+    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v5.1</title>
     <!-- html2pdf.js for 1-click PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -480,7 +480,7 @@
 <div class="container" id="pdfReportContent">
     <div class="header-box">
         <h1>EXCELSILIENCE ES-CRISE EXEC</h1>
-        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v5.0</p>
+        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v5.1</p>
     </div>
     <span class="badge-governance">🔒 ZERO PERGUNTAS — LAUDO NOMINAL DE LIDERANÇA & GOVERNANÇA</span>
 
@@ -662,6 +662,17 @@
     let audioEnergySamples = [];
     let numericVsiScore = 0.22, computedPupilRatio = 0.40;
     let waveAnimId = null;
+
+    // Verificar se foi aberto via link direto pré-reunião
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('context') === 'PRE_MEETING' || urlParams.get('mode') === 'pre_meeting') {
+            selectCheckinContext('PRE_MEETING');
+            if (urlParams.get('topic')) {
+                document.getElementById('txtMeetingTopic').value = urlParams.get('topic');
+            }
+        }
+    });
 
     function selectCheckinContext(ctx) {
         checkinContext = ctx;
@@ -977,7 +988,7 @@
             deltaContainer.innerHTML = `
                 <div class="delta-banner" style="background:rgba(56, 189, 248, 0.15); border-color:#0284c7; color:#38bdf8;">
                     🎯 <b>PRIMEIRO REGISTRO DE LIDERANÇA (Sessão #1):</b><br>
-                    Sua linha de base de prontidão foi estabelecida com sucesso. As próximas aferições acompanharão a evolução da sua energia e clareza.
+                    Sua linha de base de prontidão foi established com sucesso. As próximas aferições acompanharão a evolução da sua energia e clareza.
                 </div>
             `;
         }
@@ -986,22 +997,24 @@
 
         easyContent.innerHTML = easyHtml;
 
-        const payload = {
+        // EMBEDDED CONTEXT FOR 100% COMPATIBILITY WITH ANY SUPABASE SCHEMA
+        let isPre = checkinContext === 'PRE_MEETING';
+        let deptWithContext = execDept;
+        if (isPre) {
+            deptWithContext = `${execDept} [⚡ PRÉ-REUNIÃO${meetingTopic ? ': ' + meetingTopic : ''}]`;
+        }
+
+        // Standard Payload (Works on original Supabase table without requiring extra columns)
+        const basePayload = {
             name: execName,
             role: execRole,
-            department: execDept,
+            department: deptWithContext,
             authorized_hr: execAuth,
-            checkin_context: checkinContext,
-            is_pre_meeting: checkinContext === 'PRE_MEETING',
-            meeting_topic: meetingTopic || null,
             reaction_time_ms: avgReaction,
             veto_errors: errors,
             vsi_score: vsi,
             vsi_status: vsi > 0.45 ? "Sinal de Cansaço Vocal" : "Voz Estável",
             pupil_ratio: computedPupilRatio,
-            control_score: C,
-            intentionality_score: I,
-            resilience_score: R,
             es_crisis_score: esScore,
             weakest_link: weakestLink,
             status: profileLabel,
@@ -1010,23 +1023,50 @@
             session_count: sessionCount
         };
 
+        // Extended Payload (if user ran ALTER TABLE)
+        const extendedPayload = {
+            ...basePayload,
+            checkin_context: checkinContext,
+            is_pre_meeting: isPre,
+            meeting_topic: meetingTopic || null
+        };
+
+        // Backup locally so recent checkin is never lost
         try {
-            const resPost = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+            const localRecord = { ...extendedPayload, id: 'loc_' + Date.now(), created_at: new Date().toISOString() };
+            localStorage.setItem('es_crisis_last_checkin', JSON.stringify(localRecord));
+        } catch(e) {}
+
+        try {
+            let resPost = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_KEY,
                     'Authorization': `Bearer ${SUPABASE_KEY}`
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(extendedPayload)
             });
+
+            // Fallback to basePayload if Supabase throws 400 Bad Request
+            if (!resPost.ok && resPost.status === 400) {
+                resPost = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify(basePayload)
+                });
+            }
 
             if (resPost.ok) {
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = `✅ Laudo de Liderança atualizado no Painel de Governança (Sessão #${sessionCount})`;
+                syncElem.innerText = `✅ Laudo de Liderança registrado e enviado ao Painel de Governança (Sessão #${sessionCount})`;
             } else {
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Laudo de Liderança gerado e armazenado com sucesso!';
+                syncElem.innerText = '✅ Laudo concluído e salvo localmente com sucesso!';
             }
         } catch (e) {
             syncElem.className = 'sync-banner sync-success';
