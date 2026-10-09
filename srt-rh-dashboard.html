@@ -152,7 +152,7 @@
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 20px;
+            padding: 22px;
             margin-bottom: 24px;
         }
 
@@ -162,12 +162,31 @@
             align-items: center;
             border-bottom: 1px solid var(--border);
             padding-bottom: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
         .compliance-title { font-size: 16px; font-weight: 800; color: var(--accent); }
+
+        .filter-sector-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-inner);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-sector-box label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
 
         .report-section {
             background: #070d19;
@@ -187,6 +206,19 @@
             border-bottom: 1px solid var(--border);
             padding-bottom: 6px;
             text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-section h4 .easy-pill {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            border: 1px solid #0284c7;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
         }
 
         .esocial-box {
@@ -199,6 +231,34 @@
             color: #e2e8f0;
         }
 
+        .pdca-easy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .pdca-card {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .pdca-card h5 {
+            color: var(--accent);
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .pdca-card p {
+            font-size: 11px;
+            line-height: 1.45;
+            color: #cbd5e1;
+        }
+
         .signature-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -206,24 +266,41 @@
             margin-top: 24px;
             padding-top: 16px;
             border-top: 1px solid var(--border);
-            text-align: center;
+        }
+
+        .signature-box {
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .signature-box h5 {
+            font-size: 11px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            text-transform: uppercase;
         }
 
         .signature-line {
             border-top: 1px solid #64748b;
-            margin-top: 36px;
+            margin-top: 30px;
             padding-top: 6px;
             font-size: 11px;
             color: var(--muted);
+            text-align: center;
         }
 
         @media print {
             body { background: #fff; color: #000; padding: 0; }
-            .header, .nav-tabs, .btn-refresh, .btn-primary, #tab-exec, #tab-tech { display: none !important; }
+            .header, .nav-tabs, .btn-refresh, .btn-primary, #tab-exec, #tab-tech, .filter-sector-box { display: none !important; }
             #tab-compliance { display: block !important; }
             .compliance-panel { border: none; background: #fff; color: #000; padding: 0; }
             .report-section { background: #fff; border: 1px solid #ccc; color: #000; }
             .esocial-box { background: #f0f9ff; border: 1px solid #0284c7; color: #000; }
+            .pdca-card { background: #f8fafc; border: 1px solid #ccc; color: #000; }
+            .pdca-card p { color: #000; }
+            .signature-box { background: #fff; border: 1px solid #ccc; color: #000; }
         }
     </style>
 </head>
@@ -231,8 +308,8 @@
 
 <div class="header">
     <div>
-        <h1>👥 ExcelSilience SRT-RH | Painel de Gestão & Compliance SST</h1>
-        <div class="header-sub">People Analytics Anônimo, Matriz de Contágio C-Level & Laudos NR-01, NR-17 e eSocial S-2240</div>
+        <h1>👥 ExcelSilience SRT-RH | Painel de Gestão & Compliance SST v5.7</h1>
+        <div class="header-sub">People Analytics Anônimo, Matriz de Contágio C-Level & Laudos Auditáveis NR-01, NR-17 e eSocial S-2240</div>
     </div>
     <button class="btn-refresh" onclick="loadAllData()">🔄 Atualizar Dados</button>
 </div>
@@ -294,8 +371,18 @@
     </div>
 </div>
 
-<!-- ABA 2: COMPLIANCE LEGAL & LAUDOS AUTOMÁTICOS -->
+<!-- ABA 2: COMPLIANCE LEGAL & LAUDOS AUTOMÁTICOS (AUDITORIA SEM RESTRIÇÕES) -->
 <div id="tab-compliance" class="hidden">
+    <div class="filter-sector-box">
+        <label for="selComplianceDept">🎯 Filtrar Laudo por Setor / GHE:</label>
+        <select id="selComplianceDept" style="max-width: 280px;" onchange="updateComplianceSectionFromSelect()">
+            <option value="ALL">🌐 Todos os Setores (Consolidado Corporativo)</option>
+        </select>
+        <span style="font-size:11px; color:var(--muted); margin-left:auto;">
+            📅 Data do Laudo: <b style="color:var(--text);" id="lblReportDate">--/--/----</b>
+        </span>
+    </div>
+
     <div class="compliance-panel" id="printComplianceArea">
         <div class="compliance-header">
             <div>
@@ -308,32 +395,46 @@
         </div>
 
         <div class="report-section">
-            <h4>1. IDENTIFICAÇÃO DA EMPRESA & GARANTIA DE PRIVACIDADE (LGPD)</h4>
+            <h4>
+                <span>1. IDENTIFICAÇÃO DA EMPRESA, SETOR / GHE & GARANTIA DE PRIVACIDADE (LGPD)</span>
+                <span class="easy-pill">L-A-I-R BASE</span>
+            </h4>
             <p>
-                <b>Empresa / Razão Social:</b> <span id="lblCompCompany">Grou / ExcelSilience Cliente</span><br>
-                <b>Ambiente de Monitoramento:</b> Plataforma ExcelSilience SRT-RH (Telemetria Não-Invasiva de Prontidão Ocupacional).<br>
+                <b>Razão Social / Empresa:</b> <span id="lblCompCompany">Grou / ExcelSilience Cliente</span><br>
+                <b>Setor / GHE (Grupo Homogêneo de Exposição):</b> <span id="lblCompGHE" style="color:var(--accent); font-weight:800;">Todos os Setores (Consolidado Corporativo)</span><br>
+                <b>Período de Amostragem:</b> Últimos 30 Dias (Telemetria Telemétrica Não-Invasiva em Tempo Real).<br>
+                <b>Data de Emissão do Laudo:</b> <span id="lblCompDate">--/--/----</span><br>
                 <b>Garantia de Anonimato & LGPD:</b> Aferições 100% anônimas sem uso de câmera ou cadastro de CPF/Nome, resguardadas pela trava estatística de quórum de proteção (N ≥ 5) por setor.
             </p>
         </div>
 
         <div class="report-section">
-            <h4>2. NR-01 — INVENTÁRIO DE RISCOS PSICOSSOCIAIS & SOBRECARGA MENTAL (PGR)</h4>
+            <h4>
+                <span>2. EXAMINE — NR-01: INVENTÁRIO DE RISCOS PSICOSSOCIAIS & SOBRECARGA MENTAL (PGR)</span>
+                <span class="easy-pill">E.A.S.Y. / EXAMINE</span>
+            </h4>
             <p id="lblNR01Text">
                 Calculando inventário de riscos psicossociais por setor...
             </p>
         </div>
 
         <div class="report-section">
-            <h4>3. NR-17 — AVALIAÇÃO ERGONÔMICA PRELIMINAR DE CARGA COGNITIVA (AEP)</h4>
+            <h4>
+                <span>3. ADAPT — NR-17: AVALIAÇÃO ERGONÔMICA PRELIMINAR DE CARGA COGNITIVA (AEP)</span>
+                <span class="easy-pill">E.A.S.Y. / ADAPT</span>
+            </h4>
             <p id="lblNR17Text">
                 Analisando estresse bioacústico vocal (VSI) e tempo de reação neuromuscular do Córtex Pré-Frontal...
             </p>
         </div>
 
         <div class="report-section">
-            <h4>4. eSOCIAL — ENQUADRAMENTO DE FATORES DE RISCO (EVENTO S-2240)</h4>
+            <h4>
+                <span>4. SYSTEMATIZE — eSOCIAL: ENQUADRAMENTO DE FATORES DE RISCO (EVENTO S-2240)</span>
+                <span class="easy-pill">E.A.S.Y. / SYSTEMATIZE</span>
+            </h4>
             <p>
-                Mapeamento das condições do ambiente de trabalho para o evento <b>S-2240 (Condições Ambientais do Trabalho - Fatores de Risco)</b>:
+                Mapeamento das condições ambientais e cognitivas do trabalho para o evento <b>S-2240 (Condições Ambientais do Trabalho - Fatores de Risco)</b>:
             </p>
             <div class="esocial-box" id="lblESocialBox">
                 <b>Código do Fator de Risco Ergônomico/Psicossocial:</b> 04.01.001 — Exigência de atenção e foco mantidos sob pressão de tempo e carga cognitiva contínua.<br>
@@ -342,26 +443,56 @@
         </div>
 
         <div class="report-section">
-            <h4>5. MATRIZ DE RECOMENDAÇÕES ORGANIZACIONAIS (PLANO DE AÇÃO PDCA)</h4>
-            <div id="lblPDCAPlan">
-                • Aplicar a Poda de Reuniões em setores com exaustão elevada.<br>
-                • Instituir janelas de Foco Profundo de 90 min diários sem interrupções.<br>
-                • Orientar pausas de hidratação e descompressão após aferição de tensão vocal (VSI > 0.45).
+            <h4>
+                <span>5. YARDSTICK — MATRIZ DE RECOMENDAÇÕES ORGANIZACIONAIS (PLANO DE AÇÃO PDCA / MOTOR E.A.S.Y.)</span>
+                <span class="easy-pill">E.A.S.Y. / YARDSTICK</span>
+            </h4>
+            <p style="margin-bottom:8px;">
+                Integração do Ciclo PDCA da NR-01 com a execução contínua do Motor E.A.S.Y. para os próximos 14 a 30 dias:
+            </p>
+            <div class="pdca-easy-grid" id="lblPDCAPlanGrid">
+                <div class="pdca-card">
+                    <h5>P (Plan) / EXAMINE</h5>
+                    <p><b>Diagnóstico Continuado:</b> Manter rotina de check-in anônimo de 30s 2x por semana no setor para mapear a estabilidade da carga mental e do tônus vocal (VSI).</p>
+                </div>
+                <div class="pdca-card">
+                    <h5>D (Do) / ADAPT</h5>
+                    <p><b>Intervenção Imediata:</b> Aplicar a Poda de Reuniões de 40%, instituir micropausas de descompressão a cada 90 min e autorizar pausa tática para colaboradores com VSI > 0.45.</p>
+                </div>
+                <div class="pdca-card">
+                    <h5>C (Check) / SYSTEMATIZE</h5>
+                    <p><b>Governança de Jornada:</b> Disjuntores de reuniões pós-18h30, teto de 30 min por pauta e quarentena decisória de 60 min para aprovações estratégicas sob sobrecarga.</p>
+                </div>
+                <div class="pdca-card">
+                    <h5>A (Act) / YARDSTICK</h5>
+                    <p><b>Régua de Metas Biométricas:</b> Elevar a taxa do setor para > 80% em Sinal Verde (Homeostase) e reduzir a exaustão (Sinal Vermelho) para menos de 5% na próxima medição.</p>
+                </div>
             </div>
         </div>
 
         <div class="signature-grid">
-            <div>
+            <div class="signature-box">
+                <h5>👨‍⚕️ Responsável Técnico de SST / SESMT</h5>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;">
+                    <input type="text" id="txtSestmName" value="Dr. Responsável Técnico de SST" placeholder="Nome do Médico/Psicólogo/Engenheiro...">
+                    <input type="text" id="txtSestmRole" value="Médico do Trabalho / Eng. de Segurança do Trabalho" placeholder="Especialidade / Função...">
+                    <input type="text" id="txtSestmCouncil" value="CRM / CRP / CREA: 123456-BR" placeholder="Registro do Conselho Profissional...">
+                </div>
                 <div class="signature-line">
-                    <b>RESPONSÁVEL TÉCNICO DE SST / SESMT</b><br>
-                    Médico do Trabalho / Psicólogo / Eng. de Segurança<br>
-                    CRM / CRP / CREA
+                    <b id="dispSestmName">Dr. Responsável Técnico de SST</b><br>
+                    <span id="dispSestmCouncil">CRM / CRP / CREA: 123456-BR</span>
                 </div>
             </div>
-            <div>
+            <div class="signature-box">
+                <h5>🏛️ Representante Legal da Empresa</h5>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;">
+                    <input type="text" id="txtRepName" value="Diretoria de Recursos Humanos / CHRO" placeholder="Nome do Gestor de RH / C-Level...">
+                    <input type="text" id="txtRepRole" value="Diretor de Pessoas & Cultura / CHRO" placeholder="Cargo Executivo...">
+                    <input type="text" id="txtRepCompany" value="Grou / ExcelSilience Cliente" placeholder="Razão Social da Empresa...">
+                </div>
                 <div class="signature-line">
-                    <b>REPRESENTANTE LEGAL DA EMPRESA</b><br>
-                    Diretoria de RH / CHRO / C-Level
+                    <b id="dispRepName">Diretoria de Recursos Humanos / CHRO</b><br>
+                    <span id="dispRepRole">Diretor de Pessoas & Cultura</span>
                 </div>
             </div>
         </div>
@@ -409,6 +540,10 @@
     var urlParams = new URLSearchParams(window.location.search);
     var companyId = urlParams.get('company') || urlParams.get('c') || 'grou';
 
+    var globalSrtData = [];
+    var globalExecData = [];
+    var globalDepts = [];
+
     var BASE_APP_URL = window.location.origin + window.location.pathname.replace('srt-rh-dashboard.html', 'index-rh.html');
     if (BASE_APP_URL.indexOf('.html') === -1) {
         BASE_APP_URL = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/index-rh.html';
@@ -425,13 +560,32 @@
     }
 
     async function loadAllData() {
+        var todayStr = new Date().toLocaleDateString('pt-BR');
+        document.getElementById('lblReportDate').innerText = todayStr;
+        document.getElementById('lblCompDate').innerText = todayStr;
+
+        setupSignatureBindings();
         await loadDepartments();
         await loadHeatmapAndTechData();
+    }
+
+    function setupSignatureBindings() {
+        var txtSestmName = document.getElementById('txtSestmName');
+        var txtSestmCouncil = document.getElementById('txtSestmCouncil');
+        var txtRepName = document.getElementById('txtRepName');
+        var txtRepRole = document.getElementById('txtRepRole');
+
+        if (txtSestmName) txtSestmName.oninput = function() { document.getElementById('dispSestmName').innerText = this.value || 'Dr. Responsável Técnico de SST'; };
+        if (txtSestmCouncil) txtSestmCouncil.oninput = function() { document.getElementById('dispSestmCouncil').innerText = this.value || 'CRM / CRP / CREA'; };
+        if (txtRepName) txtRepName.oninput = function() { document.getElementById('dispRepName').innerText = this.value || 'Diretoria de Recursos Humanos'; };
+        if (txtRepRole) txtRepRole.oninput = function() { document.getElementById('dispRepRole').innerText = this.value || 'Diretor de Pessoas'; };
     }
 
     async function loadDepartments() {
         var listManager = document.getElementById('dept-list-manager');
         var listLinks = document.getElementById('link-generator-list');
+        var selCompliance = document.getElementById('selComplianceDept');
+
         listManager.innerHTML = 'Carregando...';
         listLinks.innerHTML = 'Carregando...';
 
@@ -453,8 +607,11 @@
             ];
         }
 
+        globalDepts = depts;
+
         listManager.innerHTML = '';
         listLinks.innerHTML = '';
+        selCompliance.innerHTML = '<option value="ALL">🌐 Todos os Setores (Consolidado Corporativo)</option>';
 
         depts.forEach(function(d) {
             var itemManager = document.createElement('div');
@@ -467,6 +624,11 @@
             itemLink.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; font-size:12px;";
             itemLink.innerHTML = '<span><b>' + d.name + '</b></span><button class="btn-primary" style="padding:4px 8px; font-size:10px;" data-url="' + appLink + '" onclick="copyToClipboard(this.dataset.url)">Copiar Link 🔗</button>';
             listLinks.appendChild(itemLink);
+
+            var opt = document.createElement('option');
+            opt.value = d.name;
+            opt.textContent = d.name;
+            selCompliance.appendChild(opt);
         });
     }
 
@@ -538,9 +700,13 @@
             if (resExec.ok) execData = await resExec.json() || [];
         } catch(e) {}
 
+        globalSrtData = srtData;
+        globalExecData = execData;
+
         if (srtData.length === 0) {
             tbodyTech.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:16px;">Nenhum teste registrado ainda.</td></tr>';
             tbodyHeatmap.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:16px;">Nenhum dado registrado para o mapa de calor.</td></tr>';
+            updateComplianceSectionFromSelect();
             return;
         }
 
@@ -575,14 +741,8 @@
             else deptStats[deptName].red++;
         });
 
-        var totalCompany = 0, totalRedCompany = 0, totalYellowCompany = 0;
-
         Object.keys(deptStats).forEach(function(dept) {
             var stats = deptStats[dept];
-            totalCompany += stats.total;
-            totalRedCompany += stats.red;
-            totalYellowCompany += (stats.yellow + stats.purple);
-
             var tr = document.createElement('tr');
 
             if (stats.total < 5) {
@@ -633,34 +793,63 @@
             tbodyHeatmap.appendChild(tr);
         });
 
-        updateComplianceSection(totalCompany, totalRedCompany, totalYellowCompany);
+        updateComplianceSectionFromSelect();
     }
 
-    function updateComplianceSection(total, red, yellow) {
+    function updateComplianceSectionFromSelect() {
+        var selectedDept = document.getElementById('selComplianceDept').value;
         document.getElementById('lblCompCompany').innerText = companyId.toUpperCase() + ' / ExcelSilience Cliente';
+        document.getElementById('lblCompGHE').innerText = selectedDept === 'ALL' ? 'Todos os Setores (Consolidado Corporativo)' : selectedDept;
+
+        var filteredData = globalSrtData;
+        if (selectedDept !== 'ALL') {
+            filteredData = globalSrtData.filter(function(r) {
+                var dName = r.department || r.role || 'Geral';
+                return dName.toLowerCase().indexOf(selectedDept.toLowerCase()) !== -1;
+            });
+        }
+
+        var total = filteredData.length;
+        var red = 0, yellow = 0, green = 0;
+
+        filteredData.forEach(function(r) {
+            var st = r.status || 'GREEN';
+            if (st === 'GREEN') green++;
+            else if (st === 'RED') red++;
+            else yellow++;
+        });
 
         var pRed = total > 0 ? Math.round((red / total) * 100) : 0;
         var pYellow = total > 0 ? Math.round((yellow / total) * 100) : 0;
+        var pGreen = total > 0 ? Math.round((green / total) * 100) : 0;
+
+        var riskLevelText = pRed > 15 
+            ? '<b style="color:#f87171">ALTO (Ação Preventiva Imediata Requerida)</b>' 
+            : (pYellow > 25 ? '<b style="color:#fbbf24">MODERADO (Acompanhamento Recomendado)</b>' : '<b style="color:#34d399">BAIXO / CONTROLADO (Homeostase Preservada)</b>');
 
         document.getElementById('lblNR01Text').innerHTML =
-            '• <b>Total de Colaboradores Aferidos:</b> ' + total + ' check-ins anônimos.<br>' +
-            '• <b>Nível de Risco do Grupo Ocupacional:</b> ' + (pRed > 15 ? '<b style="color:#f87171">ALTO (Ação Preventiva Imediata Requerida)</b>' : '<b style="color:#34d399">BAIXO / CONTROLADO (Homeostase Mantida)</b>') + '.<br>' +
-            '• <b>Taxa de Exaustão Crônica (Sinal Vermelho):</b> ' + pRed + '% da amostra.<br>' +
-            '• <b>Taxa de Sobrecarga Moderada (Sinal Amarelo):</b> ' + pYellow + '% da amostra.<br>' +
-            '• <b>Enquadramento no PGR:</b> O inventário atende às diretrizes do Capítulo 1.5 da NR-01 para identificação precoce de fatores de risco psicossociais.';
+            '• <b>Total de Colaboradores / Aferições Analisadas:</b> ' + total + ' check-ins anônimos.<br>' +
+            '• <b>Nível de Risco do Grupo Ocupacional / GHE:</b> ' + riskLevelText + '.<br>' +
+            '• <b>🟢 Taxa de Homeostase & Equilíbrio (Sinal Verde):</b> ' + pGreen + '% da amostra.<br>' +
+            '• <b>🟡 Taxa de Sobrecarga Moderada (Sinal Amarelo):</b> ' + pYellow + '% da amostra.<br>' +
+            '• <b>🔴 Taxa de Exaustão Crônica (Sinal Vermelho):</b> ' + pRed + '% da amostra.<br>' +
+            '• <b>Atendimento ao PGR (NR-01, Cap. 1.5):</b> O diagnóstico automatizado pelo algoritmo E.A.S.Y. identifica precocemente os fatores de risco psicossociais sem expor individualmente os trabalhadores, cumprindo integralmente as exigências de fiscalização do Ministério do Trabalho.';
 
         document.getElementById('lblNR17Text').innerHTML =
-            '• <b>Aferição de Carga Mental:</b> Aferida via bioacústica vocal (VSI) e tempo de resposta inibitória neuromuscular.<br>' +
-            '• <b>Indicador de Fadiga Visual/Telar:</b> ' + pYellow + '% da equipe apresenta sinais leves de rigidez mental ou fadiga de tela.<br>' +
-            '• <b>Conformidade com a NR-17:</b> O sistema fornece embasamento técnico para a Avaliação Ergonômica Preliminar (AEP), recomendando a implantação de micropausas ativas de descompressão a cada 90 minutos de trabalho contínuo.';
+            '• <b>Aferição de Carga Mental & Cansaço Cognitivo:</b> Aferida via bioacústica vocal (VSI) e tempo de resposta inibitória neuromuscular (Veto Motor no Córtex Pré-Frontal Dorsolateral).<br>' +
+            '• <b>Indicador de Fadiga de Tela e Tensão Vocal:</b> ' + pYellow + '% da equipe do setor apresenta sinais de fadiga de tela ou sobrecarga de voz.<br>' +
+            '• <b>Medidas de Adaptação Ergonômica (AEP - NR-17):</b> Recomenda-se a implantação de micropausas ativas de 10 minutos a cada 90 minutos de esforço mantido, com pausa tática imediata de água e descompressão sempre que o teste individual indicar estresse vocal (VSI > 0.45).';
     }
 
     function exportCompliancePDF() {
         var element = document.getElementById('printComplianceArea');
+        var selectedDept = document.getElementById('selComplianceDept').value;
+        var deptSlug = selectedDept === 'ALL' ? 'Consolidado' : selectedDept.replace(/\s+/g, '_');
+
         if (typeof html2pdf !== 'undefined') {
             var opt = {
                 margin: 10,
-                filename: 'Laudo_Compliance_SST_NR01_NR17_eSocial.pdf',
+                filename: 'Laudo_Compliance_SST_NR01_NR17_eSocial_' + deptSlug + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, backgroundColor: '#0f172a', useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
