@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ES-Crise Executivo — Dashboard de Governança C-Level & Conselho</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
@@ -127,7 +128,7 @@
             border-collapse: collapse;
             text-align: left;
             font-size: 12px;
-            min-width: 850px;
+            min-width: 900px;
         }
 
         th {
@@ -156,6 +157,18 @@
             font-weight: 800;
             display: inline-block;
             line-height: 1.3;
+        }
+
+        .badge-premeeting {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-block;
+            margin-top: 4px;
         }
 
         .b-sovereign { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid #10b981; }
@@ -244,8 +257,8 @@
         <div class="value" style="color:#34d399;" id="mSov">0</div>
     </div>
     <div class="card-metric">
-        <div class="label">🟣 Cansaço Crítico</div>
-        <div class="value" style="color:#c084fc;" id="mChassis">0</div>
+        <div class="label">⚡ Aferições Pré-Reunião</div>
+        <div class="value" style="color:#38bdf8;" id="mPreMeeting">0</div>
     </div>
     <div class="card-metric">
         <div class="label">🔴 Alerta de Impulsividade</div>
@@ -253,10 +266,10 @@
     </div>
 </div>
 
-<div class="panel">
+<div class="panel" id="boardReportPrintArea">
     <div class="panel-header">
         <div class="panel-title">🧪 Histórico de Sessões Executivas & Evolução do Loop E.A.S.Y.</div>
-        <button class="btn-export" onclick="window.print()">🖨️ Imprimir / Exportar Relatório</button>
+        <button class="btn-export" onclick="exportBoardPDF()">📄 Baixar Dossiê do Conselho em PDF</button>
     </div>
 
     <div class="table-responsive">
@@ -265,7 +278,7 @@
                 <tr>
                     <th>Executivo / Cargo</th>
                     <th>Diretoria / BU</th>
-                    <th>Sessão</th>
+                    <th>Contexto</th>
                     <th>Índice de Prontidão</th>
                     <th>Vetores (C / I / R)</th>
                     <th>Ponto de Atenção</th>
@@ -312,6 +325,7 @@
             <h4>🎯 Próximos Passos Recomendados</h4>
             <div class="dossier-item">
                 • Realizar check-in biométrico quinzenal com os executivos diretos.<br>
+                • Exigir check-in de Prontidão Pré-Reunião antes de aprovações de M&A ou Capex.<br>
                 • Aplicar a Poda de Reuniões para diretores em sinal de cansaço acumulado.<br>
                 • Instituir janelas inegociáveis de Foco Profundo de 90 min para a alta liderança.
             </div>
@@ -345,7 +359,7 @@
 
     function renderExecData(records) {
         let total = records.length;
-        let sumScore = 0, countSov = 0, countChassis = 0, countReact = 0, countMule = 0;
+        let sumScore = 0, countSov = 0, countChassis = 0, countReact = 0, countMule = 0, countPreMeeting = 0;
 
         const execMap = {};
         records.forEach(r => {
@@ -354,6 +368,9 @@
 
             const sc = parseFloat(r.es_crisis_score || 0);
             sumScore += sc;
+
+            if (r.is_pre_meeting || r.checkin_context === 'PRE_MEETING') countPreMeeting++;
+
             const pk = (r.profile_key || '').toUpperCase();
             if (pk.includes('SOVEREIGN') || (!pk.includes('IMPULSIVE') && !pk.includes('BURNED') && !pk.includes('CHASSIS') && !pk.includes('MULE') && sc >= 3.2)) {
                 countSov++;
@@ -370,12 +387,13 @@
         let avgScore = total > 0 ? (sumScore / total).toFixed(2) : '0.00';
         document.getElementById('mScore').innerText = avgScore;
         document.getElementById('mSov').innerText = countSov;
-        document.getElementById('mChassis').innerText = countChassis;
+        document.getElementById('mPreMeeting').innerText = countPreMeeting;
         document.getElementById('mReact').innerText = countReact;
 
         document.getElementById('rhSummaryText').innerHTML = `
             • <b>Total de Aferições Realizadas:</b> ${total} sessões executivas.<br>
             • <b>Índice Médio de Prontidão C-Suite:</b> <b style="color:#38bdf8;">${avgScore} / 5.00</b>.<br>
+            • <b>Aferições Pré-Reunião Estratégica:</b> <b style="color:#38bdf8;">${countPreMeeting}</b> sessões.<br>
             • <b>Líderes em Plena Prontidão:</b> <span style="color:#34d399; font-weight:800;">${countSov}</span> (${total > 0 ? Math.round((countSov/total)*100) : 0}%).<br>
             • <b>Líderes Necessitando Ajuste de Cansaço/Foco:</b> <span style="color:#f87171; font-weight:800;">${countChassis + countReact + countMule}</span> líderes.
         `;
@@ -430,11 +448,16 @@
             if (r.weakest_link === 'INTENTIONALITY') weakestText = "Clareza de Propósito";
             else if (r.weakest_link === 'RESILIENCE') weakestText = "Reserva de Energia";
 
+            let isPreMeeting = r.is_pre_meeting || r.checkin_context === 'PRE_MEETING';
+            let contextBadgeHtml = isPreMeeting 
+                ? `<span class="badge-premeeting">⚡ PRÉ-REUNIÃO</span>${r.meeting_topic ? `<br><small style="font-size:9px; color:#38bdf8;">\${r.meeting_topic}</small>` : ''}`
+                : `<span style="color:#94a3b8; font-size:11px;">☀️ Rotina</span>`;
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight:800; color:#38bdf8;">${r.name || 'Executivo'}<br><span style="font-size:10px; color:#64748b;">${r.role || 'C-Level'}</span></td>
                 <td style="color:#cbd5e1;">${r.department || 'Presidência'}</td>
-                <td><span style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; border:1px solid #0284c7; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:800;">Sessão #${r.session_count || 1}</span></td>
+                <td>${contextBadgeHtml}</td>
                 <td style="color:#38bdf8; font-weight:800; font-size:14px;">${sc.toFixed(2)}</td>
                 <td style="font-size:10px; font-weight:700;">C: ${c} | I: <b style="color:#34d399;">${i}</b> | R: ${res}</td>
                 <td style="color:#fbbf24; font-weight:700;">${weakestText}</td>
@@ -447,10 +470,12 @@
             actionCard.className = 'action-card';
             let actionContent = "";
 
+            let meetingTagText = isPreMeeting ? ` [⚡ AFERIÇÃO PRÉ-REUNIÃO${r.meeting_topic ? `: \${r.meeting_topic}` : ''}]` : '';
+
             if (sc >= 3.20 && r.veto_errors < 2) {
                 actionContent = `
                     <div class="exec-header">
-                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
                         <span style="color:#34d399; font-weight:800;">🟢 EQUILÍBRIO PRESERVADO (${sc.toFixed(2)})</span>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Executivo em plena prontidão. Manter o bloco inegociável de 90 min de Foco Profundo diários (o que restaura estoques de glicogênio no Córtex Pré-Frontal e eleva a VFC) e manter a quarentena preventiva de 30 min antes de aprovações de alto impacto.
@@ -458,7 +483,7 @@
             } else if (r.weakest_link === 'CONTROL' || pk.includes('IMPULSIVE')) {
                 actionContent = `
                     <div class="exec-header">
-                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
                         <span style="color:#f87171; font-weight:800;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório. Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).
@@ -466,7 +491,7 @@
             } else if (r.weakest_link === 'RESILIENCE' || pk.includes('BURNED') || pk.includes('CHASSIS')) {
                 actionContent = `
                     <div class="exec-header">
-                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
                         <span style="color:#c084fc; font-weight:800;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado. Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).
@@ -474,7 +499,7 @@
             } else {
                 actionContent = `
                     <div class="exec-header">
-                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})</span>
+                        <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
                         <span style="color:#fbbf24; font-weight:800;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.
@@ -483,6 +508,18 @@
             actionCard.innerHTML = actionContent;
             interventionsContainer.appendChild(actionCard);
         });
+    }
+
+    function exportBoardPDF() {
+        const element = document.getElementById('boardReportPrintArea');
+        const opt = {
+            margin: 10,
+            filename: `Dossie_Conselho_Prontidao_CSuite.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: '#070a12', useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 
     window.onload = fetchExecData;
