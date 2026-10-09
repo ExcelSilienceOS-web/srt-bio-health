@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v5.1</title>
-    <!-- html2pdf.js for 1-click PDF export -->
+    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v5.3</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -480,7 +479,7 @@
 <div class="container" id="pdfReportContent">
     <div class="header-box">
         <h1>EXCELSILIENCE ES-CRISE EXEC</h1>
-        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v5.1</p>
+        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v5.3</p>
     </div>
     <span class="badge-governance">🔒 ZERO PERGUNTAS — LAUDO NOMINAL DE LIDERANÇA & GOVERNANÇA</span>
 
@@ -649,35 +648,36 @@
 </div>
 
 <script>
-    const SUPABASE_HOST = ["uywfcrhryrzmhrukxgaf", "supabase", "co"].join(".");
-    const SUPABASE_URL = "https://" + SUPABASE_HOST;
-    const SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
+    var SUPABASE_HOST = ["uywfcrhryrzmhrukxgaf", "supabase", "co"].join(".");
+    var SUPABASE_URL = "https://" + SUPABASE_HOST;
+    var SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
 
-    let execName = "", execRole = "", execDept = "", execAuth = true;
-    let checkinContext = "ROUTINE", meetingTopic = "";
-    let currentRound = 0; const TOTAL_ROUNDS = 8; const BALL_SPEED_MS = 1100;
-    let gameErrors = 0, reactionTimes = [];
-    let ballSpawnTime = 0, ballTimer = null, ballHandled = false;
-    let mediaStream = null, audioCtx, analyser, microphone, dataArray;
-    let audioEnergySamples = [];
-    let numericVsiScore = 0.22, computedPupilRatio = 0.40;
-    let waveAnimId = null;
+    var execName = "", execRole = "", execDept = "", execAuth = true;
+    var checkinContext = "ROUTINE", meetingTopic = "";
+    var currentRound = 0; var TOTAL_ROUNDS = 8; var BALL_SPEED_MS = 1100;
+    var gameErrors = 0, reactionTimes = [];
+    var ballSpawnTime = 0, ballTimer = null, ballHandled = false;
+    var mediaStream = null, audioCtx, analyser, microphone, dataArray;
+    var audioEnergySamples = [];
+    var numericVsiScore = 0.22, computedPupilRatio = 0.40;
+    var waveAnimId = null;
 
-    // Verificar se foi aberto via link direto pré-reunião
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('context') === 'PRE_MEETING' || urlParams.get('mode') === 'pre_meeting') {
-            selectCheckinContext('PRE_MEETING');
-            if (urlParams.get('topic')) {
-                document.getElementById('txtMeetingTopic').value = urlParams.get('topic');
+    window.addEventListener('DOMContentLoaded', function() {
+        try {
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('context') === 'PRE_MEETING' || urlParams.get('mode') === 'pre_meeting') {
+                selectCheckinContext('PRE_MEETING');
+                if (urlParams.get('topic')) {
+                    document.getElementById('txtMeetingTopic').value = urlParams.get('topic');
+                }
             }
-        }
+        } catch(e) {}
     });
 
     function selectCheckinContext(ctx) {
         checkinContext = ctx;
-        document.getElementById('btnCtxRoutine').className = `context-btn ${ctx === 'ROUTINE' ? 'selected' : ''}`;
-        document.getElementById('btnCtxMeeting').className = `context-btn ${ctx === 'PRE_MEETING' ? 'selected' : ''}`;
+        document.getElementById('btnCtxRoutine').className = 'context-btn ' + (ctx === 'ROUTINE' ? 'selected' : '');
+        document.getElementById('btnCtxMeeting').className = 'context-btn ' + (ctx === 'PRE_MEETING' ? 'selected' : '');
         document.getElementById('meetingTopicBox').style.display = ctx === 'PRE_MEETING' ? 'block' : 'none';
     }
 
@@ -699,13 +699,13 @@
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            const videoElem = document.getElementById('webcamVideo');
+            var videoElem = document.getElementById('webcamVideo');
             if (videoElem) videoElem.srcObject = mediaStream;
         } catch(err) {
             console.warn("Câmera não permitida ou indisponível:", err);
         }
 
-        setTimeout(() => {
+        setTimeout(function() {
             computedPupilRatio = parseFloat((0.38 + Math.random() * 0.06).toFixed(2));
             document.getElementById('stepPupil').classList.remove('active');
             document.getElementById('stepVoz').classList.add('active');
@@ -732,9 +732,9 @@
     }
 
     function drawWaveform() {
-        const canvas = document.getElementById('audioCanvas');
+        var canvas = document.getElementById('audioCanvas');
         if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        var ctx = canvas.getContext('2d');
         canvas.width = canvas.parentElement.clientWidth || 300;
         canvas.height = canvas.parentElement.clientHeight || 80;
 
@@ -747,14 +747,14 @@
             ctx.fillStyle = '#070d19';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            const barWidth = (canvas.width / 32);
-            let x = 0;
+            var barWidth = (canvas.width / 32);
+            var x = 0;
 
-            for (let i = 0; i < 32; i++) {
-                let barHeight = dataArray ? (dataArray[i] / 255) * canvas.height * 0.8 : (Math.sin(Date.now()*0.005 + i)*15 + 20);
+            for (var i = 0; i < 32; i++) {
+                var barHeight = dataArray ? (dataArray[i] / 255) * canvas.height * 0.8 : (Math.sin(Date.now()*0.005 + i)*15 + 20);
                 barHeight = Math.max(4, barHeight);
 
-                let grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
+                var grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
                 grad.addColorStop(0, '#0284c7');
                 grad.addColorStop(0.5, '#38bdf8');
                 grad.addColorStop(1, '#34d399');
@@ -768,24 +768,24 @@
     }
 
     function runAudioTest() {
-        const btn = document.getElementById('btnRec');
+        var btn = document.getElementById('btnRec');
         btn.innerText = '🔴 Captando Energia Vocal... (5s)';
         btn.style.background = '#ef4444';
         btn.disabled = true;
         audioEnergySamples = [];
 
-        let audioInterval = setInterval(() => {
+        var audioInterval = setInterval(function() {
             if (analyser && dataArray) {
                 analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                var sum = 0;
+                for (var i = 0; i < dataArray.length; i++) sum += dataArray[i];
                 audioEnergySamples.push(sum / dataArray.length);
             } else {
                 audioEnergySamples.push(40 + Math.random() * 20);
             }
         }, 100);
 
-        setTimeout(() => {
+        setTimeout(function() {
             clearInterval(audioInterval);
             if (waveAnimId) cancelAnimationFrame(waveAnimId);
             calcularVSI();
@@ -799,10 +799,10 @@
         if (!audioEnergySamples || audioEnergySamples.length === 0) {
             numericVsiScore = 0.22; return;
         }
-        let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
-        let mean = sum / audioEnergySamples.length;
-        let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
-        let cv = Math.sqrt(variance) / (mean + 1);
+        var sum = audioEnergySamples.reduce(function(a, b) { return a + b; }, 0);
+        var mean = sum / audioEnergySamples.length;
+        var variance = audioEnergySamples.reduce(function(a, b) { return a + Math.pow(b - mean, 2); }, 0) / audioEnergySamples.length;
+        var cv = Math.sqrt(variance) / (mean + 1);
         numericVsiScore = parseFloat(Math.min(0.85, Math.max(0.12, cv * 0.8)).toFixed(2));
     }
 
@@ -816,7 +816,7 @@
 
     function spawnNextBall() {
         if (ballTimer) clearTimeout(ballTimer);
-        const gameArea = document.getElementById('gameArea');
+        var gameArea = document.getElementById('gameArea');
         gameArea.innerHTML = '';
 
         if (currentRound >= TOTAL_ROUNDS) {
@@ -825,29 +825,29 @@
         }
 
         currentRound++;
-        document.getElementById('lblRound').innerText = `${currentRound} / ${TOTAL_ROUNDS}`;
+        document.getElementById('lblRound').innerText = currentRound + ' / ' + TOTAL_ROUNDS;
         document.getElementById('lblErrors').innerText = gameErrors;
         ballHandled = false;
 
-        const isGreen = Math.random() > 0.35;
-        const ball = document.createElement('div');
-        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+        var isGreen = Math.random() > 0.35;
+        var ball = document.createElement('div');
+        ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
         ball.textContent = isGreen ? 'TOQUE' : 'NÃO';
 
-        const maxX = gameArea.clientWidth - 60;
-        const maxY = gameArea.clientHeight - 60;
-        ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
-        ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
+        var maxX = gameArea.clientWidth - 60;
+        var maxY = gameArea.clientHeight - 60;
+        ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
+        ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
 
         ballSpawnTime = Date.now();
 
-        const handleTouch = (e) => {
+        var handleTouch = function(e) {
             if (e) e.preventDefault();
             if (ballHandled) return;
             ballHandled = true;
             if (ballTimer) clearTimeout(ballTimer);
 
-            const reaction = Date.now() - ballSpawnTime;
+            var reaction = Date.now() - ballSpawnTime;
             if (isGreen) reactionTimes.push(reaction);
             else gameErrors++;
 
@@ -859,7 +859,7 @@
         ball.addEventListener('click', handleTouch);
         gameArea.appendChild(ball);
 
-        ballTimer = setTimeout(() => {
+        ballTimer = setTimeout(function() {
             if (!ballHandled) {
                 ballHandled = true;
                 if (isGreen) reactionTimes.push(1100);
@@ -871,29 +871,29 @@
     async function finishExecutiveTest() {
         if (ballTimer) clearTimeout(ballTimer);
         if (mediaStream) {
-            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream.getTracks().forEach(function(track) { track.stop(); });
         }
 
         document.getElementById('stepBolinhas').classList.remove('active');
         document.getElementById('stepResult').classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        const avgReaction = reactionTimes.length > 0
-            ? Math.round(reactionTimes.reduce((a,b)=>a+b, 0) / reactionTimes.length)
+        var avgReaction = reactionTimes.length > 0
+            ? Math.round(reactionTimes.reduce(function(a,b){ return a+b; }, 0) / reactionTimes.length)
             : 520;
 
-        const rawC = 5.00 - (1.30 * gameErrors) - Math.max(0, (avgReaction - 360)/110 * 0.55);
-        const C = parseFloat(Math.max(1.00, Math.min(5.00, rawC)).toFixed(2));
+        var rawC = 5.00 - (1.30 * gameErrors) - Math.max(0, (avgReaction - 360)/110 * 0.55);
+        var C = parseFloat(Math.max(1.00, Math.min(5.00, rawC)).toFixed(2));
 
-        const rawI = 5.00 - (Math.max(0, avgReaction - 310)/100 * 0.45) - (gameErrors * 0.35);
-        const I = parseFloat(Math.max(1.00, Math.min(5.00, rawI)).toFixed(2));
+        var rawI = 5.00 - (Math.max(0, avgReaction - 310)/100 * 0.45) - (gameErrors * 0.35);
+        var I = parseFloat(Math.max(1.00, Math.min(5.00, rawI)).toFixed(2));
 
-        const rawR = 5.00 - (numericVsiScore * 2.4) - (Math.abs(computedPupilRatio - 0.40) * 5.5);
-        const R = parseFloat(Math.max(1.00, Math.min(5.00, rawR)).toFixed(2));
+        var rawR = 5.00 - (numericVsiScore * 2.4) - (Math.abs(computedPupilRatio - 0.40) * 5.5);
+        var R = parseFloat(Math.max(1.00, Math.min(5.00, rawR)).toFixed(2));
 
-        const minVector = Math.min(C, I, R);
-        let weakestLink = "CONTROLE";
-        let weakestLabel = "Autocontrole e Foco Decisório";
+        var minVector = Math.min(C, I, R);
+        var weakestLink = "CONTROLE";
+        var weakestLabel = "Autocontrole e Foco Decisório";
 
         if (minVector === I) {
             weakestLink = "INTENTIONALITY";
@@ -903,10 +903,10 @@
             weakestLabel = "Reserva de Energia e Resistência ao Cansaço";
         }
 
-        const esCrisisScore = parseFloat(((C + I + R + minVector) / 4).toFixed(2));
+        var esCrisisScore = parseFloat(((C + I + R + minVector) / 4).toFixed(2));
 
-        let status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR', profileLabel = '🟢 PRONTIDÃO TOTAL (EQUILÍBRIO & CLAREZA)';
-        let isCrisis = false;
+        var status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR', profileLabel = '🟢 PRONTIDÃO TOTAL (EQUILÍBRIO & CLAREZA)';
+        var isCrisis = false;
 
         if (minVector < 3.20 || gameErrors >= 2) {
             isCrisis = true;
@@ -916,36 +916,31 @@
         }
 
         document.getElementById('resExecName').innerText = execName;
-        document.getElementById('resExecRole').innerText = `${execRole} | ${execDept}`;
-        document.getElementById('resScore').innerText = `${esCrisisScore} / 5.00`;
-        document.getElementById('resProfile').innerHTML = `<span class="${isCrisis ? 'status-crisis' : 'status-sovereign'}">${profileLabel}</span>`;
+        document.getElementById('resExecRole').innerText = execRole + ' | ' + execDept;
+        document.getElementById('resScore').innerText = esCrisisScore + ' / 5.00';
+        document.getElementById('resProfile').innerHTML = '<span class="' + (isCrisis ? 'status-crisis' : 'status-sovereign') + '">' + profileLabel + '</span>';
         document.getElementById('resWeakest').innerText = weakestLabel;
 
         document.getElementById('valC').innerText = C.toFixed(1);
         document.getElementById('valI').innerText = I.toFixed(1);
         document.getElementById('valR').innerText = R.toFixed(1);
 
-        const preMeetingBox = document.getElementById('preMeetingCardBox');
+        var preMeetingBox = document.getElementById('preMeetingCardBox');
         if (checkinContext === 'PRE_MEETING') {
-            let meetingAdviceText = "";
-            let meetingNameLabel = meetingTopic ? ` (${meetingTopic})` : '';
+            var meetingAdviceText = "";
+            var meetingNameLabel = meetingTopic ? (' (' + meetingTopic + ')') : '';
 
             if (!isCrisis) {
-                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO DE ALTA PERFORMANCE${meetingNameLabel}:</b> Sua clareza e autocontrole estão em nível excelente (${esCrisisScore.toFixed(2)}). Posição recomendada para a reunião: conduzir a pauta com firmeza, propor resoluções diretas e liderar o alinhamento do comitê com confiança.`;
+                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO DE ALTA PERFORMANCE' + meetingNameLabel + ':</b> Sua clareza e autocontrole estão em nível excelente (' + esCrisisScore.toFixed(2) + '). Posição recomendada para a reunião: conduzir a pauta com firmeza, propor resoluções diretas e liderar o alinhamento do comitê com confiança.';
             } else if (weakestLink === 'CONTROL') {
-                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA${meetingNameLabel}:</b> Alerta de impulso identificado. Posição recomendada na reunião: adiar a aprovação final de investimentos de grande porte ou solicitar parecer prévio do CFO/Diretoria antes da assinatura de acordos.`;
+                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA' + meetingNameLabel + ':</b> Alerta de impulso identificado. Posição recomendada na reunião: adiar a aprovação final de investimentos de grande porte ou solicitar parecer prévio do CFO/Diretoria antes da assinatura de acordos.';
             } else if (weakestLink === 'RESILIENCE') {
-                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA${meetingNameLabel}:</b> Sinal de cansaço acumulado. Posição recomendada na reunião: delegar a condução da apresentação para um liderado N2, manter intervenções pontuais e focar exclusivamente nas decisões centrais.`;
+                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA' + meetingNameLabel + ':</b> Sinal de cansaço acumulado. Posição recomendada na reunião: delegar a condução da apresentação para um liderado N2, manter intervenções pontuais e focar exclusivamente nas decisões centrais.';
             } else {
-                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA${meetingNameLabel}:</b> Excesso de tarefas secundárias. Posição recomendada na reunião: limitar a pauta a no máximo 2 tópicos prioritários e encerrar a sessão em até 30 minutos.`;
+                meetingAdviceText = '<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA' + meetingNameLabel + ':</b> Excesso de tarefas secundárias. Posição recomendada na reunião: limitar a pauta a no máximo 2 tópicos prioritários e encerrar a sessão em até 30 minutos.';
             }
 
-            preMeetingBox.innerHTML = `
-                <div class="pre-meeting-card">
-                    <h4>⚡ CONTEXTO: PRÉ-REUNIÃO DECISÓRIA</h4>
-                    <p>${meetingAdviceText}</p>
-                </div>
-            `;
+            preMeetingBox.innerHTML = '<div class="pre-meeting-card"><h4>⚡ CONTEXTO: PRÉ-REUNIÃO DECISÓRIA</h4><p>' + meetingAdviceText + '</p></div>';
         } else {
             preMeetingBox.innerHTML = '';
         }
@@ -954,58 +949,45 @@
     }
 
     async function processHistoryAndEASY(esScore, avgReaction, errors, vsi, weakestLink, status, profileKey, C, I, R, profileLabel, isCrisis) {
-        const deltaContainer = document.getElementById('historicalDeltaCard');
-        const easyContent = document.getElementById('easyContent');
-        const syncElem = document.getElementById('syncStatus');
+        var deltaContainer = document.getElementById('historicalDeltaCard');
+        var easyContent = document.getElementById('easyContent');
+        var syncElem = document.getElementById('syncStatus');
 
-        let pastRecord = null;
+        var pastRecord = null;
         try {
-            const resFetch = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?name=eq.${encodeURIComponent(execName)}&order=created_at.desc&limit=1`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            var resFetch = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins?name=eq.' + encodeURIComponent(execName) + '&order=created_at.desc&limit=1', {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
             });
 
             if (resFetch.ok) {
-                const pastData = await resFetch.json();
-                if (pastData && pastData.length > 0) pastRecord = pastData[0];
+                var pastData = await resFetch.json();
+                if (pastData && pastData.length > 0) pastRecord = pastData;
             }
         } catch (e) {}
 
-        let sessionCount = pastRecord ? ((pastRecord.session_count || 1) + 1) : 1;
+        var sessionCount = pastRecord ? ((pastRecord.session_count || 1) + 1) : 1;
 
         if (pastRecord) {
-            const deltaScore = (esScore - pastRecord.es_crisis_score).toFixed(2);
-            const deltaReaction = avgReaction - pastRecord.reaction_time_ms;
-            let signScore = deltaScore >= 0 ? `+${deltaScore}` : deltaScore;
+            var deltaScore = (esScore - pastRecord.es_crisis_score).toFixed(2);
+            var deltaReaction = avgReaction - pastRecord.reaction_time_ms;
+            var signScore = deltaScore >= 0 ? ('+' + deltaScore) : deltaScore;
 
-            deltaContainer.innerHTML = `
-                <div class="delta-banner">
-                    📈 <b>ACOMPANHAMENTO DE PRONTIDÃO (Sessão #${sessionCount}):</b><br>
-                    • Variação da Nota: <b style="color:${deltaScore >= 0 ? '#34d399' : '#f87171'}">${signScore} pts</b> (Sessão anterior: ${pastRecord.es_crisis_score})<br>
-                    • Tempo de Reação: <b>${deltaReaction > 0 ? '+'+deltaReaction : deltaReaction} ms</b>
-                </div>
-            `;
+            deltaContainer.innerHTML = '<div class="delta-banner">📈 <b>ACOMPANHAMENTO DE PRONTIDÃO (Sessão #' + sessionCount + '):</b><br>• Variação da Nota: <b style="color:' + (deltaScore >= 0 ? '#34d399' : '#f87171') + '">' + signScore + ' pts</b> (Sessão anterior: ' + pastRecord.es_crisis_score + ')<br>• Tempo de Reação: <b>' + (deltaReaction > 0 ? ('+' + deltaReaction) : deltaReaction) + ' ms</b></div>';
         } else {
-            deltaContainer.innerHTML = `
-                <div class="delta-banner" style="background:rgba(56, 189, 248, 0.15); border-color:#0284c7; color:#38bdf8;">
-                    🎯 <b>PRIMEIRO REGISTRO DE LIDERANÇA (Sessão #1):</b><br>
-                    Sua linha de base de prontidão foi established com sucesso. As próximas aferições acompanharão a evolução da sua energia e clareza.
-                </div>
-            `;
+            deltaContainer.innerHTML = '<div class="delta-banner" style="background:rgba(56, 189, 248, 0.15); border-color:#0284c7; color:#38bdf8;">🎯 <b>PRIMEIRO REGISTRO DE LIDERANÇA (Sessão #1):</b><br>Sua linha de base de prontidão foi estabelecida com sucesso. As próximas aferições acompanharão a evolução da sua energia e clareza.</div>';
         }
 
-        let easyHtml = generateNeuroExplanatoryRecommendations(execName, execRole, execDept, esScore, avgReaction, errors, vsi, C, I, R, weakestLink, isCrisis, sessionCount);
+        var easyHtml = generateNeuroExplanatoryRecommendations(execName, execRole, execDept, esScore, avgReaction, errors, vsi, C, I, R, weakestLink, isCrisis, sessionCount);
 
         easyContent.innerHTML = easyHtml;
 
-        // EMBEDDED CONTEXT FOR 100% COMPATIBILITY WITH ANY SUPABASE SCHEMA
-        let isPre = checkinContext === 'PRE_MEETING';
-        let deptWithContext = execDept;
+        var isPre = checkinContext === 'PRE_MEETING';
+        var deptWithContext = execDept;
         if (isPre) {
-            deptWithContext = `${execDept} [⚡ PRÉ-REUNIÃO${meetingTopic ? ': ' + meetingTopic : ''}]`;
+            deptWithContext = execDept + ' [⚡ PRÉ-REUNIÃO' + (meetingTopic ? (': ' + meetingTopic) : '') + ']';
         }
 
-        // Standard Payload (Works on original Supabase table without requiring extra columns)
-        const basePayload = {
+        var basePayload = {
             name: execName,
             role: execRole,
             department: deptWithContext,
@@ -1023,39 +1005,35 @@
             session_count: sessionCount
         };
 
-        // Extended Payload (if user ran ALTER TABLE)
-        const extendedPayload = {
-            ...basePayload,
+        var extendedPayload = Object.assign({}, basePayload, {
             checkin_context: checkinContext,
             is_pre_meeting: isPre,
             meeting_topic: meetingTopic || null
-        };
+        });
 
-        // Backup locally so recent checkin is never lost
         try {
-            const localRecord = { ...extendedPayload, id: 'loc_' + Date.now(), created_at: new Date().toISOString() };
+            var localRecord = Object.assign({}, extendedPayload, { id: 'loc_' + Date.now(), created_at: new Date().toISOString() });
             localStorage.setItem('es_crisis_last_checkin', JSON.stringify(localRecord));
         } catch(e) {}
 
         try {
-            let resPost = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+            var resPost = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                    'Authorization': 'Bearer ' + SUPABASE_KEY
                 },
                 body: JSON.stringify(extendedPayload)
             });
 
-            // Fallback to basePayload if Supabase throws 400 Bad Request
             if (!resPost.ok && resPost.status === 400) {
-                resPost = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+                resPost = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                        'Authorization': 'Bearer ' + SUPABASE_KEY
                     },
                     body: JSON.stringify(basePayload)
                 });
@@ -1063,10 +1041,10 @@
 
             if (resPost.ok) {
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = `✅ Laudo de Liderança registrado e enviado ao Painel de Governança (Sessão #${sessionCount})`;
+                syncElem.innerText = '✅ Laudo de Liderança registrado e enviado ao Painel de Governança (Sessão #' + sessionCount + ')';
             } else {
                 syncElem.className = 'sync-banner sync-success';
-                syncElem.innerText = '✅ Laudo concluído e salvo localmente com sucesso!';
+                syncElem.innerText = '✅ Laudo concluído e salvo localmente no seu dispositivo!';
             }
         } catch (e) {
             syncElem.className = 'sync-banner sync-success';
@@ -1075,87 +1053,65 @@
     }
 
     function generateNeuroExplanatoryRecommendations(name, role, dept, score, rt, errs, vsi, C, I, R, weakest, isCrisis, sessionNum) {
-        let roleTitle = role || "Executivo";
-        let deptTitle = dept || "Presidência";
+        var roleTitle = role || "Executivo";
+        var deptTitle = dept || "Presidência";
         
         if (!isCrisis) {
-            return `
-                <div class="easy-item" style="border-left: 3px solid #34d399; padding-left: 10px; margin-bottom: 12px;">
-                    <b>1. DIAGNÓSTICO DE EVOLUÇÃO (EQUILÍBRIO PRESERVADO):</b> O(a) líder <b>${name}</b> (${roleTitle}) apresenta excelente nível de prontidão (Nota Global <b>${score.toFixed(2)} / 5.00</b>). A resposta rápida de <b>${rt}ms</b> e a ausência de alertas de impulso comprovam que o Córtex Pré-Frontal está com estoques cheios de glicogênio, mantendo perfeita capacidade inibitória e foco estratégico em <i>${deptTitle}</i>.
-                </div>
-                <div class="easy-item">
-                    <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
-                    <br>• <i>Blocos de Foco Profundo (90 min diários):</i> Reservar 90 minutos contínuos sem e-mails para decisões de alto impacto. <b>Por que isso importa:</b> O cérebro opera em ciclos ultradianos de 90 minutos; proteger esse bloco evita a depleção do Córtex Pré-Frontal e eleva a Variabilidade da Frequência Cardíaca (VFC), mantendo sua clareza decisória sem esgotamento.
-                    <br>• <i>Quarentena Preventiva de Veto (30 min):</i> Dar um intervalo de reflexão antes de aprovações expressivas em <i>${deptTitle}</i>. <b>Por que isso importa:</b> Essa pausa acalma a amígdala cerebral (centro das reações emocionais instantâneas) e garante que o raciocínio analítico controle a palavra final.
-                </div>
-                <div class="easy-item">
-                    <b>3. GOVERNANÇA E RITMO SUSTENTÁVEL:</b> Manter reuniões com pauta prévia e duração máxima de 30 minutos. <b>Por que isso importa:</b> Evita a 'fadiga de escolha' acumulada ao longo do dia, preservando a energia mental para o momento de decisões críticas.
-                </div>
-                <div class="easy-item">
-                    <b>4. META DE MANUTENÇÃO:</b> Sustentar o Índice de Prontidão acima de 4.20/5.00 na próxima aferição de 14 dias.
-                </div>
-            `;
+            return '<div class="easy-item" style="border-left: 3px solid #34d399; padding-left: 10px; margin-bottom: 12px;">' +
+                   '<b>1. DIAGNÓSTICO DE EVOLUÇÃO (EQUILÍBRIO PRESERVADO):</b> O(a) líder <b>' + name + '</b> (' + roleTitle + ') apresenta excelente nível de prontidão (Nota Global <b>' + score.toFixed(2) + ' / 5.00</b>). A resposta rápida de <b>' + rt + 'ms</b> e a ausência de alertas de impulso comprovam que o Córtex Pré-Frontal está com estoques cheios de glicogênio, mantendo perfeita capacidade inibitória e foco estratégico em <i>' + deptTitle + '</i>.' +
+                   '</div>' +
+                   '<div class="easy-item">' +
+                   '<b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b><br>' +
+                   '• <i>Blocos de Foco Profundo (90 min diários):</i> Reservar 90 minutos contíduos sem e-mails para decisões de alto impacto. <b>Por que isso importa:</b> O cérebro opera em ciclos ultradianos de 90 minutos; proteger esse bloco evita a depleção do Córtex Pré-Frontal e eleva a Variabilidade da Frequência Cardíaca (VFC), mantendo sua clareza decisória sem esgotamento.<br>' +
+                   '• <i>Quarentena Preventiva de Veto (30 min):</i> Dar um intervalo de reflexão antes de aprovações expressivas em <i>' + deptTitle + '</i>. <b>Por que isso importa:</b> Essa pausa acalma a amígdala cerebral (centro das reações emocionais instantâneas) e garante que o raciocínio analítico controle a palavra final.' +
+                   '</div>' +
+                   '<div class="easy-item">' +
+                   '<b>3. GOVERNANÇA E RITMO SUSTENTÁVEL:</b> Manter reuniões com pauta prévia e duração máxima de 30 minutos. <b>Por que isso importa:</b> Evita a exaustão por acúmulo de escolhas ao longo do dia, preservando a energia mental para o momento de decisões críticas.' +
+                   '</div>' +
+                   '<div class="easy-item"><b>4. META DE MANUTENÇÃO:</b> Sustentar o Índice de Prontidão acima de 4.20/5.00 na próxima aferição de 14 dias.</div>';
         } else {
             if (weakest === 'CONTROL') {
-                return `
-                    <div class="easy-item" style="border-left: 3px solid #ef4444; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO DE EVOLUÇÃO (IMPULSIVIDADE TRANSITÓRIA):</b> Identificada oscilação no autocontrole do(a) <b>${name}</b> (${roleTitle}), evidenciada por <b>${errs} toque(s) precipitado(s)</b> no teste. <b>Análise Neurocientífica:</b> O excesso de demandas recentes em <i>${deptTitle}</i> consumiu a reserva de glicogênio no Córtex Pré-Frontal, fazendo o cérebro agir por impulso antes do filtro da razão.
-                    </div>
-                    <div class="easy-item">
-                        <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
-                        <br>• <i>Poda de Alçada Operacional:</i> Delegar temporariamente à equipe N2 de <i>${deptTitle}</i> aprovações secundárias. <b>Por que isso importa:</b> Reduz a carga de escolhas irrelevantes, permitindo que os circuitos de autocontrole do cérebro se regenerem em poucos dias.
-                        <br>• <i>Quarentena do Veto (60 min):</i> Pausa obrigatória de 1 hora entre reuniões intensas e a assinatura final de contratos relevantes. <b>Por que isso importa:</b> Permite a queda dos níveis de noradrenalina e cortisol, evitando que decisões de grande porte sejam tomadas sob estresse fisiológico.
-                    </div>
-                    <div class="easy-item">
-                        <b>3. GOVERNANÇA E DISJUNTORES DE SEGURANÇA:</b> Pautas de grande impacto da função de <b>${roleTitle}</b> surgidas após as 18h só devem ser votadas no dia seguinte. <b>Por que isso importa:</b> Protege a empresa contra o efeito 'Ego Depletion' (esgotamento mental ao final da jornada).
-                    </div>
-                    <div class="easy-item">
-                        <b>4. META DE RECUPERAÇÃO:</b> Zerar os alertas de impulso e reestabelecer o Autocontrole acima de 3.80 em 14 dias.
-                    </div>
-                `;
+                return '<div class="easy-item" style="border-left: 3px solid #ef4444; padding-left: 10px; margin-bottom: 12px;">' +
+                       '<b>1. DIAGNÓSTICO DE EVOLUÇÃO (IMPULSIVIDADE TRANSITÓRIA):</b> Identificada oscilação no autocontrole do(a) <b>' + name + '</b> (' + roleTitle + '), evidenciada por <b>' + errs + ' toque(s) precipitado(s)</b> no teste. <b>Análise Neurocientífica:</b> O excesso de demandas recentes em <i>' + deptTitle + '</i> consumiu a reserva de glicogênio no Córtex Pré-Frontal, fazendo o cérebro agir por impulso antes do filtro da razão.' +
+                       '</div>' +
+                       '<div class="easy-item">' +
+                       '<b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b><br>' +
+                       '• <i>Poda de Alçada Operacional:</i> Delegar temporariamente à equipe N2 de <i>' + deptTitle + '</i> aprovações secundárias. <b>Por que isso importa:</b> Reduz a carga de escolhas irrelevantes, permitindo que os circuitos de autocontrole do cérebro se regenerem em poucos dias.<br>' +
+                       '• <i>Quarentena do Veto (60 min):</i> Pausa obrigatória de 1 hora entre reuniões intensas e a assinatura final de contratos relevantes. <b>Por que isso importa:</b> Permite a queda dos níveis de noradrenalina e cortisol, evitando que decisões de grande porte sejam tomadas sob estresse fisiológico.' +
+                       '</div>' +
+                       '<div class="easy-item"><b>3. GOVERNANÇA E DISJUNTORES DE SEGURANÇA:</b> Pautas de grande impacto da função de <b>' + roleTitle + '</b> surgidas após as 18h só devem ser votadas no dia seguinte. <b>Por que isso importa:</b> Protege a empresa contra o esgotamento mental ao final da jornada.</div>' +
+                       '<div class="easy-item"><b>4. META DE RECUPERAÇÃO:</b> Zerar os alertas de impulso e reestabelecer o Autocontrole acima de 3.80 em 14 dias.</div>';
             } else if (weakest === 'RESILIENCE') {
-                return `
-                    <div class="easy-item" style="border-left: 3px solid #a855f7; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO DE EVOLUÇÃO (CANSAÇO ACUMULADO):</b> O(a) executivo(a) <b>${name}</b> (${roleTitle}) apresenta sinais claros de exaustão física e micro-tensionamento vocal (Índice de Energia: <b>${R.toFixed(1)} / 5.00</b>). <b>Análise Neurocientífica:</b> O sistema nervoso simpático (modo de alerta contínuo) está sobrecarregado, inibindo o tônus vagal e reduzindo a resistência biológica do líder em <i>${deptTitle}</i>.
-                    </div>
-                    <div class="easy-item">
-                        <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
-                        <br>• <i>Desligamento Noturno de Telas (pós-21h):</i> Encerrar e-mails e mensagens de trabalho à noite. <b>Por que isso importa:</b> A luz azul das telas bloqueia a secreção de melatonina; a desconexão noturna restaura o sono profundo, permitindo a limpeza metabólica no cérebro e a recuperação da energia vocal.
-                        <br>• <i>Reset Vagal Diário (2x de 5 min):</i> Praticar 5 minutos de respiração compassada (4s inspiração, 6s expiração). <b>Por que isso importa:</b> Estimula o Nervo Vago, reduzindo a frequência cardíaca instantaneamente e devolvendo o corpo ao estado de equilíbrio e descanso.
-                    </div>
-                    <div class="easy-item">
-                        <b>3. GOVERNANÇA E PROTEÇÃO DA LIDERANÇA:</b> Ajustar temporariamente a agenda de viagens de longa distância do <b>${roleTitle}</b> nos próximos 14 dias. <b>Por que isso importa:</b> Evita o estol cognitivo por esgotamento fisiológico e protege as equipes do SRT-RH do contágio de estresse.
-                    </div>
-                    <div class="easy-item">
-                        <b>4. META DE RECOMPOSIÇÃO:</b> Elevar o indicador de Energia para acima de 3.80 na próxima aferição.
-                    </div>
-                `;
+                return '<div class="easy-item" style="border-left: 3px solid #a855f7; padding-left: 10px; margin-bottom: 12px;">' +
+                       '<b>1. DIAGNÓSTICO DE EVOLUÇÃO (CANSAÇO ACUMULADO):</b> O(a) executivo(a) <b>' + name + '</b> (' + roleTitle + ') apresenta sinais claros de exaustão física e micro-tensionamento vocal (Índice de Energia: <b>' + R.toFixed(1) + ' / 5.00</b>). <b>Análise Neurocientífica:</b> O sistema nervoso simpático (modo de alerta contínuo) está sobrecarregado, inibindo o tônus vagal e reduzindo a resistência biológica do líder em <i>' + deptTitle + '</i>.' +
+                       '</div>' +
+                       '<div class="easy-item">' +
+                       '<b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b><br>' +
+                       '• <i>Desligamento Noturno de Telas (pós-21h):</i> Encerrar e-mails e mensagens de trabalho à noite. <b>Por que isso importa:</b> A luz azul das telas bloqueia a secreção de melatonina; a desconexão noturna restaura o sono profundo, permitindo a limpeza metabólica no cérebro e a recuperação da energia vocal.<br>' +
+                       '• <i>Reset Vagal Diário (2x de 5 min):</i> Praticar 5 minutos de respiração compassada (4s inspiração, 6s expiração). <b>Por que isso importa:</b> Estimula o Nervo Vago, reduzindo a frequência cardíaca instantaneamente e devolvendo o corpo ao estado de equilíbrio e descanso.' +
+                       '</div>' +
+                       '<div class="easy-item"><b>3. GOVERNANÇA E PROTEÇÃO DA LIDERANÇA:</b> Ajustar temporariamente a agenda de viagens de longa distância do <b>' + roleTitle + '</b> nos próximos 14 dias. <b>Por que isso importa:</b> Evita o estol cognitivo por esgotamento fisiológico e protege as equipes do SRT-RH do contágio de estresse.</div>' +
+                       '<div class="easy-item"><b>4. META DE RECOMPOSIÇÃO:</b> Elevar o indicador de Energia para acima de 3.80 na próxima aferição.</div>';
             } else {
-                return `
-                    <div class="easy-item" style="border-left: 3px solid #f59e0b; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO DE EVOLUÇÃO (DISPERSÃO OPERACIONAL):</b> Identificado acúmulo de tarefas secundárias e perda de foco estratégico no papel de <b>${name}</b> como <b>${roleTitle}</b> (Índice de Clareza: <b>${I.toFixed(1)} / 5.00</b>). <b>Análise Neurocientífica:</b> A atenção dividida em múltiplos micro-problemas em <i>${deptTitle}</i> gera ruído mental, impedindo a visão de longo prazo.
-                    </div>
-                    <div class="easy-item">
-                        <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
-                        <br>• <i>Corte de 40% das Reuniões Informativas:</i> Cancelar ou delegar reuniões de acompanhamento rotineiro. <b>Por que isso importa:</b> Libera espaço no cérebro e elimina a 'sensação de atropelamento', reconectando o líder com as prioridades estratégicas da empresa.
-                        <br>• <i>Foco Exclusivo nas 2 Metas N1:</i> Direcionar a energia do executivo apenas para os 2 projetos de maior valor. <b>Por que isso importa:</b> Reduz a fragmentação da memória de trabalho e aumenta a eficiência de execução.
-                    </div>
-                    <div class="easy-item">
-                        <b>3. GOVERNANÇA E RITMO DE TRABALHO:</b> Reuniões táticas com duração máxima de 20 minutos e pauta de 3 pontos. <b>Por que isso importa:</b> Mantém o engajamento no pico da atenção humana antes que ocorra a dispersão.
-                    </div>
-                    <div class="easy-item">
-                        <b>4. META DE CLAREZA:</b> Elevar a nota de Clareza Estratégica para acima de 4.00 na próxima sessão.
-                    </div>
-                `;
+                return '<div class="easy-item" style="border-left: 3px solid #f59e0b; padding-left: 10px; margin-bottom: 12px;">' +
+                       '<b>1. DIAGNÓSTICO DE EVOLUÇÃO (DISPERSÃO OPERACIONAL):</b> Identificado acúmulo de tarefas secundárias e perda de foco estratégico no papel de <b>' + name + '</b> como <b>' + roleTitle + '</b> (Índice de Clareza: <b>' + I.toFixed(1) + ' / 5.00</b>). <b>Análise Neurocientífica:</b> A atenção dividida em múltiplos micro-problemas em <i>' + deptTitle + '</i> gera ruído mental, impedindo a visão de longo prazo.' +
+                       '</div>' +
+                       '<div class="easy-item">' +
+                       '<b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b><br>' +
+                       '• <i>Corte de 40% das Reuniões Informativas:</i> Cancelar ou delegar reuniões de acompanhamento rotineiro. <b>Por que isso importa:</b> Libera espaço no cérebro e elimina a sensação de acúmulo, reconectando o líder com as prioridades estratégicas da empresa.<br>' +
+                       '• <i>Foco Exclusivo nas 2 Metas N1:</i> Direcionar a energia do executivo apenas para os 2 projetos de maior valor. <b>Por que isso importa:</b> Reduz a fragmentação da memória de trabalho e aumenta a eficiência de execução.' +
+                       '</div>' +
+                       '<div class="easy-item"><b>3. GOVERNANÇA E RITMO DE TRABALHO:</b> Reuniões táticas com duração máxima de 20 minutos e pauta de 3 pontos. <b>Por que isso importa:</b> Mantém o engajamento no pico da atenção humana antes que ocorra a dispersão.</div>' +
+                       '<div class="easy-item"><b>4. META DE CLAREZA:</b> Elevar a nota de Clareza Estratégica para acima de 4.00 na próxima sessão.</div>';
             }
         }
     }
 
     function exportExecutivePDF() {
-        const element = document.getElementById('pdfReportContent');
-        const opt = {
+        var element = document.getElementById('pdfReportContent');
+        var opt = {
             margin: 10,
-            filename: `Dossie_Executivo_Prontidao_${execName.replace(/\s+/g, '_')}.pdf`,
+            filename: 'Dossie_Executivo_Prontidao_' + execName.replace(/\s+/g, '_') + '.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, backgroundColor: '#070a12', useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
