@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v5.3</title>
+    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v5.4</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -408,7 +408,7 @@
 <div class="header">
     <div class="title-group">
         <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL</h1>
-        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y. v5.3</p>
+        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y. v5.4</p>
     </div>
     <div class="header-actions">
         <button class="btn-refresh" onclick="fetchExecData()">🔄 Atualizar Tabela</button>
@@ -568,7 +568,7 @@
                 var localBackup = localStorage.getItem('es_crisis_last_checkin');
                 if (localBackup) {
                     var parsed = JSON.parse(localBackup);
-                    if (parsed && parsed.name && !data.some(function(item) { return item.name === parsed.name && Math.abs((item.es_crisis_score||0) - (parsed.es_crisis_score||0)) < 0.01; })) {
+                    if (parsed && parsed.name && !data.some(function(item) { return String(item.id) === String(parsed.id) || (item.name === parsed.name && Math.abs((item.es_crisis_score||0) - (parsed.es_crisis_score||0)) < 0.01); })) {
                         data.unshift(parsed);
                     }
                 }
@@ -596,6 +596,27 @@
                 tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#f87171;">⚠️ Não foi possível conectar ao Supabase (Rede/Bloqueador). <br><button onclick="fetchExecData()" style="margin-top:8px; padding:6px 12px; background:#0284c7; color:#fff; border:none; border-radius:6px; cursor:pointer;">🔄 Tentar Novamente</button></td></tr>';
             }
         }
+    }
+
+    function getVectors(r) {
+        var reaction = r.reaction_time_ms || 520;
+        var errors = r.veto_errors || 0;
+        var vsi = r.vsi_score || 0.22;
+        var pupil = r.pupil_ratio || 0.40;
+
+        var C = (r.control_score !== undefined && r.control_score !== null) 
+            ? parseFloat(r.control_score) 
+            : parseFloat(Math.max(1.00, Math.min(5.00, 5.00 - (1.30 * errors) - Math.max(0, (reaction - 360)/110 * 0.55))).toFixed(2));
+
+        var I = (r.intentionality_score !== undefined && r.intentionality_score !== null) 
+            ? parseFloat(r.intentionality_score) 
+            : parseFloat(Math.max(1.00, Math.min(5.00, 5.00 - (Math.max(0, reaction - 310)/100 * 0.45) - (errors * 0.35))).toFixed(2));
+
+        var R = (r.resilience_score !== undefined && r.resilience_score !== null) 
+            ? parseFloat(r.resilience_score) 
+            : parseFloat(Math.max(1.00, Math.min(5.00, 5.00 - (vsi * 2.4) - (Math.abs(pupil - 0.40) * 5.5))).toFixed(2));
+
+        return { C: C, I: I, R: R };
     }
 
     function setFilter(filterType) {
@@ -627,7 +648,8 @@
 
         var html = '';
         Object.keys(execGroups).forEach(function(name) {
-            var list = execGroups[name].slice(0, 5);
+            var userList = execGroups[name].slice().reverse();
+            var list = userList.slice(Math.max(0, userList.length - 5));
             var cellsHtml = '';
 
             list.forEach(function(item, idx) {
@@ -637,9 +659,12 @@
                     if (item.weakest_link === 'CONTROL') cellClass = 'hm-red';
                     else if (item.weakest_link === 'RESILIENCE') cellClass = 'hm-purple';
                     else cellClass = 'hm-yellow';
+                } else if (sc < 3.8) {
+                    cellClass = 'hm-yellow';
                 }
 
-                cellsHtml += '<div class="rh-mini-cell ' + cellClass + '">#' + (item.session_count || (list.length - idx)) + '<br><b>' + sc.toFixed(1) + '</b></div>';
+                var sessionNum = item.session_count || (idx + 1);
+                cellsHtml += '<div class="rh-mini-cell ' + cellClass + '">#' + sessionNum + '<br><b>' + sc.toFixed(1) + '</b></div>';
             });
 
             html += '<div class="rh-heatmap-card"><h5>' + name + '</h5><div class="rh-mini-grid">' + cellsHtml + '</div></div>';
@@ -707,11 +732,11 @@
         filteredRecords.forEach(function(r, idx) {
             var userHistory = execMap[r.name] || [];
             var deltaHtml = '<span style="color:#94a3b8">Linha de Base</span>';
-            var currentIndex = userHistory.findIndex(function(item) { return item.id === r.id; });
+            var currentIndex = userHistory.findIndex(function(item) { return String(item.id) === String(r.id); });
 
             if (currentIndex >= 0 && currentIndex < userHistory.length - 1) {
                 var prev = userHistory[currentIndex + 1];
-                var diffScore = (r.es_crisis_score - prev.es_crisis_score).toFixed(2);
+                var diffScore = (parseFloat(r.es_crisis_score) - parseFloat(prev.es_crisis_score)).toFixed(2);
                 var diffReaction = (r.reaction_time_ms || 520) - (prev.reaction_time_ms || 520);
 
                 if (diffScore >= 0) {
@@ -735,9 +760,10 @@
                 }
             }
 
-            var c = r.control_score ? parseFloat(r.control_score).toFixed(1) : '4.5';
-            var i = r.intentionality_score ? parseFloat(r.intentionality_score).toFixed(1) : '4.8';
-            var res = r.resilience_score ? parseFloat(r.resilience_score).toFixed(1) : '4.2';
+            var vecs = getVectors(r);
+            var c = vecs.C.toFixed(1);
+            var i = vecs.I.toFixed(1);
+            var res = vecs.R.toFixed(1);
 
             var weakestText = "Autocontrole e Foco";
             if (r.weakest_link === 'INTENTIONALITY') weakestText = "Clareza de Propósito";
@@ -748,7 +774,7 @@
                 ? '<span class="badge-premeeting">⚡ PRÉ-REUNIÃO</span>' + (r.meeting_topic ? ('<br><small style="font-size:9px; color:#38bdf8;">' + r.meeting_topic + '</small>') : '')
                 : '<span style="color:#94a3b8; font-size:11px;">☀️ Rotina</span>';
 
-            var displayDept = (r.department || 'Presidência').split('[⚡')[0].split('[PRE')[0].trim();
+            var displayDept = (r.department || 'Presidência').split('[⚡').split('[PRE').trim();
 
             var tr = document.createElement('tr');
             var recIdStr = String(r.id);
@@ -762,7 +788,7 @@
                 '<td style="color:#fbbf24; font-weight:700;">' + weakestText + '</td>' +
                 '<td>' + deltaHtml + '</td>' +
                 '<td><span class="badge-profile ' + badgeClass + '">' + label + '</span></td>' +
-                '<td><button class="btn-view-dossier" onclick="openPersonDossierModal(' + JSON.stringify(recIdStr) + ')">👁️ Ver Laudo Completo</button></td>';
+                '<td><button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo Completo</button></td>';
             tbody.appendChild(tr);
 
             var actionCard = document.createElement('div');
@@ -776,29 +802,29 @@
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#34d399; font-weight:800; margin-right:8px;">🟢 EQUILÍBRIO PRESERVADO (' + sc.toFixed(2) + ')</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(' + JSON.stringify(recIdStr) + ')">👁️ Ver Laudo</button></div></div>' +
+                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
                     '<b>Recomendação Tática RH / Conselho:</b> Executivo em plena prontidão. Manter o bloco inegociável de 90 min de Foco Profundo diários (o que restaura estoques de glicogênio no Córtex Pré-Frontal e eleva a VFC) e manter a quarentena preventiva de 30 min antes de aprovações de alto impacto.';
             } else if (r.weakest_link === 'CONTROL' || pk.indexOf('IMPULSIVE') !== -1) {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#f87171; font-weight:800; margin-right:8px;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(' + JSON.stringify(recIdStr) + ')">👁️ Ver Laudo</button></div></div>' +
-                    '<b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório. Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).';
+                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
+                    '<b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório (Tempo: ' + (r.reaction_time_ms || 520) + 'ms / Erros: ' + (r.veto_errors || 0) + '). Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).';
             } else if (r.weakest_link === 'RESILIENCE' || pk.indexOf('BURNED') !== -1 || pk.indexOf('CHASSIS') !== -1) {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#c084fc; font-weight:800; margin-right:8px;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(' + JSON.stringify(recIdStr) + ')">👁️ Ver Laudo</button></div></div>' +
-                    '<b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado. Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).';
+                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
+                    '<b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado (Índice R: ' + res + ' / VSI Vocal: ' + (r.vsi_score || 0.22) + '). Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).';
             } else {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#fbbf24; font-weight:800; margin-right:8px;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(' + JSON.stringify(recIdStr) + ')">👁️ Ver Laudo</button></div></div>' +
-                    '<b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.';
+                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
+                    '<b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão e ruído. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.';
             }
             actionCard.innerHTML = actionContent;
             interventionsContainer.appendChild(actionCard);
@@ -813,14 +839,15 @@
         var body = document.getElementById('modalDossierBody');
 
         var sc = parseFloat(r.es_crisis_score || 0);
-        var c = r.control_score ? parseFloat(r.control_score).toFixed(1) : '4.5';
-        var i = r.intentionality_score ? parseFloat(r.intentionality_score).toFixed(1) : '4.8';
-        var res = r.resilience_score ? parseFloat(r.resilience_score).toFixed(1) : '4.2';
+        var vecs = getVectors(r);
+        var c = vecs.C.toFixed(1);
+        var i = vecs.I.toFixed(1);
+        var res = vecs.R.toFixed(1);
 
         var isPreMeeting = isRecordPreMeeting(r);
         var preMeetingText = isPreMeeting ? ('<div style="background:rgba(56, 189, 248, 0.15); border:1px solid #0284c7; padding:10px; border-radius:8px; margin-bottom:12px; font-size:11px; color:#38bdf8;">⚡ <b>AFERIÇÃO PRÉ-REUNIÃO DECISÓRIA</b>' + (r.meeting_topic ? (': ' + r.meeting_topic) : '') + '</div>') : '';
 
-        var displayDept = (r.department || 'Presidência').split('[⚡')[0].split('[PRE')[0].trim();
+        var displayDept = (r.department || 'Presidência').split('[⚡').split('[PRE').trim();
 
         body.innerHTML =
             '<div id="singleModalPrintArea">' +
@@ -857,7 +884,7 @@
             '<div style="font-size:11px; line-height:1.5; color:#cbd5e1;">' +
             '<b>Diagnóstico e Benefício Prático:</b> O acompanhamento contínuo da liderança de ' + r.name + ' garante a tomada de decisão lúcida em momentos de crise, aumentando a Variabilidade da Frequência Cardíaca (VFC), protegendo os estoques de glicogênio pré-frontal e evitando a sobrecarga dos times no SRT-RH.' +
             '</div></div></div>' +
-            '<button class="btn-export" style="width:100%; padding:10px; margin-top:10px;" onclick="exportSingleDossierPDF(' + JSON.stringify(r.name) + ')">📄 Exportar Laudo Individual em PDF</button>';
+            '<button class="btn-export" style="width:100%; padding:10px; margin-top:10px;" onclick="exportSingleDossierPDF(\'' + r.name.replace(/'/g, "\\'") + '\')">📄 Exportar Laudo Individual em PDF</button>';
 
         modal.style.display = 'flex';
     }
