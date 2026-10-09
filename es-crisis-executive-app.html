@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v2.0</title>
+    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v3.0</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
@@ -143,11 +143,11 @@
 
         .video-container {
             width: 100%;
-            height: 200px;
-            max-height: 35vh;
+            height: 280px;
+            max-height: 40vh;
             background: #070d19;
             border: 2px solid #0284c7;
-            border-radius: 12px;
+            border-radius: 14px;
             position: relative;
             overflow: hidden;
             margin-bottom: 12px;
@@ -174,26 +174,38 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 8px;
+            padding: 10px;
         }
 
-        .hud-frame {
+        .hud-frame-rect {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
+            width: 180px;
+            height: 220px;
             border: 2px dashed #38bdf8;
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
-            animation: pulseHud 2s infinite ease-in-out;
+            border-radius: 16px;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
+            animation: pulseHud 2.5s infinite ease-in-out;
         }
 
+        .hud-corner {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: #34d399;
+            border-style: solid;
+        }
+        .hud-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+        .hud-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+        .hud-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+        .hud-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
         @keyframes pulseHud {
-            0% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; }
-            50% { transform: translate(-50%, -50%) scale(1.03); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.8; }
+            0% { opacity: 0.85; transform: translate(-50%, -50%) scale(0.99); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+            100% { opacity: 0.85; transform: translate(-50%, -50%) scale(0.99); }
         }
 
         .scan-line {
@@ -283,8 +295,8 @@
 
         .easy-item {
             font-size: 11px;
-            line-height: 1.5;
-            margin-bottom: 10px;
+            line-height: 1.55;
+            margin-bottom: 12px;
             color: #cbd5e1;
         }
 
@@ -300,15 +312,54 @@
         }
 
         .sync-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
-        .status-sovereign { color: #34d399; background: rgba(52, 211, 153, 0.15); border: 1px solid #10b981; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 11px; }
-        .status-crisis { color: #f87171; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 11px; }
+
+        .status-box-container {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .status-box-label {
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .status-sovereign {
+            color: #34d399;
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid #10b981;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 11px;
+            display: inline-block;
+            line-height: 1.3;
+        }
+
+        .status-crisis {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 11px;
+            display: inline-block;
+            line-height: 1.3;
+        }
 
         @media (max-width: 480px) {
             body { padding: 8px 4px; }
             .container { padding: 14px 10px; border-radius: 12px; }
             .header-box h1 { font-size: 16px; }
-            .video-container { height: 180px; }
-            .hud-frame { width: 100px; height: 100px; }
+            .video-container { height: 250px; }
+            .hud-frame-rect { width: 150px; height: 190px; }
             .game-box { height: 190px; }
             .target-ball { width: 46px; height: 46px; font-size: 9px; }
         }
@@ -319,7 +370,7 @@
 <div class="container">
     <div class="header-box">
         <h1>EXCELSILIENCE ES-CRISE EXEC</h1>
-        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v2.0</p>
+        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v3.0</p>
     </div>
     <span class="badge-governance">🔒 ZERO PERGUNTAS — LAUDO NOMINAL DE LIDERANÇA & GOVERNANÇA</span>
 
@@ -353,16 +404,23 @@
 
     <div id="stepPupil" class="step">
         <h3 style="text-align:center; color:#38bdf8; margin-bottom:4px; font-size:14px;">👁️ Verificação de Presença Ocular & Foco (5s)</h3>
-        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Olhe para a câmera e mantenha o rosto centralizado no visor:</p>
+        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Centralize seu rosto no retângulo de enquadramento:</p>
         
         <div class="video-container">
             <video id="webcamVideo" autoplay playsinline muted></video>
             <div class="hud-overlay">
                 <div style="display:flex; justify-content:space-between; font-size:9px; color:#38bdf8; font-weight:800;">
                     <span>CÂMERA: ATIVA</span>
-                    <span id="lblScanText">ANALISANDO FOCO & PRESENÇA...</span>
+                    <span id="lblScanText">VARRENDO CÓRTEX & PUPILA...</span>
                 </div>
-                <div class="hud-frame"></div>
+                
+                <div class="hud-frame-rect">
+                    <div class="hud-corner hud-tl"></div>
+                    <div class="hud-corner hud-tr"></div>
+                    <div class="hud-corner hud-bl"></div>
+                    <div class="hud-corner hud-br"></div>
+                </div>
+
                 <div class="scan-line"></div>
                 <div style="text-align:center; font-size:10px; color:#34d399; font-weight:800;" id="lblPupilStatus">
                     Aferindo Estabilidade Ocular & Nível de Foco...
@@ -410,10 +468,12 @@
                 <span style="font-size:22px; font-weight:800; color:#38bdf8;" id="resScore">0.00</span>
             </div>
             
-            <div style="font-size:11px; color:#cbd5e1; margin-bottom:6px;">
-                <b>Estado de Prontidão:</b> <span id="resProfile">--</span>
+            <div class="status-box-container">
+                <div class="status-box-label">Estado de Prontidão:</div>
+                <div id="resProfile">--</div>
             </div>
-            <div style="font-size:11px; color:#cbd5e1;">
+
+            <div style="font-size:11px; color:#cbd5e1; margin-top:8px;">
                 <b>Ponto de Atenção Prioritária:</b> <span id="resWeakest" style="color:#fbbf24; font-weight:800;">--</span>
             </div>
         </div>
@@ -434,8 +494,8 @@
         </div>
 
         <div class="easy-box">
-            <h4>🧪 RECOMENDAÇÕES PRÁTICAS DO MOTOR E.A.S.Y. (CICLO DE 14 DIAS)</h4>
-            <div id="easyContent">Sintetizando diagnóstico personalizado de liderança...</div>
+            <h4>🧪 RECOMENDAÇÕES EXPLICATIVAS DO MOTOR E.A.S.Y. (14 DIAS)</h4>
+            <div id="easyContent">Sintetizando diagnóstico neurocientífico personalizado...</div>
         </div>
 
         <button class="btn" onclick="location.reload()">🔄 Concluir Sessão Executiva</button>
@@ -640,7 +700,7 @@
 
         const esCrisisScore = parseFloat(((C + I + R + minVector) / 4).toFixed(2));
 
-        let status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR', profileLabel = '🟢 PRONTIDÃO TOTAL (PLENO EQUILÍBRIO & CLAREZA)';
+        let status = 'GREEN', profileKey = 'SOVEREIGN_OPERATOR', profileLabel = '🟢 PRONTIDÃO TOTAL (EQUILÍBRIO & CLAREZA)';
         let isCrisis = false;
 
         if (minVector < 3.20 || gameErrors >= 2) {
@@ -676,7 +736,7 @@
 
             if (resFetch.ok) {
                 const pastData = await resFetch.json();
-                if (pastData && pastData.length > 0) pastRecord = pastData[0];
+                if (pastData && pastData.length > 0) pastRecord = pastData;
             }
         } catch (e) {}
 
@@ -703,7 +763,7 @@
             `;
         }
 
-        let easyHtml = generateDynamicRecommendations(execName, execRole, execDept, esScore, avgReaction, errors, vsi, C, I, R, weakestLink, isCrisis, sessionCount);
+        let easyHtml = generateNeuroExplanatoryRecommendations(execName, execRole, execDept, esScore, avgReaction, errors, vsi, C, I, R, weakestLink, isCrisis, sessionCount);
 
         easyContent.innerHTML = easyHtml;
 
@@ -752,86 +812,77 @@
         }
     }
 
-    function generateDynamicRecommendations(name, role, dept, score, rt, errs, vsi, C, I, R, weakest, isCrisis, sessionNum) {
+    function generateNeuroExplanatoryRecommendations(name, role, dept, score, rt, errs, vsi, C, I, R, weakest, isCrisis, sessionNum) {
         let roleTitle = role || "Executivo";
         let deptTitle = dept || "Presidência";
         
         if (!isCrisis) {
-            let focusAdvice = "";
-            if (C <= I && C <= R) {
-                focusAdvice = `Para manter essa alta performance no papel de <b>${roleTitle}</b>, recomendamos instituir a regra de <b>30 minutos de reflexão prévia</b> antes de aprovações de grande porte na diretoria de <i>${deptTitle}</i>, protegendo o seu excelente poder de foco.`;
-            } else if (I <= C && I <= R) {
-                focusAdvice = `Para potencializar ainda mais a sua atuação como <b>${roleTitle}</b>, foque em <b>blindar 90 minutos diários de Foco Profundo</b> para decisões estratégicas de <i>${deptTitle}</i>, evitando interrupções operacionais desnecessárias.`;
-            } else {
-                focusAdvice = `Para preservar a sua excelente reserva de energia como <b>${roleTitle}</b>, mantenha pausas curtas de 10 minutos entre reuniões intensas de <i>${deptTitle}</i> e evite o acúmulo de compromissos após as 19h.`;
-            }
-
             return `
                 <div class="easy-item" style="border-left: 3px solid #34d399; padding-left: 10px; margin-bottom: 12px;">
-                    <b>1. DIAGNÓSTICO DE PRONTIDÃO (EQUILÍBRIO PRESERVADO):</b> O(a) liderança <b>${name}</b> (${roleTitle}) apresenta excelente estado de prontidão executiva (Nota Global <b>${score.toFixed(2)} / 5.00</b>). Todas as funções de clareza, energia e autocontrole estão operando em faixa alta (Autocontrole: ${C.toFixed(1)}, Clareza: ${I.toFixed(1)}, Energia: ${R.toFixed(1)}). O tempo de resposta de <b>${rt}ms</b> e o índice de <b>${errs} alertas de impulso</b> comprovam que seu cérebro está pronto para tomar decisões de alto impacto com lucidez.
+                    <b>1. DIAGNÓSTICO (EQUILÍBRIO PRESERVADO):</b> O(a) líder <b>${name}</b> (${roleTitle}) apresenta excelente nível de prontidão (Nota Global <b>${score.toFixed(2)} / 5.00</b>). A resposta rápida de <b>${rt}ms</b> e a ausência de alertas de impulso comprovam que o Córtex Pré-Frontal está com estoques cheios de glicogênio, mantendo perfeita capacidade inibitória e foco estratégico em <i>${deptTitle}</i>.
                 </div>
                 <div class="easy-item">
-                    <b>2. AÇÃO DE MANUTENÇÃO E PROTEÇÃO (CICLO DE 14 DIAS):</b> 
-                    <br>• ${focusAdvice}
-                    <br>• <i>Preservação de Agenda:</i> Manter o hábito de delegar rotinas secundárias para a equipe de apoio de <i>${deptTitle}</i>, sustentando o seu nível de prontidão em alto patamar.
+                    <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
+                    <br>• <i>Blocos de Foco Profundo (90 min diários):</i> Reservar 90 minutos contínuos sem e-mails para decisões de alto impacto. <b>Por que isso importa:</b> O cérebro opera em ciclos ultradianos de 90 minutos; proteger esse bloco evita a depleção do Córtex Pré-Frontal e eleva a Variabilidade da Frequência Cardíaca (VFC), mantendo sua clareza decisória sem esgotamento.
+                    <br>• <i>Quarentena Preventiva de Veto (30 min):</i> Dar um intervalo de reflexão antes de aprovações expressivas em <i>${deptTitle}</i>. <b>Por que isso importa:</b> Essa pausa acalma a amígdala cerebral (centro das reações emocionais instantâneas) e garante que o raciocínio analítico controle a palavra final.
                 </div>
                 <div class="easy-item">
-                    <b>3. GOVERNANÇA E ROTINA ESTRATÉGICA:</b> Manter a realização do check-in quinzenal antes de reuniões de Conselho ou comitês decisórios para monitorar a consistência do seu equilíbrio.
+                    <b>3. GOVERNANÇA E RITMO SUSTENTÁVEL:</b> Manter reuniões com pauta prévia e duração máxima de 30 minutos. <b>Por que isso importa:</b> Evita a 'fadiga de escolha' acumulada ao longo do dia, preservando a energia mental para o momento de decisões críticas.
                 </div>
                 <div class="easy-item">
-                    <b>4. META DE MANUTENÇÃO:</b> Sustentar o Índice de Prontidão acima de 4.20/5.00 na próxima aferição.
+                    <b>4. META DE MANUTENÇÃO:</b> Sustentar o Índice de Prontidão acima de 4.20/5.00 na próxima aferição de 14 dias.
                 </div>
             `;
         } else {
             if (weakest === 'CONTROL') {
                 return `
                     <div class="easy-item" style="border-left: 3px solid #ef4444; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO DE PRONTIDÃO (ALERTA DE IMPULSIVIDADE):</b> Foi identificada uma redução temporária na capacidade de autocontrole e filtro de decisões do(a) <b>${name}</b> no cargo de <b>${roleTitle}</b>, evidenciada por <b>${errs} toque(s) precipitado(s)</b> no teste. A velocidade de resposta de <b>${rt}ms</b> está preservada, mas o estresse acumulado em <i>${deptTitle}</i> reduziu a capacidade de conter decisões reativas diante de momentos de pressão.
+                        <b>1. DIAGNÓSTICO (ALERTA DE IMPULSIVIDADE TRANSITÓRIA):</b> Identificada oscilação no autocontrole do(a) <b>${name}</b> (${roleTitle}), evidenciada por <b>${errs} toque(s) precipitado(s)</b> no teste. <b>O que acontece no cérebro:</b> O excesso de demandas recentes em <i>${deptTitle}</i> consumiu a reserva de glicogênio no Córtex Pré-Frontal, fazendo o cérebro agir por impulso antes do filtro da razão.
                     </div>
                     <div class="easy-item">
-                        <b>2. AÇÕES PRÁTICAS DE RECORTE (CICLO DE 14 DIAS):</b> 
-                        <br>• <i>Delegar Aprovações Operacionais:</i> Transferir temporariamente para a equipe N2 de <i>${deptTitle}</i> a assinatura de rotinas operacionais secundárias pelos próximos 14 dias.
-                        <br>• <i>Quarentena de Decisão:</i> Instituir uma pausa obrigatória de 60 minutos entre discussões acaloradas e a assinatura final de acordos ou contratações de grande porte.
+                        <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
+                        <br>• <i>Poda de Alçada Operacional:</i> Delegar temporariamente à equipe N2 de <i>${deptTitle}</i> aprovações secundárias. <b>Por que isso importa:</b> Reduz a carga de escolhas irrelevantes, permitindo que os circuitos de autocontrole do cérebro se regenerem em poucos dias.
+                        <br>• <i>Quarentena do Veto (60 min):</i> Pausa obrigatória de 1 hora entre reuniões intensas e a assinatura final de contratos relevantes. <b>Por que isso importa:</b> Permite a queda dos níveis de noradrenalina e cortisol, evitando que decisões de grande porte sejam tomadas sob estresse fisiológico.
                     </div>
                     <div class="easy-item">
-                        <b>3. GOVERNANÇA E DISJUNTORES DE SEGURANÇA:</b> Pautas decisórias de grande impacto da função de <b>${roleTitle}</b> apresentadas no final do dia devem ser avaliadas e votadas pelo comitê apenas no dia seguinte.
+                        <b>3. GOVERNANÇA E DISJUNTORES DE SEGURANÇA:</b> Pautas de grande impacto da função de <b>${roleTitle}</b> surgidas após as 18h só devem ser votadas no dia seguinte. <b>Por que isso importa:</b> Protege a empresa contra o efeito 'Ego Depletion' (esgotamento mental ao final da jornada).
                     </div>
                     <div class="easy-item">
-                        <b>4. META DE RECUPERAÇÃO:</b> Zerar os alertas de impulso e elevar o indicador de Autocontrole para acima de 3.80 no re-teste de 14 dias.
+                        <b>4. META DE RECUPERAÇÃO:</b> Zerar os alertas de impulso e reestabelecer o Autocontrole acima de 3.80 em 14 dias.
                     </div>
                 `;
             } else if (weakest === 'RESILIENCE') {
                 return `
                     <div class="easy-item" style="border-left: 3px solid #a855f7; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO DE PRONTIDÃO (CANSAÇO ACUMULADO):</b> O(a) executivo(a) <b>${name}</b> (${roleTitle}) apresenta sinais claros de sobrecarga de cansaço e oscilação de energia vocal (Índice de Energia: <b>${R.toFixed(1)} / 5.00</b>). A intensidade das demandas recentes em <i>${deptTitle}</i> está drenando a sua reserva de resistência, com risco de gerar esgotamento e transmitir estresse para a equipe.
+                        <b>1. DIAGNÓSTICO (CANSAÇO ACUMULADO):</b> O(a) executivo(a) <b>${name}</b> (${roleTitle}) apresenta sinais claros de exaustão física e micro-tensão vocal (Índice de Energia: <b>${R.toFixed(1)} / 5.00</b>). <b>O que acontece no corpo:</b> O sistema nervoso simpático (modo de alerta contínuo) está sobrecarregado, inibindo o tônus vagal e reduzindo a resistência biológica do líder em <i>${deptTitle}</i>.
                     </div>
                     <div class="easy-item">
-                        <b>2. AÇÕES PRÁTICAS DE RECUPERAÇÃO (CICLO DE 14 DIAS):</b> 
-                        <br>• <i>Bloqueio Noturno de Agenda:</i> Encerrar reuniões decisórias até no máximo 18h30 e instituir o desligamento de telas de trabalho a partir das 21h.
-                        <br>• <i>Pausas de Descompressão:</i> Incluir 2 intervalos diários de 15 minutos sem celular para descanso da mente e recuperação da energia da voz.
+                        <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
+                        <br>• <i>Desligamento Noturno de Telas (pós-21h):</i> Encerrar e-mails e mensagens de trabalho à noite. <b>Por que isso importa:</b> A luz azul das telas bloqueia a secreção de melatonina; a desconexão noturna restaura o sono profundo, permitindo a limpeza metabólica no cérebro e a recuperação da energia vocal.
+                        <br>• <i>Reset Vagal Diário (2x de 5 min):</i> Praticar 5 minutos de respiração compassada (4s inspiração, 6s expiração). <b>Por que isso importa:</b> Estimula o Nervo Vago, reduzindo a frequência cardíaca instantaneamente e devolvendo o corpo ao estado de equilíbrio e descanso.
                     </div>
                     <div class="easy-item">
-                        <b>3. GOVERNANÇA E PROTEÇÃO DE LIDERANÇA:</b> Ajustar temporariamente a agenda de viagens de longa distância do <b>${roleTitle}</b> nos próximos 14 dias para acelerar a recomposição do seu ritmo biológico.
+                        <b>3. GOVERNANÇA E PROTEÇÃO DA LIDERANÇA:</b> Ajustar temporariamente a agenda de viagens de longa distância do <b>${roleTitle}</b> nos próximos 14 dias. <b>Por que isso importa:</b> Evita o estol cognitivo por esgotamento fisiológico e protege as equipes do SRT-RH do contágio de estresse.
                     </div>
                     <div class="easy-item">
-                        <b>4. META DE RECUPERAÇÃO:</b> Elevar o indicador de Energia para acima de 3.80 no próximo check-in de liderança.
+                        <b>4. META DE RECOMPOSIÇÃO:</b> Elevar o indicador de Energia para acima de 3.80 na próxima aferição.
                     </div>
                 `;
             } else {
                 return `
                     <div class="easy-item" style="border-left: 3px solid #f59e0b; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO DE PRONTIDÃO (SOBRECARGA OPERACIONAL):</b> Identificado acúmulo excessivo de tarefas secundárias e perda de foco estratégico no papel de <b>${name}</b> como <b>${roleTitle}</b> (Índice de Clareza: <b>${I.toFixed(1)} / 5.00</b>). O tempo gasto com microgestão e reuniões longas em <i>${deptTitle}</i> está consumindo o tempo dedicado às prioridades de maior valor.
+                        <b>1. DIAGNÓSTICO (SOBRECARGA OPERACIONAL E DISPERSÃO):</b> Identificado acúmulo de tarefas secundárias e perda de foco estratégico no papel de <b>${name}</b> como <b>${roleTitle}</b> (Índice de Clareza: <b>${I.toFixed(1)} / 5.00</b>). <b>O que acontece no cérebro:</b> A atenção dividida em múltiplos micro-problemas em <i>${deptTitle}</i> gera ruído mental, impedindo a visão de longo prazo.
                     </div>
                     <div class="easy-item">
-                        <b>2. AÇÕES PRÁTICAS DE PODA (CICLO DE 14 DIAS):</b> 
-                        <br>• <i>Reduzir Reuniões Informativas:</i> Cancelar ou delegar a participação em 40% das reuniões de alinhamento secundárias em <i>${deptTitle}</i>.
-                        <br>• <i>Foco nas Prioridades N1:</i> Direcionar o tempo da liderança exclusivamente para as 2 metas principais do trimestre, repassando o restante para os gestores de área.
+                        <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
+                        <br>• <i>Corte de 40% das Reuniões Informativas:</i> Cancelar ou delegar reuniões de acompanhamento rotineiro. <b>Por que isso importa:</b> Libera espaço no cérebro e elimina a 'sensação de atropelamento', reconectando o líder com as prioridades estratégicas da empresa.
+                        <br>• <i>Foco Exclusivo nas 2 Metas N1:</i> Direcionar a energia do executivo apenas para os 2 projetos de maior valor. <b>Por que isso importa:</b> Reduz a fragmentação da memória de trabalho e aumenta a eficiência de execução.
                     </div>
                     <div class="easy-item">
-                        <b>3. GOVERNANÇA E RITMO DE TRABALHO:</b> Implementar reuniões de alinhamento tático com no máximo 20 minutos de duração e pauta prévia de 3 pontos.
+                        <b>3. GOVERNANÇA E RITMO DE TRABALHO:</b> Reuniões táticas com duração máxima de 20 minutos e pauta de 3 pontos. <b>Por que isso importa:</b> Mantém o engajamento no pico da atenção humana antes que ocorra a dispersão.
                     </div>
                     <div class="easy-item">
-                        <b>4. META DE RECUPERAÇÃO:</b> Elevar a nota de Clareza Estratégica para acima de 4.00 na próxima sessão.
+                        <b>4. META DE CLAREZA:</b> Elevar a nota de Clareza Estratégica para acima de 4.00 na próxima sessão.
                     </div>
                 `;
             }
