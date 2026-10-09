@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v3.0</title>
+    <title>ExcelSilience ES-Crise Executivo | Cockpit C-Level & Motor E.A.S.Y. v4.0</title>
+    <!-- html2pdf.js for 1-click PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
@@ -28,7 +30,7 @@
             border: 1px solid #1e293b;
             border-radius: 16px;
             width: 100%;
-            max-width: 520px;
+            max-width: 540px;
             padding: 18px 14px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.85);
             margin: auto 0;
@@ -94,6 +96,33 @@
 
         select:focus, input[type="text"]:focus { border-color: #38bdf8; }
 
+        .context-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .context-btn {
+            background: #070d19;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 10px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .context-btn.selected {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: #38bdf8;
+            color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
         .checkbox-container {
             display: flex;
             align-items: flex-start;
@@ -140,6 +169,11 @@
         }
 
         .btn:hover, .btn:active { background: linear-gradient(135deg, #0369a1, #075985); }
+        .btn-pdf {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            margin-bottom: 10px;
+        }
 
         .video-container {
             width: 100%;
@@ -219,6 +253,25 @@
 
         @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
 
+        .audio-wave-box {
+            width: 100%;
+            height: 80px;
+            background: #070d19;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas#audioCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
         .game-box {
             width: 100%;
             height: 210px;
@@ -272,6 +325,28 @@
             margin-bottom: 12px;
             text-align: center;
             line-height: 1.4;
+        }
+
+        .pre-meeting-card {
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid #0284c7;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .pre-meeting-card h4 {
+            color: #38bdf8;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .pre-meeting-card p {
+            font-size: 11px;
+            line-height: 1.5;
+            color: #e2e8f0;
         }
 
         .easy-box {
@@ -354,6 +429,41 @@
             line-height: 1.3;
         }
 
+        .pdf-heatmap-container {
+            background: #070d19;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .pdf-heatmap-title {
+            font-size: 11px;
+            color: #38bdf8;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .heatmap-cell {
+            padding: 6px 2px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
+        .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
+        .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
+        .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
+
         @media (max-width: 480px) {
             body { padding: 8px 4px; }
             .container { padding: 14px 10px; border-radius: 12px; }
@@ -367,10 +477,10 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="pdfReportContent">
     <div class="header-box">
         <h1>EXCELSILIENCE ES-CRISE EXEC</h1>
-        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v3.0</p>
+        <p>Cockpit de Prontidão C-Level & Motor E.A.S.Y. v4.0</p>
     </div>
     <span class="badge-governance">🔒 ZERO PERGUNTAS — LAUDO NOMINAL DE LIDERANÇA & GOVERNANÇA</span>
 
@@ -391,6 +501,21 @@
 
         <label for="txtDept">Business Unit / Diretoria:</label>
         <input type="text" id="txtDept" placeholder="Ex: Presidência / Operações Globais">
+
+        <label>Momento da Aferição:</label>
+        <div class="context-selector">
+            <div class="context-btn selected" id="btnCtxRoutine" onclick="selectCheckinContext('ROUTINE')">
+                ☀️ Rotina Matinal / Prontidão
+            </div>
+            <div class="context-btn" id="btnCtxMeeting" onclick="selectCheckinContext('PRE_MEETING')">
+                ⚡ Pré-Reunião Decisória
+            </div>
+        </div>
+
+        <div id="meetingTopicBox" style="display:none;">
+            <label for="txtMeetingTopic">Nome / Pauta da Reunião (Opcional):</label>
+            <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê M&A / Aprovação de Capex">
+        </div>
 
         <div class="checkbox-container">
             <input type="checkbox" id="chkAuth" checked>
@@ -431,11 +556,16 @@
 
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:#38bdf8; margin-bottom:6px; font-size:14px;">🎙️ Análise de Tom e Energia Vocal (5s)</h3>
-        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Leia a frase com tom natural e firme enquanto captamos a energia da voz:</p>
+        <p style="font-size:11px; text-align:center; color:#94a3b8; margin-bottom:10px;">Leia a frase com tom firme enquanto monitoramos a modulação da sua voz:</p>
         <div style="background:#070d19; padding:14px; border-radius:10px; text-align:center; font-weight:800; color:#fbbf24; margin-bottom:12px; border:1px solid #334155; font-size:13px; line-height:1.4;">
             "Pronto para liderar hoje com clareza, energia e visão estratégica."
         </div>
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz e Analisar (5s)</button>
+
+        <div class="audio-wave-box">
+            <canvas id="audioCanvas"></canvas>
+        </div>
+
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz e Analisar Onda Sonora (5s)</button>
     </div>
 
     <div id="stepInstruction" class="step">
@@ -456,8 +586,11 @@
     </div>
 
     <div id="stepResult" class="step">
+        <button class="btn btn-pdf" onclick="exportExecutivePDF()">📄 Baixar Dossiê Completo em PDF (1-Clique)</button>
+        
         <div id="syncStatus" class="sync-banner sync-success">⏳ Sincronizando laudo com o Painel de Governança...</div>
         <div id="historicalDeltaCard"></div>
+        <div id="preMeetingCardBox"></div>
 
         <div class="score-card">
             <h3 style="color:#38bdf8; font-size:15px; margin-bottom:2px;" id="resExecName">--</h3>
@@ -493,6 +626,19 @@
             </div>
         </div>
 
+        <div class="pdf-heatmap-container">
+            <div class="pdf-heatmap-title">📊 Heatmap de Estresse & Prontidão Recente</div>
+            <div class="heatmap-grid" id="heatmapGridBox">
+                <div class="heatmap-cell hm-green">Seg<br><b>4.8</b></div>
+                <div class="heatmap-cell hm-green">Ter<br><b>4.5</b></div>
+                <div class="heatmap-cell hm-yellow">Qua<br><b>3.1</b></div>
+                <div class="heatmap-cell hm-green">Qui<br><b>4.6</b></div>
+                <div class="heatmap-cell hm-green">Sex<br><b>4.2</b></div>
+                <div class="heatmap-cell hm-purple">Sáb<br><b>2.9</b></div>
+                <div class="heatmap-cell hm-green">Dom<br><b>4.7</b></div>
+            </div>
+        </div>
+
         <div class="easy-box">
             <h4>🧪 RECOMENDAÇÕES EXPLICATIVAS DO MOTOR E.A.S.Y. (14 DIAS)</h4>
             <div id="easyContent">Sintetizando diagnóstico neurocientífico personalizado...</div>
@@ -508,18 +654,28 @@
     const SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
 
     let execName = "", execRole = "", execDept = "", execAuth = true;
+    let checkinContext = "ROUTINE", meetingTopic = "";
     let currentRound = 0; const TOTAL_ROUNDS = 8; const BALL_SPEED_MS = 1100;
     let gameErrors = 0, reactionTimes = [];
     let ballSpawnTime = 0, ballTimer = null, ballHandled = false;
     let mediaStream = null, audioCtx, analyser, microphone, dataArray;
     let audioEnergySamples = [];
     let numericVsiScore = 0.22, computedPupilRatio = 0.40;
+    let waveAnimId = null;
+
+    function selectCheckinContext(ctx) {
+        checkinContext = ctx;
+        document.getElementById('btnCtxRoutine').className = `context-btn ${ctx === 'ROUTINE' ? 'selected' : ''}`;
+        document.getElementById('btnCtxMeeting').className = `context-btn ${ctx === 'PRE_MEETING' ? 'selected' : ''}`;
+        document.getElementById('meetingTopicBox').style.display = ctx === 'PRE_MEETING' ? 'block' : 'none';
+    }
 
     async function startExecutiveCheckin() {
         execName = document.getElementById('txtName').value.trim();
         execRole = document.getElementById('txtRole').value;
         execDept = document.getElementById('txtDept').value.trim() || 'Presidência';
         execAuth = document.getElementById('chkAuth').checked;
+        meetingTopic = document.getElementById('txtMeetingTopic').value.trim();
 
         if (!execName || !execRole) {
             alert('Por favor, preencha seu nome e cargo executivo!');
@@ -554,13 +710,50 @@
             }
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
+            analyser.fftSize = 128;
             microphone = audioCtx.createMediaStreamSource(mediaStream);
             microphone.connect(analyser);
             dataArray = new Uint8Array(analyser.frequencyBinCount);
+            drawWaveform();
         } catch (err) {
             console.warn('Microfone indisponível:', err);
         }
+    }
+
+    function drawWaveform() {
+        const canvas = document.getElementById('audioCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.clientWidth || 300;
+        canvas.height = canvas.parentElement.clientHeight || 80;
+
+        function render() {
+            waveAnimId = requestAnimationFrame(render);
+            if (analyser && dataArray) {
+                analyser.getByteFrequencyData(dataArray);
+            }
+
+            ctx.fillStyle = '#070d19';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const barWidth = (canvas.width / 32);
+            let x = 0;
+
+            for (let i = 0; i < 32; i++) {
+                let barHeight = dataArray ? (dataArray[i] / 255) * canvas.height * 0.8 : (Math.sin(Date.now()*0.005 + i)*15 + 20);
+                barHeight = Math.max(4, barHeight);
+
+                let grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
+                grad.addColorStop(0, '#0284c7');
+                grad.addColorStop(0.5, '#38bdf8');
+                grad.addColorStop(1, '#34d399');
+
+                ctx.fillStyle = grad;
+                ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
+                x += barWidth;
+            }
+        }
+        render();
     }
 
     function runAudioTest() {
@@ -583,6 +776,7 @@
 
         setTimeout(() => {
             clearInterval(audioInterval);
+            if (waveAnimId) cancelAnimationFrame(waveAnimId);
             calcularVSI();
             document.getElementById('stepVoz').classList.remove('active');
             document.getElementById('stepInstruction').classList.add('active');
@@ -720,6 +914,31 @@
         document.getElementById('valI').innerText = I.toFixed(1);
         document.getElementById('valR').innerText = R.toFixed(1);
 
+        const preMeetingBox = document.getElementById('preMeetingCardBox');
+        if (checkinContext === 'PRE_MEETING') {
+            let meetingAdviceText = "";
+            let meetingNameLabel = meetingTopic ? ` (${meetingTopic})` : '';
+
+            if (!isCrisis) {
+                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO DE ALTA PERFORMANCE${meetingNameLabel}:</b> Sua clareza e autocontrole estão em nível excelente (${esCrisisScore.toFixed(2)}). Posição recomendada para a reunião: conduzir a pauta com firmeza, propor resoluções diretas e liderar o alinhamento do comitê com confiança.`;
+            } else if (weakestLink === 'CONTROL') {
+                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA${meetingNameLabel}:</b> Alerta de impulso identificado. Posição recomendada na reunião: adiar a aprovação final de investimentos de grande porte ou solicitar parecer prévio do CFO/Diretoria antes da assinatura de acordos.`;
+            } else if (weakestLink === 'RESILIENCE') {
+                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA${meetingNameLabel}:</b> Sinal de cansaço acumulado. Posição recomendada na reunião: delegar a condução da apresentação para um liderado N2, manter intervenções pontuais e focar exclusivamente nas decisões centrais.`;
+            } else {
+                meetingAdviceText = `<b>ORIENTAÇÃO PRÉ-REUNIÃO TÁTICA${meetingNameLabel}:</b> Excesso de tarefas secundárias. Posição recomendada na reunião: limitar a pauta a no máximo 2 tópicos prioritários e encerrar a sessão em até 30 minutos.`;
+            }
+
+            preMeetingBox.innerHTML = `
+                <div class="pre-meeting-card">
+                    <h4>⚡ CONTEXTO: PRÉ-REUNIÃO DECISÓRIA</h4>
+                    <p>${meetingAdviceText}</p>
+                </div>
+            `;
+        } else {
+            preMeetingBox.innerHTML = '';
+        }
+
         await processHistoryAndEASY(esCrisisScore, avgReaction, gameErrors, numericVsiScore, weakestLink, status, profileKey, C, I, R, profileLabel, isCrisis);
     }
 
@@ -736,7 +955,7 @@
 
             if (resFetch.ok) {
                 const pastData = await resFetch.json();
-                if (pastData && pastData.length > 0) pastRecord = pastData;
+                if (pastData && pastData.length > 0) pastRecord = pastData[0];
             }
         } catch (e) {}
 
@@ -772,6 +991,9 @@
             role: execRole,
             department: execDept,
             authorized_hr: execAuth,
+            checkin_context: checkinContext,
+            is_pre_meeting: checkinContext === 'PRE_MEETING',
+            meeting_topic: meetingTopic || null,
             reaction_time_ms: avgReaction,
             veto_errors: errors,
             vsi_score: vsi,
@@ -819,7 +1041,7 @@
         if (!isCrisis) {
             return `
                 <div class="easy-item" style="border-left: 3px solid #34d399; padding-left: 10px; margin-bottom: 12px;">
-                    <b>1. DIAGNÓSTICO (EQUILÍBRIO PRESERVADO):</b> O(a) líder <b>${name}</b> (${roleTitle}) apresenta excelente nível de prontidão (Nota Global <b>${score.toFixed(2)} / 5.00</b>). A resposta rápida de <b>${rt}ms</b> e a ausência de alertas de impulso comprovam que o Córtex Pré-Frontal está com estoques cheios de glicogênio, mantendo perfeita capacidade inibitória e foco estratégico em <i>${deptTitle}</i>.
+                    <b>1. DIAGNÓSTICO DE EVOLUÇÃO (EQUILÍBRIO PRESERVADO):</b> O(a) líder <b>${name}</b> (${roleTitle}) apresenta excelente nível de prontidão (Nota Global <b>${score.toFixed(2)} / 5.00</b>). A resposta rápida de <b>${rt}ms</b> e a ausência de alertas de impulso comprovam que o Córtex Pré-Frontal está com estoques cheios de glicogênio, mantendo perfeita capacidade inibitória e foco estratégico em <i>${deptTitle}</i>.
                 </div>
                 <div class="easy-item">
                     <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
@@ -837,7 +1059,7 @@
             if (weakest === 'CONTROL') {
                 return `
                     <div class="easy-item" style="border-left: 3px solid #ef4444; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO (ALERTA DE IMPULSIVIDADE TRANSITÓRIA):</b> Identificada oscilação no autocontrole do(a) <b>${name}</b> (${roleTitle}), evidenciada por <b>${errs} toque(s) precipitado(s)</b> no teste. <b>O que acontece no cérebro:</b> O excesso de demandas recentes em <i>${deptTitle}</i> consumiu a reserva de glicogênio no Córtex Pré-Frontal, fazendo o cérebro agir por impulso antes do filtro da razão.
+                        <b>1. DIAGNÓSTICO DE EVOLUÇÃO (IMPULSIVIDADE TRANSITÓRIA):</b> Identificada oscilação no autocontrole do(a) <b>${name}</b> (${roleTitle}), evidenciada por <b>${errs} toque(s) precipitado(s)</b> no teste. <b>Análise Neurocientífica:</b> O excesso de demandas recentes em <i>${deptTitle}</i> consumiu a reserva de glicogênio no Córtex Pré-Frontal, fazendo o cérebro agir por impulso antes do filtro da razão.
                     </div>
                     <div class="easy-item">
                         <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
@@ -854,7 +1076,7 @@
             } else if (weakest === 'RESILIENCE') {
                 return `
                     <div class="easy-item" style="border-left: 3px solid #a855f7; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO (CANSAÇO ACUMULADO):</b> O(a) executivo(a) <b>${name}</b> (${roleTitle}) apresenta sinais claros de exaustão física e micro-tensão vocal (Índice de Energia: <b>${R.toFixed(1)} / 5.00</b>). <b>O que acontece no corpo:</b> O sistema nervoso simpático (modo de alerta contínuo) está sobrecarregado, inibindo o tônus vagal e reduzindo a resistência biológica do líder em <i>${deptTitle}</i>.
+                        <b>1. DIAGNÓSTICO DE EVOLUÇÃO (CANSAÇO ACUMULADO):</b> O(a) executivo(a) <b>${name}</b> (${roleTitle}) apresenta sinais claros de exaustão física e micro-tensionamento vocal (Índice de Energia: <b>${R.toFixed(1)} / 5.00</b>). <b>Análise Neurocientífica:</b> O sistema nervoso simpático (modo de alerta contínuo) está sobrecarregado, inibindo o tônus vagal e reduzindo a resistência biológica do líder em <i>${deptTitle}</i>.
                     </div>
                     <div class="easy-item">
                         <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
@@ -871,7 +1093,7 @@
             } else {
                 return `
                     <div class="easy-item" style="border-left: 3px solid #f59e0b; padding-left: 10px; margin-bottom: 12px;">
-                        <b>1. DIAGNÓSTICO (SOBRECARGA OPERACIONAL E DISPERSÃO):</b> Identificado acúmulo de tarefas secundárias e perda de foco estratégico no papel de <b>${name}</b> como <b>${roleTitle}</b> (Índice de Clareza: <b>${I.toFixed(1)} / 5.00</b>). <b>O que acontece no cérebro:</b> A atenção dividida em múltiplos micro-problemas em <i>${deptTitle}</i> gera ruído mental, impedindo a visão de longo prazo.
+                        <b>1. DIAGNÓSTICO DE EVOLUÇÃO (DISPERSÃO OPERACIONAL):</b> Identificado acúmulo de tarefas secundárias e perda de foco estratégico no papel de <b>${name}</b> como <b>${roleTitle}</b> (Índice de Clareza: <b>${I.toFixed(1)} / 5.00</b>). <b>Análise Neurocientífica:</b> A atenção dividida em múltiplos micro-problemas em <i>${deptTitle}</i> gera ruído mental, impedindo a visão de longo prazo.
                     </div>
                     <div class="easy-item">
                         <b>2. AÇÃO & BENEFÍCIO NEUROCIENTÍFICO (14 DIAS):</b> 
@@ -887,6 +1109,18 @@
                 `;
             }
         }
+    }
+
+    function exportExecutivePDF() {
+        const element = document.getElementById('pdfReportContent');
+        const opt = {
+            margin: 10,
+            filename: `Dossie_Executivo_Prontidao_${execName.replace(/\s+/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: '#070a12', useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 
