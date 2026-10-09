@@ -549,8 +549,9 @@
         var tbody = document.getElementById('tableBody');
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando laudos de liderança...</td></tr>';
 
+        // Timeout estendido para 12 segundos evitando falsos positivos no cold start
         var controller = new AbortController();
-        var timeoutId = setTimeout(function() { controller.abort(); }, 5000);
+        var timeoutId = setTimeout(function() { controller.abort(); }, 12000);
 
         try {
             var res = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc', {
@@ -562,13 +563,15 @@
             var data = [];
             if (res.ok) {
                 data = await res.json() || [];
+            } else {
+                console.warn("Supabase retornou erro HTTP:", res.status);
             }
 
             try {
                 var localBackup = localStorage.getItem('es_crisis_last_checkin');
                 if (localBackup) {
                     var parsed = JSON.parse(localBackup);
-                    if (parsed && parsed.name && !data.some(function(item) { return String(item.id) === String(parsed.id) || (item.name === parsed.name && Math.abs((item.es_crisis_score||0) - (parsed.es_crisis_score||0)) < 0.01); })) {
+                    if (parsed && parsed.name && !data.some(function(item) { return String(item.id) === String(parsed.id); })) {
                         data.unshift(parsed);
                     }
                 }
@@ -579,6 +582,8 @@
             renderRHHeatmap(data);
         } catch (e) {
             clearTimeout(timeoutId);
+            console.error("Erro na conexão com o Supabase:", e);
+
             var localBackupData = [];
             try {
                 var localBackupStr = localStorage.getItem('es_crisis_last_checkin');
@@ -593,7 +598,7 @@
                 renderExecData(localBackupData);
                 renderRHHeatmap(localBackupData);
             } else {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#f87171;">⚠️ Não foi possível conectar ao Supabase (Rede/Bloqueador). <br><button onclick="fetchExecData()" style="margin-top:8px; padding:6px 12px; background:#0284c7; color:#fff; border:none; border-radius:6px; cursor:pointer;">🔄 Tentar Novamente</button></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#f87171;">⚠️ Não foi possível conectar ao Supabase (Rede/Bloqueador/Timeout). <br><small style="color:#94a3b8; font-size:11px;">Verifique se o AdBlock/Brave Shield está desativado ou realize um check-in no aplicativo para gerar dados locais.</small><br><button onclick="fetchExecData()" style="margin-top:10px; padding:6px 14px; background:#0284c7; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:800;">🔄 Tentar Novamente</button></td></tr>';
             }
         }
     }
