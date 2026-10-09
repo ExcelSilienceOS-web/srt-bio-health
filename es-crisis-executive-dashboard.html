@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v5.4</title>
+    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v5.6</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -92,6 +92,19 @@
             border-radius: 20px;
             font-size: 11px;
             font-weight: 800;
+        }
+
+        .sync-status-bar {
+            width: 100%;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid #0284c7;
+            color: #38bdf8;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
         }
 
         .metrics-grid {
@@ -408,7 +421,7 @@
 <div class="header">
     <div class="title-group">
         <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL</h1>
-        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y. v5.4</p>
+        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y. v5.6</p>
     </div>
     <div class="header-actions">
         <button class="btn-refresh" onclick="fetchExecData()">🔄 Atualizar Tabela</button>
@@ -417,6 +430,10 @@
         </a>
         <div class="live-badge">⚡ PAINEL C-SUITE / BOARD ATIVO</div>
     </div>
+</div>
+
+<div class="sync-status-bar" id="syncStatusBar">
+    🔄 Carregando indicadores de prontidão...
 </div>
 
 <div class="metrics-grid">
@@ -545,13 +562,51 @@
     var globalRecords = [];
     var currentFilter = 'ALL';
 
+    // Função utilitária para limpar textos de departamento sem exceções de tipo
+    function cleanDeptString(str) {
+        if (!str) return 'Presidência';
+        var s = String(str);
+        if (s.indexOf('[⚡') !== -1) s = s.split('[⚡')[0];
+        if (s.indexOf('[PRE') !== -1) s = s.split('[PRE')[0];
+        return s.trim() || 'Presidência';
+    }
+
+    function getLocalRecords() {
+        var list = [];
+        try {
+            var hist = localStorage.getItem('es_crisis_history');
+            if (hist) {
+                var parsedHist = JSON.parse(hist);
+                if (Array.isArray(parsedHist)) list = parsedHist;
+            }
+        } catch(e) {}
+
+        try {
+            var last = localStorage.getItem('es_crisis_last_checkin');
+            if (last) {
+                var parsedLast = JSON.parse(last);
+                if (parsedLast && parsedLast.name) {
+                    if (!list.some(function(item) { return String(item.id) === String(parsedLast.id); })) {
+                        list.unshift(parsedLast);
+                    }
+                }
+            }
+        } catch(e) {}
+
+        return list;
+    }
+
     async function fetchExecData() {
         var tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando laudos de liderança...</td></tr>';
+        var statusBar = document.getElementById('syncStatusBar');
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando e atualizando laudos de liderança...</td></tr>';
 
-        // Timeout estendido para 12 segundos evitando falsos positivos no cold start
+        var localData = getLocalRecords();
+        var supabaseData = [];
+        var isSupabaseSuccess = false;
+
         var controller = new AbortController();
-        var timeoutId = setTimeout(function() { controller.abort(); }, 12000);
+        var timeoutId = setTimeout(function() { controller.abort(); }, 8000);
 
         try {
             var res = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc', {
@@ -560,47 +615,135 @@
             });
             clearTimeout(timeoutId);
 
-            var data = [];
             if (res.ok) {
-                data = await res.json() || [];
-            } else {
-                console.warn("Supabase retornou erro HTTP:", res.status);
+                supabaseData = await res.json() || [];
+                isSupabaseSuccess = true;
             }
-
-            try {
-                var localBackup = localStorage.getItem('es_crisis_last_checkin');
-                if (localBackup) {
-                    var parsed = JSON.parse(localBackup);
-                    if (parsed && parsed.name && !data.some(function(item) { return String(item.id) === String(parsed.id); })) {
-                        data.unshift(parsed);
-                    }
-                }
-            } catch(e) {}
-
-            globalRecords = data;
-            renderExecData(data);
-            renderRHHeatmap(data);
         } catch (e) {
             clearTimeout(timeoutId);
-            console.error("Erro na conexão com o Supabase:", e);
-
-            var localBackupData = [];
-            try {
-                var localBackupStr = localStorage.getItem('es_crisis_last_checkin');
-                if (localBackupStr) {
-                    var parsedObj = JSON.parse(localBackupStr);
-                    if (parsedObj && parsedObj.name) localBackupData.push(parsedObj);
-                }
-            } catch(err) {}
-
-            if (localBackupData.length > 0) {
-                globalRecords = localBackupData;
-                renderExecData(localBackupData);
-                renderRHHeatmap(localBackupData);
-            } else {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#f87171;">⚠️ Não foi possível conectar ao Supabase (Rede/Bloqueador/Timeout). <br><small style="color:#94a3b8; font-size:11px;">Verifique se o AdBlock/Brave Shield está desativado ou realize um check-in no aplicativo para gerar dados locais.</small><br><button onclick="fetchExecData()" style="margin-top:10px; padding:6px 14px; background:#0284c7; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:800;">🔄 Tentar Novamente</button></td></tr>';
-            }
         }
+
+        var combined = [].concat(supabaseData);
+        localData.forEach(function(loc) {
+            if (!combined.some(function(item) { return String(item.id) === String(loc.id) || (item.name === loc.name && item.created_at === loc.created_at); })) {
+                combined.unshift(loc);
+            }
+        });
+
+        combined.sort(function(a, b) {
+            return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
+
+        globalRecords = combined;
+
+        if (combined.length > 0) {
+            if (isSupabaseSuccess) {
+                statusBar.style.background = 'rgba(52, 211, 153, 0.15)';
+                statusBar.style.borderColor = '#10b981';
+                statusBar.style.color = '#34d399';
+                statusBar.innerHTML = '✅ <b>NUVEM CONECTADA:</b> Painel atualizado em tempo real (' + combined.length + ' laudo(s) no sistema)';
+            } else {
+                statusBar.style.background = 'rgba(251, 191, 36, 0.15)';
+                statusBar.style.borderColor = '#f59e0b';
+                statusBar.style.color = '#fbbf24';
+                statusBar.innerHTML = '⚡ <b>MODO LOCAL (GOVERNANÇA OFFLINE):</b> Exibindo ' + combined.length + ' laudo(s) salvos no navegador.';
+            }
+
+            renderExecData(combined);
+            renderRHHeatmap(combined);
+        } else {
+            statusBar.style.background = 'rgba(239, 68, 68, 0.15)';
+            statusBar.style.borderColor = '#ef4444';
+            statusBar.style.color = '#f87171';
+            statusBar.innerHTML = '⚠️ Nenhuma conexão externa e nenhum laudo salvo localmente no seu dispositivo.';
+
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:24px; color:#f87171;">' +
+                '⚠️ <b>Ainda não há check-ins salvos neste navegador.</b><br>' +
+                '<small style="color:#94a3b8;">Faça 1 aferição no aplicativo ou clique no botão abaixo para simular 3 laudos C-Level:</small><br>' +
+                '<button onclick="loadDemoData()" style="margin-top:12px; padding:8px 16px; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; border:1px solid #38bdf8; border-radius:8px; cursor:pointer; font-weight:800;">🧪 Carregar 3 Laudos Demonstrativos (C-Level)</button>' +
+                '</td></tr>';
+            
+            document.getElementById('interventionsList').innerHTML = '<div class="action-card">Clique em "Carregar 3 Laudos Demonstrativos" acima para visualizar as recomendações do Motor E.A.S.Y.</div>';
+        }
+    }
+
+    function loadDemoData() {
+        var demoRecords = [
+            {
+                id: 'demo_1',
+                name: 'Dr. Flavio Verissimo',
+                role: 'CEO / Presidente Executivo',
+                department: 'Presidência',
+                es_crisis_score: 4.65,
+                control_score: 4.80,
+                intentionality_score: 4.70,
+                resilience_score: 4.45,
+                reaction_time_ms: 340,
+                veto_errors: 0,
+                vsi_score: 0.18,
+                pupil_ratio: 0.40,
+                weakest_link: 'RESILIENCE',
+                status: '🟢 PRONTIDÃO TOTAL (EQUILÍBRIO & CLAREZA)',
+                profile_key: 'SOVEREIGN_OPERATOR',
+                checkin_context: 'ROUTINE',
+                is_pre_meeting: false,
+                created_at: new Date().toISOString(),
+                session_count: 3
+            },
+            {
+                id: 'demo_2',
+                name: 'Ana Paula Mendonça',
+                role: 'CFO / Diretor Financeiro',
+                department: 'Diretoria Financeira [⚡ PRÉ-REUNIÃO: Comitê M&A]',
+                es_crisis_score: 2.85,
+                control_score: 2.20,
+                intentionality_score: 3.10,
+                resilience_score: 3.25,
+                reaction_time_ms: 680,
+                veto_errors: 3,
+                vsi_score: 0.38,
+                pupil_ratio: 0.44,
+                weakest_link: 'CONTROL',
+                status: '🔴 ALERTA DE IMPULSIVIDADE (PAUSA NECESSÁRIA)',
+                profile_key: 'IMPULSIVE_REACTOR',
+                checkin_context: 'PRE_MEETING',
+                is_pre_meeting: true,
+                meeting_topic: 'Comitê M&A',
+                created_at: new Date(Date.now() - 3600000).toISOString(),
+                session_count: 2
+            },
+            {
+                id: 'demo_3',
+                name: 'Carlos Eduardo Silva',
+                role: 'COO / Diretor Operacional',
+                department: 'Operações Globais',
+                es_crisis_score: 3.10,
+                control_score: 3.50,
+                intentionality_score: 3.40,
+                resilience_score: 2.40,
+                reaction_time_ms: 510,
+                veto_errors: 1,
+                vsi_score: 0.52,
+                pupil_ratio: 0.32,
+                weakest_link: 'RESILIENCE',
+                status: '🟣 NÍVEL CRÍTICO DE CANSAÇO (EXAUSTÃO ACUMULADA)',
+                profile_key: 'BURNED_CHASSIS',
+                checkin_context: 'ROUTINE',
+                is_pre_meeting: false,
+                created_at: new Date(Date.now() - 7200000).toISOString(),
+                session_count: 5
+            }
+        ];
+
+        globalRecords = demoRecords;
+        renderExecData(demoRecords);
+        renderRHHeatmap(demoRecords);
+
+        var statusBar = document.getElementById('syncStatusBar');
+        statusBar.style.background = 'rgba(56, 189, 248, 0.15)';
+        statusBar.style.borderColor = '#0284c7';
+        statusBar.style.color = '#38bdf8';
+        statusBar.innerHTML = '🧪 <b>DADOS DEMONSTRATIVOS ATIVOS:</b> Exibindo 3 perfis C-Level simulados.';
     }
 
     function getVectors(r) {
@@ -779,7 +922,7 @@
                 ? '<span class="badge-premeeting">⚡ PRÉ-REUNIÃO</span>' + (r.meeting_topic ? ('<br><small style="font-size:9px; color:#38bdf8;">' + r.meeting_topic + '</small>') : '')
                 : '<span style="color:#94a3b8; font-size:11px;">☀️ Rotina</span>';
 
-            var displayDept = (r.department || 'Presidência').split('[⚡').split('[PRE').trim();
+            var displayDept = cleanDeptString(r.department);
 
             var tr = document.createElement('tr');
             var recIdStr = String(r.id);
@@ -793,7 +936,7 @@
                 '<td style="color:#fbbf24; font-weight:700;">' + weakestText + '</td>' +
                 '<td>' + deltaHtml + '</td>' +
                 '<td><span class="badge-profile ' + badgeClass + '">' + label + '</span></td>' +
-                '<td><button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo Completo</button></td>';
+                '<td><button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo Completo</button></td>';
             tbody.appendChild(tr);
 
             var actionCard = document.createElement('div');
@@ -807,28 +950,28 @@
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#34d399; font-weight:800; margin-right:8px;">🟢 EQUILÍBRIO PRESERVADO (' + sc.toFixed(2) + ')</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
+                    '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
                     '<b>Recomendação Tática RH / Conselho:</b> Executivo em plena prontidão. Manter o bloco inegociável de 90 min de Foco Profundo diários (o que restaura estoques de glicogênio no Córtex Pré-Frontal e eleva a VFC) e manter a quarentena preventiva de 30 min antes de aprovações de alto impacto.';
             } else if (r.weakest_link === 'CONTROL' || pk.indexOf('IMPULSIVE') !== -1) {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#f87171; font-weight:800; margin-right:8px;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
+                    '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
                     '<b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório (Tempo: ' + (r.reaction_time_ms || 520) + 'ms / Erros: ' + (r.veto_errors || 0) + '). Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).';
             } else if (r.weakest_link === 'RESILIENCE' || pk.indexOf('BURNED') !== -1 || pk.indexOf('CHASSIS') !== -1) {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#c084fc; font-weight:800; margin-right:8px;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
+                    '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
                     '<b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado (Índice R: ' + res + ' / VSI Vocal: ' + (r.vsi_score || 0.22) + '). Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).';
             } else {
                 actionContent =
                     '<div class="exec-header">' +
                     '<span><b>' + r.name + '</b> (' + (r.role || 'C-Level') + ' — ' + displayDept + ')' + meetingTagText + '</span>' +
                     '<div><span style="color:#fbbf24; font-weight:800; margin-right:8px;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>' +
-                    '<button class="btn-view-dossier" onclick="openPersonDossierModal(\'' + recIdStr.replace(/'/g, "\\'") + '\')">👁️ Ver Laudo</button></div></div>' +
+                    '<button class="btn-view-dossier" data-id="' + recIdStr + '" onclick="openPersonDossierModal(this.dataset.id)">👁️ Ver Laudo</button></div></div>' +
                     '<b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão e ruído. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.';
             }
             actionCard.innerHTML = actionContent;
@@ -852,7 +995,7 @@
         var isPreMeeting = isRecordPreMeeting(r);
         var preMeetingText = isPreMeeting ? ('<div style="background:rgba(56, 189, 248, 0.15); border:1px solid #0284c7; padding:10px; border-radius:8px; margin-bottom:12px; font-size:11px; color:#38bdf8;">⚡ <b>AFERIÇÃO PRÉ-REUNIÃO DECISÓRIA</b>' + (r.meeting_topic ? (': ' + r.meeting_topic) : '') + '</div>') : '';
 
-        var displayDept = (r.department || 'Presidência').split('[⚡').split('[PRE').trim();
+        var displayDept = cleanDeptString(r.department);
 
         body.innerHTML =
             '<div id="singleModalPrintArea">' +
@@ -889,7 +1032,7 @@
             '<div style="font-size:11px; line-height:1.5; color:#cbd5e1;">' +
             '<b>Diagnóstico e Benefício Prático:</b> O acompanhamento contínuo da liderança de ' + r.name + ' garante a tomada de decisão lúcida em momentos de crise, aumentando a Variabilidade da Frequência Cardíaca (VFC), protegendo os estoques de glicogênio pré-frontal e evitando a sobrecarga dos times no SRT-RH.' +
             '</div></div></div>' +
-            '<button class="btn-export" style="width:100%; padding:10px; margin-top:10px;" onclick="exportSingleDossierPDF(\'' + r.name.replace(/'/g, "\\'") + '\')">📄 Exportar Laudo Individual em PDF</button>';
+            '<button class="btn-export" style="width:100%; padding:10px; margin-top:10px;" data-id="' + r.name + '" onclick="exportSingleDossierPDF(this.dataset.id)">📄 Exportar Laudo Individual em PDF</button>';
 
         modal.style.display = 'flex';
     }
@@ -900,26 +1043,34 @@
 
     function exportSingleDossierPDF(name) {
         var element = document.getElementById('singleModalPrintArea');
-        var opt = {
-            margin: 10,
-            filename: 'Laudo_Individual_Prontidao_' + name.replace(/\s+/g, '_') + '.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, backgroundColor: '#0f172a', useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+        if (typeof html2pdf !== 'undefined') {
+            var opt = {
+                margin: 10,
+                filename: 'Laudo_Individual_Prontidao_' + name.replace(/\s+/g, '_') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#0f172a', useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        } else {
+            window.print();
+        }
     }
 
     function exportBoardPDF() {
         var element = document.getElementById('boardReportPrintArea');
-        var opt = {
-            margin: 10,
-            filename: 'Dossie_Conselho_Prontidao_CSuite.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, backgroundColor: '#070a12', useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-        };
-        html2pdf().set(opt).from(element).save();
+        if (typeof html2pdf !== 'undefined') {
+            var opt = {
+                margin: 10,
+                filename: 'Dossie_Conselho_Prontidao_CSuite.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#070a12', useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            html2pdf().set(opt).from(element).save();
+        } else {
+            window.print();
+        }
     }
 
     window.onload = fetchExecData;
