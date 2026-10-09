@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES-Crise Executivo — Dashboard de Governança C-Level & Conselho</title>
+    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v5.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -118,6 +118,23 @@
 
         .btn-export:hover { background: #0369a1; }
 
+        .btn-view-dossier {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-view-dossier:hover {
+            background: #0284c7;
+            color: #fff;
+        }
+
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -128,7 +145,7 @@
             border-collapse: collapse;
             text-align: left;
             font-size: 12px;
-            min-width: 900px;
+            min-width: 920px;
         }
 
         th {
@@ -225,6 +242,104 @@
             margin-bottom: 6px;
         }
 
+        /* Modal Laudo do Executivo */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 10px;
+        }
+
+        .modal-content {
+            background: #0f172a;
+            border: 1px solid #38bdf8;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 620px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px; right: 16px;
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 50%;
+            width: 28px; height: 28px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rh-heatmap-section {
+            background: #070d19;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .rh-heatmap-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .rh-heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+        }
+
+        .rh-heatmap-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .rh-heatmap-card h5 {
+            font-size: 11px;
+            color: #38bdf8;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rh-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 3px;
+        }
+
+        .rh-mini-cell {
+            padding: 4px 2px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
+        .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
+        .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
+        .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
+
         @media (max-width: 480px) {
             body { padding: 10px 6px; }
             .title-group h1 { font-size: 16px; }
@@ -238,7 +353,7 @@
 <div class="header">
     <div class="title-group">
         <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL</h1>
-        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y.</p>
+        <p>Acompanhamento de Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y. v5.0</p>
     </div>
     <div class="live-badge">⚡ PAINEL C-SUITE / BOARD ATIVO</div>
 </div>
@@ -266,6 +381,22 @@
     </div>
 </div>
 
+<!-- PAINEL DO HEATMAP DA LIDERANÇA DO RH -->
+<div class="panel">
+    <div class="panel-header">
+        <div class="panel-title">📊 Heatmap Semanal de Prontidão da Liderança (Visão RH/Board)</div>
+    </div>
+    <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">
+        Acompanhamento visual direto das oscilações de energia e foco de cada membro do C-Suite e Diretoria nas últimas aferições.
+    </p>
+
+    <div class="rh-heatmap-section">
+        <div class="rh-heatmap-grid" id="rhHeatmapContainer">
+            <div style="color:#94a3b8; font-size:11px; padding:10px;">Carregando mapa de calor executivo...</div>
+        </div>
+    </div>
+</div>
+
 <div class="panel" id="boardReportPrintArea">
     <div class="panel-header">
         <div class="panel-title">🧪 Histórico de Sessões Executivas & Evolução do Loop E.A.S.Y.</div>
@@ -282,12 +413,13 @@
                     <th>Índice de Prontidão</th>
                     <th>Vetores (C / I / R)</th>
                     <th>Ponto de Atenção</th>
-                    <th>Evolução (Delta)</th>
+                    <th>Evolução</th>
                     <th>Estado de Prontidão</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando laudos de liderança...</td></tr>
+                <tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Conectando ao Supabase e buscando laudos de liderança...</td></tr>
             </tbody>
         </table>
     </div>
@@ -333,10 +465,20 @@
     </div>
 </div>
 
+<!-- MODAL PARA EXIBIR O LAUDO INDIVIDUAL COMPLETO DA PESSOA NO DASHBOARD DO RH -->
+<div class="modal-backdrop" id="dossierModal">
+    <div class="modal-content" id="modalDossierContent">
+        <button class="modal-close" onclick="closeDossierModal()">✕</button>
+        <div id="modalDossierBody">Carregando laudo nominal da pessoa...</div>
+    </div>
+</div>
+
 <script>
     const SUPABASE_HOST = ["uywfcrhryrzmhrukxgaf", "supabase", "co"].join(".");
     const SUPABASE_URL = "https://" + SUPABASE_HOST;
     const SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
+
+    let globalRecords = [];
 
     async function fetchExecData() {
         const tbody = document.getElementById('tableBody');
@@ -348,13 +490,58 @@
 
             if (res.ok) {
                 const data = await res.json() || [];
+                globalRecords = data;
                 renderExecData(data);
+                renderRHHeatmap(data);
             } else {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado no Supabase.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado no Supabase.</td></tr>';
             }
         } catch (e) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#f87171;">Erro de conexão com o banco de dados executivo.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#f87171;">Erro de conexão com o banco de dados executivo.</td></tr>';
         }
+    }
+
+    function renderRHHeatmap(records) {
+        const container = document.getElementById('rhHeatmapContainer');
+        if (!records || records.length === 0) {
+            container.innerHTML = '<div style="color:#94a3b8; font-size:11px; padding:10px;">Nenhum laudo registrado até o momento.</div>';
+            return;
+        }
+
+        const execGroups = {};
+        records.forEach(r => {
+            if (!execGroups[r.name]) execGroups[r.name] = [];
+            execGroups[r.name].push(r);
+        });
+
+        let html = '';
+        Object.keys(execGroups).forEach(name => {
+            const list = execGroups[name].slice(0, 5);
+            let cellsHtml = '';
+
+            list.forEach((item, idx) => {
+                const sc = parseFloat(item.es_crisis_score || 0);
+                let cellClass = 'hm-green';
+                if (sc < 3.2 || item.veto_errors >= 2) {
+                    if (item.weakest_link === 'CONTROL') cellClass = 'hm-red';
+                    else if (item.weakest_link === 'RESILIENCE') cellClass = 'hm-purple';
+                    else cellClass = 'hm-yellow';
+                }
+
+                cellsHtml += `<div class="rh-mini-cell ${cellClass}">#${item.session_count || (list.length - idx)}<br><b>${sc.toFixed(1)}</b></div>`;
+            });
+
+            html += `
+                <div class="rh-heatmap-card">
+                    <h5>${name}</h5>
+                    <div class="rh-mini-grid">
+                        ${cellsHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
     }
 
     function renderExecData(records) {
@@ -404,12 +591,12 @@
         interventionsContainer.innerHTML = '';
 
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo registrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo registrado.</td></tr>';
             interventionsContainer.innerHTML = '<div class="action-card">Nenhuma sessão executiva registrada até o momento.</div>';
             return;
         }
 
-        records.forEach(r => {
+        records.forEach((r, idx) => {
             const userHistory = execMap[r.name];
             let deltaHtml = '<span style="color:#94a3b8">Linha de Base</span>';
             const currentIndex = userHistory.findIndex(item => item.id === r.id);
@@ -463,6 +650,7 @@
                 <td style="color:#fbbf24; font-weight:700;">${weakestText}</td>
                 <td>${deltaHtml}</td>
                 <td><span class="badge-profile ${badgeClass}">${label}</span></td>
+                <td><button class="btn-view-dossier" onclick="openPersonDossierModal('${r.id}')">👁️ Ver Laudo Completo</button></td>
             `;
             tbody.appendChild(tr);
 
@@ -476,7 +664,10 @@
                 actionContent = `
                     <div class="exec-header">
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
-                        <span style="color:#34d399; font-weight:800;">🟢 EQUILÍBRIO PRESERVADO (${sc.toFixed(2)})</span>
+                        <div>
+                            <span style="color:#34d399; font-weight:800; margin-right:8px;">🟢 EQUILÍBRIO PRESERVADO (${sc.toFixed(2)})</span>
+                            <button class="btn-view-dossier" onclick="openPersonDossierModal('${r.id}')">👁️ Ver Laudo</button>
+                        </div>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Executivo em plena prontidão. Manter o bloco inegociável de 90 min de Foco Profundo diários (o que restaura estoques de glicogênio no Córtex Pré-Frontal e eleva a VFC) e manter a quarentena preventiva de 30 min antes de aprovações de alto impacto.
                 `;
@@ -484,7 +675,10 @@
                 actionContent = `
                     <div class="exec-header">
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
-                        <span style="color:#f87171; font-weight:800;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>
+                        <div>
+                            <span style="color:#f87171; font-weight:800; margin-right:8px;">🔴 PAUSA DECISÓRIA NECESSÁRIA</span>
+                            <button class="btn-view-dossier" onclick="openPersonDossierModal('${r.id}')">👁️ Ver Laudo</button>
+                        </div>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Redução temporária no autocontrole inibitório. Delegar aprovações operacionais para diretores N2 por 14 dias (o que descarrega a fadiga de escolha) e proibir decisões estratégicas finais sem uma pausa prévia de 60 min (tempo necessário para acalmar a amígdala e estabilizar o nível de cortisol).
                 `;
@@ -492,7 +686,10 @@
                 actionContent = `
                     <div class="exec-header">
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
-                        <span style="color:#c084fc; font-weight:800;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>
+                        <div>
+                            <span style="color:#c084fc; font-weight:800; margin-right:8px;">🟣 RECOMPOSIÇÃO DE ENERGIA</span>
+                            <button class="btn-view-dossier" onclick="openPersonDossierModal('${r.id}')">👁️ Ver Laudo</button>
+                        </div>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Cansaço acumulado. Proibir reuniões decisórias após 18h30, desativar telas de trabalho pós-21h (para permitir a liberação natural de melatonina e regeneração celular) e aplicar 2 pausas curtas de respiração ritmada (para estimulação do Nervo Vago e recuperação da energia vocal).
                 `;
@@ -500,7 +697,10 @@
                 actionContent = `
                     <div class="exec-header">
                         <span><b>${r.name}</b> (${r.role || 'C-Level'} — ${r.department || 'Presidência'})${meetingTagText}</span>
-                        <span style="color:#fbbf24; font-weight:800;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>
+                        <div>
+                            <span style="color:#fbbf24; font-weight:800; margin-right:8px;">🟡 PODA DE SOBRECARGA OPERACIONAL</span>
+                            <button class="btn-view-dossier" onclick="openPersonDossierModal('${r.id}')">👁️ Ver Laudo</button>
+                        </div>
                     </div>
                     <b>Recomendação Tática RH / Conselho:</b> Excesso de microgestão. Reduzir em 40% as reuniões de acompanhamento na pauta do executivo e alocar equipe de apoio para absorver rotinas operacionais, liberando a memória de trabalho para focar exclusivamente nos 2 projetos N1 prioritários.
                 `;
@@ -508,6 +708,92 @@
             actionCard.innerHTML = actionContent;
             interventionsContainer.appendChild(actionCard);
         });
+    }
+
+    function openPersonDossierModal(recordId) {
+        const r = globalRecords.find(item => item.id == recordId || item.id === recordId);
+        if (!r) return;
+
+        const modal = document.getElementById('dossierModal');
+        const body = document.getElementById('modalDossierBody');
+
+        const sc = parseFloat(r.es_crisis_score || 0);
+        const c = r.control_score ? parseFloat(r.control_score).toFixed(1) : '4.5';
+        const i = r.intentionality_score ? parseFloat(r.intentionality_score).toFixed(1) : '4.8';
+        const res = r.resilience_score ? parseFloat(r.resilience_score).toFixed(1) : '4.2';
+
+        let isPreMeeting = r.is_pre_meeting || r.checkin_context === 'PRE_MEETING';
+        let preMeetingText = isPreMeeting ? `<div style="background:rgba(56, 189, 248, 0.15); border:1px solid #0284c7; padding:10px; border-radius:8px; margin-bottom:12px; font-size:11px; color:#38bdf8;">⚡ <b>AFERIÇÃO PRÉ-REUNIÃO DECISÓRIA</b>${r.meeting_topic ? `: \${r.meeting_topic}` : ''}</div>` : '';
+
+        body.innerHTML = `
+            <div id="singleModalPrintArea">
+                <div style="text-align:center; border-bottom:1px solid #1e293b; padding-bottom:10px; margin-bottom:14px;">
+                    <h2 style="color:#38bdf8; font-size:16px;">DOSSIÊ INDIVIDUAL DE PRONTIDÃO DE LIDERANÇA</h2>
+                    <p style="font-size:11px; color:#94a3b8;">Laudo Nominativo do Motor E.A.S.Y. — ExcelSilience ES-Crise</p>
+                </div>
+
+                ${preMeetingText}
+
+                <div style="background:#070d19; border:1px solid #334155; padding:12px; border-radius:10px; margin-bottom:12px;">
+                    <h3 style="color:#f8fafc; font-size:15px; margin-bottom:2px;">${r.name}</h3>
+                    <p style="font-size:11px; color:#38bdf8; margin-bottom:10px;">${r.role || 'Executivo'} | ${r.department || 'Presidência'}</p>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px; border-radius:8px; border:1px solid #334155; margin-bottom:10px;">
+                        <span style="font-size:12px; font-weight:800;">ÍNDICE DE PRONTIDÃO:</span>
+                        <span style="font-size:22px; font-weight:800; color:#38bdf8;">${sc.toFixed(2)} / 5.00</span>
+                    </div>
+
+                    <div style="font-size:11px; color:#cbd5e1; margin-bottom:6px;">
+                        <b>Estado de Prontidão:</b> <span style="color:#34d399; font-weight:800;">${r.status || '🟢 PRONTIDÃO TOTAL'}</span>
+                    </div>
+                    <div style="font-size:11px; color:#cbd5e1;">
+                        <b>Tempo de Reação:</b> ${r.reaction_time_ms || 520} ms | <b>Alertas de Impulso:</b> ${r.veto_errors || 0}
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; text-align:center; margin-bottom:12px;">
+                    <div style="background:#070d19; padding:8px 4px; border-radius:8px; border:1px solid #334155;">
+                        <div style="font-size:9px; color:#94a3b8; font-weight:700;">AUTOCONTROLE</div>
+                        <div style="font-size:16px; font-weight:800; color:#38bdf8; margin-top:2px;">${c}</div>
+                    </div>
+                    <div style="background:#070d19; padding:8px 4px; border-radius:8px; border:1px solid #334155;">
+                        <div style="font-size:9px; color:#94a3b8; font-weight:700;">CLAREZA</div>
+                        <div style="font-size:16px; font-weight:800; color:#34d399; margin-top:2px;">${i}</div>
+                    </div>
+                    <div style="background:#070d19; padding:8px 4px; border-radius:8px; border:1px solid #334155;">
+                        <div style="font-size:9px; color:#94a3b8; font-weight:700;">ENERGIA</div>
+                        <div style="font-size:16px; font-weight:800; color:#c084fc; margin-top:2px;">${res}</div>
+                    </div>
+                </div>
+
+                <div style="background:rgba(56, 189, 248, 0.04); border:1px solid #0284c7; border-radius:10px; padding:12px; margin-bottom:12px;">
+                    <h4 style="color:#38bdf8; font-size:11px; margin-bottom:8px; text-transform:uppercase;">🧪 ORIENTAÇÃO TÁTICA NEUROCIENTÍFICA (MOTOR E.A.S.Y.)</h4>
+                    <div style="font-size:11px; line-height:1.5; color:#cbd5e1;">
+                        <b>Diagnóstico e Benefício Prático:</b> O acompanhamento contínuo da liderança de ${r.name} garante a tomada de decisão lúcida em momentos de crise, aumentando a Variabilidade da Frequência Cardíaca (VFC), protegendo os estoques de glicogênio pré-frontal e evitando a sobrecarga dos times no SRT-RH.
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-export" style="width:100%; padding:10px; margin-top:10px;" onclick="exportSingleDossierPDF('${r.name}')">📄 Exportar Laudo Individual em PDF</button>
+        `;
+
+        modal.style.display = 'flex';
+    }
+
+    function closeDossierModal() {
+        document.getElementById('dossierModal').style.display = 'none';
+    }
+
+    function exportSingleDossierPDF(name) {
+        const element = document.getElementById('singleModalPrintArea');
+        const opt = {
+            margin: 10,
+            filename: `Laudo_Individual_Prontidao_${name.replace(/\s+/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: '#0f172a', useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 
     function exportBoardPDF() {
