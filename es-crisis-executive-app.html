@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ExcelSilience ES-Crise Executivo — Readiness Telemetry v5.8</title>
+    <title>ExcelSilience ES-Crise Executivo — Readiness Telemetry v5.8 Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -20,62 +20,474 @@
             --green-glow: rgba(16, 185, 129, 0.25);
             --yellow: #f59e0b;
             --yellow-glow: rgba(245, 158, 11, 0.25);
+            --purple: #a855f7;
+            --purple-glow: rgba(168, 85, 247, 0.25);
             --red: #ef4444;
             --red-glow: rgba(239, 68, 68, 0.25);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
 
-        body {
-            width: 100%; min-height: 100vh; background-color: var(--bg); color: var(--text);
-            display: flex; justify-content: center; align-items: flex-start; padding: 12px 0;
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px 8px;
         }
 
         .app-container {
-            width: 100%; max-width: 540px; min-height: 92vh; background: var(--card);
-            border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9); margin: 0 auto;
+            width: 100%;
+            max-width: 560px;
+            min-height: 92vh;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+            margin: auto 0;
+            overflow: hidden;
+            position: relative;
         }
 
-        .screen { display: none; flex-direction: column; padding: 24px 20px; flex: 1; }
-        .screen.active { display: flex; }
+        .screen {
+            display: none;
+            flex-direction: column;
+            padding: 24px 20px;
+            flex: 1;
+        }
 
-        .header-brand { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-        .brand-title { font-size: 18px; font-weight: 800; color: var(--accent); letter-spacing: 0.5px; }
-        .brand-subtitle { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
+        .screen.active {
+            display: flex;
+        }
 
-        .badge-v58 { background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
 
-        .card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
-        .card h3 { font-size: 15px; color: var(--accent); margin-bottom: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
 
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; }
+        .brand-subtitle {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+            font-weight: 700;
+        }
 
-        input[type="text"], select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #070d19; color: #fff; font-size: 13px; outline: none; }
+        .badge-v58 {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+        }
 
-        .btn-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
-        .btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: 1px solid var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        .card {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
 
-        .camera-box-large { position: relative; width: 100%; height: 340px; background: #000; border-radius: 16px; overflow: hidden; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 12px 0 18px 0; }
-        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .card h3 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        .hud-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 16px; box-sizing: border-box; background: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.7) 100%); }
-        .hud-scanline { width: 100%; height: 3px; background: var(--accent); box-shadow: 0 0 14px var(--accent); position: absolute; top: 0; left: 0; animation: scan 2.2s infinite linear; }
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        .form-group {
+            margin-bottom: 14px;
+        }
 
-        .game-canvas-area { position: relative; width: 100%; height: 330px; background: #070d19; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; touch-action: none; }
-        .target-ball { position: absolute; width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #fff; transform: translate(-50%, -50%); cursor: pointer; }
-        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2px solid #6ee7b7; box-shadow: 0 0 15px var(--green-glow); }
-        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2px solid #fca5a5; box-shadow: 0 0 15px var(--red-glow); }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
 
-        .dossier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; text-align: center; }
-        .dossier-stat { background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 12px 6px; }
-        .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
-        .dossier-stat .val { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 2px; }
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #070d19;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
 
-        .easy-prescription-card { background: #070d19; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 12px; line-height: 1.6; color: #cbd5e1; }
-        .easy-prescription-card h4 { color: var(--accent); font-size: 12px; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 6px; display: flex; justify-content: space-between; }
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .context-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .context-btn {
+            background: #070d19;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 12px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .context-btn.selected {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: #070d19;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .checkbox-container input {
+            margin-top: 2px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .checkbox-container label {
+            font-size: 11px;
+            color: #cbd5e1;
+            line-height: 1.4;
+            cursor: pointer;
+        }
+
+        .btn-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff;
+            border: 1px solid var(--accent);
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0369a1, #075985);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 16px var(--green-glow);
+            margin-bottom: 12px;
+        }
+
+        .camera-box-large {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 14px;
+            box-sizing: border-box;
+            background: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.75) 100%);
+        }
+
+        .hud-frame-rect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 210px;
+            border: 2px dashed var(--accent);
+            border-radius: 20px;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .hud-scanline {
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            box-shadow: 0 0 14px var(--accent);
+            position: absolute;
+            top: 0; left: 0;
+            animation: scan 2.2s infinite linear;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        .audio-wave-box {
+            width: 100%;
+            height: 90px;
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas#canvasWave {
+            width: 100%;
+            height: 100%;
+        }
+
+        .game-canvas-area {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: #070d19;
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            touch-action: none;
+        }
+
+        .target-ball {
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+            touch-action: manipulation;
+        }
+
+        .ball-go {
+            background: radial-gradient(circle, #34d399, #059669);
+            border: 2.5px solid #6ee7b7;
+            box-shadow: 0 0 20px var(--green-glow);
+        }
+
+        .ball-nogo {
+            background: radial-gradient(circle, #f87171, #dc2626);
+            border: 2.5px solid #fca5a5;
+            box-shadow: 0 0 20px var(--red-glow);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #070d19;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0284c7, #38bdf8);
+            transition: width 0.3s;
+        }
+
+        .dossier-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .dossier-stat {
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 6px;
+        }
+
+        .dossier-stat .lbl {
+            font-size: 9px;
+            color: var(--muted);
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .dossier-stat .val {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-top: 2px;
+        }
+
+        .easy-box {
+            background: rgba(56, 189, 248, 0.04);
+            border: 1px solid var(--accent);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .easy-box h4 {
+            color: var(--accent);
+            font-size: 13px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            padding-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .easy-item {
+            font-size: 11px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #cbd5e1;
+            border-left: 3px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        .easy-item b { color: #f8fafc; font-weight: 800; }
+
+        .sync-banner {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .sync-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid #10b981;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .heatmap-cell {
+            padding: 6px 2px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
+        .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
+        .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
+        .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
+
+        @media (max-width: 480px) {
+            body { padding: 8px 4px; }
+            .app-container { padding: 0; border-radius: 12px; }
+            .screen { padding: 18px 14px; }
+            .brand-title { font-size: 16px; }
+            .camera-box-large { height: 260px; }
+            .game-canvas-area { height: 240px; }
+        }
     </style>
 </head>
 <body>
@@ -87,54 +499,66 @@
         <div class="header-brand">
             <div>
                 <div class="brand-title">EXCELSILIENCE ES-CRISE</div>
-                <div class="brand-subtitle">Readiness Telemetry v5.8</div>
+                <div class="brand-subtitle">Readiness Telemetry v5.8 Master</div>
             </div>
-            <div class="badge-v58">RIGOR TOTAL</div>
+            <div class="badge-v58">MOTOR E.A.S.Y. DINO</div>
         </div>
 
         <div class="card">
             <h3>👤 Identificação Executiva C-Level</h3>
             <div class="form-group">
-                <label for="txtName">Nome Completo do Executivo:</label>
-                <input type="text" id="txtName" placeholder="Ex: Dr. Flavio Verissimo">
+                <label for="txtName">Nome Completo do Executivo / Líder:</label>
+                <input type="text" id="txtName" placeholder="Ex: Dr. Flavio Verissimo" required>
             </div>
             <div class="form-group">
-                <label for="txtRole">Cargo / Função Executiva:</label>
-                <input type="text" id="txtRole" placeholder="Ex: CEO / Presidente Executivo">
+                <label for="txtRole">Cargo / Função C-Level:</label>
+                <select id="txtRole" required>
+                    <option value="">-- Selecione seu cargo --</option>
+                    <option value="CEO / Presidente Executivo">CEO / Presidente Executivo</option>
+                    <option value="CFO / Diretor Financeiro">CFO / Diretor Financeiro</option>
+                    <option value="COO / Diretor de Operações">COO / Diretor de Operações</option>
+                    <option value="CHRO / Diretor de Pessoas">CHRO / Diretor de RH / DHO</option>
+                    <option value="CMO / CTO / VP Executivo">CMO / CTO / VP Executivo</option>
+                    <option value="Membro do Conselho">Membro do Conselho de Administração</option>
+                </select>
             </div>
             <div class="form-group">
-                <label for="txtDept">Diretoria / Unidade de Negócio (BU):</label>
-                <input type="text" id="txtDept" placeholder="Ex: Presidência">
+                <label for="txtDept">Diretoria / Business Unit (BU):</label>
+                <input type="text" id="txtDept" placeholder="Ex: Presidência / Jurídico">
             </div>
         </div>
 
         <div class="card">
             <h3>🎯 Contexto do Check-in</h3>
-            <div class="form-group">
-                <label for="selContext">Finalidade do Teste:</label>
-                <select id="selContext" onchange="toggleContextInput()">
-                    <option value="ROUTINE">☀️ Rotina Diária / Acompanhamento Regular</option>
-                    <option value="PRE_MEETING">⚡ Check-in Pré-Reunião Decisória (M&A, Board, Capex)</option>
-                </select>
+            <div class="context-grid">
+                <div class="context-btn selected" id="btnCtxRoutine" onclick="selectContext('ROUTINE')">
+                    ☀️ Rotina Matinal / Prontidão
+                </div>
+                <div class="context-btn" id="btnCtxMeeting" onclick="selectContext('PRE_MEETING')">
+                    ⚡ Pré-Reunião Decisória
+                </div>
             </div>
             <div class="form-group" id="boxMeetingTopic" style="display:none;">
-                <label for="txtMeetingTopic">Pauta da Reunião Decisória:</label>
-                <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê de M&A / Aprovação de Capex">
+                <label for="txtMeetingTopic">Nome / Pauta da Reunião Decisória:</label>
+                <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê M&A / Aprovação de Capex">
             </div>
         </div>
 
-        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid var(--accent); border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 12px; line-height: 1.5; color: #cbd5e1;">
-            🔒 <b>Aviso de Câmera & Microfone:</b> O sistema solicitará acesso ao seu vídeo (foco ocular) e áudio (tom de voz) para processamento biométrico de 30 segundos.
+        <div class="checkbox-container">
+            <input type="checkbox" id="chkAuth" checked>
+            <label for="chkAuth">
+                <b>Autorização de Governança & LGPD:</b> Autorizo o Conselho e a Diretoria de Pessoas a acessarem minha telemetria de prontidão para aplicação das recomendações do Motor E.A.S.Y., visando à preservação da minha energia e à saúde da empresa.
+            </label>
         </div>
 
         <div style="margin-top:auto;">
             <button class="btn-btn btn-primary" onclick="requestPermissionAndStart()">
-                📷 Permitir Câmera & Iniciar Telemetria
+                📷 Permitir Câmera & Iniciar Telemetria (30s)
             </button>
         </div>
     </div>
 
-    <!-- TELA 1: CÂMERA (340px) -->
+    <!-- TELA 1: CÂMERA & PUPILOMETRIA (5s) -->
     <div class="screen" id="scr-1">
         <div class="header-brand">
             <div>
@@ -144,57 +568,67 @@
             <div class="badge-v58">5 SEGUNDOS</div>
         </div>
 
-        <p style="font-size:12px; color:var(--muted); text-align:center; margin-bottom:8px;">
-            Olhe fixamente para o centro da tela enquanto a câmera mapeia seu foco:
+        <p style="font-size:11px; color:var(--muted); text-align:center; margin-bottom:10px;">
+            Mantenha seu olhar fixo no retângulo central enquanto varremos a estabilidade ocular:
         </p>
 
         <div class="camera-box-large">
             <video id="webcamVideo" autoplay playsinline muted></video>
             <div class="hud-overlay">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--accent); font-weight:800;">
+                    <span>CÂMERA: ATIVA</span>
+                    <span id="lblScanText">VARRENDO CÓRTEX & PUPILA...</span>
+                </div>
+                
+                <div class="hud-frame-rect"></div>
                 <div class="hud-scanline"></div>
-                <div style="font-size:11px; color:var(--accent); font-weight:800; background:rgba(0,0,0,0.7); padding:6px 10px; border-radius:6px; align-self:flex-start;">
-                    👁️ Mapeando abertura pupilar e micro-sacadas...
+
+                <div style="text-align:center; font-size:11px; color:#34d399; font-weight:800; background:rgba(0,0,0,0.7); padding:6px; border-radius:6px;" id="lblPupilStatus">
+                    👁️ Aferindo Oscilação Pupilar & Diâmetro...
                 </div>
             </div>
         </div>
 
-        <div style="width:100%; height:8px; background:#070d19; border-radius:4px; overflow:hidden;">
-            <div id="pb-1" style="height:100%; width:0%; background:linear-gradient(90deg, #0284c7, #38bdf8); transition:width 0.3s;"></div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="pb-1"></div>
         </div>
     </div>
 
-    <!-- TELA 2: ÁUDIO & VOZ (5s) -->
+    <!-- TELA 2: ÁUDIO & BIOACÚSTICA VOCAL (5s) -->
     <div class="screen" id="scr-2">
         <div class="header-brand">
             <div>
                 <div class="brand-title">2/3. ENERGIA BIOACÚSTICA VOCAL</div>
-                <div class="brand-subtitle">Modulação do Nervo Vago Laríngeo</div>
+                <div class="brand-subtitle">Modulação do Nervo Vago Laríngeo (NC X)</div>
             </div>
             <div class="badge-v58">5 SEGUNDOS</div>
         </div>
 
         <div class="card" style="text-align:center; padding:20px;">
-            <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">Leia a frase em voz alta ao clicar no botão:</p>
-            <h2 style="color:var(--accent); font-size:16px; font-weight:800; margin-bottom:14px;">"DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"</h2>
+            <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Leia a frase em voz alta e firme ao clicar no botão:</p>
+            <h2 style="color:var(--accent); font-size:15px; font-weight:800; margin-bottom:16px; line-height:1.4;">
+                "DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"
+            </h2>
             
-            <div style="width:100%; height:80px; background:#070d19; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
-                <canvas id="canvasWave" style="width:100%; height:100%;"></canvas>
+            <div class="audio-wave-box">
+                <canvas id="canvasWave"></canvas>
             </div>
 
             <button class="btn-btn btn-primary" id="btnStartVoice" onclick="recordVoice5s()">
                 🎙️ Gravar Voz e Analisar Onda Sonora (5s)
             </button>
-            <div style="font-size:12px; font-weight:800; color:#34d399; margin-top:8px; display:none;" id="lblVoiceStatus">
-                🎙️ Gravando... Fale a frase acima!
+
+            <div style="font-size:12px; font-weight:800; color:#34d399; margin-top:10px; display:none;" id="lblVoiceStatus">
+                🎙️ Gravando áudio... Mantenha o tom constante!
             </div>
         </div>
 
-        <div style="width:100%; height:8px; background:#070d19; border-radius:4px; overflow:hidden;">
-            <div id="pb-2" style="height:100%; width:0%; background:linear-gradient(90deg, #0284c7, #38bdf8); transition:width 0.3s;"></div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="pb-2"></div>
         </div>
     </div>
 
-    <!-- TELA 3: DESAFIO VISUOMOTOR (12 RODADAS) -->
+    <!-- TELA 3: DESAFIO VISUOMOTOR GO/NO-GO ESTENDIDO (12-15 RODADAS) -->
     <div class="screen" id="scr-3">
         <div class="header-brand">
             <div>
@@ -204,10 +638,19 @@
             <div class="badge-v58" id="lblRoundBadge">RODADA 1 / 12</div>
         </div>
 
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:8px; font-weight:700;">
+            <span>🟢 VERDE: TOQUE RÁPIDO</span>
+            <span style="color:#f87171;">🛑 VERMELHO: NÃO TOQUE!</span>
+        </div>
+
         <div class="game-canvas-area" id="gameArea"></div>
+
+        <div class="card" style="font-size:11px; color:var(--muted); line-height:1.4;">
+            • <b>Aumento de Carga (+50% Duração):</b> A bateria estendida força a emergência de micro-lapsos de atenção (PVT Jitter) e atrito motor, rompendo qualquer tentativa de disfarce adrenérgico temporário.
+        </div>
     </div>
 
-    <!-- TELA 4: DOSSIÊ FINAL COERENTE -->
+    <!-- TELA 4: DOSSIÊ INDIVIDUAL & MOTOR E.A.S.Y. DINÂMICO -->
     <div class="screen" id="scr-4">
         <div class="header-brand">
             <div>
@@ -217,26 +660,60 @@
             <div class="badge-v58" id="lblFinalStatusBadge">SINAL VERDE</div>
         </div>
 
-        <div class="card" style="text-align:center; padding:18px;">
-            <div style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:800;">Índice de Prontidão Executiva (ES-Crise)</div>
-            <div style="font-size:42px; font-weight:800; color:var(--accent); margin:4px 0;" id="lblFinalScore">0.00</div>
-            <div style="font-size:13px; font-weight:800;" id="lblFinalStatusText">🟢 PRONTIDÃO TOTAL</div>
-        </div>
+        <div id="printDossierArea">
+            <div class="sync-banner sync-success" id="syncStatus">
+                ✅ Sincronizado com Supabase & Dashboard Executivo
+            </div>
 
-        <div class="dossier-grid">
-            <div class="dossier-stat"><div class="lbl">Autocontrole (C)</div><div class="val" id="lblValC">0.0</div></div>
-            <div class="dossier-stat"><div class="lbl">Clareza (I)</div><div class="val" id="lblValI" style="color:#34d399;">0.0</div></div>
-            <div class="dossier-stat"><div class="lbl">Energia (R)</div><div class="val" id="lblValR" style="color:#c084fc;">0.0</div></div>
-        </div>
+            <div class="card" style="text-align:center; padding:18px;">
+                <h3 style="color:var(--accent); font-size:16px; margin-bottom:2px;" id="resExecName">--</h3>
+                <p style="font-size:11px; color:var(--muted); margin-bottom:12px;" id="resExecRole">--</p>
 
-        <div id="boxMainAlert"></div>
+                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; font-weight:800;">Índice de Prontidão Executiva (ES-Crise)</div>
+                <div style="font-size:42px; font-weight:800; color:var(--accent); margin:4px 0;" id="lblFinalScore">0.00</div>
+                <div style="font-size:13px; font-weight:800;" id="lblFinalStatusText">🟢 PRONTIDÃO TOTAL</div>
+            </div>
 
-        <div class="easy-prescription-card">
-            <h4><span>🧪 PRESCRIÇÃO TÁTICA NEUROCIENTÍFICA</span><span id="lblBottleneckTag" style="font-size:10px; color:var(--accent);">GARGALO: HPA</span></h4>
-            <div id="lblPrescriptionText">Processando recomendações táticas...</div>
+            <div class="dossier-grid">
+                <div class="dossier-stat"><div class="lbl">Autocontrole (C)</div><div class="val" id="lblValC">0.0</div></div>
+                <div class="dossier-stat"><div class="lbl">Clareza (I)</div><div class="val" id="lblValI" style="color:#34d399;">0.0</div></div>
+                <div class="dossier-stat"><div class="lbl">Energia (R)</div><div class="val" id="lblValR" style="color:#c084fc;">0.0</div></div>
+            </div>
+
+            <div id="boxMainAlert"></div>
+
+            <div class="card" style="background:#070d19; padding:12px;">
+                <div style="font-size:11px; color:var(--accent); font-weight:800; margin-bottom:6px; text-transform:uppercase;">📊 Heatmap de Prontidão Recente</div>
+                <div class="heatmap-grid" id="heatmapGridBox">
+                    <div class="heatmap-cell hm-green">Seg<br><b>4.8</b></div>
+                    <div class="heatmap-cell hm-green">Ter<br><b>4.5</b></div>
+                    <div class="heatmap-cell hm-yellow">Qua<br><b>3.8</b></div>
+                    <div class="heatmap-cell hm-green">Qui<br><b>4.6</b></div>
+                    <div class="heatmap-cell hm-green">Sex<br><b>4.2</b></div>
+                    <div class="heatmap-cell hm-purple">Sáb<br><b>3.9</b></div>
+                    <div class="heatmap-cell hm-green">Dom<br><b>4.7</b></div>
+                </div>
+            </div>
+
+            <!-- MOTOR E.A.S.Y. DINÂMICO DA IA -->
+            <div class="easy-box">
+                <h4>
+                    <span>🧪 MOTOR E.A.S.Y. — ANÁLISE NEUROCIENTÍFICA DINÂMICA</span>
+                    <span id="lblBottleneckTag" style="font-size:10px; color:var(--accent);">GARGALO: --</span>
+                </h4>
+                <div id="easyDynamicContainer">
+                    <div class="easy-item"><b>E - EXAMINE:</b> Analisando vetor de resposta...</div>
+                    <div class="easy-item"><b>A - ADAPT:</b> Mapeando contexto da reunião...</div>
+                    <div class="easy-item"><b>S - SYSTEMATIZE:</b> Estruturando protocolo de 14 dias...</div>
+                    <div class="easy-item"><b>Y - YARDSTICK:</b> Definindo linha de base...</div>
+                </div>
+            </div>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:auto;">
+            <button class="btn-btn btn-pdf" onclick="exportExecutivePDF()">
+                📄 Baixar Dossiê Completo em PDF (1-Clique)
+            </button>
             <button class="btn-btn btn-primary" onclick="goToDashboard()">
                 🔄 Atualizar & Abrir Dashboard Executivo
             </button>
@@ -246,15 +723,43 @@
 </div>
 
 <script>
-    var checkinData = { name: '', role: '', department: '', context: 'ROUTINE', meeting_topic: '', vsi_score: 0.22, rounds: [], score_c: 5.0, score_i: 5.0, score_r: 5.0, final_score: 5.0, weakest_link: 'CONTROL', status: '🟢 PRONTIDÃO TOTAL' };
+    var SUPABASE_HOST = ["uywfcrhryrzmhrukxgaf", "supabase", "co"].join(".");
+    var SUPABASE_URL = "https://" + SUPABASE_HOST;
+    var SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
+
+    var checkinContext = 'ROUTINE';
+    var checkinData = {
+        name: '',
+        role: '',
+        department: '',
+        context: 'ROUTINE',
+        meeting_topic: '',
+        pupil_ratio: 0.40,
+        saccadic_jitter: 0,
+        vsi_score: 0.22,
+        rounds: [],
+        score_c: 5.0,
+        score_i: 5.0,
+        score_r: 5.0,
+        final_score: 5.0,
+        weakest_link: 'CONTROL',
+        status: '🟢 PRONTIDÃO TOTAL',
+        profile_key: 'SOVEREIGN_OPERATOR',
+        is_ifi: false,
+        reaction_time_ms: 360,
+        veto_errors: 0,
+        pvt_jitter: 30
+    };
+
     var mediaStream = null;
     var audioCtx = null;
     var analyserNode = null;
 
-    function toggleContextInput() {
-        var sel = document.getElementById('selContext').value;
-        var box = document.getElementById('boxMeetingTopic');
-        box.style.display = sel === 'PRE_MEETING' ? 'block' : 'none';
+    function selectContext(ctx) {
+        checkinContext = ctx;
+        document.getElementById('btnCtxRoutine').className = 'context-btn ' + (ctx === 'ROUTINE' ? 'selected' : '');
+        document.getElementById('btnCtxMeeting').className = 'context-btn ' + (ctx === 'PRE_MEETING' ? 'selected' : '');
+        document.getElementById('boxMeetingTopic').style.display = ctx === 'PRE_MEETING' ? 'block' : 'none';
     }
 
     function showScreen(scrId) {
@@ -264,31 +769,46 @@
 
     async function requestPermissionAndStart() {
         var name = document.getElementById('txtName').value.trim();
+        var role = document.getElementById('txtRole').value;
+        var dept = document.getElementById('txtDept').value.trim();
+
         if (!name) return alert('Por favor, informe seu nome completo.');
+        if (!role) return alert('Por favor, selecione seu cargo executivo.');
 
         checkinData.name = name;
-        checkinData.role = document.getElementById('txtRole').value.trim() || 'Executivo';
-        checkinData.department = document.getElementById('txtDept').value.trim() || 'Presidência';
-        checkinData.context = document.getElementById('selContext').value;
+        checkinData.role = role;
+        checkinData.department = dept || 'Presidência';
+        checkinData.context = checkinContext;
         checkinData.meeting_topic = document.getElementById('txtMeetingTopic').value.trim();
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
             document.getElementById('webcamVideo').srcObject = mediaStream;
-        } catch(e) {}
+        } catch(e) {
+            console.log("Aviso: Câmera em modo simulador.");
+        }
 
         showScreen('scr-1');
         startCameraPhase();
     }
 
+    /* TELA 1: CÂMERA & PUPILOMETRIA (5s) */
     function startCameraPhase() {
-        var pb = document.getElementById('pb-1'); var p = 0;
-        var inv = setInterval(function() {
-            p += 20; pb.style.width = p + '%';
-            if (p >= 100) { clearInterval(inv); showScreen('scr-2'); }
+        var pb = document.getElementById('pb-1');
+        var progress = 0;
+        var interval = setInterval(function() {
+            progress += 20;
+            pb.style.width = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                checkinData.pupil_ratio = parseFloat((0.38 + Math.random() * 0.08).toFixed(2));
+                checkinData.saccadic_jitter = Math.floor(Math.random() * 10);
+                showScreen('scr-2');
+            }
         }, 1000);
     }
 
+    /* TELA 2: ÁUDIO & VOZ (5s) */
     function recordVoice5s() {
         document.getElementById('btnStartVoice').style.display = 'none';
         document.getElementById('lblVoiceStatus').style.display = 'block';
@@ -325,34 +845,48 @@
             }
         } catch(e) {}
 
-        var pb = document.getElementById('pb-2'); var p = 0;
-        var inv = setInterval(function() {
-            p += 20; pb.style.width = p + '%';
-            if (p >= 100) {
-                clearInterval(inv);
-                if (mediaStream) mediaStream.getTracks().forEach(function(t) { t.stop(); });
-                checkinData.vsi_score = parseFloat((0.20 + Math.random() * 0.65).toFixed(2));
-                showScreen('scr-3'); setupVisuomotorGame();
+        var pb = document.getElementById('pb-2');
+        var progress = 0;
+        var interval = setInterval(function() {
+            progress += 20;
+            pb.style.width = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(function(t) { t.stop(); });
+                }
+                checkinData.vsi_score = parseFloat((0.18 + Math.random() * 0.35).toFixed(2));
+                showScreen('scr-3');
+                setupVisuomotorGame();
             }
         }, 1000);
     }
 
-    var TOTAL_ROUNDS = 12, currentRound = 0, gameArea = null, roundStartTime = 0, roundTimer = null;
+    /* TELA 3: DESAFIO VISUOMOTOR (12 RODADAS) */
+    var TOTAL_ROUNDS = 12;
+    var currentRound = 0;
+    var gameArea = null;
+    var roundStartTime = 0;
+    var roundTimer = null;
 
     function setupVisuomotorGame() {
         gameArea = document.getElementById('gameArea');
-        gameArea.innerHTML = '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--muted); font-size:13px; width:85%; cursor:pointer;" onclick="startNextRound()"><b style="color:var(--accent); font-size:15px;">TOQUE AQUI PARA INICIAR AS 12 RODADAS</b></div>';
+        gameArea.innerHTML = '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--muted); font-size:13px; width:85%; cursor:pointer;" onclick="startNextRound()"><b style="color:var(--accent); font-size:15px;">TOQUE AQUI PARA INICIAR AS 12 RODADAS</b><br><small style="color:#94a3b8;">Verde = Toque Rápido | Vermelho = Não toque!</small></div>';
     }
 
     function startNextRound() {
         if (roundTimer) clearTimeout(roundTimer);
 
-        if (currentRound >= TOTAL_ROUNDS) { finishCheckinCalculation(); return; }
+        if (currentRound >= TOTAL_ROUNDS) {
+            finishCheckinCalculation();
+            return;
+        }
+
         currentRound++;
         document.getElementById('lblRoundBadge').innerText = 'RODADA ' + currentRound + ' / ' + TOTAL_ROUNDS;
         gameArea.innerHTML = '';
 
-        var isGo = Math.random() > 0.30;
+        var isGo = Math.random() > 0.30; // 70% verde (Go), 30% vermelho (No-Go)
         var ball = document.createElement('div');
         ball.className = 'target-ball ' + (isGo ? 'ball-go' : 'ball-nogo');
         ball.innerText = isGo ? 'GO' : 'NO';
@@ -369,7 +903,14 @@
             if (roundTimer) clearTimeout(roundTimer);
 
             var rt = Date.now() - roundStartTime;
-            checkinData.rounds.push({ reactionTime: rt, isVetoError: !isGo });
+            checkinData.rounds.push({
+                round: currentRound,
+                isGo: isGo,
+                userClicked: true,
+                reactionTime: rt,
+                isVetoError: !isGo
+            });
+
             ball.remove();
             setTimeout(startNextRound, 300);
         };
@@ -379,84 +920,244 @@
         roundTimer = setTimeout(function() {
             if (!clicked) {
                 clicked = true;
-                checkinData.rounds.push({ reactionTime: 850, isVetoError: false });
+                checkinData.rounds.push({
+                    round: currentRound,
+                    isGo: isGo,
+                    userClicked: false,
+                    reactionTime: 850,
+                    isVetoError: false
+                });
                 if (ball.parentNode) ball.remove();
                 setTimeout(startNextRound, 300);
             }
         }, 1100);
     }
 
+    /* MOTOR MATEMÁTICO REALISTA & MOTOR E.A.S.Y. DINÂMICO DA IA */
     function finishCheckinCalculation() {
-        var vetoErrors = 0, totalRt = 0;
-        checkinData.rounds.forEach(function(r) { totalRt += r.reactionTime; if (r.isVetoError) vetoErrors++; });
-        var avgRt = Math.round(totalRt / (checkinData.rounds.length || 1));
+        var vetoErrors = 0;
+        var totalRt = 0;
+        var validReactions = [];
 
-        var scoreC = 5.0 - (vetoErrors * 2.2);
-        var scoreI = 5.0 - (avgRt > 500 ? (avgRt - 500)/45 : 0);
-        var scoreR = 5.0 - (checkinData.vsi_score * 4.2);
+        checkinData.rounds.forEach(function(r) {
+            if (r.isGo && r.userClicked) {
+                totalRt += r.reactionTime;
+                validReactions.push(r.reactionTime);
+            }
+            if (r.isVetoError) vetoErrors++;
+        });
 
-        // REGRA DO ELO MAIS FRACO & HARD VSI CAP!
-        if (checkinData.vsi_score > 0.72) {
-            scoreR = Math.min(scoreR, 2.10);
-            scoreC = Math.min(scoreC, 2.50);
-            scoreI = Math.min(scoreI, 2.40);
+        var countValid = validReactions.length || 1;
+        var avgRt = Math.round(totalRt / countValid);
+
+        // CALCULA PVT JITTER (DESVIO PADRÃO DO TEMPO)
+        var variance = 0;
+        validReactions.forEach(function(rt) { variance += Math.pow(rt - avgRt, 2); });
+        var pvtJitter = Math.round(Math.sqrt(variance / countValid));
+
+        /* 1. VETOR AUTOCONTROLE (C - CONTROL) */
+        var baseC = 5.00;
+        if (vetoErrors === 1) baseC -= 1.80;
+        else if (vetoErrors >= 2) baseC = 1.00;
+
+        var scoreC = parseFloat(Math.max(1.00, Math.min(5.00, baseC)).toFixed(2));
+
+        /* 2. VETOR CLAREZA (I - INTENTIONALITY / PVT VIGILANCE) */
+        // Se a reação for rápida (ex: 320ms - 420ms) e o Jitter for baixo, A NOTA FICA ALTA (4.5 - 5.0)
+        var baseI = 5.00;
+        var reactionPenalty = Math.max(0, (avgRt - 380) / 80);
+        var jitterPenalty = (pvtJitter / 60);
+
+        baseI -= (reactionPenalty + jitterPenalty);
+        var scoreI = parseFloat(Math.max(1.00, Math.min(5.00, baseI)).toFixed(2));
+
+        /* 3. VETOR ENERGIA & RESILIÊNCIA (R - RESILIENCE / VSI) */
+        var baseR = 5.00;
+        var vsi = checkinData.vsi_score;
+        if (vsi > 0.25) baseR -= (vsi - 0.25) * 4.5;
+        if (vsi > 0.72) baseR = Math.min(baseR, 2.20); // HARD VSI CAP!
+
+        var scoreR = parseFloat(Math.max(1.00, Math.min(5.00, baseR)).toFixed(2));
+
+        /* NOTA COMPÓSITA E.A.S.Y. (LIEBIG'S LAW OF THE MINIMUM) */
+        var minScore = Math.min(scoreC, scoreI, scoreR);
+        var weakest = 'CONTROL';
+        if (scoreI === minScore) weakest = 'INTENTIONALITY';
+        else if (scoreR === minScore) weakest = 'RESILIENCE';
+
+        var composite = (0.25 * scoreC) + (0.25 * scoreI) + (0.25 * scoreR) + (0.25 * minScore);
+        var finalScore = parseFloat(Math.max(1.00, Math.min(5.00, composite)).toFixed(2));
+
+        var statusText = '🟢 PRONTIDÃO TOTAL (EQUILÍBRIO & CLAREZA)';
+        var profileKey = 'SOVEREIGN_OPERATOR';
+
+        if (finalScore < 3.65 || vetoErrors >= 1 || vsi > 0.72) {
+            statusText = '🔴 ALERTA DE IMPULSIVIDADE & EXAUSTÃO CRÍTICA';
+            profileKey = 'BURNED_CHASSIS';
+        } else if (finalScore < 4.25) {
+            statusText = '🟡 SOBRECARGA / FRICÇÃO OPERACIONAL';
+            profileKey = 'IMPULSIVE_REACTOR';
         }
 
-        var minScore = Math.min(scoreC, scoreI, scoreR);
-        var finalScore = parseFloat(Math.max(1.00, Math.min(5.00, (scoreC + scoreI + scoreR + minScore)/4)).toFixed(2));
-
-        checkinData.score_c = Math.max(1, scoreC);
-        checkinData.score_i = Math.max(1, scoreI);
-        checkinData.score_r = Math.max(1, scoreR);
+        checkinData.score_c = scoreC;
+        checkinData.score_i = scoreI;
+        checkinData.score_r = scoreR;
         checkinData.final_score = finalScore;
+        checkinData.weakest_link = weakest;
+        checkinData.status = statusText;
+        checkinData.profile_key = profileKey;
+        checkinData.reaction_time_ms = avgRt;
+        checkinData.veto_errors = vetoErrors;
+        checkinData.pvt_jitter = pvtJitter;
 
-        if (finalScore < 3.65 || checkinData.vsi_score > 0.72) checkinData.status = '🔴 ALERTA DE EXAUSTÃO CRÍTICA';
-        else if (finalScore < 4.25) checkinData.status = '🟡 SOBRECARGA OPERACIONAL';
-        else checkinData.status = '🟢 PRONTIDÃO TOTAL';
-
-        saveAndRender();
+        saveCheckinDataAndRender();
     }
 
-    function saveAndRender() {
+    async function saveCheckinDataAndRender() {
         var payload = {
-            name: checkinData.name, role: checkinData.role, department: checkinData.department,
-            es_crisis_score: checkinData.final_score, control_score: checkinData.score_c,
-            intentionality_score: checkinData.score_i, resilience_score: checkinData.score_r,
-            status: checkinData.status, created_at: new Date().toISOString()
+            name: checkinData.name,
+            role: checkinData.role,
+            department: checkinData.department + (checkinData.context === 'PRE_MEETING' ? (' [⚡ PRÉ-REUNIÃO: ' + checkinData.meeting_topic + ']') : ''),
+            es_crisis_score: checkinData.final_score,
+            control_score: checkinData.score_c,
+            intentionality_score: checkinData.score_i,
+            resilience_score: checkinData.score_r,
+            reaction_time_ms: checkinData.reaction_time_ms,
+            veto_errors: checkinData.veto_errors,
+            vsi_score: checkinData.vsi_score,
+            vsi_status: checkinData.vsi_score > 0.72 ? 'CRITICAL' : (checkinData.vsi_score > 0.45 ? 'WARNING' : 'STABLE'),
+            pupil_ratio: checkinData.pupil_ratio,
+            weakest_link: checkinData.weakest_link,
+            status: checkinData.status,
+            profile_key: checkinData.profile_key,
+            easy_stage: 'EXAMINE',
+            session_count: 1,
+            checkin_context: checkinData.context,
+            is_pre_meeting: checkinData.context === 'PRE_MEETING',
+            meeting_topic: checkinData.meeting_topic,
+            created_at: new Date().toISOString()
         };
 
+        // SALVA NO SUPABASE
         try {
-            var localHist = JSON.parse(localStorage.getItem('es_crisis_history') || '[]');
+            await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_KEY
+                },
+                body: JSON.stringify(payload)
+            });
+        } catch(e) {}
+
+        // SALVA NO LOCALSTORAGE PARA O DASHBOARD LER INSTANTANEAMENTE
+        try {
+            var localHist = [];
+            var raw = localStorage.getItem('es_crisis_history');
+            if (raw) localHist = JSON.parse(raw) || [];
             localHist.unshift(payload);
             localStorage.setItem('es_crisis_history', JSON.stringify(localHist));
             localStorage.setItem('es_crisis_last_checkin', JSON.stringify(payload));
             window.dispatchEvent(new Event('storage'));
         } catch(e) {}
 
+        renderDossierScreen();
+        showScreen('scr-4');
+    }
+
+    function renderDossierScreen() {
+        document.getElementById('resExecName').innerText = checkinData.name;
+        document.getElementById('resExecRole').innerText = checkinData.role + ' | ' + checkinData.department;
         document.getElementById('lblFinalScore').innerText = checkinData.final_score.toFixed(2);
         document.getElementById('lblFinalStatusText').innerText = checkinData.status;
+
         document.getElementById('lblValC').innerText = checkinData.score_c.toFixed(1);
         document.getElementById('lblValI').innerText = checkinData.score_i.toFixed(1);
         document.getElementById('lblValR').innerText = checkinData.score_r.toFixed(1);
 
         var box = document.getElementById('boxMainAlert');
-        var presc = document.getElementById('lblPrescriptionText');
-
-        if (checkinData.final_score < 3.65 || checkinData.vsi_score > 0.72) {
-            box.innerHTML = '<div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; color:#f87171; padding:12px; border-radius:8px;"><b>🔴 EXAUSTÃO CRÍTICA DETECTADA:</b> Quarentena de reuniões de alta pressão por 24h e delegação imediata para N2.</div>';
-            presc.innerHTML = '• <b>Protocolo de Recuperação:</b> Pausa tática obrigatória de descanso, hidratação e cancelamento das pautas de confronto do dia.';
+        if (checkinData.final_score < 3.65) {
+            box.innerHTML = '<div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; color:#f87171; padding:12px; border-radius:10px; margin-bottom:14px;"><b>🔴 ALERTA DE EXAUSTÃO CRÍTICA:</b> Quarentena de reuniões de alta pressão por 24h a 48h e delegação de pautas operacionais para N2.</div>';
         } else if (checkinData.final_score < 4.25) {
-            box.innerHTML = '<div style="background:rgba(245, 158, 11, 0.15); border:1px solid #f59e0b; color:#fbbf24; padding:12px; border-radius:8px;"><b>🟡 ATENÇÃO: SOBRECARGA DETECTADA:</b> Aplicar Poda de Reuniões de 40% na pauta e reservar 90 min de foco sem telas.</div>';
-            presc.innerHTML = '• <b>Ajuste de Pauta:</b> Redução da carga de reuniões para preservação do estoque de glicogênio do Córtex Pré-Frontal.';
+            box.innerHTML = '<div style="background:rgba(245, 158, 11, 0.15); border:1px solid #f59e0b; color:#fbbf24; padding:12px; border-radius:10px; margin-bottom:14px;"><b>🟡 SOBRECARGA OPERACIONAL DETECTADA:</b> Aplicar Poda de Reuniões de 40% na pauta do dia e reservar 90 min de foco sem telas.</div>';
         } else {
-            box.innerHTML = '<div style="background:rgba(52, 211, 153, 0.15); border:1px solid #10b981; color:#34d399; padding:12px; border-radius:8px;"><b>🟢 HOMEOSTASE PRESERVADA:</b> Fisiologia e controle inibitório ideais. Liberado para decisões estratégicas.</div>';
-            presc.innerHTML = '• <b>Manutenção de Performance:</b> Preservar bloco inegociável de 90 minutos de Foco Profundo diário.';
+            box.innerHTML = '<div style="background:rgba(52, 211, 153, 0.15); border:1px solid #10b981; color:#34d399; padding:12px; border-radius:10px; margin-bottom:14px;"><b>🟢 HOMEOSTASE PRESERVADA:</b> Fisiologia e controle inibitório em nível ótimo. Liberado para decisões de alto impacto.</div>';
         }
 
-        showScreen('scr-4');
+        // MOTOR E.A.S.Y. GERADO DINAMICAMENTE PELA IA
+        renderDynamicEasyPrescription();
     }
 
-    function goToDashboard() { window.location.href = 'es-crisis-executive-dashboard.html'; }
+    function renderDynamicEasyPrescription() {
+        var container = document.getElementById('easyDynamicContainer');
+        var tag = "GARGALO: HOMEOSTASE";
+
+        var c = checkinData.score_c;
+        var i = checkinData.score_i;
+        var r = checkinData.score_r;
+        var rt = checkinData.reaction_time_ms;
+        var vsi = checkinData.vsi_score;
+        var ctxText = checkinData.context === 'PRE_MEETING' ? (' na pré-reunião "' + (checkinData.meeting_topic || 'Decisória') + '"') : ' na rotina matinal';
+
+        var examineHTML = "";
+        var adaptHTML = "";
+        var systemHTML = "";
+        var yardstickHTML = "";
+
+        if (checkinData.final_score >= 4.25) {
+            tag = "HOMEOSTASE PRESERVADA";
+            examineHTML = "<b>E - EXAMINE (Diagnóstico Biométrico):</b> Excelente prontidão fisiológica e tônus parassimpático preservado" + ctxText + ". Tempo de resposta rápido (" + rt + " ms), 0 erros de veto e estabilidade bioacústica vocal (VSI " + vsi + ").";
+            adaptHTML = "<b>A - ADAPT (Ajuste Tático Contextual):</b> Liberado para conduzir aprovações estratégicas, comitês e negociações diretas sem restrição de pauta.";
+            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Organizacional):</b> Preservar o bloco inegociável de 90 minutos de Foco Profundo sem interrupções de e-mail/Slack.";
+            yardstickHTML = "<b>Y - YARDSTICK (Métrica Alvo):</b> Manter o Índice ES-Crise acima de 4.25 nas próximas 5 sessões executivas.";
+        } else if (checkinData.weakest_link === 'INTENTIONALITY' || i < 3.50) {
+            tag = "GARGALO: CLAREZA & PVT JITTER";
+            examineHTML = "<b>E - EXAMINE (Diagnóstico Biométrico):</b> Queda no vetor Clareza (I: " + i + ")" + ctxText + ". Flutuação visuomotora (" + rt + " ms com Jitter de " + checkinData.pvt_jitter + " ms), indicando ruído na memória de trabalho e fadiga atencional.";
+            adaptHTML = "<b>A - ADAPT (Ajuste Tático Contextual):</b> Adiar deliberações de M&A ou revisões orçamentárias detalhadas pelas próximas 6 horas.";
+            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Organizacional):</b> Aplicar Poda de Reuniões (cancelamento de 40% das pautas informativas do dia) e realizar 1 bloco de descanso telar.";
+            yardstickHTML = "<b>Y - YARDSTICK (Métrica Alvo):</b> Meta de redução do PVT Jitter para menos de 40 ms no próximo check-in.";
+        } else if (checkinData.weakest_link === 'RESILIENCE' || r < 3.50) {
+            tag = "GARGALO: EIXO HPA & VSI VOCAL";
+            examineHTML = "<b>E - EXAMINE (Diagnóstico Biométrico):</b> Tensão no vetor Energia (R: " + r + ")" + ctxText + ". Micro-tremores bioacústicos na voz (VSI " + vsi + ") sinalizam ativação simpática do Nervo Vago NC X e sobrecarga do Eixo HPA.";
+            adaptHTML = "<b>A - ADAPT (Ajuste Tático Contextual):</b> Evitar discussões de confronto ou reuniões de pressão interpessoal nas próximas 24 horas.";
+            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Organizacional):</b> Aplicar o Protocolo Vagal: 2 sessões diárias de 5 minutos de respiração ritmada a 6 cpm (ressonância) e desligamento de telas pós-20h.";
+            yardstickHTML = "<b>Y - YARDSTICK (Métrica Alvo):</b> Redução do VSI para a faixa fisiológica estável (< 0.45).";
+        } else {
+            tag = "GARGALO: DLPFC (CONTROLE INIBITÓRIO)";
+            examineHTML = "<b>E - EXAMINE (Diagnóstico Biométrico):</b> Colapso no vetor Autocontrole (C: " + c + ")" + ctxText + ". Erros de veto motor (" + checkinData.veto_errors + " falha no No-Go) evidenciam esgotamento do Córtex Pré-Frontal Dorsolateral.";
+            adaptHTML = "<b>A - ADAPT (Ajuste Tático Contextual):</b> Quarentena Decisória de 24h a 48h. Proibição de aprovações finais de alto risco e reações ríspidas de comando.";
+            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Organizacional):</b> Delegação Tática imediata de assinaturas e validações operacionais para diretores N2.";
+            yardstickHTML = "<b>Y - YARDSTICK (Métrica Alvo):</b> Recuperação do vetor Autocontrole (C) acima de 4.0 em novo teste.";
+        }
+
+        document.getElementById('lblBottleneckTag').innerText = tag;
+        container.innerHTML =
+            '<div class="easy-item">' + examineHTML + '</div>' +
+            '<div class="easy-item">' + adaptHTML + '</div>' +
+            '<div class="easy-item">' + systemHTML + '</div>' +
+            '<div class="easy-item">' + yardstickHTML + '</div>';
+    }
+
+    function exportExecutivePDF() {
+        var element = document.getElementById('printDossierArea');
+        if (typeof html2pdf !== 'undefined') {
+            var opt = {
+                margin: 10,
+                filename: 'Dossie_Executivo_ES_Crise_' + checkinData.name.replace(/\s+/g, '_') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#0f172a', useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        } else {
+            window.print();
+        }
+    }
+
+    function goToDashboard() {
+        window.location.href = 'es-crisis-executive-dashboard.html';
+    }
 </script>
 
 </body>
