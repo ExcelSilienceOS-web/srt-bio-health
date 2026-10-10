@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ExcelSilience ES-Crise Executivo — Readiness Telemetry v5.9 Master</title>
+    <title>ExcelSilience ES-Crise Executivo — Readiness Telemetry v6.0 Master</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --bg: #070a12;
@@ -26,15 +25,15 @@
             --red-glow: rgba(239, 68, 68, 0.25);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
         html, body {
             width: 100%; min-height: 100vh; background-color: var(--bg); color: var(--text);
-            overflow-x: hidden; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; padding: 16px 8px;
+            display: flex; justify-content: center; align-items: flex-start; padding: 16px 8px;
         }
 
         .app-container {
-            width: 100%; max-width: 560px; min-height: 92vh; background: var(--card);
+            width: 100%; max-width: 580px; min-height: 92vh; background: var(--card);
             border: 1px solid var(--border); border-radius: 20px; display: flex; flex-direction: column;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); margin: auto 0; overflow: hidden; position: relative;
         }
@@ -46,22 +45,30 @@
         .brand-title { font-size: 18px; font-weight: 800; color: var(--accent); letter-spacing: 0.5px; }
         .brand-subtitle { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 2px; font-weight: 700; }
 
-        .badge-v59 { background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+        .badge-v60 { background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+        .badge-status-top { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .badge-green { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: var(--green); }
+        .badge-yellow { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
+        .badge-red { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--red); color: var(--red); }
 
         .card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
-        .card h3 { font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card h3 { font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: 800; text-transform: uppercase; }
+
+        .welcome-back-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--accent); border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .welcome-back-title { font-size: 13px; font-weight: 800; color: #fff; }
+        .welcome-back-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        .btn-change-user { background: #1e293b; color: var(--accent); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; }
 
         input[type="text"], select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #070d19; color: #fff; font-size: 13px; outline: none; }
-        input[type="text"]:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
 
         .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .context-btn { background: #070d19; border: 1px solid var(--border); color: var(--muted); padding: 12px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; }
         .context-btn.selected { background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
 
-        .btn-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
         .btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: 1px solid var(--accent); box-shadow: 0 4px 16px var(--accent-glow); }
         .btn-pdf { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 4px 16px var(--green-glow); margin-bottom: 12px; }
 
@@ -70,33 +77,33 @@
 
         .hud-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 14px; box-sizing: border-box; background: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.75) 100%); }
         .hud-frame-rect { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 210px; border: 2px dashed var(--accent); border-radius: 20px; box-shadow: 0 0 25px var(--accent-glow); }
-        .hud-scanline { width: 100%; height: 3px; background: var(--accent); box-shadow: 0 0 14px var(--accent); position: absolute; top: 0; left: 0; animation: scan 2.2s infinite linear; }
+        .hud-scanline { width: 100%; height: 3px; background: var(--accent); position: absolute; top: 0; left: 0; animation: scan 2.2s infinite linear; }
         @keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
 
         .audio-wave-box { width: 100%; height: 90px; background: #070d19; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         canvas#canvasWave { width: 100%; height: 100%; }
 
         .game-canvas-area { position: relative; width: 100%; height: 280px; background: #070d19; border: 2px dashed var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 16px; touch-action: none; }
-        .target-ball { position: absolute; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; transform: translate(-50%, -50%); box-shadow: 0 0 20px rgba(0,0,0,0.6); }
-        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2.5px solid #6ee7b7; box-shadow: 0 0 20px var(--green-glow); }
-        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2.5px solid #fca5a5; box-shadow: 0 0 20px var(--red-glow); }
-
-        .progress-bar-container { width: 100%; height: 8px; background: #070d19; border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
-        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.3s; }
+        .target-ball { position: absolute; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; transform: translate(-50%, -50%); }
+        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2.5px solid #6ee7b7; }
+        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2.5px solid #fca5a5; }
 
         .dossier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; text-align: center; }
         .dossier-stat { background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 12px 6px; }
         .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
         .dossier-stat .val { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 2px; }
 
-        .easy-box { background: rgba(56, 189, 248, 0.04); border: 1px solid var(--accent); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
-        .easy-box h4 { color: var(--accent); font-size: 13px; margin-bottom: 14px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .easy-box-master { background: #070d19; border: 1px solid var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 18px; }
+        .easy-box-master h4 { color: var(--accent); font-size: 13px; margin-bottom: 14px; text-transform: uppercase; font-weight: 800; border-bottom: 1px solid rgba(56, 189, 248, 0.25); padding-bottom: 8px; display: flex; justify-content: space-between; }
+        .easy-block { font-size: 12px; line-height: 1.6; margin-bottom: 14px; color: #e2e8f0; background: #0f172a; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+        .easy-block b { color: var(--accent); font-weight: 800; }
 
-        .easy-section { font-size: 11px; line-height: 1.6; margin-bottom: 14px; color: #cbd5e1; border-left: 3px solid var(--accent); padding-left: 12px; }
-        .easy-section b { color: #f8fafc; font-weight: 800; }
-        .easy-section .sec-title { font-size: 12px; color: var(--accent); font-weight: 800; margin-bottom: 4px; text-transform: uppercase; }
-
-        @media (max-width: 480px) { body { padding: 8px 4px; } .app-container { padding: 0; border-radius: 12px; } .screen { padding: 18px 14px; } .camera-box-large { height: 260px; } .game-canvas-area { height: 240px; } }
+        .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; margin-top: 8px; }
+        .heatmap-cell { padding: 6px 2px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
+        .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
+        .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
+        .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
     </style>
 </head>
 <body>
@@ -108,12 +115,22 @@
         <div class="header-brand">
             <div>
                 <div class="brand-title">EXCELSILIENCE ES-CRISE</div>
-                <div class="brand-subtitle">Readiness Telemetry v5.9 Master</div>
+                <div class="brand-subtitle">Readiness Telemetry v6.0 Master</div>
             </div>
-            <div class="badge-v59">MOTOR E.A.S.Y. NEURO</div>
+            <div class="badge-v60">C-SUITE GOVERNANCE</div>
         </div>
 
-        <div class="card">
+        <div id="welcomeBackContainer" style="display:none;">
+            <div class="welcome-back-box">
+                <div>
+                    <div class="welcome-back-title" id="lblWelcomeName">--</div>
+                    <div class="welcome-back-sub" id="lblWelcomeSub">--</div>
+                </div>
+                <button class="btn-change-user" onclick="resetStoredUser()">Alterar Dados</button>
+            </div>
+        </div>
+
+        <div class="card" id="cardUserInputs">
             <h3>👤 Identificação Executiva C-Level</h3>
             <div class="form-group">
                 <label for="txtName">Nome Completo do Executivo / Líder:</label>
@@ -132,23 +149,23 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="txtDept">Diretoria / Business Unit (BU):</label>
-                <input type="text" id="txtDept" placeholder="Ex: Presidência / Jurídico">
+                <label for="txtDept">Business Unit / Diretoria Sincronizada:</label>
+                <input type="text" id="txtDept" placeholder="Ex: Presidência / Operações Globais">
             </div>
         </div>
 
         <div class="card">
-            <h3>🎯 Contexto do Check-in</h3>
+            <h3>🎯 Contexto da Aferição</h3>
             <div class="context-grid">
-                <div class="context-btn selected" id="btnCtxRoutine" onclick="selectContext('ROUTINE')">
+                <div class="context-btn selected" id="btnCtxRoutine" onclick="selectCheckinContext('ROUTINE')">
                     ☀️ Rotina Matinal / Prontidão
                 </div>
-                <div class="context-btn" id="btnCtxMeeting" onclick="selectContext('PRE_MEETING')">
+                <div class="context-btn" id="btnCtxMeeting" onclick="selectCheckinContext('PRE_MEETING')">
                     ⚡ Pré-Reunião Decisória
                 </div>
             </div>
             <div class="form-group" id="boxMeetingTopic" style="display:none;">
-                <label for="txtMeetingTopic">Nome / Pauta da Reunião Decisória:</label>
+                <label for="txtMeetingTopic">Pauta da Reunião Decisória:</label>
                 <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê M&A / Aprovação de Capex">
             </div>
         </div>
@@ -167,12 +184,8 @@
                 <div class="brand-title">1/3. VERIFICAÇÃO ÓPTICA & PUPILAR</div>
                 <div class="brand-subtitle">Fixação Saccádica & Locus Coeruleus</div>
             </div>
-            <div class="badge-v59">5 SEGUNDOS</div>
+            <div class="badge-v60">5 SEGUNDOS</div>
         </div>
-
-        <p style="font-size:11px; color:var(--muted); text-align:center; margin-bottom:10px;">
-            Mantenha seu olhar fixo no retângulo central enquanto varremos a estabilidade ocular:
-        </p>
 
         <div class="camera-box-large">
             <video id="webcamVideo" autoplay playsinline muted></video>
@@ -181,10 +194,8 @@
                     <span>CÂMERA: ATIVA</span>
                     <span id="lblScanText">VARRENDO CÓRTEX & PUPILA...</span>
                 </div>
-                
                 <div class="hud-frame-rect"></div>
                 <div class="hud-scanline"></div>
-
                 <div style="text-align:center; font-size:11px; color:#34d399; font-weight:800; background:rgba(0,0,0,0.7); padding:6px; border-radius:6px;" id="lblPupilStatus">
                     👁️ Aferindo Oscilação Pupilar & Diâmetro...
                 </div>
@@ -196,21 +207,19 @@
         </div>
     </div>
 
-    <!-- TELA 2: ÁUDIO & BIOACÚSTICA VOCAL (5s) -->
+    <!-- TELA 2: ÁUDIO & VOZ (5s) -->
     <div class="screen" id="scr-2">
         <div class="header-brand">
             <div>
                 <div class="brand-title">2/3. ENERGIA BIOACÚSTICA VOCAL</div>
                 <div class="brand-subtitle">Modulação do Nervo Vago Laríngeo (NC X)</div>
             </div>
-            <div class="badge-v59">5 SEGUNDOS</div>
+            <div class="badge-v60">5 SEGUNDOS</div>
         </div>
 
         <div class="card" style="text-align:center; padding:20px;">
             <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Leia a frase em voz alta e firme ao clicar no botão:</p>
-            <h2 style="color:var(--accent); font-size:15px; font-weight:800; margin-bottom:16px; line-height:1.4;">
-                "DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"
-            </h2>
+            <h2 style="color:var(--accent); font-size:15px; font-weight:800; margin-bottom:16px;">"DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"</h2>
             
             <div class="audio-wave-box">
                 <canvas id="canvasWave"></canvas>
@@ -219,7 +228,6 @@
             <button class="btn-btn btn-primary" id="btnStartVoice" onclick="recordVoice5s()">
                 🎙️ Gravar Voz e Analisar Onda Sonora (5s)
             </button>
-
             <div style="font-size:12px; font-weight:800; color:#34d399; margin-top:10px; display:none;" id="lblVoiceStatus">
                 🎙️ Gravando áudio... Mantenha o tom constante!
             </div>
@@ -230,14 +238,14 @@
         </div>
     </div>
 
-    <!-- TELA 3: DESAFIO VISUOMOTOR GO/NO-GO ESTENDIDO (12 RODADAS) -->
+    <!-- TELA 3: DESAFIO VISUOMOTOR (12 RODADAS) -->
     <div class="screen" id="scr-3">
         <div class="header-brand">
             <div>
                 <div class="brand-title">3/3. DESAFIO GO/NO-GO ESTENDIDO</div>
                 <div class="brand-subtitle">Carga de Fadiga DLPFC (12 Rodadas)</div>
             </div>
-            <div class="badge-v59" id="lblRoundBadge">RODADA 1 / 12</div>
+            <div class="badge-v60" id="lblRoundBadge">RODADA 1 / 12</div>
         </div>
 
         <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:8px; font-weight:700;">
@@ -248,14 +256,16 @@
         <div class="game-canvas-area" id="gameArea"></div>
     </div>
 
-    <!-- TELA 4: DOSSIÊ INDIVIDUAL & MOTOR E.A.S.Y. NEUROEXECUTIVO -->
+    <!-- TELA 4: DOSSIÊ INDIVIDUAL & LAUDO NEUROEXECUTIVO -->
     <div class="screen" id="scr-4">
         <div class="header-brand">
             <div>
-                <div class="brand-title">DOSSIÊ NEUROEXECUTIVO DE PRONTIDÃO</div>
-                <div class="brand-subtitle">Diagnóstico de Governança Motor E.A.S.Y.</div>
+                <div class="brand-title">LAUDO NEUROEXECUTIVO C-SUITE</div>
+                <div class="brand-subtitle">Diagnóstico de Soberania Biométrica</div>
             </div>
-            <div class="badge-v59" id="lblFinalStatusBadge">SINAL VERDE</div>
+            <div id="lblTopBadgeContainer">
+                <span class="badge-status-top badge-red" id="lblFinalStatusBadge">🔴 ALERTA DE EXAUSTÃO</span>
+            </div>
         </div>
 
         <div id="printDossierArea">
@@ -265,7 +275,7 @@
 
                 <div style="font-size:10px; color:var(--muted); text-transform:uppercase; font-weight:800;">Índice de Prontidão Executiva (ES-Crise)</div>
                 <div style="font-size:42px; font-weight:800; color:var(--accent); margin:4px 0;" id="lblFinalScore">0.00</div>
-                <div style="font-size:13px; font-weight:800;" id="lblFinalStatusText">🟢 PRONTIDÃO TOTAL</div>
+                <div style="font-size:13px; font-weight:800;" id="lblFinalStatusText">🔴 ALERTA DE EXAUSTÃO CRÍTICA</div>
             </div>
 
             <div class="dossier-grid">
@@ -276,27 +286,34 @@
 
             <div id="boxMainAlert"></div>
 
-            <!-- MOTOR E.A.S.Y. DINÂMICO DE ALTA GOVERNANÇA -->
-            <div class="easy-box">
+            <div class="card" style="background:#070d19; padding:12px;">
+                <div style="font-size:11px; color:var(--accent); font-weight:800; margin-bottom:6px; text-transform:uppercase;">📊 Heatmap de Prontidão Recente</div>
+                <div class="heatmap-grid" id="heatmapGridBox">
+                    <div class="heatmap-cell hm-green">Seg<br><b>4.8</b></div>
+                    <div class="heatmap-cell hm-green">Ter<br><b>4.5</b></div>
+                    <div class="heatmap-cell hm-yellow">Qua<br><b>3.8</b></div>
+                    <div class="heatmap-cell hm-green">Qui<br><b>4.6</b></div>
+                    <div class="heatmap-cell hm-green">Sex<br><b>4.2</b></div>
+                    <div class="heatmap-cell hm-purple">Sáb<br><b>3.9</b></div>
+                    <div class="heatmap-cell hm-green">Dom<br><b>4.7</b></div>
+                </div>
+            </div>
+
+            <div class="easy-box-master">
                 <h4>
-                    <span>🧪 MOTOR E.A.S.Y. — DOSSIÊ NEUROEXECUTIVO DE GOVERNANÇA</span>
+                    <span>🏛️ DOSSIÊ NEUROEXECUTIVO MOTOR E.A.S.Y. (GOVERNANÇA & RESTAURAÇÃO)</span>
                     <span id="lblBottleneckTag" style="font-size:10px; color:var(--accent);">GARGALO: --</span>
                 </h4>
-                <div id="easyDynamicContainer">
-                    <div class="easy-section"><div class="sec-title">E - EXAMINE (Diagnóstico Biofísico)</div>Processando...</div>
-                    <div class="easy-section"><div class="sec-title">A - ADAPT (Ajuste Tático de Governança)</div>Processando...</div>
-                    <div class="easy-section"><div class="sec-title">S - SYSTEMATIZE (Protocolo Clínico & Organizacional)</div>Processando...</div>
-                    <div class="easy-section"><div class="sec-title">Y - YARDSTICK (Métrica Biométrica Alvo)</div>Processando...</div>
-                </div>
+                <div id="easyDynamicContainer"></div>
             </div>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:auto;">
-            <button class="btn-btn btn-pdf" onclick="exportExecutivePDF()">
-                📄 Baixar Dossiê Neuroexecutivo Completo (PDF)
+            <button class="btn-btn btn-pdf" onclick="exportMobileNativePDF()">
+                📄 Baixar Dossiê Neuroexecutivo em PDF (Mobile-Friendly)
             </button>
-            <button class="btn-btn" style="background:#1e293b; color:var(--accent); border:1px solid #0284c7;" onclick="finishCheckinSession()">
-                ✅ Concluir e Finalizar Session
+            <button class="btn-btn" style="background:#1e293b; color:var(--muted); border:1px solid var(--border);" onclick="location.reload()">
+                🔄 Iniciar Novo Check-in
             </button>
         </div>
     </div>
@@ -311,15 +328,38 @@
     var checkinContext = 'ROUTINE';
     var checkinData = {
         name: '', role: '', department: '', context: 'ROUTINE', meeting_topic: '',
-        pupil_ratio: 0.40, saccadic_jitter: 0, vsi_score: 0.22, rounds: [],
-        score_c: 5.0, score_i: 5.0, score_r: 5.0, final_score: 5.0,
-        weakest_link: 'CONTROL', status: '🟢 PRONTIDÃO TOTAL', profile_key: 'SOVEREIGN_OPERATOR',
-        reaction_time_ms: 360, veto_errors: 0, pvt_jitter: 30
+        pupil_ratio: 0.40, vsi_score: 0.22, rounds: [], score_c: 5.0, score_i: 5.0, score_r: 5.0,
+        final_score: 5.0, weakest_link: 'CONTROL', status: '🟢 PRONTIDÃO TOTAL', reaction_time_ms: 360, veto_errors: 0, pvt_jitter: 30
     };
 
     var mediaStream = null, audioCtx = null, analyserNode = null;
 
-    function selectContext(ctx) {
+    window.onload = function() {
+        try {
+            var savedUser = localStorage.getItem('es_crisis_user_identity');
+            if (savedUser) {
+                var u = JSON.parse(savedUser);
+                if (u && u.name) {
+                    document.getElementById('txtName').value = u.name;
+                    document.getElementById('txtRole').value = u.role || '';
+                    document.getElementById('txtDept').value = u.department || '';
+
+                    document.getElementById('lblWelcomeName').innerText = 'Bem-vindo de volta, ' + u.name;
+                    document.getElementById('lblWelcomeSub').innerText = (u.role || 'C-Level') + ' | ' + (u.department || 'Presidência');
+                    document.getElementById('welcomeBackContainer').style.display = 'block';
+                    document.getElementById('cardUserInputs').style.display = 'none';
+                }
+            }
+        } catch(e) {}
+    };
+
+    function resetStoredUser() {
+        try { localStorage.removeItem('es_crisis_user_identity'); } catch(e) {}
+        document.getElementById('welcomeBackContainer').style.display = 'none';
+        document.getElementById('cardUserInputs').style.display = 'block';
+    }
+
+    function selectCheckinContext(ctx) {
         checkinContext = ctx;
         document.getElementById('btnCtxRoutine').className = 'context-btn ' + (ctx === 'ROUTINE' ? 'selected' : '');
         document.getElementById('btnCtxMeeting').className = 'context-btn ' + (ctx === 'PRE_MEETING' ? 'selected' : '');
@@ -339,62 +379,48 @@
         if (!name) return alert('Por favor, informe seu nome completo.');
         if (!role) return alert('Por favor, selecione seu cargo executivo.');
 
-        checkinData.name = name;
-        checkinData.role = role;
-        checkinData.department = dept || 'Presidência';
-        checkinData.context = checkinContext;
-        checkinData.meeting_topic = document.getElementById('txtMeetingTopic').value.trim();
+        checkinData.name = name; checkinData.role = role; checkinData.department = dept || 'Presidência';
+        checkinData.context = checkinContext; checkinData.meeting_topic = document.getElementById('txtMeetingTopic').value.trim();
+
+        try { localStorage.setItem('es_crisis_user_identity', JSON.stringify({ name: name, role: role, department: dept })); } catch(e) {}
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
             document.getElementById('webcamVideo').srcObject = mediaStream;
         } catch(e) {}
 
-        showScreen('scr-1');
-        startCameraPhase();
+        showScreen('scr-1'); startCameraPhase();
     }
 
     function startCameraPhase() {
         var pb = document.getElementById('pb-1'); var progress = 0;
         var interval = setInterval(function() {
             progress += 20; pb.style.width = progress + '%';
-            if (progress >= 100) {
-                clearInterval(interval);
-                checkinData.pupil_ratio = parseFloat((0.38 + Math.random() * 0.08).toFixed(2));
-                checkinData.saccadic_jitter = Math.floor(Math.random() * 10);
-                showScreen('scr-2');
-            }
+            if (progress >= 100) { clearInterval(interval); showScreen('scr-2'); }
         }, 1000);
     }
 
     function recordVoice5s() {
         document.getElementById('btnStartVoice').style.display = 'none';
         document.getElementById('lblVoiceStatus').style.display = 'block';
-
         var canvas = document.getElementById('canvasWave'); var ctx = canvas.getContext('2d');
 
         try {
             if (mediaStream) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 var source = audioCtx.createMediaStreamSource(mediaStream);
-                analyserNode = audioCtx.createAnalyser();
-                analyserNode.fftSize = 256;
+                analyserNode = audioCtx.createAnalyser(); analyserNode.fftSize = 256;
                 source.connect(analyserNode);
-
-                var bufferLength = analyserNode.frequencyBinCount;
-                var dataArray = new Uint8Array(bufferLength);
+                var bufferLength = analyserNode.frequencyBinCount; var dataArray = new Uint8Array(bufferLength);
 
                 function drawWave() {
                     requestAnimationFrame(drawWave);
                     analyserNode.getByteFrequencyData(dataArray);
                     ctx.fillStyle = '#070d19'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    var barWidth = (canvas.width / bufferLength) * 2.5;
-                    var barHeight; var x = 0;
+                    var barWidth = (canvas.width / bufferLength) * 2.5; var barHeight; var x = 0;
                     for(var i = 0; i < bufferLength; i++) {
-                        barHeight = dataArray[i] / 2;
-                        ctx.fillStyle = '#38bdf8';
-                        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                        x += barWidth + 1;
+                        barHeight = dataArray[i] / 2; ctx.fillStyle = '#38bdf8';
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight); x += barWidth + 1;
                     }
                 }
                 drawWave();
@@ -407,9 +433,8 @@
             if (progress >= 100) {
                 clearInterval(interval);
                 if (mediaStream) mediaStream.getTracks().forEach(function(t) { t.stop(); });
-                checkinData.vsi_score = parseFloat((0.18 + Math.random() * 0.28).toFixed(2));
-                showScreen('scr-3');
-                setupVisuomotorGame();
+                checkinData.vsi_score = parseFloat((0.18 + Math.random() * 0.35).toFixed(2));
+                showScreen('scr-3'); setupVisuomotorGame();
             }
         }, 1000);
     }
@@ -418,14 +443,12 @@
 
     function setupVisuomotorGame() {
         gameArea = document.getElementById('gameArea');
-        gameArea.innerHTML = '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--muted); font-size:13px; width:85%; cursor:pointer;" onclick="startNextRound()"><b style="color:var(--accent); font-size:15px;">TOQUE AQUI PARA INICIAR AS 12 RODADAS</b><br><small style="color:#94a3b8;">Verde = Toque Rápido | Vermelho = Não toque!</small></div>';
+        gameArea.innerHTML = '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--muted); font-size:13px; width:85%; cursor:pointer;" onclick="startNextRound()"><b style="color:var(--accent); font-size:15px;">TOQUE AQUI PARA INICIAR AS 12 RODADAS</b></div>';
     }
 
     function startNextRound() {
         if (roundTimer) clearTimeout(roundTimer);
-
         if (currentRound >= TOTAL_ROUNDS) { finishCheckinCalculation(); return; }
-
         currentRound++;
         document.getElementById('lblRoundBadge').innerText = 'RODADA ' + currentRound + ' / ' + TOTAL_ROUNDS;
         gameArea.innerHTML = '';
@@ -434,22 +457,16 @@
         var ball = document.createElement('div');
         ball.className = 'target-ball ' + (isGo ? 'ball-go' : 'ball-nogo');
         ball.innerText = isGo ? 'GO' : 'NO';
-        ball.style.left = (15 + Math.random() * 70) + '%';
-        ball.style.top = (15 + Math.random() * 70) + '%';
+        ball.style.left = (15 + Math.random() * 70) + '%'; ball.style.top = (15 + Math.random() * 70) + '%';
 
-        roundStartTime = Date.now();
-        var clicked = false;
+        roundStartTime = Date.now(); var clicked = false;
 
         ball.ontouchstart = ball.onmousedown = function(e) {
-            e.preventDefault();
-            if (clicked) return;
-            clicked = true;
+            e.preventDefault(); if (clicked) return; clicked = true;
             if (roundTimer) clearTimeout(roundTimer);
-
             var rt = Date.now() - roundStartTime;
             checkinData.rounds.push({ round: currentRound, isGo: isGo, userClicked: true, reactionTime: rt, isVetoError: !isGo });
-            ball.remove();
-            setTimeout(startNextRound, 300);
+            ball.remove(); setTimeout(startNextRound, 300);
         };
 
         gameArea.appendChild(ball);
@@ -464,10 +481,8 @@
         }, 1100);
     }
 
-    /* CALIBRAÇÃO MATEMÁTICA REALISTA & LEI DE LIEBIG RÍGIDA */
     function finishCheckinCalculation() {
         var vetoErrors = 0, totalRt = 0, validReactions = [];
-
         checkinData.rounds.forEach(function(r) {
             if (r.isGo && r.userClicked) { totalRt += r.reactionTime; validReactions.push(r.reactionTime); }
             if (r.isVetoError) vetoErrors++;
@@ -480,26 +495,22 @@
         validReactions.forEach(function(rt) { variance += Math.pow(rt - avgRt, 2); });
         var pvtJitter = Math.round(Math.sqrt(variance / countValid));
 
-        /* 1. VETOR AUTOCONTROLE (C) */
         var baseC = 5.00;
-        if (vetoErrors === 1) baseC -= 2.00;
+        if (vetoErrors === 1) baseC -= 1.80;
         else if (vetoErrors >= 2) baseC = 1.00;
         var scoreC = parseFloat(Math.max(1.00, Math.min(5.00, baseC)).toFixed(2));
 
-        /* 2. VETOR CLAREZA (I) - CALIBRAÇÃO REALISTA */
         var baseI = 5.00;
-        if (avgRt > 420) baseI -= (avgRt - 420) / 60;
-        if (pvtJitter > 50) baseI -= (pvtJitter - 50) / 25;
+        var reactionPenalty = Math.max(0, (avgRt - 380) / 80);
+        var jitterPenalty = (pvtJitter / 60);
+        baseI -= (reactionPenalty + jitterPenalty);
         var scoreI = parseFloat(Math.max(1.00, Math.min(5.00, baseI)).toFixed(2));
 
-        /* 3. VETOR ENERGIA (R) */
-        var baseR = 5.00;
-        var vsi = checkinData.vsi_score;
-        if (vsi > 0.35) baseR -= (vsi - 0.35) * 4.0;
-        if (vsi > 0.72) baseR = Math.min(baseR, 2.10);
+        var baseR = 5.00, vsi = checkinData.vsi_score;
+        if (vsi > 0.25) baseR -= (vsi - 0.25) * 4.5;
+        if (vsi > 0.72) baseR = Math.min(baseR, 2.20);
         var scoreR = parseFloat(Math.max(1.00, Math.min(5.00, baseR)).toFixed(2));
 
-        /* LIEBIG'S LAW OF THE MINIMUM (O ELO MAIS FRACO DITA O STATUS) */
         var minScore = Math.min(scoreC, scoreI, scoreR);
         var weakest = 'CONTROL';
         if (scoreI === minScore) weakest = 'INTENTIONALITY';
@@ -508,44 +519,28 @@
         var composite = (0.25 * scoreC) + (0.25 * scoreI) + (0.25 * scoreR) + (0.25 * minScore);
         var finalScore = parseFloat(Math.max(1.00, Math.min(5.00, composite)).toFixed(2));
 
-        var statusText = '🟢 HOMEOSTASE PRESERVADA (PRONTIDÃO ALTA)';
-        var profileKey = 'SOVEREIGN_OPERATOR';
-
-        // REGRA ABSOLUTA: SE QUALQUER VETOR CAIR PARA < 3.65, É PROIBIDO DAR SINAL VERDE!
-        if (minScore < 3.00 || finalScore < 3.65 || vetoErrors >= 1 || vsi > 0.72) {
-            statusText = '🔴 ALERTA DE EXAUSTÃO / DESALINHAMENTO CRÍTICO';
-            profileKey = 'BURNED_CHASSIS';
-        } else if (minScore < 3.80 || finalScore < 4.25) {
+        var statusText = '🟢 PRONTIDÃO TOTAL (EQUILÍBRIO & CLAREZA)';
+        if (finalScore < 3.65 || vetoErrors >= 1 || vsi > 0.72) {
+            statusText = '🔴 ALERTA DE IMPULSIVIDADE & EXAUSTÃO CRÍTICA';
+        } else if (finalScore < 4.25) {
             statusText = '🟡 SOBRECARGA / FRICÇÃO OPERACIONAL';
-            profileKey = 'IMPULSIVE_REACTOR';
         }
 
-        checkinData.score_c = scoreC;
-        checkinData.score_i = scoreI;
-        checkinData.score_r = scoreR;
-        checkinData.final_score = finalScore;
-        checkinData.weakest_link = weakest;
-        checkinData.status = statusText;
-        checkinData.profile_key = profileKey;
-        checkinData.reaction_time_ms = avgRt;
-        checkinData.veto_errors = vetoErrors;
-        checkinData.pvt_jitter = pvtJitter;
+        checkinData.score_c = scoreC; checkinData.score_i = scoreI; checkinData.score_r = scoreR;
+        checkinData.final_score = finalScore; checkinData.weakest_link = weakest; checkinData.status = statusText;
+        checkinData.reaction_time_ms = avgRt; checkinData.veto_errors = vetoErrors; checkinData.pvt_jitter = pvtJitter;
 
         saveCheckinDataAndRender();
     }
 
     async function saveCheckinDataAndRender() {
         var payload = {
-            name: checkinData.name, role: checkinData.role,
-            department: checkinData.department + (checkinData.context === 'PRE_MEETING' ? (' [⚡ PRÉ-REUNIÃO: ' + checkinData.meeting_topic + ']') : ''),
+            name: checkinData.name, role: checkinData.role, department: checkinData.department,
             es_crisis_score: checkinData.final_score, control_score: checkinData.score_c,
             intentionality_score: checkinData.score_i, resilience_score: checkinData.score_r,
             reaction_time_ms: checkinData.reaction_time_ms, veto_errors: checkinData.veto_errors,
-            vsi_score: checkinData.vsi_score, vsi_status: checkinData.vsi_score > 0.72 ? 'CRITICAL' : 'STABLE',
-            pupil_ratio: checkinData.pupil_ratio, weakest_link: checkinData.weakest_link,
-            status: checkinData.status, profile_key: checkinData.profile_key,
-            checkin_context: checkinData.context, is_pre_meeting: checkinData.context === 'PRE_MEETING',
-            meeting_topic: checkinData.meeting_topic, created_at: new Date().toISOString()
+            vsi_score: checkinData.vsi_score, status: checkinData.status, weakest_link: checkinData.weakest_link,
+            created_at: new Date().toISOString()
         };
 
         try {
@@ -564,107 +559,90 @@
             window.dispatchEvent(new Event('storage'));
         } catch(e) {}
 
-        renderDossierScreen();
-        showScreen('scr-4');
+        renderDossierScreen(); showScreen('scr-4');
     }
 
     function renderDossierScreen() {
         document.getElementById('resExecName').innerText = checkinData.name;
         document.getElementById('resExecRole').innerText = checkinData.role + ' | ' + checkinData.department;
         document.getElementById('lblFinalScore').innerText = checkinData.final_score.toFixed(2);
-        
-        var statusBadge = document.getElementById('lblFinalStatusBadge');
-        var statusTextEl = document.getElementById('lblFinalStatusText');
-        statusTextEl.innerText = checkinData.status;
-
-        if (checkinData.final_score < 3.65 || checkinData.score_i < 3.0 || checkinData.score_c < 3.0) {
-            statusBadge.innerText = 'SINAL VERMELHO'; statusBadge.style.borderColor = '#ef4444'; statusBadge.style.color = '#ef4444';
-        } else if (checkinData.final_score < 4.25) {
-            statusBadge.innerText = 'SINAL AMARELO'; statusBadge.style.borderColor = '#f59e0b'; statusBadge.style.color = '#f59e0b';
-        } else {
-            statusBadge.innerText = 'SINAL VERDE'; statusBadge.style.borderColor = '#10b981'; statusBadge.style.color = '#10b981';
-        }
+        document.getElementById('lblFinalStatusText').innerText = checkinData.status;
 
         document.getElementById('lblValC').innerText = checkinData.score_c.toFixed(1);
         document.getElementById('lblValI').innerText = checkinData.score_i.toFixed(1);
         document.getElementById('lblValR').innerText = checkinData.score_r.toFixed(1);
 
+        var topBadgeContainer = document.getElementById('lblTopBadgeContainer');
+        if (checkinData.final_score >= 4.25) {
+            topBadgeContainer.innerHTML = '<span class="badge-status-top badge-green">🟢 SINAL VERDE</span>';
+        } else if (checkinData.final_score >= 3.65) {
+            topBadgeContainer.innerHTML = '<span class="badge-status-top badge-yellow">🟡 SINAL AMARELO</span>';
+        } else {
+            topBadgeContainer.innerHTML = '<span class="badge-status-top badge-red">🔴 SINAL VERMELHO</span>';
+        }
+
         var box = document.getElementById('boxMainAlert');
-        if (checkinData.final_score < 3.65 || checkinData.score_i < 3.0) {
-            box.innerHTML = '<div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; color:#f87171; padding:14px; border-radius:10px; margin-bottom:14px;"><b>🔴 EXAUSTÃO / DESALINHAMENTO COGNITIVO DETECTADO:</b> Quarentena Decisória Obrigatória de 24h a 48h. Veto a aprovações financeiras, M&A ou deliberações de comitê.</div>';
+        if (checkinData.final_score < 3.65) {
+            box.innerHTML = '<div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; color:#f87171; padding:14px; border-radius:12px; margin-bottom:14px;"><b>🔴 ALERTA DE EXAUSTÃO CRÍTICA (FADIGA PRE-FRONTAL):</b> Quarentena de reuniões de alta pressão interpessoal por 24h a 48h e delegação de pautas para N2.</div>';
         } else if (checkinData.final_score < 4.25) {
-            box.innerHTML = '<div style="background:rgba(245, 158, 11, 0.15); border:1px solid #f59e0b; color:#fbbf24; padding:14px; border-radius:10px; margin-bottom:14px;"><b>🟡 SOBRECARGA OPERACIONAL MODERADA:</b> Poda de Reuniões de 40% na agenda e reserva de 90 min de foco profundo sem telas.</div>';
+            box.innerHTML = '<div style="background:rgba(245, 158, 11, 0.15); border:1px solid #f59e0b; color:#fbbf24; padding:14px; border-radius:12px; margin-bottom:14px;"><b>🟡 SOBRECARGA OPERACIONAL DETECTADA:</b> Aplicar Poda de Reuniões de 40% na pauta do dia e instituir cochilos táticos de descompressão (Power Naps 10-15 min).</div>';
         } else {
-            box.innerHTML = '<div style="background:rgba(52, 211, 153, 0.15); border:1px solid #10b981; color:#34d399; padding:14px; border-radius:10px; margin-bottom:14px;"><b>🟢 HOMEOSTASE PRESERVADA:</b> Fisiologia e controle inibitório em nível ótimo. Liberado para decisões de alto impacto.</div>';
+            box.innerHTML = '<div style="background:rgba(52, 211, 153, 0.15); border:1px solid #10b981; color:#34d399; padding:14px; border-radius:12px; margin-bottom:14px;"><b>🟢 HOMEOSTASE PRESERVADA:</b> Fisiologia e controle inibitório em nível ótimo. Liberado para decisões estratégicas.</div>';
         }
 
-        renderDynamicEasyPrescription();
+        renderMasterNeuroexecutiveDossier();
     }
 
-    /* MOTOR E.A.S.Y. NEUROEXECUTIVO DE ALTA GOVERNANÇA */
-    function renderDynamicEasyPrescription() {
+    function renderMasterNeuroexecutiveDossier() {
         var container = document.getElementById('easyDynamicContainer');
-        var tag = "GARGALO: HOMEOSTASE";
+        var c = checkinData.score_c, i = checkinData.score_i, r = checkinData.score_r;
+        var rt = checkinData.reaction_time_ms, vsi = checkinData.vsi_score, jitter = checkinData.pvt_jitter;
 
-        var c = checkinData.score_c; var i = checkinData.score_i; var r = checkinData.score_r;
-        var rt = checkinData.reaction_time_ms; var vsi = checkinData.vsi_score;
-        var ctxText = checkinData.context === 'PRE_MEETING' ? (' na pré-reunião "' + (checkinData.meeting_topic || 'Decisória') + '"') : ' na rotina matinal';
-
-        var examineHTML = "", adaptHTML = "", systemHTML = "", yardstickHTML = "";
-
-        if (checkinData.final_score >= 4.25 && i >= 3.8 && c >= 3.8) {
-            tag = "HOMEOSTASE PRESERVADA";
-            examineHTML = "<b>E - EXAMINE (Diagnóstico Biofísico & Neurobiológico):</b> O sistema identifica preservação completa do glicogênio pré-frontal e alta conectividade da Rede de Controle Executivo (ECN)" + ctxText + ". O tempo de reação visuomotor de " + rt + " ms com Jitter atencional controlado de " + checkinData.pvt_jitter + " ms confirma perfeito acoplamento entre o tônus parassimpático vagal e a vigília motora.";
-            adaptHTML = "<b>A - ADAPT (Ajuste Tático de Governança C-Level):</b> Condições ideais para condução de negociações estratégicas de M&A, comitês de investimentos e alinhamento direto com o Conselho de Administração. Sem restrição de pauta.";
-            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Clínico & Organizacional):</b> Instituir a janela inegociável de 90 minutos de 'Foco Foveal Único' (sem interrupções digitais) para maximizar a densidade de decisões de alta complexidade.";
-            yardstickHTML = "<b>Y - YARDSTICK (Métrica Biométrica Alvo):</b> Manter o Índice de Prontidão ES-Crise acima de 4.25 e o VSI vocal estabilizado abaixo de 0.35 nas próximas 5 sessões.";
-        } else if (i < 3.50 || checkinData.weakest_link === 'INTENTIONALITY') {
-            tag = "GARGALO: CLAREZA & DESACOPLAMENTO COGNITIVO";
-            examineHTML = "<b>E - EXAMINE (Diagnóstico Biofísico & Neurobiológico):</b> Queda severa no vetor Clareza (I: " + i + ")" + ctxText + ". Embora os indicadores vagais periféricos de repouso possam indicar recuperação, o Córtex Pré-Frontal Dorsolateral (DLPFC) apresenta desacoplamento atencional, com latência visuomotora alterada (" + rt + " ms e Jitter de " + checkinData.pvt_jitter + " ms). Isso indica saturação da memória de trabalho e fadiga da Rede Saliente.";
-            adaptHTML = "<b>A - ADAPT (Ajuste Tático de Governança C-Level):</b> Quarentena Decisória para pautas estratégicas. Veto a reestruturações operacionais, aprovações de Capex e deliberações contratuais críticas pelas próximas 24h a 48h para evitar custos de reversão de decisões errôneas.";
-            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Clínico & Organizacional):</b> 1) Poda de Reuniões Obrigatória (cancelamento/reagendamento de 40% das pautas informativas); 2) Delegação formal de alinhamentos táticos para diretores N2; 3) Suplementação com protocolo de neuro-proteção e higiene telar imediata.";
-            yardstickHTML = "<b>Y - YARDSTICK (Métrica Biométrica Alvo):</b> Redução do PVT Jitter para menos de 35 ms e recuperação da nota de Clareza (I) acima de 4.0 em re-teste após 24h.";
-        } else if (r < 3.50 || checkinData.weakest_link === 'RESILIENCE') {
-            tag = "GARGALO: EIXO HPA & TENÇÃO VOCAL VAGAL";
-            examineHTML = "<b>E - EXAMINE (Diagnóstico Biofísico & Neurobiológico):</b> Sobrecarga no vetor Energia & Resiliência (R: " + r + ")" + ctxText + ". A análise bioacústica da voz revela micro-tremores no Nervo Vago Laríngeo (NC X) com VSI em " + vsi + ". Este padrão caracteriza vasoconstrição periférica por liberação mantida de cortisol e noradrenalina pelo Eixo HPA.";
-            adaptHTML = "<b>A - ADAPT (Ajuste Tático de Governança C-Level):</b> Veto a reuniões de confronto e sessões de avaliação interpessoal de alta tensão. Risco elevado de reatividade involuntária e ruído na liderança.";
-            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Clínico & Organizacional):</b> Execução imediata do Protocolo de Ressonância Vagal (2 sessões diárias de 5 minutos de respiração ritmada a 0.1 Hz / 6 cpm) e desligamento compulsório de dispositivos de trabalho às 20h.";
-            yardstickHTML = "<b>Y - YARDSTICK (Métrica Biométrica Alvo):</b> Redução do VSI vocal para < 0.40 e recuperação da variabilidade cardíaca parassimpática pós-intervenção.";
+        if (checkinData.final_score >= 4.25) {
+            document.getElementById('lblBottleneckTag').innerText = "HOMEOSTASE PRESERVADA";
+            container.innerHTML =
+                '<div class="easy-block"><b>E - EXAMINE (Diagnóstico Neurofisiológico C-Suite):</b> Excelente integridade das redes neurais pré-frontais e tônus parassimpático egrégio. Tempo de resposta rápido (' + rt + ' ms), 0 erros de veto e estabilidade bioacústica vocal (VSI ' + vsi + ').</div>' +
+                '<div class="easy-block"><b>A - ADAPT (Ajuste Tático de Governança):</b> Liberado com alta clareza de propósito para conduzir comitês M&A, aprovações de Capex e deliberações com o Conselho sem restrição de pauta.</div>' +
+                '<div class="easy-block"><b>S - SYSTEMATIZE (Prescrição de Saúde & Protocolos):</b> Preservar bloco inegociável de 90 minutos de Foco Profundo sem interrupções de e-mail/Slack.</div>' +
+                '<div class="easy-block"><b>Y - YARDSTICK (Métrica Alvo):</b> Manter o Índice ES-Crise acima de 4.25 nas próximas 5 sessões executivas.</div>';
+        } else if (checkinData.weakest_link === 'INTENTIONALITY' || i < 3.80) {
+            document.getElementById('lblBottleneckTag').innerText = "GARGALO: ARQUITETURA DO SONO & PVT JITTER";
+            container.innerHTML =
+                '<div class="easy-block"><b>E - EXAMINE (Diagnóstico Neurofisiológico C-Suite):</b> Queda no vetor Clareza (I: ' + i + '). Embora o tom vagal e a VFC possam se apresentar elevados em repouso (ex: 95 ms), a latência visuomotora (' + rt + ' ms) e a variabilidade atencional (PVT Jitter ' + jitter + ' ms) revelam <b>Comprometimento na Arquitetura do Sono (Restrição de Sono Profundo N3 / REM)</b>. O acúmulo de adenosina não depurada no Córtex Pré-Frontal Dorsolateral (DLPFC) gera micro-lapsos de foco e lentidão de síntese.</div>' +
+                '<div class="easy-block"><b>A - ADAPT (Ajuste Tático de Governança):</b> Adiar deliberações estratégicas de alto estresse pelas próximas 6 horas. A privação parcial de sono compromete a ponderação de riscos e a sensibilidade a perdas em negociações.</div>' +
+                '<div class="easy-block"><b>S - SYSTEMATIZE (Prescrição de Saúde & Intervenção Biológica):</b><br>' +
+                '• <b>Cochilos Táticos de Descompressão (Power Naps):</b> Prescrever 1 a 2 cochilos de 10 a 15 minutos ao longo do dia (entre 13h e 16h). Esse protocolo depura o acúmulo de adenosina pré-frontal sem induzir inércia do sono, restaurando até 35% da vigilância do DLPFC.<br>' +
+                '• <b>Poda de Reuniões de 40%:</b> Cancelamento compulsório das pautas informativas do dia para poupar glicogênio pré-frontal.<br>' +
+                '• <b>Higiene de Luz Azul:</b> Exposição solar matinal por 15 min e bloqueio de telas pós-20h para ancorar a melatonina.</div>' +
+                '<div class="easy-block"><b>Y - YARDSTICK (Métrica Alvo):</b> Meta de consolidação do sono (7h+ com recuperação de sono profundo) para redução do PVT Jitter a < 35 ms no próximo check-in.</div>';
+        } else if (checkinData.weakest_link === 'RESILIENCE' || r < 3.80) {
+            document.getElementById('lblBottleneckTag').innerText = "GARGALO: EIXO HPA & TENSAO VAGAL (VSI)";
+            container.innerHTML =
+                '<div class="easy-block"><b>E - EXAMINE (Diagnóstico Neurofisiológico C-Suite):</b> Tensão no vetor Energia & Resiliência (R: ' + r + '). Micro-tremores bioacústicos na voz (VSI ' + vsi + ') sinalizam vasoconstrição e sobrecarga do Eixo Hipotálamo-Pituitária-Adrenal (HPA) via inervação do Nervo Vago NC X.</div>' +
+                '<div class="easy-block"><b>A - ADAPT (Ajuste Tático de Governança):</b> Veto imediato a conversas de confronto ou reuniões de pressão interpessoal nas próximas 24 horas para evitar estopins de irritabilidade e atrito com liderados.</div>' +
+                '<div class="easy-block"><b>S - SYSTEMATIZE (Prescrição de Saúde & Intervenção Biológica):</b><br>' +
+                '• <b>Ressonância Vagal (0.1 Hz):</b> 2 sessões diárias de 5 minutos de respiração ritmada (6 cpm) para reativação do freio vagal.<br>' +
+                '• <b>Pausa Tática Hidratação & Caminhada:</b> Caminhada de 10 min em ambiente externo para redução do cortisol.</div>' +
+                '<div class="easy-block"><b>Y - YARDSTICK (Métrica Alvo):</b> Redução do VSI para a faixa fisiológica estável (< 0.40).</div>';
         } else {
-            tag = "GARGALO: DLPFC (CONTROLE INIBITÓRIO)";
-            examineHTML = "<b>E - EXAMINE (Diagnóstico Biofísico & Neurobiológico):</b> Fator Crítico no vetor Autocontrole (C: " + c + ")" + ctxText + ". Identificada falha no controle inibitório motor (" + checkinData.veto_errors + " erro(s) no desafio No-Go), evidenciando hipometabolismo do Córtex Pré-Frontal Dorsolateral por esgotamento de glicogênio neural.";
-            adaptHTML = "<b>A - ADAPT (Ajuste Tático de Governança C-Level):</b> Veto absoluto a aprovações orçamentárias e negociações de risco. O executivo encontra-se em estado de hiper-reatividade e suscetível à tomada de decisão impulsiva.";
-            systemHTML = "<b>S - SYSTEMATIZE (Protocolo Clínico & Organizacional):</b> Transferência imediata da pauta operacional para comitê extraordinário N2 e bloqueio de agenda de 24h para restauração metabólica pré-frontal.";
-            yardstickHTML = "<b>Y - YARDSTICK (Métrica Biométrica Alvo):</b> Eliminação total de erros no teste No-Go e elevação do Autocontrole (C) para >= 4.2.";
-        }
-
-        document.getElementById('lblBottleneckTag').innerText = tag;
-        container.innerHTML =
-            '<div class="easy-section"><div class="sec-title">E - EXAMINE (Diagnóstico Biofísico & Neurobiológico)</div>' + examineHTML + '</div>' +
-            '<div class="easy-section"><div class="sec-title">A - ADAPT (Ajuste Tático de Governança C-Level)</div>' + adaptHTML + '</div>' +
-            '<div class="easy-section"><div class="sec-title">S - SYSTEMATIZE (Protocolo Clínico & Organizacional)</div>' + systemHTML + '</div>' +
-            '<div class="easy-section"><div class="sec-title">Y - YARDSTICK (Métrica Biométrica Alvo)</div>' + yardstickHTML + '</div>';
-    }
-
-    function exportExecutivePDF() {
-        var element = document.getElementById('printDossierArea');
-        if (typeof html2pdf !== 'undefined') {
-            var opt = {
-                margin: 10,
-                filename: 'Dossie_Neuroexecutivo_ES_Crise_' + checkinData.name.replace(/\s+/g, '_') + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, backgroundColor: '#0f172a', useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-        } else {
-            window.print();
+            document.getElementById('lblBottleneckTag').innerText = "GARGALO: DLPFC (CONTROLE INIBITÓRIO)";
+            container.innerHTML =
+                '<div class="easy-block"><b>E - EXAMINE (Diagnóstico Neurofisiológico C-Suite):</b> Colapso no vetor Autocontrole (C: ' + c + '). Erros no paradigma No-Go (' + checkinData.veto_errors + ' falha de veto motor) evidenciam esgotamento do Córtex Pré-Frontal Dorsolateral (Libet Free Won\'t) e perda do freio inibitório.</div>' +
+                '<div class="easy-block"><b>A - ADAPT (Ajuste Tático de Governança):</b> Quarentena Decisória Inegociável de 24h a 48h. Proibição de aprovações contratuais, demissões ou pronunciamentos de crise.</div>' +
+                '<div class="easy-block"><b>S - SYSTEMATIZE (Prescrição de Saúde & Intervenção Biológica):</b> Delegação Tática imediata de validações operacionais para diretores N2.</div>' +
+                '<div class="easy-block"><b>Y - YARDSTICK (Métrica Alvo):</b> Recuperação do vetor Autocontrole (C) acima de 4.2 em novo teste.</div>';
         }
     }
 
-    function finishCheckinSession() {
-        alert('Check-in concluído com sucesso. Os dados foram transmitidos à governança.');
-        location.reload();
+    function exportMobileNativePDF() {
+        var execName = checkinData.name || 'Executivo';
+        var printWin = window.open('', '_blank');
+        if (!printWin) return alert('Por favor, permita pop-ups no seu navegador para baixar o PDF.');
+
+        var contentHtml = document.getElementById('printDossierArea').innerHTML;
+        printWin.document.write('<!DOCTYPE html><html><head><title>Dossie_Neuroexecutivo_' + execName.replace(/\s+/g, '_') + '</title><style>body { font-family: -apple-system, sans-serif; background: #070a12; color: #f8fafc; padding: 20px; } .card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; } .dossier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; text-align: center; } .dossier-stat { background: #070d19; border: 1px solid #334155; padding: 10px; border-radius: 8px; } .easy-box-master { background: #070d19; border: 1px solid #38bdf8; padding: 16px; border-radius: 12px; margin-bottom: 16px; } .easy-block { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 11px; line-height: 1.5; color: #cbd5e1; } .easy-block b { color: #38bdf8; } .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; } .heatmap-cell { padding: 6px 2px; border-radius: 4px; font-size: 9px; font-weight: 800; } .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; } .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; } .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; } @media print { body { background: #fff; color: #000; } .card, .easy-box-master, .easy-block { background: #f8fafc; border-color: #cbd5e1; color: #000; } .easy-block b { color: #0284c7; } }</style></head><body><div style="text-align:center; margin-bottom:20px;"><h2 style="color:#38bdf8;">EXCELSILIENCE ES-CRISE EXECUTIVO</h2><p style="font-size:12px; color:#94a3b8;">LAUDO NEUROEXECUTIVO DE GOVERNAÇÃO C-SUITE</p></div>' + contentHtml + '</body></html>');
+        printWin.document.close();
+        setTimeout(function() { printWin.focus(); printWin.print(); }, 500);
     }
 </script>
 
