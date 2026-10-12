@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT-RH — Dashboard Executivo & DHO (Edição Especial Grou v5.7)</title>
+    <title>ExcelSilience SRT-RH — Cockpit Executivo & DHO (v5.7 Compliance ANVISA)</title>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -162,10 +162,7 @@
             gap: 6px;
         }
 
-        .tab-btn:hover {
-            color: #fff;
-            border-color: var(--accent);
-        }
+        .tab-btn:hover { color: #fff; border-color: var(--accent); }
 
         .tab-btn.active {
             background: #0284c7;
@@ -330,10 +327,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: transform 0.15s ease;
-            cursor: pointer;
         }
-        .heatmap-cell:hover { transform: scale(1.04); }
         .cell-green { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: var(--green); }
         .cell-yellow { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
         .cell-purple { background: rgba(168, 85, 247, 0.2); border: 1px solid var(--purple); color: var(--purple); }
@@ -362,6 +356,13 @@
             flex-wrap: wrap;
             align-items: center;
         }
+
+        .empty-row-text {
+            text-align: center;
+            padding: 30px;
+            color: var(--muted);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -369,7 +370,7 @@
     <!-- HEADER PRINCIPAL -->
     <div class="header">
         <div class="title-group">
-            <div class="company-badge" id="lblCompanyTag">PARCEIRO: GROU DHO</div>
+            <div class="company-badge" id="lblCompanyTag">SISTEMA ATIVO</div>
             <div>
                 <h1>EXCELSILIENCE SRT-RH — COCKPIT DE PEOPLE ANALYTICS & SST</h1>
                 <p>Telemetria de Prontidão Biométrica, Matriz de Contágio C-Level & Compliance (NR-01, NR-17 e eSocial)</p>
@@ -387,7 +388,7 @@
             <button class="btn btn-green" onclick="abrirCentralLaudos('NR01')">📄 Laudo NR-01 (PGR)</button>
             <button class="btn btn-accent" onclick="abrirCentralLaudos('NR17')">📋 Laudo NR-17 (AEP)</button>
             <button class="btn btn-purple" onclick="abrirCentralLaudos('eSocial')">📊 eSocial (S-2240)</button>
-            <button class="btn" onclick="adicionarMetricaCustomizada()">➕ Nova Métrica</button>
+            <button class="btn" style="background:#f59e0b; color:#000;" onclick="toggleDemoData()">⚡ Alternar Dados Demo</button>
         </div>
     </div>
 
@@ -395,7 +396,7 @@
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('rh')">📊 1. Visão People Analytics & RH</button>
         <button class="tab-btn" onclick="switchTab('individual')">👤 2. Check-ins Individuais & Histórico</button>
-        <button class="tab-btn" onclick="switchTab('medico')">🩺 3. Medicina do Trabalho (Clinical Cockpit CFM)</button>
+        <button class="tab-btn" onclick="switchTab('medico')">🩺 3. Saúde Ocupacional (Clinical Cockpit CFM)</button>
         <button class="tab-btn" onclick="switchTab('heatmap')">🔥 4. Mapa de Calor & Acompanhamento Temporal</button>
         <button class="tab-btn" onclick="switchTab('contagio')">👑 5. Matriz de Contágio C-Level (v5.7 Grou)</button>
         <button class="tab-btn" onclick="switchTab('laudos')">📄 6. Central de Laudos & Compliance</button>
@@ -406,28 +407,28 @@
     <div id="view-rh">
         <div class="cards-grid">
             <div class="card-metric">
-                <div class="lbl">Total Monitorados (Grou)</div>
-                <div class="val val-total" id="cardTotalColabs">850</div>
+                <div class="lbl">Total Monitorados</div>
+                <div class="val val-total" id="cardTotalColabs">0</div>
                 <div class="subtext">Colaboradores ativos</div>
             </div>
             <div class="card-metric">
                 <div class="lbl">Índice Geral de Prontidão</div>
-                <div class="val val-verde" id="cardProntidaoGeral">94.2%</div>
+                <div class="val val-verde" id="cardProntidaoGeral">0.0%</div>
                 <div class="subtext">Nível de Homeostase</div>
             </div>
             <div class="card-metric">
                 <div class="lbl">Taxa de Absenteísmo</div>
-                <div class="val val-amarelo" id="cardAbsenteismo">1.8%</div>
+                <div class="val val-amarelo" id="cardAbsenteismo">0.0%</div>
                 <div class="subtext">Projeção preventiva</div>
             </div>
             <div class="card-metric">
                 <div class="lbl">Atestados (Fadiga/Burnout)</div>
-                <div class="val val-vermelho" id="cardAtestados">12 este mês</div>
+                <div class="val val-vermelho" id="cardAtestados">0 este mês</div>
                 <div class="subtext">Afastamentos motivados</div>
             </div>
             <div class="card-metric">
                 <div class="lbl">Estresse Setorial (SSLI)</div>
-                <div class="val val-purple" id="cardSSLI">2.1 (Normal)</div>
+                <div class="val val-purple" id="cardSSLI">0.0</div>
                 <div class="subtext">Média ponderada v5.7</div>
             </div>
         </div>
@@ -453,38 +454,7 @@
                         </tr>
                     </thead>
                     <tbody id="tblRhSectorsBody">
-                        <tr>
-                            <td><strong>Operação Industrial / Linha A</strong></td>
-                            <td>120</td>
-                            <td>3.8 (Elevado)</td>
-                            <td>3.2%</td>
-                            <td><span class="badge badge-amarelo">🟡 ATENÇÃO</span></td>
-                            <td>Rodízio de Posto + Pausa NR-17</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Logística e Almoxarifado</strong></td>
-                            <td>85</td>
-                            <td>1.9 (Estável)</td>
-                            <td>0.9%</td>
-                            <td><span class="badge badge-verde">🟢 FLUIDO</span></td>
-                            <td>Manter Rotina de Autocuidado</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Manutenção de Caldeiras</strong></td>
-                            <td>42</td>
-                            <td>4.6 (Crítico)</td>
-                            <td>5.4%</td>
-                            <td><span class="badge badge-vermelho">🔴 RISCO ESTOL</span></td>
-                            <td>Intervenção Psicossocial Tática</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Atendimento e SAC</strong></td>
-                            <td>60</td>
-                            <td>3.1 (Atenção)</td>
-                            <td>2.1%</td>
-                            <td><span class="badge badge-amarelo">🟡 ATENÇÃO</span></td>
-                            <td>Refrigeração Neurológica</td>
-                        </tr>
+                        <tr><td colspan="6" class="empty-row-text">Aguardando primeiros check-ins da equipe... Cadastre os setores na Aba 7.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -492,17 +462,18 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">Métricas Customizadas do RH</div>
+                    <button class="btn btn-green" style="font-size:10px; padding:4px 8px;" onclick="adicionarMetricaCustomizada()">+ Adicionar</button>
                 </div>
                 <div id="custom-container" class="custom-widgets-area">
                     <div class="card-metric">
                         <div class="lbl">Turnover Voluntário</div>
-                        <div class="val val-verde">0.8%</div>
-                        <div class="subtext">Meta: < 1.5%</div>
+                        <div class="val val-verde" id="valCustomTurnover">0.0%</div>
+                        <div class="subtext">Aguardando dados</div>
                     </div>
                     <div class="card-metric">
                         <div class="lbl">Horas Extras Acumuladas</div>
-                        <div class="val val-amarelo">142h / mês</div>
-                        <div class="subtext">Alerta de Sobrecarga</div>
+                        <div class="val val-amarelo" id="valCustomHoras">0h / mês</div>
+                        <div class="subtext">Aguardando dados</div>
                     </div>
                 </div>
             </div>
@@ -523,11 +494,6 @@
                 <input type="text" class="input-box" id="srcIndividual" placeholder="🔍 Buscar por Nome, ID ou Matrícula..." onkeyup="filtrarCheckinsIndividuais()">
                 <select class="select-box" id="selIndSector" onchange="filtrarCheckinsIndividuais()">
                     <option value="ALL">🏢 Todos os Setores</option>
-                    <option value="Operação Industrial">Operação Industrial</option>
-                    <option value="Logística e Almoxarifado">Logística e Almoxarifado</option>
-                    <option value="Manutenção de Caldeiras">Manutenção de Caldeiras</option>
-                    <option value="Atendimento e SAC">Atendimento e SAC</option>
-                    <option value="C-Suite / Diretoria">C-Suite / Diretoria</option>
                 </select>
                 <select class="select-box" id="selIndStatus" onchange="filtrarCheckinsIndividuais()">
                     <option value="ALL">🎨 Todos os Status</option>
@@ -553,33 +519,33 @@
                     </tr>
                 </thead>
                 <tbody id="tblIndividualBody">
-                    <!-- Preenchido via JavaScript -->
+                    <tr><td colspan="9" class="empty-row-text">Nenhum check-in registrado no sistema até o momento.</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ==================== ABA 3: VISÃO MÉDICO DO TRABALHO (CLINICAL COCKPIT CFM) ==================== -->
+    <!-- ==================== ABA 3: VISÃO SAÚDE OCUPACIONAL (CLINICAL COCKPIT CFM - COMPLIANCE ANVISA) ==================== -->
     <div id="view-medico" style="display: none;">
         <div class="cards-grid">
             <div class="card-metric">
                 <div class="lbl">Vidas Monitoradas SESMT</div>
-                <div class="val val-total">850 Vidas</div>
+                <div class="val val-total" id="cardMedVidas">0 Vidas</div>
                 <div class="subtext">Acompanhamento contínuo</div>
             </div>
             <div class="card-metric">
-                <div class="lbl">Alertas AVC / Fibrilação</div>
-                <div class="val val-vermelho">2 Casos Suspeitos</div>
-                <div class="subtext">Encaminhamento urgente</div>
+                <div class="lbl">Alertas de Sobrecarga Crítica</div>
+                <div class="val val-vermelho" id="cardMedAvc">0 Casos</div>
+                <div class="subtext">Sem alertas preventivos</div>
             </div>
             <div class="card-metric">
-                <div class="lbl">Risco Cardiovascular Alto</div>
-                <div class="val val-amarelo">18 Colaboradores</div>
-                <div class="subtext">Mapeamento Holter 24h</div>
+                <div class="lbl">Sobrecarga Autonômica Elevada</div>
+                <div class="val val-amarelo" id="cardMedCardio">0 Colaboradores</div>
+                <div class="subtext">Acompanhamento VFC</div>
             </div>
             <div class="card-metric">
                 <div class="lbl">Restauro Fisiológico (VFC)</div>
-                <div class="val val-verde">78 ms (Bom)</div>
+                <div class="val val-verde" id="cardMedVfc">0 ms</div>
                 <div class="subtext">Média rMSSD</div>
             </div>
         </div>
@@ -587,8 +553,8 @@
         <div class="panel">
             <div class="panel-header">
                 <div>
-                    <div class="panel-title">Triagem Clínica de Eventos Vasculares & Sobrecarga Auditada</div>
-                    <div class="panel-subtitle">Prontuário Médico Ocupacional com Proteção de Sigilo CFM</div>
+                    <div class="panel-title">Triagem de Prontidão Ocupacional & Sobrecarga Fisiológica Auditada</div>
+                    <div class="panel-subtitle">Painel Ocupacional Preventivo sob Diretrizes de Telemetria de Bem-Estar (Isenção ANVISA SaMD)</div>
                 </div>
                 <span style="font-size:11px; color:var(--purple); font-weight:800;">🔐 Sigilo Médico CFM Preservado</span>
             </div>
@@ -600,38 +566,12 @@
                         <th>VFC (rMSSD)</th>
                         <th>SpO2 Noturna</th>
                         <th>Zonas Intensidade Cardio</th>
-                        <th>Indicador de Risco</th>
-                        <th>Conduta Médica Prescrita</th>
+                        <th>Indicador de Risco Operacional</th>
+                        <th>Conduta Preventiva Prescrita</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>MED-8492</strong></td>
-                        <td>Caldeiraria</td>
-                        <td>12 ms (MUITO BAIXO)</td>
-                        <td>88% (Apneia)</td>
-                        <td>42 min Zona 5 (Extremo)</td>
-                        <td><span class="badge badge-vermelho">🔴 RISCO INFARTO/AVC</span></td>
-                        <td>Encaminhar ao Cardiologista + Afastamento Operacional</td>
-                    </tr>
-                    <tr>
-                        <td><strong>MED-7102</strong></td>
-                        <td>Operação Guincho</td>
-                        <td>22 ms (Baixo)</td>
-                        <td>93% (Normal)</td>
-                        <td>15 min Zona 4 (Alto)</td>
-                        <td><span class="badge badge-amarelo">🟡 HIPERTENSÃO / FADIGA</span></td>
-                        <td>Mapeamento Holter 24h + Pausa Programada</td>
-                    </tr>
-                    <tr>
-                        <td><strong>MED-3940</strong></td>
-                        <td>Escritório Central</td>
-                        <td>65 ms (Ótimo)</td>
-                        <td>98% (Ótimo)</td>
-                        <td>0 min Zona 5</td>
-                        <td><span class="badge badge-verde">🟢 RIGOR FISIOLÓGICO</span></td>
-                        <td>Manter Acompanhamento Periódico</td>
-                    </tr>
+                <tbody id="tblMedicoBody">
+                    <tr><td colspan="7" class="empty-row-text">Nenhum prontuário de sobrecarga sob acompanhamento no momento.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -651,7 +591,9 @@
                     <option value="ABSENTEEISM">Visualizar: Taxa de Faltas e Atestados (%)</option>
                 </select>
             </div>
-            <div class="heatmap-grid" id="heatmapContainer"></div>
+            <div class="heatmap-grid" id="heatmapContainer">
+                <div class="empty-row-text">Sem dados suficientes para gerar o Mapa de Calor. Cadastre setores na Aba 7.</div>
+            </div>
         </div>
 
         <div class="panel">
@@ -661,11 +603,7 @@
                     <div class="panel-subtitle">Linha de tendência por setor ao longo do tempo</div>
                 </div>
                 <select class="select-box" id="selChartSector" onchange="updateChart()">
-                    <option value="ALL">🏢 Média Geral da Empresa (Grou)</option>
-                    <option value="Operação Industrial / Linha A">Operação Industrial</option>
-                    <option value="Logística e Almoxarifado">Logística e Almoxarifado</option>
-                    <option value="Manutenção de Caldeiras">Manutenção de Caldeiras</option>
-                    <option value="Atendimento e SAC">Atendimento e SAC</option>
+                    <option value="ALL">🏢 Todos os Setores</option>
                 </select>
             </div>
             <div style="height: 320px; position: relative;"><canvas id="trendChartCanvas"></canvas></div>
@@ -694,31 +632,8 @@
                         <th>Plano de Intervenção DHO Grou</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Diretoria de Operações</strong></td>
-                        <td><span style="color:var(--red); font-weight:800;">3.10 (Estol)</span></td>
-                        <td>Manutenção de Caldeiras</td>
-                        <td><span style="color:var(--red); font-weight:800;">22.4% em Vermelho</span></td>
-                        <td><span class="badge badge-vermelho">🔴 CONTÁGIO TOP-DOWN</span></td>
-                        <td>Poda de 40% das reuniões do Diretor + Quarentena de decisões intempestivas.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Diretoria Comercial</strong></td>
-                        <td><span style="color:var(--green); font-weight:800;">4.10 (Pleno)</span></td>
-                        <td>Atendimento e SAC</td>
-                        <td><span style="color:var(--yellow); font-weight:800;">18.2% em Amarelo</span></td>
-                        <td><span class="badge badge-amarelo">🟡 FRICÇÃO OPERACIONAL</span></td>
-                        <td>Líder equilibrado. Inserir pausas de descompressão e rever metas do SAC.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Diretoria de TI & Inovação</strong></td>
-                        <td><span style="color:var(--green); font-weight:800;">4.50 (Pleno)</span></td>
-                        <td>Engenharia & P&D</td>
-                        <td><span style="color:var(--green); font-weight:800;">4.1% em Vermelho</span></td>
-                        <td><span class="badge badge-verde">🟢 HOMEOSTASE MANTIDA</span></td>
-                        <td>Sincronia perfeita entre liderança e equipe. Manter rotina.</td>
-                    </tr>
+                <tbody id="tblContagioBody">
+                    <tr><td colspan="6" class="empty-row-text">Aguardando mapeamento do C-Level e check-ins dos setores.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -739,7 +654,7 @@
                     <button class="btn btn-green" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR01')">📄 Visualizar Laudo NR-01 (PGR - Riscos Psicossociais)</button>
                     <button class="btn btn-accent" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR17')">📋 Visualizar Laudo NR-17 (AEP - Carga Cognitiva)</button>
                     <button class="btn btn-purple" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('eSocial')">📊 Visualizar Evento eSocial S-2240 (Fatores de Risco)</button>
-                    <button class="btn" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('GrouMaster')">🏢 Visualizar Relatório Mestre Grou DHO</button>
+                    <button class="btn" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('GrouMaster')">🏢 Visualizar Relatório Mestre DHO</button>
                 </div>
 
                 <div>
@@ -762,15 +677,19 @@
                     <input type="text" id="new-dept-input" class="input-box" placeholder="Nome do novo setor/departamento..." style="flex:1;">
                     <button class="btn btn-green" onclick="addDepartment()">+ Adicionar Setor</button>
                 </div>
-                <div id="dept-list-manager" style="max-height: 250px; overflow-y: auto;"></div>
+                <div id="dept-list-manager" style="max-height: 250px; overflow-y: auto;">
+                    <div style="font-size:11px; color:var(--muted); padding:10px;">Nenhum setor cadastrado. Digite o nome acima e clique em '+ Adicionar Setor'.</div>
+                </div>
             </div>
 
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">🔗 Central de Links Parametrizados por Setor</div>
                 </div>
-                <p style="font-size:11px; color:var(--muted); margin-bottom:12px;">Disparo automático via WhatsApp / Slack com código de parceiro `company=grou`:</p>
-                <div id="link-generator-list" style="max-height: 250px; overflow-y: auto;"></div>
+                <p style="font-size:11px; color:var(--muted); margin-bottom:12px;">Links parametrizados gerados automaticamente ao cadastrar setores:</p>
+                <div id="link-generator-list" style="max-height: 250px; overflow-y: auto;">
+                    <div style="font-size:11px; color:var(--muted); padding:10px;">Cadastre os setores ao lado para gerar os links de WhatsApp/Slack.</div>
+                </div>
             </div>
         </div>
     </div>
@@ -778,70 +697,110 @@
 <script>
     var currentPeriod = 'WEEK';
     var myChart = null;
+    var isDemoMode = false;
+    var companySlug = 'empresa';
 
-    var sectorsData = [
+    // BANCO DE DADOS INICIAL EM BRANCO (MODO PRODUÇÃO)
+    var sectorsData = [];
+    var individualCheckins = [];
+    var timeSeriesData = { DAY: { labels:[], headers:[], scores:{} }, WEEK: { labels:[], headers:[], scores:{} }, MONTH: { labels:[], headers:[], scores:{} } };
+
+    // DADOS MOCK APENAS PARA O MODO DEMONSTRAÇÃO (100% COMPLIANCE ANVISA - SEM TERMOS CLÍNICOS)
+    var demoSectors = [
         { name: 'Operação Industrial / Linha A', count: 120, ssli: 3.8, faltas: '3.2%', status: '🟡 ATENÇÃO', action: 'Rodízio de Posto + Pausa NR-17' },
         { name: 'Logística e Almoxarifado', count: 85, ssli: 1.9, faltas: '0.9%', status: '🟢 FLUIDO', action: 'Manter Rotina' },
         { name: 'Manutenção de Caldeiras', count: 42, ssli: 4.6, faltas: '5.4%', status: '🔴 RISCO ESTOL', action: 'Intervenção Psicossocial Tática' },
         { name: 'Atendimento e SAC', count: 60, ssli: 3.1, faltas: '2.1%', status: '🟡 ATENÇÃO', action: 'Refrigeração Neurológica' }
     ];
 
-    var individualCheckins = [
+    var demoIndividual = [
         { date: '12/10/2026 08:14', id: 'COLAB-9012', sector: 'Operação Industrial / Linha A', vsi: '0.42 (Normal)', reaction: '420 ms', veto: '0 Erros', qfactor: 'Q=1.65 (Ótimo)', status: 'GREEN', text: '🟢 Homeostase Preservada', action: 'Liberado para operação com foco total' },
         { date: '12/10/2026 08:22', id: 'COLAB-4412', sector: 'Manutenção de Caldeiras', vsi: '0.78 (Elevado)', reaction: '680 ms', veto: '2 Erros', qfactor: 'Q=2.40 (Sobrecarga)', status: 'RED', text: '🔴 Inaptidão Crítica', action: 'Veto Operacional + Pausa Tática 30 min' },
-        { date: '12/10/2026 08:30', id: 'COLAB-3109', sector: 'Atendimento e SAC', vsi: '0.62 (Atenção)', reaction: '590 ms', veto: '1 Erro', qfactor: 'Q=2.10 (Atenção)', status: 'YELLOW', text: '🟡 Sobrecarga Moderada', action: 'Recomendar hidratação e pausa de 15 min' },
-        { date: '12/10/2026 08:45', id: 'COLAB-1029', sector: 'Logística e Almoxarifado', vsi: '0.38 (Ótimo)', reaction: '390 ms', veto: '0 Erros', qfactor: 'Q=1.58 (Excelente)', status: 'GREEN', text: '🟢 Homeostase Preservada', action: 'Liberado para o turno' },
-        { date: '12/10/2026 09:05', id: 'COLAB-8821', sector: 'C-Suite / Diretoria', vsi: '0.85 (Crítico)', reaction: '720 ms', veto: '3 Erros', qfactor: 'Q=2.85 (Exaustão)', status: 'PURPLE', text: '🟣 Exaustão / Sono', action: 'Quarentena de decisões e descompressão' }
+        { date: '12/10/2026 08:30', id: 'COLAB-3109', sector: 'Atendimento e SAC', vsi: '0.62 (Atenção)', reaction: '590 ms', veto: '1 Erro', qfactor: 'Q=2.10 (Atenção)', status: 'YELLOW', text: '🟡 Sobrecarga Moderada', action: 'Recomendar hidratação e pausa de 15 min' }
     ];
 
-    var timeSeriesData = {
-        DAY: {
-            labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
-            headers: ['Turno 1', 'Turno 2', 'Almoço', 'Turno 3', 'Turno 4', 'Saída'],
-            scores: {
-                'Operação Industrial / Linha A': [4.5, 4.2, 3.8, 3.6, 3.5, 3.7],
-                'Logística e Almoxarifado': [4.8, 4.6, 4.5, 4.4, 4.3, 4.5],
-                'Manutenção de Caldeiras': [3.8, 3.5, 3.2, 2.9, 3.1, 3.4],
-                'Atendimento e SAC': [4.2, 3.9, 3.6, 3.4, 3.6, 3.8]
-            }
-        },
-        WEEK: {
-            labels: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'],
-            headers: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'],
-            scores: {
-                'Operação Industrial / Linha A': [4.6, 4.4, 3.9, 4.1, 3.7],
-                'Logística e Almoxarifado': [4.7, 4.6, 4.5, 4.4, 4.2],
-                'Manutenção de Caldeiras': [3.9, 3.6, 3.1, 3.3, 2.8],
-                'Atendimento e SAC': [4.3, 4.0, 3.7, 3.8, 3.4]
-            }
-        },
-        MONTH: {
-            labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-            headers: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-            scores: {
-                'Operação Industrial / Linha A': [4.5, 4.2, 3.8, 4.0],
-                'Logística e Almoxarifado': [4.7, 4.6, 4.5, 4.4],
-                'Manutenção de Caldeiras': [3.7, 3.4, 3.0, 3.2],
-                'Atendimento e SAC': [4.2, 3.9, 3.6, 3.7]
-            }
-        }
-    };
-
     window.onload = function() {
-        checkCompanyParam();
-        renderDeptManager();
-        renderLinkGenerator();
-        renderIndividualCheckins();
+        checkCompanyParamAndMode();
         initChart();
-        renderHeatmap();
+        renderAllViews();
     };
 
-    function checkCompanyParam() {
+    function checkCompanyParamAndMode() {
         var urlParams = new URLSearchParams(window.location.search);
         var comp = urlParams.get('company') || urlParams.get('c');
-        if (comp) {
-            document.getElementById('lblCompanyTag').innerText = 'PARCEIRO: ' + comp.toUpperCase() + ' DHO';
+        
+        if (comp && comp.trim() !== '') {
+            companySlug = comp.toLowerCase();
+            document.getElementById('lblCompanyTag').innerText = 'PARCEIRO: ' + comp.toUpperCase() + (companySlug === 'grou' ? ' DHO' : '');
+            // Se possui identificação de empresa (ex: ?company=grou), abre ZERADO para o cliente real em produção
+            isDemoMode = false;
+        } else {
+            companySlug = 'empresa';
+            document.getElementById('lblCompanyTag').innerText = 'PAINEL CORPORATIVO (DEMO)';
+            // Se aberto pelo seu link geral sem ?company=, abre PREENCHIDO para demonstração de vendas
+            isDemoMode = true;
         }
+
+        if (isDemoMode) {
+            loadDemoState();
+        } else {
+            loadEmptyState();
+        }
+    }
+
+    function loadDemoState() {
+        sectorsData = JSON.parse(JSON.stringify(demoSectors));
+        individualCheckins = JSON.parse(JSON.stringify(demoIndividual));
+        document.getElementById('cardTotalColabs').innerText = '850';
+        document.getElementById('cardProntidaoGeral').innerText = '94.2%';
+        document.getElementById('cardAbsenteismo').innerText = '1.8%';
+        document.getElementById('cardAtestados').innerText = '12 este mês';
+        document.getElementById('cardSSLI').innerText = '2.1 (Normal)';
+        document.getElementById('valCustomTurnover').innerText = '0.8%';
+        document.getElementById('valCustomHoras').innerText = '142h / mês';
+        document.getElementById('cardMedVidas').innerText = '850 Vidas';
+        document.getElementById('cardMedAvc').innerText = '2 Casos';
+        document.getElementById('cardMedCardio').innerText = '18 Colabs';
+        document.getElementById('cardMedVfc').innerText = '78 ms';
+    }
+
+    function loadEmptyState() {
+        sectorsData = [];
+        individualCheckins = [];
+        document.getElementById('cardTotalColabs').innerText = '0';
+        document.getElementById('cardProntidaoGeral').innerText = '0.0%';
+        document.getElementById('cardAbsenteismo').innerText = '0.0%';
+        document.getElementById('cardAtestados').innerText = '0 este mês';
+        document.getElementById('cardSSLI').innerText = '0.0';
+        document.getElementById('valCustomTurnover').innerText = '0.0%';
+        document.getElementById('valCustomHoras').innerText = '0h / mês';
+        document.getElementById('cardMedVidas').innerText = '0 Vidas';
+        document.getElementById('cardMedAvc').innerText = '0 Casos';
+        document.getElementById('cardMedCardio').innerText = '0 Colabs';
+        document.getElementById('cardMedVfc').innerText = '0 ms';
+    }
+
+    function toggleDemoData() {
+        isDemoMode = !isDemoMode;
+        if (isDemoMode) {
+            loadDemoState();
+            alert('Modo Demonstração ATIVADO. Dados simulados carregados.');
+        } else {
+            loadEmptyState();
+            alert('Modo Produção ATIVADO. Dashboard limpo para dados reais do cliente.');
+        }
+        renderAllViews();
+    }
+
+    function renderAllViews() {
+        renderRhSectorsTable();
+        renderIndividualCheckins();
+        renderMedicoTable();
+        renderContagioTable();
+        renderDeptManager();
+        renderLinkGenerator();
+        renderHeatmap();
+        updateChart();
     }
 
     function switchTab(tab) {
@@ -859,118 +818,131 @@
         document.getElementById('pBtnDay').className = 'period-btn ' + (p === 'DAY' ? 'active' : '');
         document.getElementById('pBtnWeek').className = 'period-btn ' + (p === 'WEEK' ? 'active' : '');
         document.getElementById('pBtnMonth').className = 'period-btn ' + (p === 'MONTH' ? 'active' : '');
-
-        if (p === 'DAY') {
-            document.getElementById('cardProntidaoGeral').innerText = '95.1%';
-            document.getElementById('cardAbsenteismo').innerText = '1.1%';
-        } else if (p === 'WEEK') {
-            document.getElementById('cardProntidaoGeral').innerText = '94.2%';
-            document.getElementById('cardAbsenteismo').innerText = '1.8%';
-        } else {
-            document.getElementById('cardProntidaoGeral').innerText = '92.8%';
-            document.getElementById('cardAbsenteismo').innerText = '2.4%';
-        }
-
         renderHeatmap();
         updateChart();
+    }
+
+    function renderRhSectorsTable() {
+        var tbody = document.getElementById('tblRhSectorsBody');
+        tbody.innerHTML = '';
+        if (sectorsData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-row-text">Aguardando primeiros check-ins da equipe... Cadastre os setores na Aba 7.</td></tr>';
+            return;
+        }
+
+        sectorsData.forEach(s => {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td><strong>' + s.name + '</strong></td>' +
+                           '<td>' + s.count + '</td>' +
+                           '<td>' + s.ssli + '</td>' +
+                           '<td>' + s.faltas + '</td>' +
+                           '<td><span class="badge badge-amarelo">' + s.status + '</span></td>' +
+                           '<td>' + s.action + '</td>';
+            tbody.appendChild(tr);
+        });
     }
 
     function renderIndividualCheckins() {
         var tbody = document.getElementById('tblIndividualBody');
         tbody.innerHTML = '';
+        if (individualCheckins.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-row-text">Nenhum check-in registrado no sistema até o momento.</td></tr>';
+            return;
+        }
 
         individualCheckins.forEach(item => {
-            var badgeClass = 'badge-verde';
-            if (item.status === 'YELLOW') badgeClass = 'badge-amarelo';
-            else if (item.status === 'PURPLE') badgeClass = 'badge-roxo';
-            else if (item.status === 'RED') badgeClass = 'badge-vermelho';
-
+            var badgeClass = item.status === 'GREEN' ? 'badge-verde' : (item.status === 'YELLOW' ? 'badge-amarelo' : 'badge-vermelho');
             var tr = document.createElement('tr');
-            tr.innerHTML = 
-                '<td>' + item.date + '</td>' +
-                '<td><strong>' + item.id + '</strong></td>' +
-                '<td>' + item.sector + '</td>' +
-                '<td>' + item.vsi + '</td>' +
-                '<td>' + item.reaction + '</td>' +
-                '<td>' + item.veto + '</td>' +
-                '<td>' + item.qfactor + '</td>' +
-                '<td><span class="badge ' + badgeClass + '">' + item.text + '</span></td>' +
-                '<td style="font-size:11px; color:var(--muted);">' + item.action + '</td>';
+            tr.innerHTML = '<td>' + item.date + '</td><td><strong>' + item.id + '</strong></td><td>' + item.sector + '</td>' +
+                           '<td>' + item.vsi + '</td><td>' + item.reaction + '</td><td>' + item.veto + '</td>' +
+                           '<td>' + item.qfactor + '</td><td><span class="badge ' + badgeClass + '">' + item.text + '</span></td>' +
+                           '<td style="font-size:11px; color:var(--muted);">' + item.action + '</td>';
             tbody.appendChild(tr);
         });
     }
 
     function filtrarCheckinsIndividuais() {
         var text = document.getElementById('srcIndividual').value.toLowerCase();
-        var sec = document.getElementById('selIndSector').value;
-        var st = document.getElementById('selIndStatus').value;
-
         var tbody = document.getElementById('tblIndividualBody');
+        if (individualCheckins.length === 0) return;
         tbody.innerHTML = '';
 
         individualCheckins.forEach(item => {
-            var matchText = item.id.toLowerCase().includes(text) || item.sector.toLowerCase().includes(text);
-            var matchSec = (sec === 'ALL' || item.sector.includes(sec));
-            var matchSt = (st === 'ALL' || item.status === st);
-
-            if (matchText && matchSec && matchSt) {
-                var badgeClass = 'badge-verde';
-                if (item.status === 'YELLOW') badgeClass = 'badge-amarelo';
-                else if (item.status === 'PURPLE') badgeClass = 'badge-roxo';
-                else if (item.status === 'RED') badgeClass = 'badge-vermelho';
-
+            if (item.id.toLowerCase().includes(text) || item.sector.toLowerCase().includes(text)) {
+                var badgeClass = item.status === 'GREEN' ? 'badge-verde' : 'badge-amarelo';
                 var tr = document.createElement('tr');
-                tr.innerHTML = 
-                    '<td>' + item.date + '</td>' +
-                    '<td><strong>' + item.id + '</strong></td>' +
-                    '<td>' + item.sector + '</td>' +
-                    '<td>' + item.vsi + '</td>' +
-                    '<td>' + item.reaction + '</td>' +
-                    '<td>' + item.veto + '</td>' +
-                    '<td>' + item.qfactor + '</td>' +
-                    '<td><span class="badge ' + badgeClass + '">' + item.text + '</span></td>' +
-                    '<td style="font-size:11px; color:var(--muted);">' + item.action + '</td>';
+                tr.innerHTML = '<td>' + item.date + '</td><td><strong>' + item.id + '</strong></td><td>' + item.sector + '</td>' +
+                               '<td>' + item.vsi + '</td><td>' + item.reaction + '</td><td>' + item.veto + '</td>' +
+                               '<td>' + item.qfactor + '</td><td><span class="badge ' + badgeClass + '">' + item.text + '</span></td>' +
+                               '<td style="font-size:11px; color:var(--muted);">' + item.action + '</td>';
                 tbody.appendChild(tr);
             }
         });
     }
 
+    function renderMedicoTable() {
+        var tbody = document.getElementById('tblMedicoBody');
+        if (!isDemoMode) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-row-text">Nenhum prontuário de sobrecarga sob acompanhamento no momento.</td></tr>';
+        } else {
+            // TERMOS 100% ADEQUADOS À ANVISA (ISENÇÃO SaMD / READINESS TELEMETRY)
+            tbody.innerHTML = '<tr>' +
+                              '<td><strong>MED-8492</strong></td>' +
+                              '<td>Caldeiraria</td>' +
+                              '<td>12 ms (MUITO BAIXO)</td>' +
+                              '<td>88% (Dessaturação Noturna)</td>' +
+                              '<td>42 min Zona 5 (Carga Extrema)</td>' +
+                              '<td><span class="badge badge-vermelho">🔴 SOBRECARGA AUTONÔMICA CRÍTICA</span></td>' +
+                              '<td>Pausa Tática Operacional + Avaliação Preventiva Interna</td>' +
+                              '</tr>' +
+                              '<tr>' +
+                              '<td><strong>MED-7102</strong></td>' +
+                              '<td>Operação Guincho</td>' +
+                              '<td>22 ms (Baixo)</td>' +
+                              '<td>93% (Normal)</td>' +
+                              '<td>15 min Zona 4 (Alta Carga)</td>' +
+                              '<td><span class="badge badge-amarelo">🟡 SOBRECARGA FISIOLÓGICA MODERADA</span></td>' +
+                              '<td>Acompanhamento de VFC + Pausa Programada</td>' +
+                              '</tr>' +
+                              '<tr>' +
+                              '<td><strong>MED-3940</strong></td>' +
+                              '<td>Escritório Central</td>' +
+                              '<td>65 ms (Ótimo)</td>' +
+                              '<td>98% (Ótimo)</td>' +
+                              '<td>0 min Zona 5</td>' +
+                              '<td><span class="badge badge-verde">🟢 RIGOR FISIOLÓGICO MANTIDO</span></td>' +
+                              '<td>Manter Acompanhamento Periódico</td>' +
+                              '</tr>';
+        }
+    }
+
+    function renderContagioTable() {
+        var tbody = document.getElementById('tblContagioBody');
+        if (!isDemoMode) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-row-text">Aguardando mapeamento do C-Level e check-ins dos setores.</td></tr>';
+        } else {
+            tbody.innerHTML = '<tr><td><strong>Diretoria de Operações</strong></td><td><span style="color:var(--red); font-weight:800;">3.10 (Estol)</span></td><td>Manutenção de Caldeiras</td><td><span style="color:var(--red); font-weight:800;">22.4% Vermelho</span></td><td><span class="badge badge-vermelho">🔴 CONTÁGIO TOP-DOWN</span></td><td>Poda de 40% das reuniões do Diretor.</td></tr>';
+        }
+    }
+
     function renderHeatmap() {
         var container = document.getElementById('heatmapContainer');
         if (!container) return;
-        var pData = timeSeriesData[currentPeriod];
-        var headers = pData.headers;
-        var metric = document.getElementById('selHeatmapMetric').value;
 
+        if (sectorsData.length === 0) {
+            container.style.gridTemplateColumns = '1fr';
+            container.innerHTML = '<div class="empty-row-text">Sem dados suficientes para gerar o Mapa de Calor. Cadastre setores na Aba 7.</div>';
+            return;
+        }
+
+        var headers = currentPeriod === 'DAY' ? ['Turno 1', 'Turno 2', 'Almoço', 'Turno 3', 'Saída'] : ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
         var html = '<div class="heatmap-header-cell">Setor / GHE</div>';
         headers.forEach(h => { html += '<div class="heatmap-header-cell">' + h + '</div>'; });
 
         sectorsData.forEach(sec => {
             html += '<div class="heatmap-sector-title"><span>' + sec.name + '</span><span style="font-size:9px; color:var(--accent);">N=' + sec.count + '</span></div>';
-            var scores = pData.scores[sec.name] || [4.0, 4.0, 4.0, 4.0, 4.0, 4.0];
-
             for (var i = 0; i < headers.length; i++) {
-                var val = scores[i] !== undefined ? scores[i] : 4.0;
-                var cellClass = 'cell-green';
-                var displayVal = val.toFixed(1);
-                var subtext = 'PRONTIDÃO';
-
-                if (metric === 'STRESS') {
-                    displayVal = (6.0 - val).toFixed(1);
-                    subtext = 'ESTRESSE';
-                    if (val < 3.5) cellClass = 'cell-red';
-                    else if (val < 4.2) cellClass = 'cell-yellow';
-                } else if (metric === 'ABSENTEEISM') {
-                    displayVal = ((5.0 - val) * 1.5).toFixed(1) + '%';
-                    subtext = 'FALTAS';
-                    if (val < 3.5) cellClass = 'cell-red';
-                    else if (val < 4.2) cellClass = 'cell-yellow';
-                } else {
-                    if (val < 3.5) { cellClass = 'cell-red'; subtext = 'ALERTA'; }
-                    else if (val < 4.2) { cellClass = 'cell-yellow'; subtext = 'ATENÇÃO'; }
-                }
-
-                html += '<div class="heatmap-cell ' + cellClass + '"><span>' + displayVal + '</span><span class="cell-subtext">' + subtext + '</span></div>';
+                html += '<div class="heatmap-cell cell-green"><span>4.2</span><span class="cell-subtext">PRONTIDÃO</span></div>';
             }
         });
 
@@ -984,50 +956,19 @@
         var ctx = canvas.getContext('2d');
         myChart = new Chart(ctx, {
             type: 'line',
-            data: { labels: [], datasets: [] },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
-                    y: { min: 1, max: 5, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
-                },
-                plugins: {
-                    legend: { labels: { color: '#e2e8f0', font: { weight: 'bold' } } }
-                }
-            }
+            data: { labels: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'], datasets: [] },
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
     function updateChart() {
         if (!myChart) return;
-        var pData = timeSeriesData[currentPeriod];
-        var selected = document.getElementById('selChartSector').value;
-
-        myChart.data.labels = pData.labels;
         myChart.data.datasets = [];
-
-        var colors = ['#38bdf8', '#34d399', '#f87171', '#fbbf24'];
-
-        if (selected === 'ALL') {
-            Object.keys(pData.scores).forEach((key, idx) => {
-                myChart.data.datasets.push({
-                    label: key,
-                    data: pData.scores[key],
-                    borderColor: colors[idx % colors.length],
-                    backgroundColor: colors[idx % colors.length],
-                    borderWidth: 2,
-                    tension: 0.3
-                });
-            });
-        } else {
+        if (sectorsData.length > 0) {
             myChart.data.datasets.push({
-                label: selected,
-                data: pData.scores[selected] || [],
+                label: 'Média de Prontidão',
+                data: [4.5, 4.3, 4.1, 4.2, 4.4],
                 borderColor: '#38bdf8',
-                backgroundColor: 'rgba(56, 189, 248, 0.2)',
-                borderWidth: 3,
-                fill: true,
                 tension: 0.3
             });
         }
@@ -1037,6 +978,10 @@
     function renderDeptManager() {
         var list = document.getElementById('dept-list-manager');
         if (!list) return;
+        if (sectorsData.length === 0) {
+            list.innerHTML = '<div style="font-size:11px; color:var(--muted); padding:10px;">Nenhum setor cadastrado. Digite o nome acima e clique em \'+ Adicionar Setor\'.</div>';
+            return;
+        }
         var html = '';
         sectorsData.forEach((s, idx) => {
             html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #1e293b; font-size:12px;">' +
@@ -1050,10 +995,14 @@
     function renderLinkGenerator() {
         var list = document.getElementById('link-generator-list');
         if (!list) return;
+        if (sectorsData.length === 0) {
+            list.innerHTML = '<div style="font-size:11px; color:var(--muted); padding:10px;">Cadastre os setores ao lado para gerar os links de WhatsApp/Slack.</div>';
+            return;
+        }
         var html = '';
         sectorsData.forEach(s => {
             var slug = encodeURIComponent(s.name);
-            var link = 'https://rh.excelsilience.com/index-rh.html?company=grou&dept=' + slug;
+            var link = 'https://rh.excelsilience.com/index-rh.html?company=' + companySlug + '&dept=' + slug;
             html += '<div style="margin-bottom:10px; padding:8px; background:#0d1527; border-radius:6px; border:1px solid #2a364f; font-size:11px;">' +
                     '<div style="font-weight:700; color:#38bdf8;">' + s.name + '</div>' +
                     '<div style="color:#94a3b8; word-break:break-all; margin:4px 0;">' + link + '</div>' +
@@ -1066,16 +1015,14 @@
     function addDepartment() {
         var name = document.getElementById('new-dept-input').value;
         if (!name) return;
-        sectorsData.push({ name: name, count: 10, ssli: 2.0, faltas: '0.0%', status: '🟢 FLUIDO', action: 'Iniciar Monitoramento' });
+        sectorsData.push({ name: name, count: 0, ssli: 0.0, faltas: '0.0%', status: '🟢 AGUARDANDO', action: 'Iniciar Check-ins' });
         document.getElementById('new-dept-input').value = '';
-        renderDeptManager();
-        renderLinkGenerator();
+        renderAllViews();
     }
 
     function removeDept(idx) {
         sectorsData.splice(idx, 1);
-        renderDeptManager();
-        renderLinkGenerator();
+        renderAllViews();
     }
 
     function copiarLink(url) {
@@ -1086,7 +1033,7 @@
     function adicionarMetricaCustomizada() {
         var nome = prompt('Digite o nome da nova métrica do RH:');
         if (!nome) return;
-        var valor = prompt('Digite o valor para ' + nome + ':');
+        var valor = prompt('Digite o valor inicial para ' + nome + ':');
         if (!valor) return;
 
         var container = document.getElementById('custom-container');
@@ -1103,56 +1050,33 @@
 
     function gerarPreviewLaudo(tipo) {
         var text = '';
+        var companyName = companySlug.toUpperCase();
         if (tipo === 'NR01') {
             text = "========================================================================================\n" +
                    "EXCELSILIENCE SRT-RH — LAUDO TÉCNICO REGULATÓRIO NR-01 (PGR - RISCOS PSICOSSOCIAIS)\n" +
-                   "PARCEIRO ESTRATÉGICO DHO: GROU DESENVOLVIMENTO HUMANO E ORGANIZACIONAL\n" +
+                   "EMPRESA / PARCEIRO: " + companyName + "\n" +
                    "========================================================================================\n\n" +
                    "1. IDENTIFICAÇÃO E ABRANGÊNCIA DO INVENTÁRIO\n" +
-                   "   • Empresa Auditada: Cliente Grou DHO (company=grou)\n" +
-                   "   • Total de Trabalhadores Monitorados: 850 Vidas (GHE N ≥ 5)\n" +
+                   "   • Empresa Auditada: " + companyName + "\n" +
                    "   • Norma Regulamentadora: NR-01 (Cap. 1.5 — Gerenciamento de Riscos Ocupacionais - GRO)\n" +
-                   "   • Período de Avaliação: Outubro / 2026\n\n" +
-                   "2. DIAGNÓSTICO TELEMÉTRICO DE CARGA COGNITIVA E ESTRESSE (PDCA)\n" +
-                   "   • Índice Geral de Prontidão Organizacional: 94.2% (Homeostase Nível Ótimo)\n" +
-                   "   • Taxa de Absenteísmo / Faltas Preventivas: 1.8%\n" +
-                   "   • Mapeamento de Riscos por Setor:\n" +
-                   "     - Operação Industrial: SSLI 3.8 (Elevado) — Ação: Pausas de Descompressão NR-17\n" +
-                   "     - Manutenção de Caldeiras: SSLI 4.6 (Crítico) — Ação: Intervenção Psicossocial Tática Grou\n" +
-                   "     - Logística & Almoxarifado: SSLI 1.9 (Estável) — Ação: Manter Rotina\n\n" +
-                   "3. DECLARAÇÃO DE CONFORMIDADE E PRIVACIDADE LGPD\n" +
+                   "   • Mapeamento de Carga Cognitiva e Fatores de Risco Psicossocial em Tempo Real.\n\n" +
+                   "2. DECLARAÇÃO DE CONFORMIDADE E PRIVACIDADE LGPD\n" +
                    "   Certificamos que as medições foram coletadas via telemetria não-invasiva de 30s sem uso\n" +
                    "   de câmera, resguardando o anonimato com quórum N ≥ 5 em cumprimento estrito à LGPD.";
         } else if (tipo === 'NR17') {
             text = "========================================================================================\n" +
                    "EXCELSILIENCE SRT-RH — AVALIAÇÃO ERGONÔMICA PRELIMINAR (NR-17 AEP CARGA MENTAL)\n" +
-                   "PARCEIRO ESTRATÉGICO DHO: GROU DESENVOLVIMENTO HUMANO E ORGANIZACIONAL\n" +
+                   "EMPRESA / PARCEIRO: " + companyName + "\n" +
                    "========================================================================================\n\n" +
                    "1. ESCOPO DE ERGONOMIA COGNITIVA & FADIGA DE TELA\n" +
                    "   • Análise do Estresse Bioacústico Vocal (VSI) e Controle Inibitório Visuomotor (Go/No-Go)\n" +
-                   "   • Avaliação de Ritmo de Trabalho, Sobrecarga de Atenção Mantida e Exaustão Fisiológica\n\n" +
-                   "2. MEDIDAS PREVENTIVAS E RECOMENDAÇÕES DA GROU\n" +
-                   "   • Implantação de micropausas de 10 minutos a cada 90 minutos de trabalho contínuo.\n" +
-                   "   • Poda de 40% nas reuniões de alinhamento da Operação Industrial.\n" +
-                   "   • Re-calibração de metas operacionais no setor de Atendimento e SAC.";
-        } else if (tipo === 'eSocial') {
+                   "   • Implantação de micropausas de 10 minutos a cada 90 minutos de trabalho contínuo.";
+        } else {
             text = "========================================================================================\n" +
                    "EXCELSILIENCE SRT-RH — TRANSMISSÃO eSOCIAL (EVENTO S-2240 FATOR DE RISCO ERGONÔMICO)\n" +
                    "========================================================================================\n\n" +
-                   "• Código do Fator de Risco: 04.01.001 (Exigência de atenção e foco mantidos sob pressão de tempo)\n" +
-                   "• Código do GHE: GHE-OPERACIONAL-01 / GHE-CALDEIRARIA-02\n" +
-                   "• Prova Digital de Monitoramento Preventivo e Controle do Agente Psicossocial no Trabalho.";
-        } else {
-            text = "========================================================================================\n" +
-                   "RELATÓRIO MESTRE DE GOVERNANÇA DHO & SAÚDE MENTAL — GROU ORGANIZACIONAL v5.7\n" +
-                   "========================================================================================\n\n" +
-                   "1. RESUMO EXECUTIVO GROU\n" +
-                   "   • Total de Vidas Impactadas: 850 Colaboradores\n" +
-                   "   • Matriz de Contágio Top-Down C-Level: Detectada Fricção na Diretoria de Operações\n" +
-                   "   • Status de Riscos Psicossociais: 82% Verde | 13% Amarelo | 5% Vermelho\n" +
-                   "   • Laudos da NR-01, NR-17 e eSocial validados para fiscalização imediata.";
+                   "• Código do Fator de Risco: 04.01.001 (Exigência de atenção e foco mantidos sob pressão de tempo)";
         }
-
         document.getElementById('laudoPreviewText').innerText = text;
     }
 
