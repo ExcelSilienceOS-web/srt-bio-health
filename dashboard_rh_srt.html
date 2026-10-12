@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT-RH — Dashboard de People Analytics, Mapa de Calor & Acompanhamento Setorial v6.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #070a12;
+            --card: #0f172a;
+            --card-inner: #1e293b;
+            --border: #334155;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.25);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.25);
+            --yellow: #f59e0b;
+            --yellow-glow: rgba(245, 158, 11, 0.25);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.25);
+            --purple: #a855f7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px 16px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .title-group h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+
+        .title-group p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .period-tabs {
+            display: flex;
+            background: #0d1527;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .period-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .period-btn.active {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .btn-refresh {
+            background: var(--card-inner);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .card-metric {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .card-metric .lbl {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .card-metric .val {
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .panel-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-subtitle {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .heatmap-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            gap: 8px;
+            min-width: 800px;
+        }
+
+        .heatmap-header-cell {
+            background: #0d1527;
+            border: 1px solid var(--border);
+            padding: 10px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--accent);
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .heatmap-sector-title {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .heatmap-cell {
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.15s ease;
+            cursor: pointer;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+        }
+
+        .cell-green {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--green);
+            color: #34d399;
+        }
+
+        .cell-yellow {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid var(--yellow);
+            color: #fbbf24;
+        }
+
+        .cell-red {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--red);
+            color: #f87171;
+        }
+
+        .cell-subtext {
+            font-size: 8px;
+            opacity: 0.8;
+            margin-top: 2px;
+            font-weight: 700;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .two-columns { grid-template-columns: 1fr; }
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            background: #0d1527;
+            color: var(--accent);
+            padding: 12px 10px;
+            font-weight: 800;
+            font-size: 10px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            color: #cbd5e1;
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-block;
+        }
+
+        .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid var(--green); }
+        .badge-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid var(--yellow); }
+        .badge-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid var(--red); }
+
+        .sector-select-box {
+            background: #0d1527;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="title-group">
+            <h1>EXCELSILIENCE SRT-RH — PEOPLE ANALYTICS & SAÚDE OCUPACIONAL</h1>
+            <p>Telemetria Anônima de Prontidão, Mapa de Calor Setorial & Acompanhamento Temporal (NR-01 & NR-17)</p>
+        </div>
+        <div class="header-controls">
+            <div class="period-tabs">
+                <button class="period-btn" id="btnPeriodDay" onclick="setPeriod('DAY')">☀️ Dia</button>
+                <button class="period-btn active" id="btnPeriodWeek" onclick="setPeriod('WEEK')">📅 Semana</button>
+                <button class="period-btn" id="btnPeriodMonth" onclick="setPeriod('MONTH')">📊 Mês</button>
+            </div>
+            <button class="btn-refresh" onclick="refreshDashboardData()">🔄 Atualizar Dados</button>
+        </div>
+    </div>
+
+    <!-- CARDS DE RESUMO GERAL -->
+    <div class="cards-grid">
+        <div class="card-metric">
+            <div class="lbl">Total Colaboradores (GHE)</div>
+            <div class="val" style="color: #fff;" id="lblTotalEmp">850</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">Índice Geral de Prontidão</div>
+            <div class="val" style="color: #34d399;" id="lblOverallScore">4.42 / 5.00</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">🟢 Prontidão Plena</div>
+            <div class="val" style="color: #34d399;" id="lblGreenPct">82%</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">🟡 Sobrecarga Moderada</div>
+            <div class="val" style="color: #fbbf24;" id="lblYellowPct">13%</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">🔴 Alerta Crítico (Exaustão)</div>
+            <div class="val" style="color: #f87171;" id="lblRedPct">5%</div>
+        </div>
+    </div>
+
+    <!-- PAINEL 1: MAPA DE CALOR SETORIAL (HEATMAP) -->
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">🔥 Mapa de Calor de Carga Cognitiva & Estresse por Setor (GHE — Trava N ≥ 5)</div>
+                <div class="panel-subtitle" id="lblHeatmapSubtitle">Acompanhamento temporal em tempo real com preservação de anonimato LGPD</div>
+            </div>
+            <div>
+                <select class="sector-select-box" id="selHeatmapMetric" onchange="renderHeatmap()">
+                    <option value="SCORE">Visualizar: Índice de Prontidão (1.0 a 5.0)</option>
+                    <option value="STRESS">Visualizar: Carga de Estresse SSLI (1.0 a 5.0)</option>
+                    <option value="ABSENTEEISM">Visualizar: Taxa de Faltas e Atestados (%)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="heatmap-container">
+            <div class="heatmap-grid" id="heatmapGridBox">
+                <!-- Preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL 2: DOIS COLUNAS - GRÁFICO DE ACOMPANHAMENTO E AVALIAÇÃO DETALHADA -->
+    <div class="two-columns">
+        <!-- ESQUERDA: GRÁFICO DE TENDÊNCIA TEMPORAL -->
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">📈 Gráfico de Acompanhamento Temporal</div>
+                    <div class="panel-subtitle" id="lblChartSubtitle">Evolução do Índice de Prontidão por Setor</div>
+                </div>
+                <div>
+                    <select class="sector-select-box" id="selChartSector" onchange="updateChart()">
+                        <option value="ALL">🏢 Média Geral da Empresa</option>
+                        <option value="Operação Industrial">🏭 Operação Industrial</option>
+                        <option value="Logística & Almoxarifado">📦 Logística & Almoxarifado</option>
+                        <option value="Manutenção & Caldeiraria">🔧 Manutenção & Caldeiraria</option>
+                        <option value="Atendimento & SAC">🎧 Atendimento & SAC</option>
+                        <option value="Engenharia & P&D">🔬 Engenharia & P&D</option>
+                        <option value="RH & DHO">👥 RH & DHO</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- DIREITA: AVALIAÇÃO DETALHADA POR SETOR -->
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">🏛️ Avaliação Detalhada por Setor</div>
+                    <div class="panel-subtitle">Auditoria de Riscos Psicossociais para NR-01 & NR-17</div>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Setor</th>
+                            <th>Prontidão</th>
+                            <th>Tendência</th>
+                            <th>Atestados</th>
+                            <th>Ação Recomendada</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblSectorBody">
+                        <!-- Preenchido via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+    var currentPeriod = 'WEEK';
+    var myTrendChart = null;
+
+    var sectorNames = [
+        'Operação Industrial',
+        'Logística & Almoxarifado',
+        'Manutenção & Caldeiraria',
+        'Atendimento & SAC',
+        'Engenharia & P&D',
+        'RH & DHO'
+    ];
+
+    var rawData = {
+        DAY: {
+            labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'],
+            heatmapHeaders: ['Turno 1', 'Turno 2', 'Almoço', 'Turno 3', 'Turno 4', 'Encerramento', 'Pós-Turno'],
+            scores: {
+                'Operação Industrial': [4.5, 4.2, 3.8, 3.6, 3.5, 3.7, 4.0],
+                'Logística & Almoxarifado': [4.8, 4.6, 4.5, 4.4, 4.3, 4.5, 4.6],
+                'Manutenção & Caldeiraria': [3.8, 3.5, 3.2, 2.9, 3.1, 3.4, 3.6],
+                'Atendimento & SAC': [4.2, 3.9, 3.6, 3.4, 3.6, 3.8, 4.1],
+                'Engenharia & P&D': [4.7, 4.6, 4.5, 4.6, 4.5, 4.6, 4.7],
+                'RH & DHO': [4.9, 4.8, 4.7, 4.6, 4.7, 4.8, 4.8]
+            }
+        },
+        WEEK: {
+            labels: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+            heatmapHeaders: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+            scores: {
+                'Operação Industrial': [4.6, 4.4, 3.9, 4.1, 3.7, 4.2, 4.5],
+                'Logística & Almoxarifado': [4.7, 4.6, 4.5, 4.4, 4.2, 4.5, 4.7],
+                'Manutenção & Caldeiraria': [3.9, 3.6, 3.1, 3.3, 2.8, 3.5, 3.8],
+                'Atendimento & SAC': [4.3, 4.0, 3.7, 3.8, 3.4, 4.1, 4.4],
+                'Engenharia & P&D': [4.8, 4.7, 4.6, 4.5, 4.4, 4.6, 4.8],
+                'RH & DHO': [4.9, 4.8, 4.7, 4.8, 4.6, 4.8, 4.9]
+            }
+        },
+        MONTH: {
+            labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+            heatmapHeaders: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Média Mês', 'Delta (%)', 'Status'],
+            scores: {
+                'Operação Industrial': [4.5, 4.2, 3.8, 4.0, 4.12, -2.4, 3.8],
+                'Logística & Almoxarifado': [4.7, 4.6, 4.5, 4.4, 4.55, +0.8, 4.5],
+                'Manutenção & Caldeiraria': [3.7, 3.4, 3.0, 3.2, 3.32, -5.2, 3.2],
+                'Atendimento & SAC': [4.2, 3.9, 3.6, 3.7, 3.85, -1.1, 3.7],
+                'Engenharia & P&D': [4.8, 4.7, 4.6, 4.6, 4.67, +1.2, 4.6],
+                'RH & DHO': [4.9, 4.8, 4.7, 4.8, 4.80, +0.5, 4.8]
+            }
+        }
+    };
+
+    window.onload = function() {
+        initChart();
+        refreshDashboardData();
+    };
+
+    function setPeriod(p) {
+        currentPeriod = p;
+        document.getElementById('btnPeriodDay').className = 'period-btn ' + (p === 'DAY' ? 'active' : '');
+        document.getElementById('btnPeriodWeek').className = 'period-btn ' + (p === 'WEEK' ? 'active' : '');
+        document.getElementById('btnPeriodMonth').className = 'period-btn ' + (p === 'MONTH' ? 'active' : '');
+        refreshDashboardData();
+    }
+
+    function refreshDashboardData() {
+        renderHeatmap();
+        renderSectorTable();
+        updateChart();
+        updateSummaryCards();
+    }
+
+    function updateSummaryCards() {
+        var data = rawData[currentPeriod];
+        var totalSum = 0, count = 0, greens = 0, yellows = 0, reds = 0;
+
+        sectorNames.forEach(function(sec) {
+            var arr = data.scores[sec];
+            arr.forEach(function(val) {
+                totalSum += val;
+                count++;
+                if (val >= 4.25) greens++;
+                else if (val >= 3.65) yellows++;
+                else reds++;
+            });
+        });
+
+        var avg = (totalSum / count).toFixed(2);
+        document.getElementById('lblOverallScore').innerText = avg + ' / 5.00';
+        document.getElementById('lblGreenPct').innerText = Math.round((greens / count) * 100) + '%';
+        document.getElementById('lblYellowPct').innerText = Math.round((yellows / count) * 100) + '%';
+        document.getElementById('lblRedPct').innerText = Math.round((reds / count) * 100) + '%';
+    }
+
+    function renderHeatmap() {
+        var container = document.getElementById('heatmapGridBox');
+        var pData = rawData[currentPeriod];
+        var headers = pData.heatmapHeaders;
+        var metricType = document.getElementById('selHeatmapMetric').value;
+
+        var html = '<div class="heatmap-header-cell">Setor / GHE</div>';
+        headers.forEach(function(h) {
+            html += '<div class="heatmap-header-cell">' + h + '</div>';
+        });
+
+        sectorNames.forEach(function(sec) {
+            html += '<div class="heatmap-sector-title"><span>' + sec + '</span><span style="font-size:9px; color:var(--accent);">N≥5</span></div>';
+            var scores = pData.scores[sec];
+            
+            for (var i = 0; i < headers.length; i++) {
+                var val = scores[i] !== undefined ? scores[i] : scores[scores.length - 1];
+                var cellClass = 'cell-green';
+                var displayVal = val.toFixed(1);
+                var subText = 'PRONTIDÃO';
+
+                if (metricType === 'STRESS') {
+                    var stressVal = (6.0 - val).toFixed(1);
+                    displayVal = stressVal;
+                    subText = 'SSLI ESTRESSE';
+                    if (val < 3.65) cellClass = 'cell-red';
+                    else if (val < 4.25) cellClass = 'cell-yellow';
+                } else if (metricType === 'ABSENTEEISM') {
+                    var absVal = ((5.0 - val) * 1.8).toFixed(1) + '%';
+                    displayVal = absVal;
+                    subText = 'FALTAS';
+                    if (val < 3.65) cellClass = 'cell-red';
+                    else if (val < 4.25) cellClass = 'cell-yellow';
+                } else {
+                    if (val < 3.65) { cellClass = 'cell-red'; subText = 'EXAUSTÃO'; }
+                    else if (val < 4.25) { cellClass = 'cell-yellow'; subText = 'SOBRECARGA'; }
+                }
+
+                html += '<div class="heatmap-cell ' + cellClass + '"><span>' + displayVal + '</span><span class="cell-subtext">' + subText + '</span></div>';
+            }
+        });
+
+        container.style.gridTemplateColumns = '220px repeat(' + headers.length + ', 1fr)';
+        container.innerHTML = html;
+    }
+
+    function renderSectorTable() {
+        var tbody = document.getElementById('tblSectorBody');
+        tbody.innerHTML = '';
+        var pData = rawData[currentPeriod];
+
+        sectorNames.forEach(function(sec) {
+            var scores = pData.scores[sec];
+            var lastVal = scores[scores.length - 1];
+            var prevVal = scores[scores.length - 2] || lastVal;
+            var delta = lastVal - prevVal;
+
+            var badgeClass = 'badge-green', label = '🟢 FLUIDO';
+            var action = 'Manter rotina e pausas regulares';
+            var trendHtml = '<span style="color:#34d399;"> Estável</span>';
+
+            if (delta < -0.15) trendHtml = '<span style="color:#f87171;">🔻 Queda (' + delta.toFixed(1) + ')</span>';
+            else if (delta > 0.15) trendHtml = '<span style="color:#34d399;">🔺 Alta (+' + delta.toFixed(1) + ')</span>';
+
+            if (lastVal < 3.65) {
+                badgeClass = 'badge-red'; label = '🔴 RISCO ESTOL';
+                action = 'Intervenção Tática NR-17 + Poda 40%';
+            } else if (lastVal < 4.25) {
+                badgeClass = 'badge-yellow'; label = '🟡 ATENÇÃO';
+                action = 'Rodízio de posto + Pausa Tática 15 min';
+            }
+
+            var absVal = ((5.0 - lastVal) * 1.5).toFixed(1) + '%';
+
+            var tr = document.createElement('tr');
+            tr.innerHTML = 
+                '<td style="font-weight:800; color:#fff;">' + sec + '</td>' +
+                '<td style="font-weight:800; color:var(--accent);">' + lastVal.toFixed(2) + '</td>' +
+                '<td>' + trendHtml + '</td>' +
+                '<td style="color:#fbbf24; font-weight:700;">' + absVal + '</td>' +
+                '<td><span class="badge ' + badgeClass + '">' + label + '</span><br><span style="font-size:10px; color:var(--muted);">' + action + '</span></td>';
+            tbody.appendChild(tr);
+        });
+    }
+
+    function initChart() {
+        var ctx = document.getElementById('trendChart').getContext('2d');
+        myTrendChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#94a3b8', font: { weight: 'bold', size: 11 } } }
+                },
+                scales: {
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                    y: { min: 1, max: 5, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+                }
+            }
+        });
+    }
+
+    function updateChart() {
+        if (!myTrendChart) return;
+        var pData = rawData[currentPeriod];
+        var selectedSector = document.getElementById('selChartSector').value;
+
+        myTrendChart.data.labels = pData.labels;
+        myTrendChart.data.datasets = [];
+
+        var colors = ['#38bdf8', '#34d399', '#f87171', '#fbbf24', '#c084fc', '#f43f5e'];
+
+        if (selectedSector === 'ALL') {
+            sectorNames.forEach(function(sec, idx) {
+                myTrendChart.data.datasets.push({
+                    label: sec,
+                    data: pData.scores[sec],
+                    borderColor: colors[idx % colors.length],
+                    backgroundColor: colors[idx % colors.length],
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 4
+                });
+            });
+        } else {
+            myTrendChart.data.datasets.push({
+                label: selectedSector,
+                data: pData.scores[selectedSector] || [],
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5
+            });
+        }
+
+        myTrendChart.update();
+    }
+</script>
+
+</body>
+</html>
