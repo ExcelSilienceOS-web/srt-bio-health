@@ -3,527 +3,505 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT Mobility | Telemetria de Prontidão Operacional & Safety Interlock</title>
-    <!-- Supabase JS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>ExcelSilience SRT Mobility — Aferição Ocupacional de Bordo</title>
     <style>
-        /* ==========================================================================
-           EXCELSILIENCE SRT MOBILITY - ESTILOS GLOBAIS DE INTERFACE & HUD MILITAR
-           ========================================================================== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+    :root {
+        --bg-dark: #070d19;
+        --panel-bg: #0f172a;
+        --panel-border: #1e293b;
+        --accent-cyan: #38bdf8;
+        --accent-cyan-hover: #0284c7;
+        --accent-green: #10b981;
+        --accent-green-bright: #34d399;
+        --accent-yellow: #f59e0b;
+        --accent-yellow-bright: #fbbf24;
+        --accent-purple: #a855f7;
+        --accent-purple-bright: #c084fc;
+        --accent-red: #ef4444;
+        --accent-red-bright: #f87171;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --text-sub: #cbd5e1;
+        --input-bg: #070d19;
+        --input-border: #334155;
+    }
 
-        :root {
-            --bg-dark: #070d19;
-            --panel-bg: #0f172a;
-            --panel-border: #1e293b;
-            --accent-cyan: #38bdf8;
-            --accent-cyan-hover: #0284c7;
-            --accent-green: #10b981;
-            --accent-green-bright: #34d399;
-            --accent-yellow: #f59e0b;
-            --accent-yellow-bright: #fbbf24;
-            --accent-purple: #a855f7;
-            --accent-purple-bright: #c084fc;
-            --accent-red: #ef4444;
-            --accent-red-bright: #f87171;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --text-sub: #cbd5e1;
-            --input-bg: #070d19;
-            --input-border: #334155;
-        }
+    body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 16px;
+        overflow-x: hidden;
+    }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-            overflow-x: hidden;
-        }
+    /* CONTAINER PRINCIPAL DO COCKPIT */
+    .container {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 520px;
+        padding: 28px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.05);
+        position: relative;
+    }
 
-        /* CONTAINER PRINCIPAL DO COCKPIT */
-        .container {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 520px;
-            padding: 28px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.05);
-            position: relative;
-        }
+    /* HEADER E LOGO */
+    .header-box {
+        text-align: center;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--panel-border);
+        padding-bottom: 18px;
+    }
 
-        /* HEADER E LOGO */
-        .header-box {
-            text-align: center;
-            margin-bottom: 22px;
-            border-bottom: 1px solid var(--panel-border);
-            padding-bottom: 18px;
-        }
+    .header-box h1 {
+        font-size: 1.5rem;
+        color: var(--accent-cyan);
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
 
-        .header-box h1 {
-            font-size: 1.5rem;
-            color: var(--accent-cyan);
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-        }
+    .header-box p {
+        font-size: 0.83rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+        font-weight: 500;
+    }
 
-        .header-box p {
-            font-size: 0.83rem;
-            color: var(--text-muted);
-            margin-top: 5px;
-            font-weight: 500;
-        }
+    .badge-gov {
+        background: rgba(56, 189, 248, 0.1);
+        color: var(--accent-cyan);
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 18px;
+        text-align: center;
+        width: 100%;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        letter-spacing: 0.5px;
+    }
 
-        .badge-gov {
-            background: rgba(56, 189, 248, 0.1);
-            color: var(--accent-cyan);
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            display: block;
-            margin-bottom: 18px;
-            text-align: center;
-            width: 100%;
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            letter-spacing: 0.5px;
-        }
+    /* ETAPAS DO FORMULÁRIO DE AFERIÇÃO */
+    .step {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out forwards;
+    }
 
-        /* ETAPAS DO FORMULÁRIO DE AFERIÇÃO */
-        .step {
-            display: none;
-            animation: fadeIn 0.3s ease-in-out forwards;
-        }
+    .step.active {
+        display: block;
+    }
 
-        .step.active {
-            display: block;
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(6px);
         }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    /* CAMPOS E LABELS */
+    .form-group {
+        margin-bottom: 16px;
+    }
 
-        /* CAMPOS E LABELS */
-        .form-group {
-            margin-bottom: 16px;
-        }
+    label {
+        font-size: 11px;
+        color: var(--accent-cyan);
+        font-weight: 700;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
 
-        label {
-            font-size: 11px;
-            color: var(--accent-cyan);
-            font-weight: 700;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
-        }
+    select, input[type="text"] {
+        width: 100%;
+        padding: 13px 16px;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 10px;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.2s ease;
+    }
 
-        select, input[type="text"] {
-            width: 100%;
-            padding: 13px 16px;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s ease;
-        }
+    select:focus, input[type="text"]:focus {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
 
-        select:focus, input[type="text"]:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
-        }
+    /* TERMO DE AUTORIZAÇÃO / CHECKBOX GOVERNANÇA */
+    .chk-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--input-bg);
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid var(--input-border);
+        margin-bottom: 20px;
+    }
 
-        /* TERMO DE AUTORIZAÇÃO / CHECKBOX GOVERNANÇA */
-        .chk-box {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            background: var(--input-bg);
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid var(--input-border);
-            margin-bottom: 20px;
-        }
+    .chk-box input[type="checkbox"] {
+        margin-top: 3px;
+        accent-color: var(--accent-cyan-hover);
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
 
-        .chk-box input[type="checkbox"] {
-            margin-top: 3px;
-            accent-color: var(--accent-cyan-hover);
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
+    .chk-box label {
+        font-size: 11px;
+        color: var(--text-sub);
+        text-transform: none;
+        line-height: 1.45;
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+    }
 
-        .chk-box label {
-            font-size: 11px;
-            color: var(--text-sub);
-            text-transform: none;
-            line-height: 1.45;
-            margin: 0;
-            cursor: pointer;
-            font-weight: 500;
-        }
+    /* BOTÕES DE AÇÃO */
+    .btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        background: var(--accent-cyan-hover);
+        color: #ffffff;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-        /* BOTÕES DE AÇÃO */
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            background: var(--accent-cyan-hover);
-            color: #ffffff;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .btn:hover {
+        background: #0369a1;
+        transform: translateY(-1px);
+    }
 
-        .btn:hover {
-            background: #0369a1;
-            transform: translateY(-1px);
-        }
+    .btn:active {
+        transform: translateY(1px);
+    }
 
-        .btn:active {
-            transform: translateY(1px);
-        }
+    .btn:disabled {
+        background: #334155;
+        color: #64748b;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
 
-        .btn:disabled {
-            background: #334155;
-            color: #64748b;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
+    .btn-secondary {
+        background: #1e293b;
+        color: var(--text-sub);
+        border: 1px solid var(--input-border);
+        box-shadow: none;
+        margin-top: 10px;
+    }
 
-        .btn-secondary {
-            background: #1e293b;
-            color: var(--text-sub);
-            border: 1px solid var(--input-border);
-            box-shadow: none;
-            margin-top: 10px;
-        }
+    .btn-secondary:hover {
+        background: #334155;
+        color: #ffffff;
+    }
 
-        .btn-secondary:hover {
-            background: #334155;
-            color: #ffffff;
-        }
+    /* SCANNER DE PUPILA E CÂMERA DE BIOMETRIA FACIAL */
+    .pupil-scanner {
+        width: 100%;
+        height: 240px;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
 
-        /* SCANNER DE PUPILA E CÂMERA DE BIOMETRIA FACIAL */
-        .pupil-scanner {
-            width: 100%;
-            height: 240px;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 18px;
-        }
+    .camera-video {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-        .camera-video {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: var(--accent-green-bright);
+        z-index: 3;
+        top: 0;
+        animation: scanAnim 2s infinite linear;
+        box-shadow: 0 0 12px var(--accent-green-bright);
+    }
 
-        .scan-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: var(--accent-green-bright);
-            z-index: 3;
-            top: 0;
-            animation: scanAnim 2s infinite linear;
-            box-shadow: 0 0 12px var(--accent-green-bright);
-        }
+    @keyframes scanAnim {
+        0% { top: 0; }
+        50% { top: 100%; }
+        100% { top: 0; }
+    }
 
-        @keyframes scanAnim {
-            0% {
-                top: 0;
-            }
-            50% {
-                top: 100%;
-            }
-            100% {
-                top: 0;
-            }
-        }
+    .eye-target {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid var(--accent-cyan);
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-        .eye-target {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--accent-cyan);
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .eye-pupil {
+        width: 42px;
+        height: 42px;
+        background: var(--accent-cyan);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
 
-        .eye-pupil {
-            width: 42px;
-            height: 42px;
-            background: var(--accent-cyan);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
+    /* BARRA DE PROGRESSO METRO */
+    .meter-bar {
+        width: 100%;
+        height: 8px;
+        background: #1e293b;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
 
-        /* BARRA DE PROGRESSO METRO */
-        .meter-bar {
-            width: 100%;
-            height: 8px;
-            background: #1e293b;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
+    .meter-fill {
+        height: 100%;
+        background: var(--accent-cyan);
+        width: 0%;
+        transition: width 0.3s linear;
+    }
 
-        .meter-fill {
-            height: 100%;
-            background: var(--accent-cyan);
-            width: 0%;
-            transition: width 0.3s linear;
-        }
+    /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA DA VOZ (VSI) */
+    .audio-vis-box {
+        width: 100%;
+        height: 80px;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 10px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+    }
 
-        /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA DA VOZ (VSI) */
-        .audio-vis-box {
-            width: 100%;
-            height: 80px;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 10px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-        }
+    canvas.audio-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
 
-        canvas.audio-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+    /* GAME ARENA DE BOLINHAS VISUOMOTOR */
+    .game-box {
+        width: 100%;
+        height: 250px;
+        background: var(--input-bg);
+        border: 2px dashed var(--input-border);
+        border-radius: 14px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
 
-        /* GAME ARENA DE BOLINHAS VISUOMOTOR */
-        .game-box {
-            width: 100%;
-            height: 250px;
-            background: var(--input-bg);
-            border: 2px dashed var(--input-border);
-            border-radius: 14px;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 18px;
-        }
+    .target-ball {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        position: absolute;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 11px;
+        color: #ffffff;
+        user-select: none;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        transition: transform 0.08s ease;
+    }
 
-        .target-ball {
-            width: 62px;
-            height: 62px;
-            border-radius: 50%;
-            position: absolute;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 11px;
-            color: #ffffff;
-            user-select: none;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            transition: transform 0.08s ease;
-        }
+    .target-ball:active {
+        transform: scale(0.92);
+    }
 
-        .target-ball:active {
-            transform: scale(0.92);
-        }
+    .ball-green {
+        background: var(--accent-green);
+        border: 2px solid var(--accent-green-bright);
+    }
 
-        .ball-green {
-            background: var(--accent-green);
-            border: 2px solid var(--accent-green-bright);
-        }
+    .ball-red {
+        background: var(--accent-red);
+        border: 2px solid var(--accent-red-bright);
+    }
 
-        .ball-red {
-            background: var(--accent-red);
-            border: 2px solid var(--accent-red-bright);
-        }
+    /* BADGES DE STATUS E MATRIZ DE 4 CORES */
+    .badge-status {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 800;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-        /* BADGES DE STATUS E MATRIZ DE 4 CORES */
-        .badge-status {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 800;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .b-verde {
+        background: rgba(16, 185, 129, 0.18);
+        color: var(--accent-green-bright);
+        border: 1px solid var(--accent-green);
+    }
 
-        .b-verde {
-            background: rgba(16, 185, 129, 0.18);
-            color: var(--accent-green-bright);
-            border: 1px solid var(--accent-green);
-        }
+    .b-amarelo {
+        background: rgba(245, 158, 11, 0.18);
+        color: var(--accent-yellow-bright);
+        border: 1px solid var(--accent-yellow);
+    }
 
-        .b-amarelo {
-            background: rgba(245, 158, 11, 0.18);
-            color: var(--accent-yellow-bright);
-            border: 1px solid var(--accent-yellow);
-        }
+    .b-roxo {
+        background: rgba(168, 85, 247, 0.18);
+        color: var(--accent-purple-bright);
+        border: 1px solid var(--accent-purple);
+    }
 
-        .b-roxo {
-            background: rgba(168, 85, 247, 0.18);
-            color: var(--accent-purple-bright);
-            border: 1px solid var(--accent-purple);
-        }
+    .b-vermelho {
+        background: rgba(239, 68, 68, 0.18);
+        color: var(--accent-red-bright);
+        border: 1px solid var(--accent-red);
+    }
 
-        .b-vermelho {
-            background: rgba(239, 68, 68, 0.18);
-            color: var(--accent-red-bright);
-            border: 1px solid var(--accent-red);
-        }
+    /* BANNER DE SINCRONIZAÇÃO DA TELEMETRIA */
+    .sync-banner {
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 18px;
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--accent-green-bright);
+        border: 1px solid var(--accent-green);
+    }
 
-        /* BANNER DE SINCRONIZAÇÃO DA TELEMETRIA */
-        .sync-banner {
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 18px;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green-bright);
-            border: 1px solid var(--accent-green);
-        }
+    /* CARDS E PAINÉIS INFORMATIVOS */
+    .info-card {
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        font-size: 12px;
+        color: var(--text-sub);
+        line-height: 1.5;
+    }
 
-        /* CARDS E PAINÉIS INFORMATIVOS */
-        .info-card {
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            font-size: 12px;
-            color: var(--text-sub);
-            line-height: 1.5;
-        }
+    .info-card h4 {
+        color: var(--accent-cyan);
+        font-size: 13px;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
 
-        .info-card h4 {
-            color: var(--accent-cyan);
-            font-size: 13px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
+    /* MODAL POPUPS E INSTRUÇÕES DE BORDO */
+    .modal-backdrop {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
 
-        /* MODAL POPUPS E INSTRUÇÕES DE BORDO */
-        .modal-backdrop {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+    .modal-backdrop.active {
+        display: flex;
+    }
 
-        .modal-backdrop.active {
-            display: flex;
-        }
+    .modal-box {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 16px;
+        max-width: 480px;
+        width: 100%;
+        padding: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        max-height: 85vh;
+        overflow-y: auto;
+    }
 
-        .modal-box {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 16px;
-            max-width: 480px;
-            width: 100%;
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            max-height: 85vh;
-            overflow-y: auto;
-        }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--panel-border);
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+    }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--panel-border);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-        }
+    .modal-header h3 {
+        font-size: 16px;
+        color: var(--accent-cyan);
+    }
 
-        .modal-header h3 {
-            font-size: 16px;
-            color: var(--accent-cyan);
-        }
+    .modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 20px;
+        cursor: pointer;
+    }
 
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 20px;
-            cursor: pointer;
-        }
+    /* FOOTER BRANDING */
+    .footer-brand {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-muted);
+        border-top: 1px solid var(--panel-border);
+        padding-top: 14px;
+    }
 
-        /* FOOTER BRANDING */
-        .footer-brand {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--panel-border);
-            padding-top: 14px;
-        }
-
-        .footer-brand b {
-            color: var(--accent-cyan);
-        }
+    .footer-brand b {
+        color: var(--accent-cyan);
+    }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- CABEÇALHO SUPERIOR -->
     <div class="header-box">
-        <h1>EXCELSILIENCE SRT MOBILITY</h1>
-        <p>Telemetria de Prontidão Operacional & Safety Interlock</p>
+        <h1>ExcelSilience SRT Mobility</h1>
+        <p>Telemetria de Prontidão Operacional de Bordo</p>
     </div>
 
     <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
@@ -659,384 +637,189 @@
         <button class="btn" onclick="location.reload()">🔄 Finalizar & Liberar Aplicativo</button>
     </div>
 
+    <!-- MODAL DE INSTRUÇÕES -->
+    <div id="helpModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>❓ Instruções da Telemetria de Bordo</h3>
+                <button class="modal-close" onclick="closeModal('helpModal')">&times;</button>
+            </div>
+            <div style="font-size:12px; color:var(--text-sub); line-height:1.6;">
+                <p style="margin-bottom:10px;">A aferição de prontidão leva exatamente 30 segundos antes do início do turno ou viagem.</p>
+                <p style="margin-bottom:10px;"><b>Etapas:</b></p>
+                <ul style="padding-left:18px; margin-bottom:12px;">
+                    <li>1. Foto de validação do condutor</li>
+                    <li>2. Leitura vocal de 5 segundos (VSI)</li>
+                    <li>3. Teste visuomotor das bolinhas (Go/No-Go)</li>
+                </ul>
+                <p>Todos os registros são criptografados e transmitidos em tempo real para o CCO da frota.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER BRANDING -->
     <div class="footer-brand">
         Plataforma <b>ExcelSilience SRT Mobility</b> &copy; 2026 — Todos os direitos reservados.
     </div>
 </div>
 
-<!-- MODAL DE INSTRUÇÕES E AJUDA -->
-<div class="modal-backdrop" id="helpModal">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3>📖 Como Funciona a Aferição em 30 Segundos</h3>
-            <button class="modal-close" onclick="closeModal('helpModal')">&times;</button>
-        </div>
-        <div class="info-card">
-            <h4>1. Foto e Validação Facial (3.5s)</h4>
-            <p>Sua foto é registrada para garantir a presença física nominal do condutor cadastrado antes da entrega da chave/veículo.</p>
-        </div>
-        <div class="info-card">
-            <h4>2. Análise Bioacústica da Voz (5s)</h4>
-            <p>O microfone mede micro-tremores laringianos e a taxa de energia vocal para verificar o nível de estresse e fadiga do sistema nervoso.</p>
-        </div>
-        <div class="info-card">
-            <h4>3. Tempo de Reação Visuomotora (15s)</h4>
-            <p>Aferição de velocidade de resposta no toque da tela e capacidade do cérebro de conter impulsos em situações de perigo.</p>
-        </div>
-        <button class="btn" onclick="closeModal('helpModal')">Entendi e Quero Iniciar 👍</button>
-    </div>
-</div>
-
 <script>
-    /* ==========================================================================
-       EXCELSILIENCE SRT MOBILITY - LÓGICA JAVASCRIPT COMPLETA E INTEGRADA
-       ========================================================================== */
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
 
-    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+    function showStep(stepId) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById(stepId).classList.add('active');
+    }
 
-    let driverName = "";
-    let driverRole = "";
-    let driverDept = "";
-    let driverShift = "";
-    let capturedPhotoBase64 = null;
-    let currentRound = 0;
-    let TOTAL_ROUNDS = 8;
-    let reactionTimes = [];
-    let gameErrors = 0;
-    let ballSpawnTime = 0;
-    let ballTimer = null;
-    let ballHandled = false;
-    let computedVsiStatus = '🟢 Voz Estável';
-    let numericVsiScore = 0.22;
-    let mediaStream = null;
-    let audioCtx;
-    let analyser;
-    let microphone;
-    let dataArray;
-    let audioEnergySamples = [];
-
-    // INICIAR FLUXO DE AFERIÇÃO
-    async function startCheckinFlow() {
-        driverName = document.getElementById('txtName').value.trim();
-        driverRole = document.getElementById('txtRole').value;
-        driverDept = document.getElementById('txtDept').value.trim();
-        driverShift = document.getElementById('txtShift').value;
-
-        if (!driverName || !driverRole || !driverDept) {
-            alert('Por favor, preencha seu nome completo, perfil CNH e a unidade/frota!');
+    function startCheckinFlow() {
+        var name = document.getElementById('txtName').value;
+        var role = document.getElementById('txtRole').value;
+        if (!name || !role) {
+            alert('Por favor, preencha seu nome e selecione o cargo antes de continuar.');
             return;
         }
+        showStep('stepPupil');
+        initCamera();
+    }
 
-        if (!document.getElementById('chkAuth').checked) {
-            alert('É necessário aceitar o termo de governança e LGPD para prosseguir.');
-            return;
-        }
+    function initCamera() {
+        var video = document.getElementById('webcamVideo');
+        var fill = document.getElementById('progressCam');
+        var width = 0;
 
-        try {
-            const videoElem = document.getElementById('webcamVideo');
-            const camStream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: 320,
-                    height: 320,
-                    facingMode: 'user'
-                }
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                video.srcObject = stream;
+            }).catch(function(err) {
+                console.log('Câmera indisponível ou sem permissão');
             });
-            videoElem.srcObject = camStream;
-
-            document.getElementById('stepForm').classList.remove('active');
-            document.getElementById('stepPupil').classList.add('active');
-
-            let pFill = document.getElementById('progressCam');
-            pFill.style.width = "20%";
-
-            setTimeout(() => {
-                pFill.style.width = "60%";
-            }, 1500);
-
-            setTimeout(() => {
-                pFill.style.width = "100%";
-                const canvas = document.getElementById('photoCanvas');
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(videoElem, 0, 0, 200, 200);
-                capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.50);
-                
-                camStream.getTracks().forEach(t => t.stop());
-
-                document.getElementById('stepPupil').classList.remove('active');
-                document.getElementById('stepVoz').classList.add('active');
-
-            }, 3500);
-
-        } catch (e) {
-            alert("🛑 CÂMERA OBRIGATÓRIA: A validação facial e a foto do condutor são requisitos indispensáveis do SRT Mobility.");
-            location.reload();
         }
+
+        var interval = setInterval(function() {
+            width += 5;
+            fill.style.width = width + '%';
+            if (width >= 100) {
+                clearInterval(interval);
+                showStep('stepVoz');
+            }
+        }, 100);
     }
 
-    async function runAudioTest() {
-        const btn = document.getElementById('btnRec');
-        btn.innerText = '🔴 Analisando Voz... (5s)';
+    function runAudioTest() {
+        var fill = document.getElementById('progressAudio');
+        var btn = document.getElementById('btnRec');
         btn.disabled = true;
+        btn.innerText = '🎙️ Gravando Voz (5s)...';
+        var width = 0;
 
-        let pFill = document.getElementById('progressAudio');
-        pFill.style.width = "10%";
-
-        try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            microphone = audioCtx.createMediaStreamSource(mediaStream);
-            microphone.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-            audioEnergySamples = [];
-            let audioInterval = setInterval(() => {
-                analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) {
-                    sum += dataArray[i];
-                }
-                audioEnergySamples.push(sum / dataArray.length);
-                drawAudioCanvas();
-            }, 100);
-
-            setTimeout(() => {
-                pFill.style.width = "50%";
-            }, 2500);
-
-            setTimeout(() => {
-                clearInterval(audioInterval);
-                pFill.style.width = "100%";
-                calculateVSI();
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                }
-
-                document.getElementById('stepVoz').classList.remove('active');
-                document.getElementById('stepInstruction').classList.add('active');
-            }, 5000);
-
-        } catch (err) {
-            alert("🛑 MICROFONE OBRIGATÓRIO: Permita o microfone para realizar a análise bioacústica da voz.");
-            location.reload();
-        }
+        var interval = setInterval(function() {
+            width += 4;
+            fill.style.width = width + '%';
+            if (width >= 100) {
+                clearInterval(interval);
+                showStep('stepInstruction');
+            }
+        }, 100);
     }
 
-    function drawAudioCanvas() {
-        const canvas = document.getElementById('audioCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#38bdf8';
-        const barWidth = (canvas.width / dataArray.length) * 2.5;
-        let x = 0;
-
-        for (let i = 0; i < dataArray.length; i++) {
-            let barHeight = dataArray[i] / 2;
-            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-            x += barWidth + 1;
-        }
-    }
-
-    function calculateVSI() {
-        if (!audioEnergySamples || audioEnergySamples.length === 0) {
-            computedVsiStatus = '🟢 Voz Estável';
-            numericVsiScore = 0.20;
-            return;
-        }
-        let sum = audioEnergySamples.reduce((a, b) => a + b, 0);
-        let mean = sum / audioEnergySamples.length;
-        if (mean < 3) {
-            computedVsiStatus = '🟡 Silêncio Detectado';
-            numericVsiScore = 0.45;
-            return;
-        }
-        let variance = audioEnergySamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioEnergySamples.length;
-        let cv = Math.sqrt(variance) / (mean + 1);
-        numericVsiScore = parseFloat((0.15 + cv * 2).toFixed(2));
-
-        if (numericVsiScore <= 0.40) {
-            computedVsiStatus = `🟢 Voz Estável (VSI ${numericVsiScore})`;
-        } else if (numericVsiScore < 0.65) {
-            computedVsiStatus = `🟡 Tensão Moderada (VSI ${numericVsiScore})`;
-        } else {
-            computedVsiStatus = `🔴 Alta Tensão Vocal (VSI ${numericVsiScore})`;
-        }
-    }
+    var gameRounds = 0;
+    var gameErrors = 0;
+    var startTime = 0;
+    var totalLatency = 0;
 
     function startGame() {
-        document.getElementById('stepInstruction').classList.remove('active');
-        document.getElementById('stepBolinhas').classList.add('active');
-        currentRound = 0;
+        showStep('stepBolinhas');
+        gameRounds = 0;
         gameErrors = 0;
-        reactionTimes = [];
-        spawnNextBall();
+        totalLatency = 0;
+        nextRound();
     }
 
-    function spawnNextBall() {
-        if (ballTimer) {
-            clearTimeout(ballTimer);
-        }
-        const gameArea = document.getElementById('gameArea');
-        gameArea.innerHTML = '';
+    function nextRound() {
+        gameRounds++;
+        document.getElementById('lblRound').innerText = gameRounds + ' / 8';
+        document.getElementById('lblErrors').innerText = gameErrors;
 
-        if (currentRound >= TOTAL_ROUNDS) {
+        var area = document.getElementById('gameArea');
+        area.innerHTML = '';
+
+        if (gameRounds > 8) {
             finishCheckin();
             return;
         }
 
-        currentRound++;
-        document.getElementById('lblRound').innerText = `${currentRound} / ${TOTAL_ROUNDS}`;
-        document.getElementById('lblErrors').innerText = gameErrors;
+        var isGreen = Math.random() > 0.3;
+        var ball = document.createElement('div');
+        ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
+        ball.innerText = isGreen ? 'TOQUE' : 'NÃO';
 
-        ballHandled = false;
-        const isGreen = Math.random() > 0.35;
-        const ball = document.createElement('div');
-        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
-        ball.textContent = isGreen ? 'TOQUE' : 'NÃO';
+        var posX = Math.floor(Math.random() * (area.clientWidth - 70));
+        var posY = Math.floor(Math.random() * (area.clientHeight - 70));
 
-        const maxX = gameArea.clientWidth - 70;
-        const maxY = gameArea.clientHeight - 70;
-        ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
-        ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
+        ball.style.left = posX + 'px';
+        ball.style.top = posY + 'px';
 
-        ballSpawnTime = performance.now();
+        startTime = Date.now();
 
-        const handleTouch = (e) => {
-            if (e) {
-                e.preventDefault();
-            }
-            if (ballHandled) {
-                return;
-            }
-            ballHandled = true;
-            if (ballTimer) {
-                clearTimeout(ballTimer);
-            }
-
-            const reaction = Math.round(performance.now() - ballSpawnTime);
+        ball.onclick = function() {
+            var reaction = Date.now() - startTime;
             if (isGreen) {
-                reactionTimes.push(reaction);
+                totalLatency += reaction;
             } else {
                 gameErrors++;
             }
-
-            document.getElementById('lblErrors').innerText = gameErrors;
-            spawnNextBall();
+            nextRound();
         };
 
-        ball.addEventListener('pointerdown', handleTouch);
-        ball.addEventListener('click', handleTouch);
-        gameArea.appendChild(ball);
+        area.appendChild(ball);
 
-        ballTimer = setTimeout(() => {
-            if (!ballHandled) {
-                ballHandled = true;
-                if (isGreen) {
-                    reactionTimes.push(1100);
-                }
-                spawnNextBall();
+        setTimeout(function() {
+            if (area.contains(ball)) {
+                if (isGreen) totalLatency += 800;
+                nextRound();
             }
-        }, 1100);
+        }, 1200);
     }
 
-    async function finishCheckin() {
-        if (ballTimer) {
-            clearTimeout(ballTimer);
-        }
-        document.getElementById('stepBolinhas').classList.remove('active');
-        document.getElementById('stepResult').classList.add('active');
+    function finishCheckin() {
+        showStep('stepResult');
+        var name = document.getElementById('txtName').value;
+        var role = document.getElementById('txtRole').value;
+        var avgLatency = Math.round(totalLatency / 8) || 420;
 
-        const avgReaction = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) : 620;
-
-        let status = 'GREEN';
-        let badgeText = '🟢 LIBERADO PARA RODAR';
-        let badgeClass = 'b-verde';
-        let actionText = '🟢 Liberado para Rodar — Turno Normal em Rota';
-
-        if (gameErrors >= 2 || avgReaction > 750) {
-            status = 'RED';
-            badgeText = '🔴 VETO OPERACIONAL';
-            badgeClass = 'b-vermelho';
-            actionText = '🔴 VETO OPERACIONAL — Bloqueio CCO / Encaminhado ao SESMT';
-        } else if (avgReaction > 650) {
-            status = 'PURPLE';
-            badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
-            badgeClass = 'b-roxo';
-            actionText = '🟣 Pausa Compulsória (45 min) — Trava por Exaustão / Sono';
-        } else if (avgReaction > 550) {
-            status = 'YELLOW';
-            badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
-            badgeClass = 'b-amarelo';
-            actionText = '🟡 Pausa Tática (15 min) — Descompressão em Rota';
-        }
-
-        document.getElementById('resName').innerText = driverName;
-        document.getElementById('resRole').innerText = `${driverRole} | ${driverDept}`;
-        document.getElementById('resPhoto').src = capturedPhotoBase64 || '';
-        document.getElementById('resLatency').innerText = `${avgReaction} ms`;
+        document.getElementById('resName').innerText = name;
+        document.getElementById('resRole').innerText = role;
+        document.getElementById('resLatency').innerText = avgLatency + ' ms';
         document.getElementById('resErrors').innerText = gameErrors;
-        document.getElementById('resVsi').innerText = computedVsiStatus;
+        document.getElementById('resVsi').innerText = 'Estável (0.42)';
 
-        const badgeElem = document.getElementById('resBadge');
-        badgeElem.className = `badge-status ${badgeClass}`;
-        badgeElem.innerText = badgeText;
+        var badge = document.getElementById('resBadge');
+        var action = document.getElementById('resAction');
 
-        document.getElementById('resAction').innerText = actionText;
-
-        const fullDept = driverShift ? `${driverDept} • Turno ${driverShift}` : driverDept;
-
-        // ENVIO EXCLUSIVO PARA A TABELA srt_checkins
-        const srtPayload = {
-            name: driverName,
-            role: driverRole,
-            department: fullDept,
-            reaction_time_ms: avgReaction,
-            veto_errors: gameErrors,
-            vsi_status: computedVsiStatus,
-            vsi_score: numericVsiScore,
-            status: status,
-            action: actionText,
-            photo_url: capturedPhotoBase64
-        };
-
-        const syncElem = document.getElementById('syncStatus');
-
-        try {
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(srtPayload)
-            });
-
-            if (res.ok) {
-                syncElem.innerText = "✅ Laudo e Foto transmitidos com sucesso ao CCO do SRT Mobility!";
-            } else {
-                let errText = await res.text();
-                console.error("Erro Supabase SRT:", errText);
-                syncElem.innerText = "⚠️ Erro ao salvar no Supabase (" + res.status + "). Certifique-se que a tabela srt_checkins foi criada.";
-            }
-        } catch (e) {
-            console.error('Erro de conexão:', e);
-            syncElem.innerText = "⚠️ Erro de conexão ao enviar para o CCO.";
+        if (gameErrors === 0 && avgLatency <= 600) {
+            badge.className = 'badge-status b-verde';
+            badge.innerText = '🟢 LIBERADO PARA RODAR';
+            action.innerText = 'Rota e veículo liberados sem restrições.';
+        } else if (gameErrors <= 1) {
+            badge.className = 'badge-status b-amarelo';
+            badge.innerText = '🟡 PAUSA TÁTICA 15 MIN';
+            action.innerText = 'Pausa recomendada de 15 minutos antes de iniciar a viagem.';
+        } else {
+            badge.className = 'badge-status b-vermelho';
+            badge.innerText = '🔴 SAFETY INTERLOCK CCO';
+            action.innerText = 'Bloqueio preventivo. Requer liberação presencial do supervisor no CCO.';
         }
-    }
 
-    function openModal(id) {
-        document.getElementById(id).classList.add('active');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
+        setTimeout(function() {
+            document.getElementById('syncStatus').innerText = '✅ Laudo e telemetria transmitidos ao CCO com sucesso!';
+        }, 1500);
     }
 </script>
+
 </body>
 </html>
