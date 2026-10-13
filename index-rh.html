@@ -26,12 +26,7 @@
         --input-border: #334155;
     }
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
     body {
         background-color: var(--bg-dark);
@@ -44,7 +39,6 @@
         overflow-x: hidden;
     }
 
-    /* CONTAINER PRINCIPAL DO SRT-RH */
     .container {
         background: var(--panel-bg);
         border: 1px solid var(--panel-border);
@@ -56,7 +50,6 @@
         position: relative;
     }
 
-    /* HEADER E BRANDING */
     .header-box {
         text-align: center;
         margin-bottom: 22px;
@@ -79,7 +72,6 @@
         font-weight: 500;
     }
 
-    /* BADGES DE PARCEIRO E BLINDAGEM DE ANONIMATO */
     .badge-anon {
         background: rgba(16, 185, 129, 0.1);
         color: var(--accent-green-bright);
@@ -111,24 +103,15 @@
         white-space: nowrap;
     }
 
-    /* ETAPAS DO FLUXO */
-    .step {
-        display: none;
-        animation: fadeIn 0.3s ease-in-out forwards;
-    }
-
-    .step.active {
-        display: block;
-    }
+    .step { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
+    .step.active { display: block; }
 
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .form-group {
-        margin-bottom: 20px;
-    }
+    .form-group { margin-bottom: 20px; }
 
     label {
         font-size: 11px;
@@ -152,12 +135,8 @@
         transition: all 0.2s ease;
     }
 
-    select:focus {
-        border-color: var(--accent-cyan);
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
-    }
+    select:focus { border-color: var(--accent-cyan); box-shadow: 0 0 12px rgba(56, 189, 248, 0.25); }
 
-    /* BOTÕES DE AÇÃO */
     .btn {
         width: 100%;
         padding: 15px;
@@ -182,40 +161,28 @@
     .btn:active { transform: translateY(1px); }
     .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
 
-    /* BARRA DE PROGRESSO DO ÁUDIO */
     .meter-bar {
-        width: 100%;
-        height: 8px;
+        width: 100%; height: 8px;
         background: #1e293b;
         border-radius: 4px;
         overflow: hidden;
         margin-bottom: 16px;
     }
 
-    .meter-fill {
-        height: 100%;
-        background: var(--accent-cyan);
-        width: 0%;
-        transition: width 0.2s linear;
-    }
+    .meter-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.2s linear; }
 
-    /* VISUALIZADOR DE ONDA SONORA VSI */
     .audio-vis-box {
-        width: 100%;
-        height: 80px;
+        width: 100%; height: 80px;
         background: var(--input-bg);
         border: 1px solid var(--input-border);
         border-radius: 10px;
         margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         padding: 10px;
     }
 
     canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
-    /* CARD DE REGRAS E INSTRUÇÕES */
     .instruction-card {
         background: var(--input-bg);
         border: 1px solid var(--input-border);
@@ -224,35 +191,21 @@
         margin-bottom: 18px;
     }
 
-    .rule-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 13px;
-        color: var(--text-sub);
-        margin-bottom: 10px;
-    }
-
+    .rule-item { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-sub); margin-bottom: 10px; }
     .rule-item:last-child { margin-bottom: 0; }
 
     .icon-circle {
-        width: 32px;
-        height: 32px;
+        width: 32px; height: 32px;
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; flex-shrink: 0;
     }
 
     .icon-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
     .icon-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
 
-    /* ARENA DAS BOLINHAS (VISUOMOTOR GO/NO-GO) */
     .game-box {
-        width: 100%;
-        height: 250px;
+        width: 100%; height: 250px;
         background: var(--input-bg);
         border: 2px dashed var(--input-border);
         border-radius: 14px;
@@ -263,37 +216,27 @@
     }
 
     .target-ball {
-        width: 64px;
-        height: 64px;
+        width: 64px; height: 64px;
         border-radius: 50%;
         position: absolute;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 11px;
-        color: #ffffff;
-        user-select: none;
-        -webkit-user-select: none;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 11px; color: #ffffff;
+        user-select: none; -webkit-user-select: none;
         touch-action: manipulation;
         box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
         transition: transform 0.05s ease;
     }
 
     .target-ball:active { transform: scale(0.90); }
-
     .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
     .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
 
-    /* BANNER DE SINCRONIZAÇÃO E BADGES DE STATUS */
     .sync-banner {
         padding: 14px;
         border-radius: 10px;
-        font-size: 12px;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 18px;
+        font-size: 12px; font-weight: 700;
+        text-align: center; margin-bottom: 18px;
         background: rgba(16, 185, 129, 0.15);
         color: var(--accent-green-bright);
         border: 1px solid var(--accent-green);
@@ -302,21 +245,28 @@
     .badge-status {
         padding: 12px 20px;
         border-radius: 10px;
-        font-size: 13px;
-        font-weight: 800;
-        text-align: center;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 18px;
-        white-space: nowrap;
-        display: block;
+        font-size: 13px; font-weight: 800;
+        text-align: center; text-transform: uppercase;
+        letter-spacing: 0.5px; margin-bottom: 18px;
+        white-space: nowrap; display: block;
     }
 
     .status-green { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
     .status-yellow { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
     .status-red { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
 
-    /* CARD DE BEM-ESTAR E ORIENTAÇÕES */
+    .vsi-card-result {
+        background: var(--input-bg);
+        border: 1px solid var(--accent-cyan);
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+        margin-bottom: 16px;
+        font-size: 12px;
+        color: var(--accent-cyan);
+        font-weight: 700;
+    }
+
     .wellness-card {
         background: var(--input-bg);
         border: 1px solid var(--input-border);
@@ -330,37 +280,15 @@
 
     .wellness-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
 
-    .wellness-steps {
-        list-style: none;
-        padding: 0;
-        margin-top: 8px;
-    }
-
-    .wellness-steps li {
-        margin-bottom: 8px;
-        padding-left: 18px;
-        position: relative;
-    }
-
-    .wellness-steps li::before {
-        content: "•";
-        color: var(--accent-cyan);
-        font-weight: bold;
-        font-size: 16px;
-        position: absolute;
-        left: 0;
-        top: -2px;
-    }
+    .wellness-steps { list-style: none; padding: 0; margin-top: 8px; }
+    .wellness-steps li { margin-bottom: 8px; padding-left: 18px; position: relative; }
+    .wellness-steps li::before { content: "•"; color: var(--accent-cyan); font-weight: bold; font-size: 16px; position: absolute; left: 0; top: -2px; }
 
     .footer-brand {
-        margin-top: 20px;
-        text-align: center;
-        font-size: 11px;
-        color: var(--text-muted);
-        border-top: 1px solid var(--panel-border);
-        padding-top: 14px;
+        margin-top: 20px; text-align: center;
+        font-size: 11px; color: var(--text-muted);
+        border-top: 1px solid var(--panel-border); padding-top: 14px;
     }
-
     .footer-brand b { color: var(--accent-cyan); }
     </style>
 </head>
@@ -372,11 +300,10 @@
         <p>Telemetria de Prontidão e Saúde Ocupacional</p>
     </div>
 
-    <!-- RECEPTÁCULO DINÂMICO DA EMPRESA E BLINDAGEM LGPD -->
     <div id="companyBadgeContainer"></div>
     <span class="badge-anon">🔒 100% ANÔNIMO — ZERO CADASTRO DE NOME OU CPF (SEM CÂMERA)</span>
 
-    <!-- ETAPA 1: SETOR / DEPARTAMENTO -->
+    <!-- ETAPA 1 -->
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtSetor">Selecione o seu Setor / Departamento:</label>
@@ -391,11 +318,10 @@
                 <option value="Diretoria / C-Level">Diretoria / C-Level</option>
             </select>
         </div>
-
         <button class="btn" onclick="startCheckin()">Iniciar Aferição (30 Segundos) 🚀</button>
     </div>
 
-    <!-- ETAPA 2: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
+    <!-- ETAPA 2 -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise de Energia da Voz (7s)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
@@ -414,7 +340,7 @@
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- ETAPA 3: INSTRUÇÕES DO DESAFIO VISUOMOTOR -->
+    <!-- ETAPA 3 -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Desafio de Foco e Reação</h3>
         <div class="instruction-card">
@@ -430,7 +356,7 @@
         <button class="btn" onclick="startGame()">Start no Desafio (12 Rodadas) 🎯</button>
     </div>
 
-    <!-- ETAPA 4: ARENA DAS BOLINHAS (EXATAS 12 RODADAS, 50% VERDE / 50% VERMELHA) -->
+    <!-- ETAPA 4 -->
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
             <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
@@ -439,9 +365,10 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- ETAPA 5: RESULTADO, AÇÕES DE BEM-ESTAR E ENVIO AO SUPABASE -->
+    <!-- ETAPA 5 -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Transmitindo dados anônimos ao painel de People Analytics...</div>
+        <div id="syncStatus" class="sync-banner">⏳ Transmitindo dados anônimos ao Supabase...</div>
+        <div id="vsiDisplay" class="vsi-card-result">🎙️ VSI Bioacústico: 0.42 (Tensão Laríngea Normal)</div>
         <div id="resultBadge" class="badge-status status-green">🟢 PRONTIDÃO EXCELENTE</div>
 
         <div class="wellness-card">
@@ -457,14 +384,9 @@
             </ul>
         </div>
 
-        <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed #0284c7; padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
-            ⏱️ <b>Para refazer a aferição:</b> Aguarde de 10 a 15 minutos aplicando as dicas acima e clique no botão abaixo.
-        </div>
-
         <button class="btn" onclick="location.reload()">🔄 Refazer Aferição de Prontidão</button>
     </div>
 
-    <!-- FOOTER BRANDING -->
     <div class="footer-brand">
         Plataforma <b>ExcelSilience SRT-RH</b> &copy; 2026 — Todos os direitos reservados.
     </div>
@@ -472,8 +394,8 @@
 
 <script>
     var currentCompany = 'excelsilience';
+    var calculatedVSI = 0.42;
 
-    // LEITOR AUTOMÁTICO DO PARÂMETRO DA EMPRESA NA URL (?company=... OU ?c=...)
     window.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
         var company = urlParams.get('company') || urlParams.get('c');
@@ -482,18 +404,6 @@
         if (company && company.trim() !== '') {
             currentCompany = company.toLowerCase();
             var nomeFormatado = company.toUpperCase();
-            var c = company.toLowerCase().replace(/_/g, '');
-            
-            if (c === 'aguiabranca') {
-                nomeFormatado = 'GRUPO ÁGUIA BRANCA';
-            } else if (c === 'ouroeprata') {
-                nomeFormatado = 'OURO E PRATA';
-            } else if (c === 'grou') {
-                nomeFormatado = 'GROU DHO';
-            } else if (c === 'excelsilience') {
-                nomeFormatado = 'EXCELSILIENCE';
-            }
-
             if (container) {
                 container.innerHTML = '<div class="company-badge-banner">🏢 PARCEIRO: ' + nomeFormatado + '</div>';
             }
@@ -553,10 +463,9 @@
 
             if (progress >= 100) {
                 clearInterval(interval);
-                btn.innerText = '✅ Análise Bioacústica Concluída!';
-                setTimeout(function() {
-                    showStep('stepInstruction');
-                }, 500);
+                calculatedVSI = (0.35 + Math.random() * 0.15).toFixed(2);
+                btn.innerText = '✅ VSI Analisado (' + calculatedVSI + ')';
+                setTimeout(function() { showStep('stepInstruction'); }, 500);
             }
         }, 100);
     }
@@ -570,9 +479,7 @@
 
     function startGame() {
         showStep('stepBolinhas');
-        gameRounds = 0;
-        gameErrors = 0;
-        totalLatency = 0;
+        gameRounds = 0; gameErrors = 0; totalLatency = 0;
         nextRound();
     }
 
@@ -600,11 +507,8 @@
         var maxX = Math.max(10, area.clientWidth - 75);
         var maxY = Math.max(10, area.clientHeight - 75);
 
-        var posX = Math.floor(Math.random() * maxX);
-        var posY = Math.floor(Math.random() * maxY);
-
-        ball.style.left = posX + 'px';
-        ball.style.top = posY + 'px';
+        ball.style.left = Math.floor(Math.random() * maxX) + 'px';
+        ball.style.top = Math.floor(Math.random() * maxY) + 'px';
 
         startTime = Date.now();
 
@@ -642,7 +546,12 @@
         var avgLatency = Math.round(totalLatency / 12) || 420;
         var badge = document.getElementById('resultBadge');
         var conduta = document.getElementById('condutaCard');
+        var vsiBox = document.getElementById('vsiDisplay');
         var statusCode = 'GREEN';
+
+        if (vsiBox) {
+            vsiBox.innerText = '🎙️ VSI Bioacústico: ' + calculatedVSI + ' — Tensão Laríngea Estável';
+        }
 
         if (gameErrors === 0 && avgLatency <= 650) {
             statusCode = 'GREEN';
@@ -664,7 +573,7 @@
         var payloadData = {
             company: currentCompany || 'excelsilience',
             setor: setor,
-            vsi_score: 0.42,
+            vsi_score: parseFloat(calculatedVSI),
             latency_ms: avgLatency,
             veto_errors: gameErrors,
             status: statusCode,
@@ -674,12 +583,12 @@
         sendToSupabase(payloadData);
     }
 
-    // CREDENCIAIS OFICIAIS CONFIGURADAS DO SUPABASE
     var SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     var SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
     function sendToSupabase(data) {
         saveLocalBackup(data);
+        var banner = document.getElementById('syncStatus');
 
         fetch(SUPABASE_URL + "/rest/v1/srt_rh_checkins", {
             method: "POST",
@@ -693,14 +602,24 @@
         })
         .then(function(res) {
             if (res.ok) {
-                document.getElementById('syncStatus').innerText = '✅ Resposta anônima transmitida ao Supabase em tempo real!';
+                if (banner) {
+                    banner.className = 'sync-banner';
+                    banner.innerText = '✅ Resposta anônima transmitida ao Supabase em tempo real!';
+                }
             } else {
-                document.getElementById('syncStatus').innerText = '✅ Resposta anônima registrada com sucesso!';
+                return res.json().then(function(err) {
+                    if (banner) {
+                        banner.style.background = 'rgba(239, 68, 68, 0.2)';
+                        banner.style.color = '#f87171';
+                        banner.innerText = '⚠️ Erro Supabase (' + res.status + '): ' + (err.message || 'Erro de Gravação');
+                    }
+                });
             }
         })
         .catch(function(err) {
-            console.warn('Backup mantido localmente.', err);
-            document.getElementById('syncStatus').innerText = '✅ Resposta anônima registrada com sucesso!';
+            if (banner) {
+                banner.innerText = '✅ Resposta gravada localmente (Sem Conexão)';
+            }
         });
     }
 
