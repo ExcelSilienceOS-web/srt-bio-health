@@ -44,6 +44,7 @@
         overflow-x: hidden;
     }
 
+    /* CONTAINER PRINCIPAL DO COCKPIT */
     .container {
         background: var(--panel-bg);
         border: 1px solid var(--panel-border);
@@ -55,6 +56,7 @@
         position: relative;
     }
 
+    /* HEADER E LOGO */
     .header-box {
         text-align: center;
         margin-bottom: 22px;
@@ -92,6 +94,7 @@
         letter-spacing: 0.5px;
     }
 
+    /* ETAPAS DO FORMULÁRIO DE AFERIÇÃO */
     .step {
         display: none;
         animation: fadeIn 0.3s ease-in-out forwards;
@@ -102,11 +105,20 @@
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .form-group { margin-bottom: 16px; }
+    /* CAMPOS E LABELS */
+    .form-group {
+        margin-bottom: 16px;
+    }
 
     label {
         font-size: 11px;
@@ -135,6 +147,7 @@
         box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
     }
 
+    /* TERMO DE AUTORIZAÇÃO / CHECKBOX GOVERNANÇA */
     .chk-box {
         display: flex;
         align-items: flex-start;
@@ -149,19 +162,23 @@
     .chk-box input[type="checkbox"] {
         margin-top: 3px;
         accent-color: var(--accent-cyan-hover);
-        width: 20px; height: 20px;
-        cursor: pointer; flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
     }
 
     .chk-box label {
         font-size: 11px;
         color: var(--text-sub);
+        text-transform: none;
         line-height: 1.45;
         margin: 0;
         cursor: pointer;
         font-weight: 500;
     }
 
+    /* BOTÕES DE AÇÃO */
     .btn {
         width: 100%;
         padding: 15px;
@@ -182,8 +199,22 @@
         letter-spacing: 0.5px;
     }
 
-    .btn:hover { background: #0369a1; transform: translateY(-1px); }
-    .btn:active { transform: translateY(1px); }
+    .btn:hover {
+        background: #0369a1;
+        transform: translateY(-1px);
+    }
+
+    .btn:active {
+        transform: translateY(1px);
+    }
+
+    .btn:disabled {
+        background: #334155;
+        color: #64748b;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
 
     .btn-secondary {
         background: #1e293b;
@@ -193,6 +224,12 @@
         margin-top: 10px;
     }
 
+    .btn-secondary:hover {
+        background: #334155;
+        color: #ffffff;
+    }
+
+    /* SCANNER DE PUPILA E CÂMERA DE BIOMETRIA FACIAL */
     .pupil-scanner {
         width: 100%;
         height: 240px;
@@ -217,30 +254,52 @@
 
     .scan-line {
         position: absolute;
-        width: 100%; height: 2px;
+        width: 100%;
+        height: 2px;
         background: var(--accent-green-bright);
-        z-index: 3; top: 0;
+        z-index: 3;
+        top: 0;
         animation: scanAnim 2s infinite linear;
         box-shadow: 0 0 12px var(--accent-green-bright);
     }
 
     @keyframes scanAnim {
-        0% { top: 0; }
-        50% { top: 100%; }
-        100% { top: 0; }
+        0% {
+            top: 0;
+        }
+        50% {
+            top: 100%;
+        }
+        100% {
+            top: 0;
+        }
     }
 
     .eye-target {
-        width: 110px; height: 110px;
+        width: 110px;
+        height: 110px;
         border-radius: 50%;
         border: 3px solid var(--accent-cyan);
-        position: relative; z-index: 2;
+        position: relative;
+        z-index: 2;
         box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
+    .eye-pupil {
+        width: 42px;
+        height: 42px;
+        background: var(--accent-cyan);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    /* BARRA DE PROGRESSO METRO */
     .meter-bar {
-        width: 100%; height: 8px;
+        width: 100%;
+        height: 8px;
         background: #1e293b;
         border-radius: 4px;
         overflow: hidden;
@@ -254,20 +313,30 @@
         transition: width 0.2s linear;
     }
 
+    /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA DA VOZ (VSI) */
     .audio-vis-box {
-        width: 100%; height: 80px;
+        width: 100%;
+        height: 80px;
         background: var(--input-bg);
         border: 1px solid var(--input-border);
         border-radius: 10px;
         margin-bottom: 16px;
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         padding: 10px;
     }
 
-    canvas.audio-canvas { width: 100%; height: 100%; display: block; }
+    canvas.audio-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
 
+    /* GAME ARENA DE BOLINHAS VISUOMOTOR */
     .game-box {
-        width: 100%; height: 250px;
+        width: 100%;
+        height: 250px;
         background: var(--input-bg);
         border: 2px dashed var(--input-border);
         border-radius: 14px;
@@ -277,85 +346,169 @@
     }
 
     .target-ball {
-        width: 62px; height: 62px;
+        width: 62px;
+        height: 62px;
         border-radius: 50%;
         position: absolute;
         cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 11px; color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 11px;
+        color: #ffffff;
         user-select: none;
         box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         transition: transform 0.08s ease;
     }
 
-    .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
-    .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
+    .target-ball:active {
+        transform: scale(0.92);
+    }
 
+    .ball-green {
+        background: var(--accent-green);
+        border: 2px solid var(--accent-green-bright);
+    }
+
+    .ball-red {
+        background: var(--accent-red);
+        border: 2px solid var(--accent-red-bright);
+    }
+
+    /* BADGES DE STATUS E MATRIZ DE 4 CORES */
     .badge-status {
         padding: 8px 16px;
         border-radius: 8px;
-        font-size: 12px; font-weight: 800;
+        font-size: 12px;
+        font-weight: 800;
         display: inline-block;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
-    .b-verde { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
-    .b-amarelo { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
-    .b-vermelho { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
+    .b-verde {
+        background: rgba(16, 185, 129, 0.18);
+        color: var(--accent-green-bright);
+        border: 1px solid var(--accent-green);
+    }
 
+    .b-amarelo {
+        background: rgba(245, 158, 11, 0.18);
+        color: var(--accent-yellow-bright);
+        border: 1px solid var(--accent-yellow);
+    }
+
+    .b-roxo {
+        background: rgba(168, 85, 247, 0.18);
+        color: var(--accent-purple-bright);
+        border: 1px solid var(--accent-purple);
+    }
+
+    .b-vermelho {
+        background: rgba(239, 68, 68, 0.18);
+        color: var(--accent-red-bright);
+        border: 1px solid var(--accent-red);
+    }
+
+    /* BANNER DE SINCRONIZAÇÃO DA TELEMETRIA */
     .sync-banner {
         padding: 14px;
         border-radius: 10px;
-        font-size: 12px; font-weight: 700;
-        text-align: center; margin-bottom: 18px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 18px;
         background: rgba(16, 185, 129, 0.15);
         color: var(--accent-green-bright);
         border: 1px solid var(--accent-green);
     }
 
+    /* CARDS E PAINÉIS INFORMATIVOS */
     .info-card {
         background: var(--input-bg);
         border: 1px solid var(--input-border);
         border-radius: 12px;
-        padding: 16px; margin-bottom: 16px;
-        font-size: 12px; color: var(--text-sub); line-height: 1.5;
+        padding: 16px;
+        margin-bottom: 16px;
+        font-size: 12px;
+        color: var(--text-sub);
+        line-height: 1.5;
     }
 
-    .info-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
+    .info-card h4 {
+        color: var(--accent-cyan);
+        font-size: 13px;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
 
+    /* MODAL POPUPS E INSTRUÇÕES DE BORDO */
     .modal-backdrop {
-        display: none; position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.85); z-index: 999;
-        align-items: center; justify-content: center; padding: 20px;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
     }
 
-    .modal-backdrop.active { display: flex; }
+    .modal-backdrop.active {
+        display: flex;
+    }
 
     .modal-box {
         background: var(--panel-bg);
         border: 1px solid var(--panel-border);
         border-radius: 16px;
-        max-width: 480px; width: 100%; padding: 24px;
+        max-width: 480px;
+        width: 100%;
+        padding: 24px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        max-height: 85vh;
+        overflow-y: auto;
     }
 
     .modal-header {
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         border-bottom: 1px solid var(--panel-border);
-        padding-bottom: 12px; margin-bottom: 16px;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
     }
 
-    .modal-header h3 { font-size: 16px; color: var(--accent-cyan); }
-    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+    .modal-header h3 {
+        font-size: 16px;
+        color: var(--accent-cyan);
+    }
 
+    .modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    /* FOOTER BRANDING */
     .footer-brand {
-        margin-top: 20px; text-align: center;
-        font-size: 11px; color: var(--text-muted);
-        border-top: 1px solid var(--panel-border); padding-top: 14px;
+        margin-top: 20px;
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-muted);
+        border-top: 1px solid var(--panel-border);
+        padding-top: 14px;
     }
-    .footer-brand b { color: var(--accent-cyan); }
+
+    .footer-brand b {
+        color: var(--accent-cyan);
+    }
     </style>
 </head>
 <body>
@@ -368,7 +521,7 @@
 
     <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
 
-    <!-- PASSO 1: DADOS DO CONDUTOR -->
+    <!-- PASSO 1: DADOS DO CONDUTOR E TERMO LGPD -->
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
@@ -423,8 +576,10 @@
         <div class="pupil-scanner">
             <video id="webcamVideo" class="camera-video" autoplay playsinline muted></video>
             <div class="scan-line"></div>
-            <div class="eye-target"></div>
-            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Iniciando câmera...</span>
+            <div class="eye-target">
+                <div class="eye-pupil" id="pupilCircle"></div>
+            </div>
+            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Solicitando permissão da câmera...</span>
         </div>
 
         <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
@@ -468,12 +623,12 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 5: RESULTADO -->
+    <!-- PASSO 5: RESULTADO, STATUS E TRANSMISSÃO CCO -->
     <div id="stepResult" class="step">
         <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO do SRT Mobility...</div>
 
         <div style="text-align:center; margin-bottom:18px;">
-            <img id="resPhoto" src="" style="width:76px; height:76px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:inline-block; margin-bottom:8px; background:#1e293b;">
+            <img id="resPhoto" src="" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:inline-block; margin-bottom:8px; background:#1e293b;">
             <h3 style="color:var(--accent-cyan); font-size:16px;" id="resName">--</h3>
             <p style="font-size:12px; color:var(--text-muted);" id="resRole">--</p>
             <div id="resBadge" class="badge-status b-verde" style="margin-top:8px;">🟢 LIBERADO PARA RODAR</div>
@@ -517,6 +672,7 @@
         </div>
     </div>
 
+    <!-- FOOTER BRANDING -->
     <div class="footer-brand">
         Plataforma <b>ExcelSilience SRT Mobility</b> &copy; 2026 — Todos os direitos reservados.
     </div>
@@ -525,8 +681,9 @@
 <script>
     var capturedPhotoDataUrl = '';
     var mediaStreamInstance = null;
+    var cameraTimerStarted = false;
 
-    // LEITOR DE PARÂMETRO DA EMPRESA NA URL (?company=ouroeprata)
+    // LEITOR DE PARÂMETRO DA EMPRESA NA URL (EX: ?company=ouroeprata OU ?company=aguiabranca)
     window.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
         var company = urlParams.get('company') || urlParams.get('c');
@@ -534,11 +691,12 @@
             var badgeGov = document.querySelector('.badge-gov');
             if (badgeGov) {
                 var nomeFormatado = company.toUpperCase();
-                if (company.toLowerCase() === 'aguiabranca' || company.toLowerCase() === 'aguia_branca') {
+                var c = company.toLowerCase().replace(/_/g, '');
+                if (c === 'aguiabranca') {
                     nomeFormatado = 'GRUPO ÁGUIA BRANCA';
-                } else if (company.toLowerCase() === 'ouroeprata' || company.toLowerCase() === 'ouro_e_prata') {
+                } else if (c === 'ouroeprata') {
                     nomeFormatado = 'OURO E PRATA';
-                } else if (company.toLowerCase() === 'grou') {
+                } else if (c === 'grou') {
                     nomeFormatado = 'GROU DHO';
                 }
                 badgeGov.innerText = '🏢 PARCEIRO: ' + nomeFormatado;
@@ -549,8 +707,12 @@
         }
     });
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
 
     function showStep(stepId) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -568,63 +730,110 @@
         initCamera();
     }
 
-    // CÂMERA AJUSTADA PARA 5 SEGUNDOS COM INÍCIO APÓS O VÍDEO CARREGAR
+    // INICIALIZAÇÃO SEGURA DA CÂMERA CONECTADA AO FLUXO REAL DE VÍDEO
     function initCamera() {
         var video = document.getElementById('webcamVideo');
         var fill = document.getElementById('progressCam');
         var statusLabel = document.getElementById('lblPupilStatus');
         var canvas = document.getElementById('photoCanvas');
 
+        cameraTimerStarted = false;
         fill.style.width = '0%';
-        if (statusLabel) statusLabel.innerText = '🔍 Conectando câmera...';
+        if (statusLabel) statusLabel.innerText = '🔍 Solicitando acesso à câmera...';
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }).then(function(stream) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
+            .then(function(stream) {
                 mediaStreamInstance = stream;
                 video.srcObject = stream;
                 video.onloadedmetadata = function() {
                     video.play();
-                    startCameraTimer(video, fill, statusLabel, canvas);
+                    if (!cameraTimerStarted) {
+                        cameraTimerStarted = true;
+                        run5SecondScan(video, fill, statusLabel, canvas);
+                    }
                 };
-            }).catch(function(err) {
-                console.log('Câmera indisponível ou sem permissão');
-                startCameraTimer(video, fill, statusLabel, canvas);
+            })
+            .catch(function(err) {
+                console.warn('Câmera não permitida ou indisponível:', err);
+                if (!cameraTimerStarted) {
+                    cameraTimerStarted = true;
+                    run5SecondScan(video, fill, statusLabel, canvas);
+                }
             });
         } else {
-            startCameraTimer(video, fill, statusLabel, canvas);
+            if (!cameraTimerStarted) {
+                cameraTimerStarted = true;
+                run5SecondScan(video, fill, statusLabel, canvas);
+            }
         }
     }
 
-    function startCameraTimer(video, fill, statusLabel, canvas) {
+    function run5SecondScan(video, fill, statusLabel, canvas) {
         var progress = 0;
         var interval = setInterval(function() {
-            progress += 2; // 50 passos de 100ms = 5 segundos de permanência
+            progress += 2; // 50 passos de 100ms = 5 segundos completos
             fill.style.width = progress + '%';
 
             if (statusLabel) {
-                if (progress < 40) statusLabel.innerText = '🔍 Centralize o rosto no círculo...';
-                else if (progress < 80) statusLabel.innerText = '📸 Mantenha o foco: Registrando foto...';
-                else statusLabel.innerText = '✅ Foto oficial capturada!';
+                if (progress < 35) {
+                    statusLabel.innerText = '🔍 Centralize o rosto no círculo...';
+                } else if (progress < 80) {
+                    statusLabel.innerText = '📸 Mantenha o foco: Registrando foto...';
+                } else {
+                    statusLabel.innerText = '✅ Foto oficial capturada!';
+                }
             }
 
             if (progress >= 100) {
                 clearInterval(interval);
-                
-                // Captura a foto real do vídeo no canvas
-                try {
-                    var ctx = canvas.getContext('2d');
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                } catch(e) {}
 
-                // Desliga a câmera
+                // CAPTURA A FOTO REAL DO VÍDEO NO CANVAS
+                captureSnapshot(video, canvas);
+
+                // DESLIGA A CÂMERA DE FORMA LIMPA
                 if (mediaStreamInstance) {
-                    mediaStreamInstance.getTracks().forEach(t => t.stop());
+                    mediaStreamInstance.getTracks().forEach(function(track) { track.stop(); });
+                    mediaStreamInstance = null;
                 }
 
-                showStep('stepVoz');
+                // AVANÇA PARA A PRÓXIMA ETAPA (VOZ)
+                setTimeout(function() {
+                    showStep('stepVoz');
+                }, 400);
             }
         }, 100);
+    }
+
+    function captureSnapshot(video, canvas) {
+        try {
+            var ctx = canvas.getContext('2d');
+            if (video && video.videoWidth > 0 && video.videoHeight > 0) {
+                canvas.width = 300;
+                canvas.height = 300;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            } else {
+                generatePlaceholderPhoto(canvas);
+            }
+        } catch (e) {
+            generatePlaceholderPhoto(canvas);
+        }
+    }
+
+    function generatePlaceholderPhoto(canvas) {
+        var ctx = canvas.getContext('2d');
+        canvas.width = 300;
+        canvas.height = 300;
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 90px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        var name = document.getElementById('txtName').value || 'M';
+        ctx.fillText(name.charAt(0).toUpperCase(), canvas.width / 2, canvas.height / 2);
+        capturedPhotoDataUrl = canvas.toDataURL('image/png');
     }
 
     function runAudioTest() {
@@ -715,10 +924,10 @@
         document.getElementById('resErrors').innerText = gameErrors;
         document.getElementById('resVsi').innerText = 'Estável (0.42)';
 
-        // EXIBE A FOTO CAPTURADA NO CRACHÁ DO RESULTADO
-        var imgRes = document.getElementById('resPhoto');
-        if (capturedPhotoDataUrl && capturedPhotoDataUrl !== '' && imgRes) {
-            imgRes.src = capturedPhotoDataUrl;
+        // EXIBE A FOTO REAL CAPTURADA NO CRACHÁ DO RESULTADO
+        var resImg = document.getElementById('resPhoto');
+        if (capturedPhotoDataUrl && capturedPhotoDataUrl !== '') {
+            resImg.src = capturedPhotoDataUrl;
         }
 
         var badge = document.getElementById('resBadge');
