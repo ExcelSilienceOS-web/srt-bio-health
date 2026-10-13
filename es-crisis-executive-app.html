@@ -645,6 +645,52 @@
         setTimeout(function() { printWin.focus(); printWin.print(); }, 500);
     }
 </script>
+// LEITOR AUTOMÁTICO DE NOME DE CLIENTE/PARCEIRO NA URL (?company=... OU ?c=...)
+window.addEventListener('DOMContentLoaded', function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var company = urlParams.get('company') || urlParams.get('c');
+    
+    if (company && company.trim() !== '') {
+        var nomeFormatado = company.toUpperCase();
+        var c = company.toLowerCase().replace(/_/g, '');
+        
+        // Mapeamento automático dos nomes de parceiros
+        if (c === 'aguiabranca') {
+            nomeFormatado = 'GRUPO ÁGUIA BRANCA';
+        } else if (c === 'ouroeprata') {
+            nomeFormatado = 'OURO E PRATA';
+        } else if (c === 'grou') {
+            nomeFormatado = 'GROU DHO';
+        } else if (c === 'excelsilience') {
+            nomeFormatado = 'EXCELSILIENCE';
+        }
 
+        // Busca um badge existente no topo
+        var badge = document.querySelector('.badge-gov, .badge-anon, .badge-company, .badge, #companyBadgeContainer');
+        
+        if (badge) {
+            badge.innerText = '🏢 PARCEIRO: ' + nomeFormatado;
+            badge.style.background = 'rgba(56, 189, 248, 0.2)';
+            badge.style.border = '1px solid #38bdf8';
+            badge.style.color = '#38bdf8';
+            badge.style.display = 'block';
+        } else {
+            // Se não houver um badge na tela, cria o banner dinamicamente no topo do container
+            var container = document.querySelector('.container') || document.body;
+            var headerBox = document.querySelector('.header-box');
+            
+            var newBadge = document.createElement('div');
+            newBadge.className = 'company-badge-banner';
+            newBadge.innerText = '🏢 PARCEIRO: ' + nomeFormatado;
+            newBadge.style.cssText = 'background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; padding: 10px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; text-align: center; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);';
+            
+            if (headerBox && headerBox.nextSibling) {
+                container.insertBefore(newBadge, headerBox.nextSibling);
+            } else {
+                container.prepend(newBadge);
+            }
+        }
+    }
+});
 </body>
 </html>
