@@ -321,9 +321,9 @@
         <button class="btn" onclick="startCheckin()">Iniciar Aferição (30 Segundos) 🚀</button>
     </div>
 
-    <!-- ETAPA 2 -->
+    <!-- ETAPA 2 (VOZ AJUSTADA PARA 6 SEGUNDOS) -->
     <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise de Energia da Voz (7s)</h3>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise de Energia da Voz (6s)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
             Clique no botão abaixo e leia a frase em voz alta no microfone:
         </p>
@@ -336,7 +336,7 @@
             <canvas id="audioCanvas" class="audio-canvas"></canvas>
         </div>
 
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz (7 Segundos)</button>
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz (6 Segundos)</button>
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
@@ -445,11 +445,12 @@
         var ctx = canvas ? canvas.getContext('2d') : null;
 
         btn.disabled = true;
-        btn.innerText = '🎙️ Gravando e Analisando Voz (7s)...';
+        btn.innerText = '🎙️ Gravando e Analisando Voz (6s)...';
         var progress = 0;
 
+        // DURAÇÃO AJUSTADA PARA EXATOS 6 SEGUNDOS
         var interval = setInterval(function() {
-            progress += (100 / 70);
+            progress += (100 / 60); // 6.0s
             fill.style.width = Math.min(progress, 100) + '%';
 
             if (ctx && canvas) {
@@ -570,7 +571,9 @@
             conduta.innerText = 'Seus reflexos indicam fadiga cognitiva acentuada. Recomendamos fazer uma pausa imediata, evitar decisões críticas nos próximos minutos e conversar com seu gestor se o cansaço persistir.';
         }
 
+        // PAYLOAD COM O SESSION_ID ADICIONADO PARA CORRIGIR O ERRO DE BANCO
         var payloadData = {
+            session_id: 'sess_' + Date.now() + '_' + Math.floor(Math.random() * 10000),
             company: currentCompany || 'excelsilience',
             setor: setor,
             vsi_score: parseFloat(calculatedVSI),
@@ -611,7 +614,8 @@
                     if (banner) {
                         banner.style.background = 'rgba(239, 68, 68, 0.2)';
                         banner.style.color = '#f87171';
-                        banner.innerText = '⚠️ Erro Supabase (' + res.status + '): ' + (err.message || 'Erro de Gravação');
+                        banner.style.border = '1px solid #ef4444';
+                        banner.innerText = '⚠️ Erro Supabase (' + res.status + '): ' + (err.message || 'Erro ao gravar no banco');
                     }
                 });
             }
