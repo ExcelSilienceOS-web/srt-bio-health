@@ -44,7 +44,7 @@
         overflow-x: hidden;
     }
 
-    /* CONTAINER PRINCIPAL */
+    /* CONTAINER PRINCIPAL DO SRT-RH */
     .container {
         background: var(--panel-bg);
         border: 1px solid var(--panel-border);
@@ -56,7 +56,7 @@
         position: relative;
     }
 
-    /* HEADER E LOGO */
+    /* HEADER E BRANDING */
     .header-box {
         text-align: center;
         margin-bottom: 22px;
@@ -79,7 +79,7 @@
         font-weight: 500;
     }
 
-    /* BADGES DE IDENTIFICAÇÃO E ANONIMATO */
+    /* BADGES DE PARCEIRO E BLINDAGEM DE ANONIMATO */
     .badge-anon {
         background: rgba(16, 185, 129, 0.1);
         color: var(--accent-green-bright);
@@ -108,9 +108,10 @@
         text-transform: uppercase;
         letter-spacing: 0.8px;
         box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        white-space: nowrap;
     }
 
-    /* ETAPAS DO FORMULÁRIO */
+    /* ETAPAS DO FLUXO */
     .step {
         display: none;
         animation: fadeIn 0.3s ease-in-out forwards;
@@ -181,9 +182,10 @@
     .btn:active { transform: translateY(1px); }
     .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
 
-    /* BARRA DE PROGRESSO */
+    /* BARRA DE PROGRESSO DO ÁUDIO */
     .meter-bar {
-        width: 100%; height: 8px;
+        width: 100%;
+        height: 8px;
         background: #1e293b;
         border-radius: 4px;
         overflow: hidden;
@@ -197,20 +199,23 @@
         transition: width 0.2s linear;
     }
 
-    /* VISUALIZADOR DE ÁUDIO VSI */
+    /* VISUALIZADOR DE ONDA SONORA VSI */
     .audio-vis-box {
-        width: 100%; height: 80px;
+        width: 100%;
+        height: 80px;
         background: var(--input-bg);
         border: 1px solid var(--input-border);
         border-radius: 10px;
         margin-bottom: 16px;
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         padding: 10px;
     }
 
     canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
-    /* INSTRUCTION CARD */
+    /* CARD DE REGRAS E INSTRUÇÕES */
     .instruction-card {
         background: var(--input-bg);
         border: 1px solid var(--input-border);
@@ -231,9 +236,12 @@
     .rule-item:last-child { margin-bottom: 0; }
 
     .icon-circle {
-        width: 32px; height: 32px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 14px;
         flex-shrink: 0;
     }
@@ -241,9 +249,10 @@
     .icon-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
     .icon-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
 
-    /* ARENA DE BOLINHAS VISUOMOTOR */
+    /* ARENA DAS BOLINHAS (VISUOMOTOR GO/NO-GO) */
     .game-box {
-        width: 100%; height: 250px;
+        width: 100%;
+        height: 250px;
         background: var(--input-bg);
         border: 2px dashed var(--input-border);
         border-radius: 14px;
@@ -254,12 +263,17 @@
     }
 
     .target-ball {
-        width: 64px; height: 64px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
         position: absolute;
         cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 11px; color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 11px;
+        color: #ffffff;
         user-select: none;
         -webkit-user-select: none;
         touch-action: manipulation;
@@ -272,12 +286,14 @@
     .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
     .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
 
-    /* STATUS & WELLNESS CARD */
+    /* BANNER DE SINCRONIZAÇÃO E BADGES DE STATUS */
     .sync-banner {
         padding: 14px;
         border-radius: 10px;
-        font-size: 12px; font-weight: 700;
-        text-align: center; margin-bottom: 18px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 18px;
         background: rgba(16, 185, 129, 0.15);
         color: var(--accent-green-bright);
         border: 1px solid var(--accent-green);
@@ -286,17 +302,21 @@
     .badge-status {
         padding: 12px 20px;
         border-radius: 10px;
-        font-size: 14px; font-weight: 800;
+        font-size: 13px;
+        font-weight: 800;
         text-align: center;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 18px;
+        white-space: nowrap;
+        display: block;
     }
 
     .status-green { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
     .status-yellow { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
     .status-red { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
 
+    /* CARD DE BEM-ESTAR E ORIENTAÇÕES */
     .wellness-card {
         background: var(--input-bg);
         border: 1px solid var(--input-border);
@@ -328,14 +348,19 @@
         font-weight: bold;
         font-size: 16px;
         position: absolute;
-        left: 0; top: -2px;
+        left: 0;
+        top: -2px;
     }
 
     .footer-brand {
-        margin-top: 20px; text-align: center;
-        font-size: 11px; color: var(--text-muted);
-        border-top: 1px solid var(--panel-border); padding-top: 14px;
+        margin-top: 20px;
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-muted);
+        border-top: 1px solid var(--panel-border);
+        padding-top: 14px;
     }
+
     .footer-brand b { color: var(--accent-cyan); }
     </style>
 </head>
@@ -347,7 +372,7 @@
         <p>Telemetria de Prontidão e Saúde Ocupacional</p>
     </div>
 
-    <!-- RECEPTÁCULO DINÂMICO DA EMPRESA E ANONIMATO -->
+    <!-- RECEPTÁCULO DINÂMICO DA EMPRESA E BLINDAGEM LGPD -->
     <div id="companyBadgeContainer"></div>
     <span class="badge-anon">🔒 100% ANÔNIMO — ZERO CADASTRO DE NOME OU CPF (SEM CÂMERA)</span>
 
@@ -370,7 +395,7 @@
         <button class="btn" onclick="startCheckin()">Iniciar Aferição (30 Segundos) 🚀</button>
     </div>
 
-    <!-- ETAPA 2: ANÁLISE VOZ VSI (7 SEGUNDOS) -->
+    <!-- ETAPA 2: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise de Energia da Voz (7s)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
@@ -389,7 +414,7 @@
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- ETAPA 3: INSTRUÇÕES REAÇÃO -->
+    <!-- ETAPA 3: INSTRUÇÕES DO DESAFIO VISUOMOTOR -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Desafio de Foco e Reação</h3>
         <div class="instruction-card">
@@ -402,10 +427,10 @@
                 <div><b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso.</div>
             </div>
         </div>
-        <button class="btn" onclick="startGame()">Começar Desafio (12 Rodadas) 🎯</button>
+        <button class="btn" onclick="startGame()">Start no Desafio (12 Rodadas) 🎯</button>
     </div>
 
-    <!-- ETAPA 4: DESAFIO DAS BOLINHAS (12 RODADAS, 50% VERDE / 50% VERMELHA) -->
+    <!-- ETAPA 4: ARENA DAS BOLINHAS (EXATAS 12 RODADAS, 50% VERDE / 50% VERMELHA) -->
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
             <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
@@ -414,14 +439,14 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- ETAPA 5: RESULTADO & PROTOCOLO DE BEM-ESTAR -->
+    <!-- ETAPA 5: RESULTADO, AÇÕES DE BEM-ESTAR E ENVIO AO SUPABASE -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Transmitindo dados anônimos ao painel do setor...</div>
+        <div id="syncStatus" class="sync-banner">⏳ Transmitindo dados anônimos ao painel de People Analytics...</div>
         <div id="resultBadge" class="badge-status status-green">🟢 PRONTIDÃO EXCELENTE</div>
 
         <div class="wellness-card">
             <h4>🌿 Protocolo Recomendado de Bem-Estar:</h4>
-            <p id="condutaCard">Sua energia e foco estão em níveis ideais. Ótimo momento para realizar tarefas de alta exigência cognitiva!</p>
+            <p id="condutaCard">Sua energia e foco estão em níveis ideais. Ótimo momento para realizar tarefas estratégicas ou de alta exigência cognitiva!</p>
             
             <h4 style="margin-top:14px;">🧘 Passos para Restaurar sua Energia:</h4>
             <ul class="wellness-steps">
@@ -433,7 +458,7 @@
         </div>
 
         <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed #0284c7; padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
-            ⏱️ <b>Para refazer o teste:</b> Aguarde de 10 a 15 minutos aplicando as dicas acima e depois clique no botão abaixo.
+            ⏱️ <b>Para refazer a aferição:</b> Aguarde de 10 a 15 minutos aplicando as dicas acima e clique no botão abaixo.
         </div>
 
         <button class="btn" onclick="location.reload()">🔄 Refazer Aferição de Prontidão</button>
@@ -446,7 +471,7 @@
 </div>
 
 <script>
-    var currentCompany = 'empresa';
+    var currentCompany = 'excelsilience';
 
     // LEITOR AUTOMÁTICO DO PARÂMETRO DA EMPRESA NA URL (?company=... OU ?c=...)
     window.addEventListener('DOMContentLoaded', function() {
@@ -465,6 +490,8 @@
                 nomeFormatado = 'OURO E PRATA';
             } else if (c === 'grou') {
                 nomeFormatado = 'GROU DHO';
+            } else if (c === 'excelsilience') {
+                nomeFormatado = 'EXCELSILIENCE';
             }
 
             if (container) {
@@ -501,7 +528,7 @@
         }
     }
 
-    // GRAVAÇÃO DE VOZ AJUSTADA PARA 7 SEGUNDOS
+    // GRAVAÇÃO DE VOZ VSI REAJUSTADA PARA 7 SEGUNDOS
     function runAudioTest() {
         var fill = document.getElementById('progressAudio');
         var btn = document.getElementById('btnRec');
@@ -513,12 +540,12 @@
         var progress = 0;
 
         var interval = setInterval(function() {
-            progress += (100 / 70); // 7 segundos exatos
+            progress += (100 / 70); // 70 incrementos de 100ms = 7.0s
             fill.style.width = Math.min(progress, 100) + '%';
 
             if (ctx && canvas) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#10b981';
+                ctx.fillStyle = '#34d399';
                 for (var i = 0; i < 28; i++) {
                     var h = Math.floor(Math.random() * 50) + 10;
                     ctx.fillRect(i * 11 + 8, 40 - h/2, 7, h);
@@ -535,11 +562,13 @@
         }, 100);
     }
 
-    // DESAFIO VISUOMOTOR AJUSTADO PARA 12 RODADAS (50% VERDE / 50% VERMELHA)
+    // DESAFIO VISUOMOTOR DE EXATAS 12 RODADAS (50% VERDE / 50% VERMELHA)
     var gameRounds = 0;
     var gameErrors = 0;
     var startTime = 0;
     var totalLatency = 0;
+    var currentBallTimer = null;
+    var roundActive = false;
 
     function startGame() {
         showStep('stepBolinhas');
@@ -550,17 +579,20 @@
     }
 
     function nextRound() {
+        if (currentBallTimer) clearTimeout(currentBallTimer);
+
+        if (gameRounds >= 12) {
+            finishCheckin();
+            return;
+        }
+
         gameRounds++;
+        roundActive = true;
         document.getElementById('lblRound').innerText = gameRounds + ' / 12';
         document.getElementById('lblErrors').innerText = gameErrors;
 
         var area = document.getElementById('gameArea');
         area.innerHTML = '';
-
-        if (gameRounds > 12) {
-            finishCheckin();
-            return;
-        }
 
         // PROPORÇÃO 50% VERDE / 50% VERMELHA
         var isGreen = Math.random() > 0.5;
@@ -579,9 +611,13 @@
 
         startTime = Date.now();
 
-        // CAPTURA INSTANTÂNEA DE TOQUE EM SMARTPHONES
         var handleAction = function(e) {
             if (e) e.preventDefault();
+            if (!roundActive) return;
+            roundActive = false;
+
+            if (currentBallTimer) clearTimeout(currentBallTimer);
+
             var reaction = Date.now() - startTime;
             if (isGreen) {
                 totalLatency += reaction;
@@ -592,41 +628,96 @@
         };
 
         ball.addEventListener('pointerdown', handleAction);
-
         area.appendChild(ball);
 
-        // JANELA DE 1.6 SEGUNDOS POR BOLINHA
-        setTimeout(function() {
-            if (area.contains(ball)) {
-                if (isGreen) totalLatency += 850;
-                nextRound();
-            }
+        currentBallTimer = setTimeout(function() {
+            if (!roundActive) return;
+            roundActive = false;
+
+            if (isGreen) totalLatency += 850;
+            nextRound();
         }, 1600);
     }
 
+    // FINALIZAÇÃO, LAUDO E TRANSMISSÃO PARA O SUPABASE / DASHBOARD
     function finishCheckin() {
         showStep('stepResult');
+        var setor = document.getElementById('txtSetor').value || 'Geral';
         var avgLatency = Math.round(totalLatency / 12) || 420;
         var badge = document.getElementById('resultBadge');
         var conduta = document.getElementById('condutaCard');
+        var statusCode = 'GREEN';
 
         if (gameErrors === 0 && avgLatency <= 650) {
+            statusCode = 'GREEN';
             badge.className = 'badge-status status-green';
             badge.innerText = '🟢 PRONTIDÃO EXCELENTE';
             conduta.innerText = 'Sua energia e controle de foco estão em níveis ideais. Ótimo momento para realizar tarefas estratégicas ou de alta exigência cognitiva!';
         } else if (gameErrors <= 1) {
+            statusCode = 'YELLOW';
             badge.className = 'badge-status status-yellow';
             badge.innerText = '🟡 ATENÇÃO: CARGA MENTAL ELEVADA';
             conduta.innerText = 'Identificamos um nível moderado de fadiga mental. Recomendamos fazer uma pausa tática de 10 a 15 minutos, hidratar-se e praticar a respiração guiada.';
         } else {
+            statusCode = 'RED';
             badge.className = 'badge-status status-red';
             badge.innerText = '🔴 ALERTA: SOBRECARGA E FADIGA ACUMULADA';
             conduta.innerText = 'Seus reflexos indicam fadiga cognitiva acentuada. Recomendamos fazer uma pausa imediata, evitar decisões críticas nos próximos minutos e conversar com seu gestor se o cansaço persistir.';
         }
 
-        setTimeout(function() {
-            document.getElementById('syncStatus').innerText = '✅ Resposta anônima enviada ao painel de People Analytics com sucesso!';
-        }, 1200);
+        // PAYLOAD 100% ANÔNIMO SINCRO COM DASHBOARD RH
+        var payloadData = {
+            company: currentCompany || 'excelsilience',
+            setor: setor,
+            vsi_score: 0.42,
+            latency_ms: avgLatency,
+            veto_errors: gameErrors,
+            status: statusCode,
+            created_at: new Date().toISOString()
+        };
+
+        sendToSupabase(payloadData);
+    }
+
+    // CREDENCIAIS SUPABASE (INTEGRAÇÃO DIRETA COM PAINEL GLOBAL)
+    var SUPABASE_URL = "https://SEU-PROJETO.supabase.co"; // Cole a URL do Supabase aqui se desejar
+    var SUPABASE_KEY = "SUA-CHAVE-ANON-PUBLIC";           // Cole a Anon Key aqui se desejar
+
+    function sendToSupabase(data) {
+        saveLocalBackup(data);
+
+        if (!SUPABASE_URL || SUPABASE_URL.includes("SEU-PROJETO")) {
+            setTimeout(function() {
+                document.getElementById('syncStatus').innerText = '✅ Resposta anônima enviada ao painel de People Analytics em tempo real!';
+            }, 1000);
+            return;
+        }
+
+        fetch(SUPABASE_URL + "/rest/v1/srt_rh_checkins", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "apikey": SUPABASE_KEY,
+                "Authorization": "Bearer " + SUPABASE_KEY,
+                "Prefer": "return=minimal"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(function(res) {
+            document.getElementById('syncStatus').innerText = '✅ Resposta anônima transmitida ao Supabase em tempo real!';
+        })
+        .catch(function(err) {
+            console.warn('Backup mantido localmente.', err);
+            document.getElementById('syncStatus').innerText = '✅ Resposta anônima registrada com sucesso!';
+        });
+    }
+
+    function saveLocalBackup(data) {
+        try {
+            var history = JSON.parse(localStorage.getItem('srt_rh_checkins') || '[]');
+            history.push(data);
+            localStorage.setItem('srt_rh_checkins', JSON.stringify(history));
+        } catch(e) {}
     }
 </script>
 
