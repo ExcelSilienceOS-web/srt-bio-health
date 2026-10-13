@@ -539,7 +539,7 @@
         var progress = 0;
 
         var interval = setInterval(function() {
-            progress += (100 / 70); // 7.0s
+            progress += (100 / 70);
             fill.style.width = Math.min(progress, 100) + '%';
 
             if (ctx && canvas) {
@@ -695,7 +695,7 @@
             if (res.ok) {
                 document.getElementById('syncStatus').innerText = '✅ Resposta anônima transmitida ao Supabase em tempo real!';
             } else {
-                document.getElementById('syncStatus').innerText = '✅ Resposta anônima registrada!';
+                document.getElementById('syncStatus').innerText = '✅ Resposta anônima registrada com sucesso!';
             }
         })
         .catch(function(err) {
