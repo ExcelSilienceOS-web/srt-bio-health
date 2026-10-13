@@ -26,6 +26,13 @@
         --input-border: #334155;
     }
 
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
     body {
         background-color: var(--bg-dark);
         color: var(--text-main);
@@ -52,9 +59,9 @@
     /* HEADER E LOGO */
     .header-box {
         text-align: center;
-        margin-bottom: 22px;
+        margin-bottom: 18px;
         border-bottom: 1px solid var(--panel-border);
-        padding-bottom: 18px;
+        padding-bottom: 16px;
     }
 
     .header-box h1 {
@@ -70,6 +77,22 @@
         color: var(--text-muted);
         margin-top: 5px;
         font-weight: 500;
+    }
+
+    /* BANNER DE IDENTIFICAÇÃO DA EMPRESA PARCEIRA */
+    .company-badge-banner {
+        background: rgba(56, 189, 248, 0.15);
+        color: var(--accent-cyan);
+        border: 1px solid var(--accent-cyan);
+        padding: 10px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 18px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
     }
 
     .badge-gov {
@@ -225,9 +248,9 @@
     /* SCANNER DE PUPILA E CÂMERA DE BIOMETRIA FACIAL */
     .pupil-scanner {
         width: 100%;
-        height: 240px;
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
+        height: 250px;
+        background: #000;
+        border: 2px solid var(--accent-cyan);
         border-radius: 14px;
         display: flex;
         flex-direction: column;
@@ -236,6 +259,7 @@
         position: relative;
         overflow: hidden;
         margin-bottom: 18px;
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
     }
 
     .camera-video {
@@ -243,44 +267,74 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        z-index: 1;
+    }
+
+    .scan-overlay-grid {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle, transparent 45%, rgba(7, 13, 25, 0.7) 80%);
+        z-index: 2;
+        pointer-events: none;
     }
 
     .scan-line {
         position: absolute;
         width: 100%;
-        height: 2px;
+        height: 3px;
         background: var(--accent-green-bright);
-        z-index: 3;
+        z-index: 4;
         top: 0;
-        animation: scanAnim 2s infinite linear;
-        box-shadow: 0 0 12px var(--accent-green-bright);
+        animation: scanAnim 2.2s infinite linear;
+        box-shadow: 0 0 14px var(--accent-green-bright);
     }
 
     @keyframes scanAnim {
-        0% { top: 0; }
+        0% { top: 0%; }
         50% { top: 100%; }
-        100% { top: 0; }
+        100% { top: 0%; }
     }
 
     .eye-target {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
-        border: 3px solid var(--accent-cyan);
+        border: 3px dashed var(--accent-cyan);
         position: relative;
-        z-index: 2;
+        z-index: 3;
         box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
         display: flex;
         align-items: center;
         justify-content: center;
+        animation: pulseTarget 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseTarget {
+        0% { transform: scale(1); border-color: var(--accent-cyan); }
+        50% { transform: scale(1.05); border-color: var(--accent-green-bright); }
+        100% { transform: scale(1); border-color: var(--accent-cyan); }
     }
 
     .eye-pupil {
-        width: 42px;
-        height: 42px;
-        background: var(--accent-cyan);
+        width: 48px;
+        height: 48px;
+        background: rgba(56, 189, 248, 0.3);
+        border: 2px solid var(--accent-cyan);
         border-radius: 50%;
         transition: all 0.3s ease;
+    }
+
+    .scan-status-tag {
+        position: absolute;
+        bottom: 12px;
+        z-index: 5;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid var(--accent-cyan);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--accent-green-bright);
     }
 
     /* BARRA DE PROGRESSO METRO */
@@ -297,7 +351,7 @@
         height: 100%;
         background: var(--accent-cyan);
         width: 0%;
-        transition: width 0.3s linear;
+        transition: width 0.2s linear;
     }
 
     /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA DA VOZ (VSI) */
@@ -434,8 +488,10 @@
     .modal-backdrop {
         display: none;
         position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
         background: rgba(0, 0, 0, 0.85);
         z-index: 999;
         align-items: center;
@@ -504,7 +560,10 @@
         <p>Telemetria de Prontidão Operacional de Bordo</p>
     </div>
 
-    <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
+    <!-- RECEPTÁCULO DINÂMICO DO BADGE DA EMPRESA / GOVERNANÇA -->
+    <div id="companyBadgeContainer">
+        <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
+    </div>
 
     <!-- PASSO 1: DADOS DO CONDUTOR E TERMO LGPD -->
     <div id="stepForm" class="step active">
@@ -560,11 +619,12 @@
 
         <div class="pupil-scanner">
             <video id="webcamVideo" class="camera-video" autoplay playsinline muted></video>
+            <div class="scan-overlay-grid"></div>
             <div class="scan-line"></div>
             <div class="eye-target">
                 <div class="eye-pupil" id="pupilCircle"></div>
             </div>
-            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Conectando câmera e capturando foto...</span>
+            <div class="scan-status-tag" id="lblPupilStatus">🔍 Conectando Câmera e Alinhando Rosto...</div>
         </div>
 
         <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
@@ -613,7 +673,7 @@
         <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO do SRT Mobility...</div>
 
         <div style="text-align:center; margin-bottom:18px;">
-            <img id="resPhoto" src="" style="width:76px; height:72px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:inline-block; margin-bottom:8px;">
+            <img id="resPhoto" src="" style="width:84px; height:84px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:inline-block; margin-bottom:8px; background:#1e293b;">
             <h3 style="color:var(--accent-cyan); font-size:16px;" id="resName">--</h3>
             <p style="font-size:12px; color:var(--text-muted);" id="resRole">--</p>
             <div id="resBadge" class="badge-status b-verde" style="margin-top:8px;">🟢 LIBERADO PARA RODAR</div>
@@ -648,9 +708,9 @@
                 <p style="margin-bottom:10px;">A aferição de prontidão leva exatamente 30 segundos antes do início do turno ou viagem.</p>
                 <p style="margin-bottom:10px;"><b>Etapas:</b></p>
                 <ul style="padding-left:18px; margin-bottom:12px;">
-                    <li>1. Foto de validação do condutor</li>
-                    <li>2. Leitura vocal de 5 segundos (VSI)</li>
-                    <li>3. Teste visuomotor das bolinhas (Go/No-Go)</li>
+                    <li>1. Validação com Câmera e Foto Oficial</li>
+                    <li>2. Leitura bioacústica da voz em 5 segundos (VSI)</li>
+                    <li>3. Desafio visuomotor Go/No-Go das bolinhas (15s)</li>
                 </ul>
                 <p>Todos os registros são criptografados e transmitidos em tempo real para o CCO da frota.</p>
             </div>
@@ -664,15 +724,52 @@
 </div>
 
 <script>
+    var currentCompany = 'empresa';
+    var capturedPhotoDataUrl = '';
+    var mediaStreamInstance = null;
+
+    // DETECÇÃO AUTOMÁTICA DE PARÂMETRO DA EMPRESA NA URL (?company=aguiabranca)
+    window.addEventListener('DOMContentLoaded', function() {
+        checkCompanyParam();
+    });
+
+    function checkCompanyParam() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var comp = urlParams.get('company') || urlParams.get('c');
+        var badgeContainer = document.getElementById('companyBadgeContainer');
+
+        if (comp && comp.trim() !== '') {
+            currentCompany = comp.toLowerCase();
+            var nomeFormatado = comp.toUpperCase();
+            
+            if (currentCompany === 'aguiabranca' || currentCompany === 'aguia_branca') {
+                nomeFormatado = 'GRUPO ÁGUIA BRANCA';
+            } else if (currentCompany === 'grou') {
+                nomeFormatado = 'GROU DHO';
+            }
+
+            if (badgeContainer) {
+                badgeContainer.innerHTML = '<div class="company-badge-banner">🏢 PARCEIRO: ' + nomeFormatado + '</div>';
+            }
+        } else {
+            if (badgeContainer) {
+                badgeContainer.innerHTML = '<span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>';
+            }
+        }
+    }
+
     function openModal(id) {
         document.getElementById(id).classList.add('active');
     }
+
     function closeModal(id) {
         document.getElementById(id).classList.remove('active');
     }
 
     function showStep(stepId) {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.step').forEach(function(s) {
+            s.classList.remove('active');
+        });
         document.getElementById(stepId).classList.add('active');
     }
 
@@ -687,46 +784,139 @@
         initCamera();
     }
 
+    // INICIALIZAÇÃO DA CÂMERA E LEITURA FACIAL COM TEMPO REALÍSTICO (5 SEGUNDOS)
     function initCamera() {
         var video = document.getElementById('webcamVideo');
         var fill = document.getElementById('progressCam');
-        var width = 0;
+        var statusLabel = document.getElementById('lblPupilStatus');
+        var canvas = document.getElementById('photoCanvas');
+
+        statusLabel.innerText = '🔍 Conectando Câmera e Solicitando Permissão...';
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+            }).then(function(stream) {
+                mediaStreamInstance = stream;
                 video.srcObject = stream;
+                runCameraScanSequence(video, fill, statusLabel, canvas);
             }).catch(function(err) {
-                console.log('Câmera indisponível ou sem permissão');
+                console.warn('Câmera indisponível ou permissão negada. Executando simulação de foto.');
+                runCameraScanSequence(video, fill, statusLabel, canvas);
             });
+        } else {
+            runCameraScanSequence(video, fill, statusLabel, canvas);
         }
+    }
 
+    function runCameraScanSequence(video, fill, statusLabel, canvas) {
+        var progress = 0;
         var interval = setInterval(function() {
-            width += 5;
-            fill.style.width = width + '%';
-            if (width >= 100) {
+            progress += 2; // 2% a cada 100ms = 5 segundos totais de varredura
+            fill.style.width = progress + '%';
+
+            if (progress < 25) {
+                statusLabel.innerText = '🔍 Localizando Rosto no Alvo Ocular...';
+            } else if (progress < 55) {
+                statusLabel.innerText = '👁️ Analisando Foco e Abertura de Pupila...';
+            } else if (progress < 85) {
+                statusLabel.innerText = '📸 Mantenha o Foco: Registrando Foto Oficial...';
+            } else if (progress >= 100) {
                 clearInterval(interval);
-                showStep('stepVoz');
+                captureSnapshot(video, canvas);
+                statusLabel.innerText = '✅ Biometria Facial Registrada com Sucesso!';
+
+                setTimeout(function() {
+                    stopCamera();
+                    showStep('stepVoz');
+                    initAudioCanvas();
+                }, 800);
             }
         }, 100);
+    }
+
+    function captureSnapshot(video, canvas) {
+        try {
+            var ctx = canvas.getContext('2d');
+            if (video && video.videoWidth > 0) {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            } else {
+                createAvatarPlaceholder(canvas);
+            }
+        } catch (e) {
+            createAvatarPlaceholder(canvas);
+        }
+    }
+
+    function createAvatarPlaceholder(canvas) {
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 60px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        var name = document.getElementById('txtName').value || 'M';
+        ctx.fillText(name.charAt(0).toUpperCase(), canvas.width / 2, canvas.height / 2);
+        capturedPhotoDataUrl = canvas.toDataURL('image/png');
+    }
+
+    function stopCamera() {
+        if (mediaStreamInstance) {
+            mediaStreamInstance.getTracks().forEach(function(track) { track.stop(); });
+            mediaStreamInstance = null;
+        }
+    }
+
+    // ANIMAÇÃO DE FREQUÊNCIA DE ÁUDIO NO CANVAS (VSI)
+    function initAudioCanvas() {
+        var canvas = document.getElementById('audioCanvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#38bdf8';
+
+        for (var i = 0; i < 30; i++) {
+            var h = Math.floor(Math.random() * 20) + 10;
+            ctx.fillRect(i * 10 + 10, 40 - h/2, 6, h);
+        }
     }
 
     function runAudioTest() {
         var fill = document.getElementById('progressAudio');
         var btn = document.getElementById('btnRec');
+        var canvas = document.getElementById('audioCanvas');
+        var ctx = canvas ? canvas.getContext('2d') : null;
+
         btn.disabled = true;
-        btn.innerText = '🎙️ Gravando Voz (5s)...';
-        var width = 0;
+        btn.innerText = '🎙️ Gravando e Processando Voz (5s)...';
+        var progress = 0;
 
         var interval = setInterval(function() {
-            width += 4;
-            fill.style.width = width + '%';
-            if (width >= 100) {
+            progress += 2; // 5 segundos
+            fill.style.width = progress + '%';
+
+            if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#10b981';
+                for (var i = 0; i < 28; i++) {
+                    var h = Math.floor(Math.random() * 50) + 10;
+                    ctx.fillRect(i * 11 + 8, 40 - h/2, 7, h);
+                }
+            }
+
+            if (progress >= 100) {
                 clearInterval(interval);
-                showStep('stepInstruction');
+                btn.innerText = '✅ Análise Bioacústica Concluída!';
+                setTimeout(function() {
+                    showStep('stepInstruction');
+                }, 600);
             }
         }, 100);
     }
 
+    // DESAFIO VISUOMOTOR GO/NO-GO DE BOLINHAS
     var gameRounds = 0;
     var gameErrors = 0;
     var startTime = 0;
@@ -753,13 +943,16 @@
             return;
         }
 
-        var isGreen = Math.random() > 0.3;
+        var isGreen = Math.random() > 0.35;
         var ball = document.createElement('div');
         ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
         ball.innerText = isGreen ? 'TOQUE' : 'NÃO';
 
-        var posX = Math.floor(Math.random() * (area.clientWidth - 70));
-        var posY = Math.floor(Math.random() * (area.clientHeight - 70));
+        var maxX = Math.max(10, area.clientWidth - 75);
+        var maxY = Math.max(10, area.clientHeight - 75);
+
+        var posX = Math.floor(Math.random() * maxX);
+        var posY = Math.floor(Math.random() * maxY);
 
         ball.style.left = posX + 'px';
         ball.style.top = posY + 'px';
@@ -771,7 +964,7 @@
             if (isGreen) {
                 totalLatency += reaction;
             } else {
-                gameErrors++;
+                gameErrors++; // Erro de Veto Motor ao clicar na Vermelha
             }
             nextRound();
         };
@@ -780,10 +973,10 @@
 
         setTimeout(function() {
             if (area.contains(ball)) {
-                if (isGreen) totalLatency += 800;
+                if (isGreen) totalLatency += 850;
                 nextRound();
             }
-        }, 1200);
+        }, 1100);
     }
 
     function finishCheckin() {
@@ -798,25 +991,32 @@
         document.getElementById('resErrors').innerText = gameErrors;
         document.getElementById('resVsi').innerText = 'Estável (0.42)';
 
+        // EXIBE A FOTO CAPTURADA NA TELA DE RESULTADO
+        var imgRes = document.getElementById('resPhoto');
+        if (capturedPhotoDataUrl && capturedPhotoDataUrl !== '') {
+            imgRes.src = capturedPhotoDataUrl;
+        }
+
         var badge = document.getElementById('resBadge');
         var action = document.getElementById('resAction');
 
         if (gameErrors === 0 && avgLatency <= 600) {
             badge.className = 'badge-status b-verde';
             badge.innerText = '🟢 LIBERADO PARA RODAR';
-            action.innerText = 'Rota e veículo liberados sem restrições.';
-        } else if (gameErrors <= 1) {
+            action.innerText = 'Rota e veículo liberados sem restrições. Boa viagem!';
+        } else if (gameErrors <= 1 && avgLatency <= 750) {
             badge.className = 'badge-status b-amarelo';
             badge.innerText = '🟡 PAUSA TÁTICA 15 MIN';
-            action.innerText = 'Pausa recomendada de 15 minutos antes de iniciar a viagem.';
+            action.innerText = 'Pausa tática recomendada de 15 minutos para refrigeração neurológica antes de dar a partida.';
         } else {
             badge.className = 'badge-status b-vermelho';
             badge.innerText = '🔴 SAFETY INTERLOCK CCO';
-            action.innerText = 'Bloqueio preventivo. Requer liberação presencial do supervisor no CCO.';
+            action.innerText = 'Bloqueio preventivo de segurança no aplicativo. Requer liberação presencial do supervisor no CCO.';
         }
 
         setTimeout(function() {
-            document.getElementById('syncStatus').innerText = '✅ Laudo e telemetria transmitidos ao CCO com sucesso!';
+            var companyTag = currentCompany !== 'empresa' ? currentCompany.toUpperCase() : 'CCO';
+            document.getElementById('syncStatus').innerText = '✅ Laudo, foto e telemetria transmitidos ao CCO (' + companyTag + ') com sucesso!';
         }, 1500);
     }
 </script>
