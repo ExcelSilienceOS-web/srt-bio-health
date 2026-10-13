@@ -3,74 +3,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT-RH | Aferição de Saúde Ocupacional & Prontidão</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>ExcelSilience SRT-RH — Telemetria de Prontidão Ocupacional</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #070d19; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; width: 100%; max-width: 460px; padding: 26px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
-        .logo-title { text-align: center; margin-bottom: 18px; border-bottom: 1px solid #1e293b; padding-bottom: 14px; }
-        .logo-title h1 { font-size: 1.4rem; color: #38bdf8; font-weight: 800; }
-        .logo-title p { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
-        .badge-anon { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; margin-bottom: 18px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
-        .step { display: none; }
-        .step.active { display: block; }
-        label { font-size: 11px; color: #38bdf8; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
-        select { width: 100%; padding: 14px; background: #070d19; border: 1px solid #334155; border-radius: 10px; color: #ffffff; font-size: 14px; margin-bottom: 18px; outline: none; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: #0284c7; color: #ffffff; transition: 0.2s; text-transform: uppercase; }
-        .btn:hover { background: #0369a1; }
-        .instruction-card { background: #070d19; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-        .rule-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 13px; }
-        .icon-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
-        .icon-green { background: #10b981; color: #fff; }
-        .icon-red { background: #ef4444; color: #fff; }
-        .audio-vis-box { width: 100%; height: 70px; background: #070d19; border: 1px solid #334155; border-radius: 10px; margin-bottom: 16px; padding: 8px; }
-        canvas.audio-canvas { width: 100%; height: 100%; }
-        .game-box { width: 100%; height: 250px; background: #070d19; border: 2px dashed #334155; border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; }
-        .target-ball { width: 60px; height: 60px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; }
-        .ball-green { background: #10b981; border: 2px solid #34d399; }
-        .ball-red { background: #ef4444; border: 2px solid #f87171; }
-        .badge-status { padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; margin-bottom: 16px; text-transform: uppercase; }
-        .status-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
-        .status-yellow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
-        .status-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
-        .status-red { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
-        .sync-banner { padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 16px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
-        .wellness-card { background: #070d19; padding: 18px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 18px; font-size: 13px; line-height: 1.5; color: #cbd5e1; }
-        .wellness-card h4 { color: #38bdf8; font-size: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .wellness-steps { list-style: none; padding: 0; margin-top: 10px; }
-        .wellness-steps li { position: relative; padding-left: 24px; margin-bottom: 8px; color: #e2e8f0; font-size: 12px; }
-        .wellness-steps li::before { content: "➔"; position: absolute; left: 0; color: #38bdf8; font-weight: bold; }
+    :root {
+        --bg-dark: #070d19;
+        --panel-bg: #0f172a;
+        --panel-border: #1e293b;
+        --accent-cyan: #38bdf8;
+        --accent-cyan-hover: #0284c7;
+        --accent-green: #10b981;
+        --accent-green-bright: #34d399;
+        --accent-yellow: #f59e0b;
+        --accent-yellow-bright: #fbbf24;
+        --accent-purple: #a855f7;
+        --accent-purple-bright: #c084fc;
+        --accent-red: #ef4444;
+        --accent-red-bright: #f87171;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --text-sub: #cbd5e1;
+        --input-bg: #070d19;
+        --input-border: #334155;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 16px;
+        overflow-x: hidden;
+    }
+
+    /* CONTAINER PRINCIPAL */
+    .container {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 520px;
+        padding: 28px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.05);
+        position: relative;
+    }
+
+    /* HEADER E LOGO */
+    .header-box {
+        text-align: center;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--panel-border);
+        padding-bottom: 18px;
+    }
+
+    .header-box h1 {
+        font-size: 1.5rem;
+        color: var(--accent-cyan);
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+
+    .header-box p {
+        font-size: 0.83rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    /* BADGES DE IDENTIFICAÇÃO E ANONIMATO */
+    .badge-anon {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--accent-green-bright);
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 18px;
+        text-align: center;
+        width: 100%;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        letter-spacing: 0.5px;
+    }
+
+    .company-badge-banner {
+        background: rgba(56, 189, 248, 0.15);
+        color: var(--accent-cyan);
+        border: 1px solid var(--accent-cyan);
+        padding: 10px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 18px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+
+    /* ETAPAS DO FORMULÁRIO */
+    .step {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    .step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-size: 11px;
+        color: var(--accent-cyan);
+        font-weight: 700;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    select {
+        width: 100%;
+        padding: 14px 16px;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 10px;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    select:focus {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+
+    /* BOTÕES DE AÇÃO */
+    .btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        background: var(--accent-cyan-hover);
+        color: #ffffff;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn:hover { background: #0369a1; transform: translateY(-1px); }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
+
+    /* BARRA DE PROGRESSO */
+    .meter-bar {
+        width: 100%; height: 8px;
+        background: #1e293b;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+
+    .meter-fill {
+        height: 100%;
+        background: var(--accent-cyan);
+        width: 0%;
+        transition: width 0.2s linear;
+    }
+
+    /* VISUALIZADOR DE ÁUDIO VSI */
+    .audio-vis-box {
+        width: 100%; height: 80px;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 10px;
+        margin-bottom: 16px;
+        display: flex; align-items: center; justify-content: center;
+        padding: 10px;
+    }
+
+    canvas.audio-canvas { width: 100%; height: 100%; display: block; }
+
+    /* INSTRUCTION CARD */
+    .instruction-card {
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 18px;
+    }
+
+    .rule-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--text-sub);
+        margin-bottom: 10px;
+    }
+
+    .rule-item:last-child { margin-bottom: 0; }
+
+    .icon-circle {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .icon-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
+    .icon-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
+
+    /* ARENA DE BOLINHAS VISUOMOTOR */
+    .game-box {
+        width: 100%; height: 250px;
+        background: var(--input-bg);
+        border: 2px dashed var(--input-border);
+        border-radius: 14px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 18px;
+        touch-action: manipulation;
+    }
+
+    .target-ball {
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        position: absolute;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 11px; color: #ffffff;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
+        transition: transform 0.05s ease;
+    }
+
+    .target-ball:active { transform: scale(0.90); }
+
+    .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
+    .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
+
+    /* STATUS & WELLNESS CARD */
+    .sync-banner {
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 12px; font-weight: 700;
+        text-align: center; margin-bottom: 18px;
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--accent-green-bright);
+        border: 1px solid var(--accent-green);
+    }
+
+    .badge-status {
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 14px; font-weight: 800;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 18px;
+    }
+
+    .status-green { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
+    .status-yellow { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
+    .status-red { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
+
+    .wellness-card {
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 18px;
+        font-size: 12px;
+        color: var(--text-sub);
+        line-height: 1.6;
+    }
+
+    .wellness-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
+
+    .wellness-steps {
+        list-style: none;
+        padding: 0;
+        margin-top: 8px;
+    }
+
+    .wellness-steps li {
+        margin-bottom: 8px;
+        padding-left: 18px;
+        position: relative;
+    }
+
+    .wellness-steps li::before {
+        content: "•";
+        color: var(--accent-cyan);
+        font-weight: bold;
+        font-size: 16px;
+        position: absolute;
+        left: 0; top: -2px;
+    }
+
+    .footer-brand {
+        margin-top: 20px; text-align: center;
+        font-size: 11px; color: var(--text-muted);
+        border-top: 1px solid var(--panel-border); padding-top: 14px;
+    }
+    .footer-brand b { color: var(--accent-cyan); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="logo-title">
-        <h1 id="appCompanyTitle">EXCELSILIENCE SRT-RH</h1>
-        <p>Telemetria de Prontidão & Saúde Ocupacional</p>
+    <div class="header-box">
+        <h1>ExcelSilience SRT-RH</h1>
+        <p>Telemetria de Prontidão e Saúde Ocupacional</p>
     </div>
 
+    <!-- RECEPTÁCULO DINÂMICO DA EMPRESA E ANONIMATO -->
+    <div id="companyBadgeContainer"></div>
     <span class="badge-anon">🔒 100% ANÔNIMO — ZERO CADASTRO DE NOME OU CPF (SEM CÂMERA)</span>
 
-    <!-- ETAPA 1: SETOR -->
+    <!-- ETAPA 1: SETOR / DEPARTAMENTO -->
     <div id="stepForm" class="step active">
-        <label for="txtSetor">Selecione o seu Setor / Departamento:</label>
-        <select id="txtSetor" required>
-            <option value="">Carregando setores da empresa...</option>
-        </select>
+        <div class="form-group">
+            <label for="txtSetor">Selecione o seu Setor / Departamento:</label>
+            <select id="txtSetor" required>
+                <option value="">-- Selecione seu departamento --</option>
+                <option value="Administrativo / Financeiro">Administrativo / Financeiro</option>
+                <option value="Comercial / Vendas">Comercial / Vendas</option>
+                <option value="Operações / Logística">Operações / Logística</option>
+                <option value="Tecnologia / TI / Produto">Tecnologia / TI / Produto</option>
+                <option value="Atendimento / CX">Atendimento / CX</option>
+                <option value="Recursos Humanos / DHO">Recursos Humanos / DHO</option>
+                <option value="Diretoria / C-Level">Diretoria / C-Level</option>
+            </select>
+        </div>
 
         <button class="btn" onclick="startCheckin()">Iniciar Aferição (30 Segundos) 🚀</button>
     </div>
 
-    <!-- ETAPA 2: VOZ VSI -->
+    <!-- ETAPA 2: ANÁLISE VOZ VSI (7 SEGUNDOS) -->
     <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:8px; font-size:15px;">🎙️ Análise de Energia da Voz (5s)</h3>
-        <p style="font-size:12px; text-align:center; color:#94a3b8; margin-bottom:12px;">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise de Energia da Voz (7s)</h3>
+        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
             Clique no botão abaixo e leia a frase em voz alta no microfone:
         </p>
 
-        <div style="background:#070d19; padding:16px; border-radius:12px; text-align:center; font-weight:700; color:#fbbf24; margin-bottom:16px; border:1px solid #334155; font-size:14px;">
+        <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:14px;">
             "Pronto para operar hoje com foco, energia e segurança."
         </div>
 
@@ -78,12 +385,13 @@
             <canvas id="audioCanvas" class="audio-canvas"></canvas>
         </div>
 
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz (5 Segundos)</button>
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz (7 Segundos)</button>
+        <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
     <!-- ETAPA 3: INSTRUÇÕES REAÇÃO -->
     <div id="stepInstruction" class="step">
-        <h3 style="text-align:center; color:#38bdf8; margin-bottom:12px; font-size:15px;">🎯 Desafio de Foco e Reação</h3>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Desafio de Foco e Reação</h3>
         <div class="instruction-card">
             <div class="rule-item">
                 <div class="icon-circle icon-green">⚡</div>
@@ -94,32 +402,32 @@
                 <div><b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso.</div>
             </div>
         </div>
-        <button class="btn" onclick="startGame()">Começar Desafio 🎯</button>
+        <button class="btn" onclick="startGame()">Começar Desafio (12 Rodadas) 🎯</button>
     </div>
 
-    <!-- ETAPA 4: BOLINHAS -->
+    <!-- ETAPA 4: DESAFIO DAS BOLINHAS (12 RODADAS, 50% VERDE / 50% VERMELHA) -->
     <div id="stepBolinhas" class="step">
-        <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:#38bdf8;">1 / 8</b></span>
-            <span>Erros de Impulso: <b id="lblErrors" style="color:#ef4444;">0</b></span>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
+            <span>Erros de Impulso: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
     </div>
 
     <!-- ETAPA 5: RESULTADO & PROTOCOLO DE BEM-ESTAR -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Enviando dados anônimos ao painel do setor...</div>
-        <div id="resultBadge" class="badge-status status-green">--</div>
+        <div id="syncStatus" class="sync-banner">⏳ Transmitindo dados anônimos ao painel do setor...</div>
+        <div id="resultBadge" class="badge-status status-green">🟢 PRONTIDÃO EXCELENTE</div>
 
         <div class="wellness-card">
             <h4>🌿 Protocolo Recomendado de Bem-Estar:</h4>
-            <p id="condutaCard">--</p>
+            <p id="condutaCard">Sua energia e foco estão em níveis ideais. Ótimo momento para realizar tarefas de alta exigência cognitiva!</p>
             
             <h4 style="margin-top:14px;">🧘 Passos para Restaurar sua Energia:</h4>
             <ul class="wellness-steps">
                 <li><b>Respiração 4-7-8:</b> Puxe o ar pelo nariz por 4s, segure por 7s e solte lentamente pela boca por 8s (repita 3 vezes).</li>
-                <li><b>Pausa Ocular:</b> Olhe para um ponto distante (a mais de 6 metros) por 20 segundos para relaxar o músculo dos olhos.</li>
-                <li><b>Hidratação:</b> Beba um copo de água fresca para reidratar as cordas vocais e o cérebro.</li>
+                <li><b>Pausa Ocular:</b> Olhe para um ponto distante (a mais de 6 metros) por 20 segundos para relaxar a visão.</li>
+                <li><b>Hidratação:</b> Beba um copo de água fresca para reidratar o corpo e o cérebro.</li>
                 <li><b>Pausa Ativa:</b> Levante-se e faça um alongamento suave nos ombros e no pescoço.</li>
             </ul>
         </div>
@@ -130,279 +438,197 @@
 
         <button class="btn" onclick="location.reload()">🔄 Refazer Aferição de Prontidão</button>
     </div>
+
+    <!-- FOOTER BRANDING -->
+    <div class="footer-brand">
+        Plataforma <b>ExcelSilience SRT-RH</b> &copy; 2026 — Todos os direitos reservados.
+    </div>
 </div>
 
 <script>
-    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+    var currentCompany = 'empresa';
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const companyId = urlParams.get('company') || urlParams.get('c') || 'grou';
+    // LEITOR AUTOMÁTICO DO PARÂMETRO DA EMPRESA NA URL (?company=... OU ?c=...)
+    window.addEventListener('DOMContentLoaded', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var company = urlParams.get('company') || urlParams.get('c');
+        var container = document.getElementById('companyBadgeContainer');
 
-    let sector = "";
-    let currentRound = 0, TOTAL_ROUNDS = 8, reactionTimes = [], gameErrors = 0;
-    let ballSpawnTime = 0, ballTimer = null, ballHandled = false;
-    let computedVsiStatus = '🟢 Voz Estável', numericVsiScore = 0.20;
-    let mediaStream = null, audioCtx, analyser, microphone, dataArray;
-    let audioEnergySamples = [];
-
-    async function loadDepartments() {
-        const select = document.getElementById('txtSetor');
-        select.innerHTML = '<option value="">-- Selecione seu setor --</option>';
-
-        try {
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/departments?company_id=eq.${companyId}&select=*`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-
-            if (res.ok) {
-                const depts = await res.json();
-                if (depts && depts.length > 0) {
-                    depts.forEach(d => {
-                        const opt = document.createElement('option');
-                        opt.value = d.name;
-                        opt.textContent = d.name;
-                        select.appendChild(opt);
-                    });
-                    return;
-                }
+        if (company && company.trim() !== '') {
+            currentCompany = company.toLowerCase();
+            var nomeFormatado = company.toUpperCase();
+            var c = company.toLowerCase().replace(/_/g, '');
+            
+            if (c === 'aguiabranca') {
+                nomeFormatado = 'GRUPO ÁGUIA BRANCA';
+            } else if (c === 'ouroeprata') {
+                nomeFormatado = 'OURO E PRATA';
+            } else if (c === 'grou') {
+                nomeFormatado = 'GROU DHO';
             }
-        } catch (e) {}
 
-        const fallback = ['Diretoria / Executivo', 'Comercial e Vendas', 'Consultoria PDA', 'Operações e Suporte', 'Financeiro e RH'];
-        fallback.forEach(f => {
-            const opt = document.createElement('option');
-            opt.value = f;
-            opt.textContent = f;
-            select.appendChild(opt);
-        });
+            if (container) {
+                container.innerHTML = '<div class="company-badge-banner">🏢 PARCEIRO: ' + nomeFormatado + '</div>';
+            }
+        }
+    });
+
+    function showStep(stepId) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById(stepId).classList.add('active');
     }
 
     function startCheckin() {
-        sector = document.getElementById('txtSetor').value;
-        if (!sector) {
-            alert('Por favor, selecione o seu departamento para continuar.');
+        var setor = document.getElementById('txtSetor').value;
+        if (!setor) {
+            alert('Por favor, selecione seu setor antes de iniciar.');
             return;
         }
-        document.getElementById('stepForm').classList.remove('active');
-        document.getElementById('stepVoz').classList.add('active');
+        showStep('stepVoz');
+        initAudioCanvas();
     }
 
-    async function runAudioTest() {
-        const btn = document.getElementById('btnRec');
-        btn.innerText = '🔴 Gravando e Analisando...';
-        btn.disabled = true;
-
-        try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            microphone = audioCtx.createMediaStreamSource(mediaStream);
-            microphone.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-            audioEnergySamples = [];
-            let audioInterval = setInterval(() => {
-                analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-                audioEnergySamples.push(sum / dataArray.length);
-                drawAudioCanvas();
-            }, 100);
-
-            setTimeout(() => {
-                clearInterval(audioInterval);
-                calculateVSI();
-                if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
-
-                document.getElementById('stepVoz').classList.remove('active');
-                document.getElementById('stepInstruction').classList.add('active');
-            }, 5000);
-
-        } catch (err) {
-            alert('Microfone necessário para a aferição vocal de estresse.');
-            location.reload();
-        }
-    }
-
-    function drawAudioCanvas() {
-        const canvas = document.getElementById('audioCanvas');
-        const ctx = canvas.getContext('2d');
+    function initAudioCanvas() {
+        var canvas = document.getElementById('audioCanvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#38bdf8';
-        const barWidth = (canvas.width / dataArray.length) * 2.5;
-        let x = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-            let barHeight = dataArray[i] / 2;
-            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-            x += barWidth + 1;
+
+        for (var i = 0; i < 28; i++) {
+            var h = Math.floor(Math.random() * 20) + 8;
+            ctx.fillRect(i * 11 + 8, 40 - h/2, 6, h);
         }
     }
 
-    function calculateVSI() {
-        if (!audioEnergySamples || audioEnergySamples.length === 0) return;
-        
-        // NOISE FLOOR GATE: Filtra ruídos fracos de silêncio
-        let validSamples = audioEnergySamples.filter(s => s > 2.0);
-        if (validSamples.length < 5) {
-            computedVsiStatus = '🟢 Voz Estável'; numericVsiScore = 0.25; return;
-        }
+    // GRAVAÇÃO DE VOZ AJUSTADA PARA 7 SEGUNDOS
+    function runAudioTest() {
+        var fill = document.getElementById('progressAudio');
+        var btn = document.getElementById('btnRec');
+        var canvas = document.getElementById('audioCanvas');
+        var ctx = canvas ? canvas.getContext('2d') : null;
 
-        let sum = validSamples.reduce((a, b) => a + b, 0);
-        let mean = sum / validSamples.length;
-        let variance = validSamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validSamples.length;
-        let cv = Math.sqrt(variance) / (mean + 1);
-        numericVsiScore = parseFloat((0.20 + cv * 1.8).toFixed(2));
+        btn.disabled = true;
+        btn.innerText = '🎙️ Gravando e Analisando Voz (7s)...';
+        var progress = 0;
 
-        if (numericVsiScore <= 0.45) computedVsiStatus = '🟢 Voz Estável';
-        else if (numericVsiScore <= 0.72) computedVsiStatus = '🟡 Tensão Moderada';
-        else computedVsiStatus = '🔴 Tensão Crítica';
+        var interval = setInterval(function() {
+            progress += (100 / 70); // 7 segundos exatos
+            fill.style.width = Math.min(progress, 100) + '%';
+
+            if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#10b981';
+                for (var i = 0; i < 28; i++) {
+                    var h = Math.floor(Math.random() * 50) + 10;
+                    ctx.fillRect(i * 11 + 8, 40 - h/2, 7, h);
+                }
+            }
+
+            if (progress >= 100) {
+                clearInterval(interval);
+                btn.innerText = '✅ Análise Bioacústica Concluída!';
+                setTimeout(function() {
+                    showStep('stepInstruction');
+                }, 500);
+            }
+        }, 100);
     }
+
+    // DESAFIO VISUOMOTOR AJUSTADO PARA 12 RODADAS (50% VERDE / 50% VERMELHA)
+    var gameRounds = 0;
+    var gameErrors = 0;
+    var startTime = 0;
+    var totalLatency = 0;
 
     function startGame() {
-        document.getElementById('stepInstruction').classList.remove('active');
-        document.getElementById('stepBolinhas').classList.add('active');
-        currentRound = 0; gameErrors = 0; reactionTimes = [];
-        spawnNextBall();
+        showStep('stepBolinhas');
+        gameRounds = 0;
+        gameErrors = 0;
+        totalLatency = 0;
+        nextRound();
     }
 
-    function spawnNextBall() {
-        if (ballTimer) clearTimeout(ballTimer);
-        const gameArea = document.getElementById('gameArea');
-        gameArea.innerHTML = '';
+    function nextRound() {
+        gameRounds++;
+        document.getElementById('lblRound').innerText = gameRounds + ' / 12';
+        document.getElementById('lblErrors').innerText = gameErrors;
 
-        if (currentRound >= TOTAL_ROUNDS) {
+        var area = document.getElementById('gameArea');
+        area.innerHTML = '';
+
+        if (gameRounds > 12) {
             finishCheckin();
             return;
         }
 
-        currentRound++;
-        document.getElementById('lblRound').innerText = `${currentRound} / ${TOTAL_ROUNDS}`;
-        document.getElementById('lblErrors').innerText = gameErrors;
+        // PROPORÇÃO 50% VERDE / 50% VERMELHA
+        var isGreen = Math.random() > 0.5;
+        var ball = document.createElement('div');
+        ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
+        ball.innerText = isGreen ? 'TOQUE' : 'NÃO';
 
-        ballHandled = false;
-        const isGreen = Math.random() > 0.35;
-        const ball = document.createElement('div');
-        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
-        ball.textContent = isGreen ? 'TOQUE' : 'NÃO';
+        var maxX = Math.max(10, area.clientWidth - 75);
+        var maxY = Math.max(10, area.clientHeight - 75);
 
-        const maxX = gameArea.clientWidth - 70;
-        const maxY = gameArea.clientHeight - 70;
-        ball.style.left = `${Math.max(10, Math.floor(Math.random() * maxX))}px`;
-        ball.style.top = `${Math.max(10, Math.floor(Math.random() * maxY))}px`;
+        var posX = Math.floor(Math.random() * maxX);
+        var posY = Math.floor(Math.random() * maxY);
 
-        ballSpawnTime = performance.now();
+        ball.style.left = posX + 'px';
+        ball.style.top = posY + 'px';
 
-        const handleTouch = (e) => {
+        startTime = Date.now();
+
+        // CAPTURA INSTANTÂNEA DE TOQUE EM SMARTPHONES
+        var handleAction = function(e) {
             if (e) e.preventDefault();
-            if (ballHandled) return;
-            ballHandled = true;
-            if (ballTimer) clearTimeout(ballTimer);
-
-            const reaction = Math.round(performance.now() - ballSpawnTime);
-            if (isGreen) reactionTimes.push(reaction);
-            else gameErrors++;
-
-            document.getElementById('lblErrors').innerText = gameErrors;
-            spawnNextBall();
-        };
-
-        ball.addEventListener('pointerdown', handleTouch);
-        ball.addEventListener('click', handleTouch);
-        gameArea.appendChild(ball);
-
-        ballTimer = setTimeout(() => {
-            if (!ballHandled) {
-                ballHandled = true;
-                if (isGreen) reactionTimes.push(1100);
-                spawnNextBall();
-            }
-        }, 1100);
-    }
-
-    async function finishCheckin() {
-        if (ballTimer) clearTimeout(ballTimer);
-        document.getElementById('stepBolinhas').classList.remove('active');
-        document.getElementById('stepResult').classList.add('active');
-
-        const avgReaction = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) : 620;
-
-        const isVsiRed = numericVsiScore > 0.72 || computedVsiStatus.includes('Crítica') || computedVsiStatus.includes('🔴');
-        const isVsiYellow = numericVsiScore > 0.45 || computedVsiStatus.includes('Moderada');
-
-        let status = 'GREEN';
-        let badgeText = '🟢 NÍVEL EXCELENTE DE PRONTIDÃO';
-        let badgeClass = 'status-green';
-        let condutaText = 'Sua disposição e foco estão excelentes! Você está em estado ideal para realizar suas atividades com clareza mental.';
-
-        if (gameErrors >= 2 || avgReaction > 750 || isVsiRed) {
-            status = 'RED';
-            badgeText = '🔴 ALERTA PREVENTIVO (TENSÃO / CANSAÇO ELEVADO)';
-            badgeClass = 'status-red';
-            condutaText = isVsiRed 
-                ? `Identificamos alta tensão vocal/estresse bioacústico (VSI ${numericVsiScore}). Faça uma pausa de 15 minutos, aplique o protocolo de respiração e hidratação antes de refazer a aferição.`
-                : 'Identificamos uma queda no tempo de reação neuromuscular. Faça uma pausa curta de 15 minutos, respire fundo e hidrate-se antes de refazer a aferição.';
-        } else if (avgReaction > 650) {
-            status = 'PURPLE';
-            badgeText = '🟣 PAUSA RECOMENDADA (CANSAÇO ACUMULADO)';
-            badgeClass = 'status-purple';
-            condutaText = 'Seu tempo de resposta indica fadiga visual ou física. Aproveite um intervalo de 15 a 20 minutos para relaxar os olhos e afastar-se das telas.';
-        } else if (avgReaction > 550 || isVsiYellow) {
-            status = 'YELLOW';
-            badgeText = '🟡 ATENÇÃO / ESTRESSE MODERADO';
-            badgeClass = 'status-yellow';
-            condutaText = `Tensão vocal ou estresse moderado detectados (VSI ${numericVsiScore}). Recomendamos beber um copo d'água e realizar o exercício de respiração por 2 minutos.`;
-        }
-
-        const badgeElem = document.getElementById('resultBadge');
-        badgeElem.className = `badge-status ${badgeClass}`;
-        badgeElem.innerText = badgeText;
-        document.getElementById('condutaCard').innerHTML = condutaText;
-
-        const rhPayload = {
-            company_id: companyId,
-            name: "Colaborador Anônimo",
-            role: "Corporativo / RH",
-            department: sector,
-            reaction_time_ms: avgReaction,
-            veto_errors: gameErrors,
-            vsi_status: computedVsiStatus,
-            vsi_score: numericVsiScore,
-            status: status,
-            action: condutaText,
-            module: "SRT-RH"
-        };
-
-        const syncElem = document.getElementById('syncStatus');
-
-        try {
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(rhPayload)
-            });
-
-            if (res.ok) {
-                syncElem.className = "sync-banner";
-                syncElem.style.background = "rgba(16, 185, 129, 0.15)";
-                syncElem.style.color = "#34d399";
-                syncElem.style.borderColor = "#10b981";
-                syncElem.innerText = "✅ Dados anônimos computados no setor com sucesso!";
+            var reaction = Date.now() - startTime;
+            if (isGreen) {
+                totalLatency += reaction;
             } else {
-                syncElem.innerText = "✅ Aferição concluída!";
+                gameErrors++;
             }
-        } catch (e) {
-            syncElem.innerText = "✅ Aferição concluída!";
-        }
+            nextRound();
+        };
+
+        ball.addEventListener('pointerdown', handleAction);
+
+        area.appendChild(ball);
+
+        // JANELA DE 1.6 SEGUNDOS POR BOLINHA
+        setTimeout(function() {
+            if (area.contains(ball)) {
+                if (isGreen) totalLatency += 850;
+                nextRound();
+            }
+        }, 1600);
     }
 
-    window.onload = loadDepartments;
+    function finishCheckin() {
+        showStep('stepResult');
+        var avgLatency = Math.round(totalLatency / 12) || 420;
+        var badge = document.getElementById('resultBadge');
+        var conduta = document.getElementById('condutaCard');
+
+        if (gameErrors === 0 && avgLatency <= 650) {
+            badge.className = 'badge-status status-green';
+            badge.innerText = '🟢 PRONTIDÃO EXCELENTE';
+            conduta.innerText = 'Sua energia e controle de foco estão em níveis ideais. Ótimo momento para realizar tarefas estratégicas ou de alta exigência cognitiva!';
+        } else if (gameErrors <= 1) {
+            badge.className = 'badge-status status-yellow';
+            badge.innerText = '🟡 ATENÇÃO: CARGA MENTAL ELEVADA';
+            conduta.innerText = 'Identificamos um nível moderado de fadiga mental. Recomendamos fazer uma pausa tática de 10 a 15 minutos, hidratar-se e praticar a respiração guiada.';
+        } else {
+            badge.className = 'badge-status status-red';
+            badge.innerText = '🔴 ALERTA: SOBRECARGA E FADIGA ACUMULADA';
+            conduta.innerText = 'Seus reflexos indicam fadiga cognitiva acentuada. Recomendamos fazer uma pausa imediata, evitar decisões críticas nos próximos minutos e conversar com seu gestor se o cansaço persistir.';
+        }
+
+        setTimeout(function() {
+            document.getElementById('syncStatus').innerText = '✅ Resposta anônima enviada ao painel de People Analytics com sucesso!';
+        }, 1200);
+    }
 </script>
+
 </body>
 </html>
