@@ -30,7 +30,6 @@
         min-height: 100vh;
     }
 
-    /* HEADER PRINCIPAL */
     .header {
         display: flex;
         justify-content: space-between;
@@ -42,11 +41,7 @@
         gap: 16px;
     }
 
-    .title-group {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+    .title-group { display: flex; align-items: center; gap: 12px; }
 
     .company-badge {
         background: rgba(56, 189, 248, 0.15);
@@ -60,54 +55,10 @@
         text-transform: uppercase;
     }
 
-    .title-group h1 {
-        font-size: 20px;
-        font-weight: 800;
-        color: #fff;
-        letter-spacing: 0.5px;
-    }
+    .title-group h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
+    .title-group p { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 600; }
 
-    .title-group p {
-        font-size: 11px;
-        color: var(--muted);
-        margin-top: 2px;
-        font-weight: 600;
-    }
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .period-selector {
-        display: flex;
-        background: #0d1527;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 3px;
-        gap: 3px;
-    }
-
-    .period-btn {
-        background: transparent;
-        border: none;
-        color: var(--muted);
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-transform: uppercase;
-    }
-
-    .period-btn.active {
-        background: var(--accent);
-        color: #000;
-        box-shadow: 0 0 10px var(--accent-glow);
-    }
+    .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
     .btn {
         background: var(--card-inner);
@@ -126,13 +77,8 @@
 
     .btn:hover { background: #2d3d5a; border-color: var(--accent); }
     .btn-green { background: #059669; color: #fff; border: none; }
-    .btn-green:hover { background: #10b981; }
     .btn-accent { background: #0284c7; color: #fff; border-color: var(--accent); }
-    .btn-accent:hover { background: #0369a1; }
-    .btn-purple { background: #7e22ce; color: #fff; border: none; }
-    .btn-purple:hover { background: #9333ea; }
 
-    /* NAV TABS */
     .nav-tabs {
         display: flex;
         gap: 8px;
@@ -152,12 +98,7 @@
         font-weight: 800;
         cursor: pointer;
         transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 6px;
     }
-
-    .tab-btn:hover { color: #fff; border-color: var(--accent); }
 
     .tab-btn.active {
         background: #0284c7;
@@ -166,7 +107,6 @@
         box-shadow: 0 0 12px var(--accent-glow);
     }
 
-    /* CARDS GRID */
     .cards-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -180,36 +120,17 @@
         border-radius: 14px;
         padding: 16px;
         text-align: center;
-        position: relative;
     }
 
-    .card-metric .lbl {
-        font-size: 10px;
-        text-transform: uppercase;
-        color: var(--muted);
-        font-weight: 800;
-        margin-bottom: 6px;
-    }
-
-    .card-metric .val {
-        font-size: 26px;
-        font-weight: 800;
-    }
-
-    .card-metric .subtext {
-        font-size: 10px;
-        color: var(--muted);
-        margin-top: 4px;
-        font-weight: 600;
-    }
+    .card-metric .lbl { font-size: 10px; text-transform: uppercase; color: var(--muted); font-weight: 800; margin-bottom: 6px; }
+    .card-metric .val { font-size: 26px; font-weight: 800; }
+    .card-metric .subtext { font-size: 10px; color: var(--muted); margin-top: 4px; font-weight: 600; }
 
     .val-total { color: var(--accent); }
     .val-verde { color: var(--green); }
     .val-amarelo { color: var(--yellow); }
     .val-vermelho { color: var(--red); }
-    .val-purple { color: var(--purple); }
 
-    /* PAINÉIS */
     .panel {
         background: var(--card);
         border: 1px solid var(--border);
@@ -227,165 +148,42 @@
         gap: 10px;
     }
 
-    .panel-title {
-        font-size: 15px;
-        font-weight: 800;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+    .panel-title { font-size: 15px; font-weight: 800; color: #fff; }
 
-    .panel-subtitle {
-        font-size: 11px;
-        color: var(--muted);
-        font-weight: 600;
-    }
-
-    /* TABELAS */
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
     th { padding: 10px; color: var(--accent); font-size: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: #0d1527; font-weight: 800; }
     td { padding: 12px 10px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
 
-    .badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 10px;
-        font-weight: 800;
-        display: inline-block;
-    }
-
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; }
     .badge-verde { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid var(--green); }
     .badge-amarelo { background: rgba(251, 191, 36, 0.15); color: var(--yellow); border: 1px solid var(--yellow); }
-    .badge-roxo { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid var(--purple); }
     .badge-vermelho { background: rgba(248, 113, 113, 0.15); color: var(--red); border: 1px solid var(--red); }
 
-    .grid-two {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 20px;
-        margin-bottom: 24px;
-    }
-
-    @media (max-width: 960px) {
-        .grid-two { grid-template-columns: 1fr; }
-    }
-
-    .select-box, .input-box {
-        background: #0d1527;
-        border: 1px solid var(--border);
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 700;
-        outline: none;
-    }
-
-    /* HEATMAP STYLES */
-    .heatmap-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
-        overflow-x: auto;
-    }
-    .heatmap-header-cell {
-        background: #0d1527;
-        border: 1px solid var(--border);
-        padding: 10px 8px;
-        border-radius: 6px;
-        font-size: 10px;
-        font-weight: 800;
-        color: var(--accent);
-        text-align: center;
-        text-transform: uppercase;
-    }
-    .heatmap-cell {
-        padding: 10px 6px;
-        border-radius: 6px;
-        text-align: center;
-        font-size: 11px;
-        font-weight: 800;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    .cell-green { background: rgba(52, 211, 153, 0.2); border: 1px solid var(--green); color: var(--green); }
-    .cell-yellow { background: rgba(251, 191, 36, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
-    .cell-purple { background: rgba(192, 132, 252, 0.2); border: 1px solid var(--purple); color: var(--purple); }
-    .cell-red { background: rgba(248, 113, 113, 0.2); border: 1px solid var(--red); color: var(--red); }
-
-    .report-preview-box {
-        background: #090d16;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 18px;
-        font-family: monospace;
-        font-size: 11px;
-        color: #38bdf8;
-        line-height: 1.6;
-        white-space: pre-wrap;
-        margin: 16px 0;
-        max-height: 350px;
-        overflow-y: auto;
-    }
-
-    .filter-bar {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .empty-row-text {
-        text-align: center;
-        padding: 30px;
-        color: var(--muted);
-        font-weight: 600;
-    }
+    .empty-row-text { text-align: center; padding: 30px; color: var(--muted); font-weight: 600; }
 </style>
 </head>
 <body>
 
-<!-- HEADER PRINCIPAL -->
 <div class="header">
     <div class="title-group">
-        <div class="company-badge" id="lblCompanyTag">SUPABASE CONECTADO</div>
+        <div class="company-badge">SUPABASE CONECTADO</div>
         <div>
-            <h1>EXCELSILIENCE SRT-RH — COCKPIT DE PEOPLE ANALYTICS & SST</h1>
-            <p>Telemetria de Prontidão Biométrica, Matriz de Contágio C-Level & Compliance (NR-01, NR-17 e eSocial)</p>
+            <h1>EXCELSILIENCE SRT-RH — COCKPIT DE PEOPLE ANALYTICS</h1>
+            <p>Telemetria de Prontidão Biométrica e Saúde Ocupacional em Tempo Real</p>
         </div>
     </div>
 
     <div class="header-actions">
-        <div class="period-selector">
-            <button class="period-btn" id="pBtnDay" onclick="setPeriod('DAY')">☀️ Dia</button>
-            <button class="period-btn active" id="pBtnWeek" onclick="setPeriod('WEEK')">📅 Semana</button>
-            <button class="period-btn" id="pBtnMonth" onclick="setPeriod('MONTH')">📊 Mês</button>
-        </div>
-
-        <button class="btn btn-green" onclick="abrirCentralLaudos('NR01')">📄 Laudo NR-01 (PGR)</button>
-        <button class="btn btn-accent" onclick="abrirCentralLaudos('NR17')">📋 Laudo NR-17 (AEP)</button>
-        <button class="btn btn-purple" onclick="abrirCentralLaudos('eSocial')">📊 eSocial (S-2240)</button>
-        <button class="btn" style="background:#0284c7; color:#fff;" onclick="fetchSupabaseData()">🔄 Atualizar Dados</button>
+        <button class="btn btn-green" onclick="fetchSupabaseData()">🔄 Atualizar Dados</button>
     </div>
 </div>
 
-<!-- NAVEGAÇÃO PRINCIPAL DE ABAS -->
 <div class="nav-tabs">
-    <button class="tab-btn active" id="btnTab1" onclick="switchTab('rh')">📊 1. Visão People Analytics & RH</button>
-    <button class="tab-btn" id="btnTab2" onclick="switchTab('individual')">👤 2. Check-ins Individuais & Histórico</button>
-    <button class="tab-btn" id="btnTab3" onclick="switchTab('medico')">🩺 3. Saúde Ocupacional (Clinical Cockpit CFM)</button>
-    <button class="tab-btn" id="btnTab4" onclick="switchTab('heatmap')">🔥 4. Mapa de Calor & Acompanhamento Temporal</button>
-    <button class="tab-btn" id="btnTab5" onclick="switchTab('contagio')">👑 5. Matriz de Contágio C-Level (v5.7 Grou)</button>
-    <button class="tab-btn" id="btnTab6" onclick="switchTab('laudos')">📄 6. Central de Laudos & Compliance</button>
-    <button class="tab-btn" id="btnTab7" onclick="switchTab('gerenciador')">⚙️ 7. Gerenciador de Setores & Links</button>
+    <button class="tab-btn active" id="btnTab1" onclick="switchTab('rh')">📊 1. Visão People Analytics</button>
+    <button class="tab-btn" id="btnTab2" onclick="switchTab('individual')">👤 2. Registros Individuais</button>
 </div>
 
-<!-- ==================== ABA 1: VISÃO PEOPLE ANALYTICS & RH ==================== -->
+<!-- ABA 1: VISÃO GERAL -->
 <div id="view-rh">
     <div class="cards-grid">
         <div class="card-metric">
@@ -396,95 +194,47 @@
         <div class="card-metric">
             <div class="lbl">Índice Geral de Prontidão</div>
             <div class="val val-verde" id="cardProntidaoGeral">100.0%</div>
-            <div class="subtext">Nível de Homeostase</div>
+            <div class="subtext">Homeostase da equipe</div>
         </div>
         <div class="card-metric">
-            <div class="lbl">Taxa de Fadiga Elevada</div>
-            <div class="val val-amarelo" id="cardAbsenteismo">0.0%</div>
-            <div class="subtext">Projeção preventiva</div>
+            <div class="lbl">Sinais Amarelos (Sobrecarga)</div>
+            <div class="val val-amarelo" id="cardAbsenteismo">0</div>
+            <div class="subtext">Atenção preventiva</div>
         </div>
         <div class="card-metric">
-            <div class="lbl">Alertas de Sobrecarga Crítica</div>
+            <div class="lbl">Alertas Vermelhos (Crítico)</div>
             <div class="val val-vermelho" id="cardAtestados">0</div>
-            <div class="subtext">Sinais Vermelhos/Inaptidão</div>
-        </div>
-        <div class="card-metric">
-            <div class="lbl">Estresse Setorial (SSLI)</div>
-            <div class="val val-purple" id="cardSSLI">1.2</div>
-            <div class="subtext">Média ponderada v5.7</div>
+            <div class="subtext">Riscos de Inaptidão</div>
         </div>
     </div>
 
-    <div class="grid-two">
-        <div class="panel">
-            <div class="panel-header">
-                <div>
-                    <div class="panel-title">Mapeamento de Carga de Estresse por Setor (GHE)</div>
-                    <div class="panel-subtitle">Auditoria de Riscos Psicossociais em Tempo Real</div>
-                </div>
-                <span style="font-size:11px; color:var(--accent); font-weight:800;">🔒 Blindagem LGPD Ativa</span>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Setor / Departamento</th>
-                        <th>Nº Check-ins</th>
-                        <th>Latência Média</th>
-                        <th>Status Prontidão</th>
-                        <th>Ação Recomendada (PDCA)</th>
-                    </tr>
-                </thead>
-                <tbody id="tblRhSectorsBody">
-                    <tr><td colspan="5" class="empty-row-text">Aguardando primeiros check-ins da equipe...</td></tr>
-                </tbody>
-            </table>
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">Mapeamento de Carga de Estresse por Setor</div>
         </div>
-
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Métricas Customizadas do RH</div>
-            </div>
-            <div id="custom-container" style="display:flex; flex-direction:column; gap:10px;">
-                <div class="card-metric">
-                    <div class="lbl">Turnover Voluntário Projetado</div>
-                    <div class="val val-verde" id="valCustomTurnover">1.8%</div>
-                    <div class="subtext">Dentro da meta anual</div>
-                </div>
-                <div class="card-metric">
-                    <div class="lbl">Horas Extras Acumuladas</div>
-                    <div class="val val-amarelo" id="valCustomHoras">12h / mês</div>
-                    <div class="subtext">Média por colaborador</div>
-                </div>
-            </div>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Setor</th>
+                    <th>Nº Check-ins</th>
+                    <th>Latência Média</th>
+                    <th>Status Prontidão</th>
+                    <th>Ação Recomendada</th>
+                </tr>
+            </thead>
+            <tbody id="tblRhSectorsBody">
+                <tr><td colspan="5" class="empty-row-text">Aguardando check-ins da equipe...</td></tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- ==================== ABA 2: CHECK-INS INDIVIDUAIS & HISTÓRICO ==================== -->
+<!-- ABA 2: REGISTROS INDIVIDUAIS -->
 <div id="view-individual" style="display: none;">
     <div class="panel">
         <div class="panel-header">
-            <div>
-                <div class="panel-title">👤 Registros Individuais de Telemetria & Check-ins de Prontidão</div>
-                <div class="panel-subtitle">Histórico auditável por colaborador com métricas neurofisiológicas de 30 segundos</div>
-            </div>
-            <button class="btn btn-accent" onclick="fetchSupabaseData()">🔄 Atualizar do Supabase</button>
+            <div class="panel-title">👤 Registros de Telemetria do Supabase</div>
         </div>
-
-        <div class="filter-bar">
-            <input type="text" class="input-box" id="srcIndividual" placeholder="🔍 Buscar por Setor ou Status..." onkeyup="filtrarCheckinsIndividuais()">
-            <select class="select-box" id="selIndSector" onchange="filtrarCheckinsIndividuais()">
-                <option value="ALL">🏢 Todos os Setores</option>
-            </select>
-            <select class="select-box" id="selIndStatus" onchange="filtrarCheckinsIndividuais()">
-                <option value="ALL">🎨 Todos os Status</option>
-                <option value="GREEN">🟢 Verde (Homeostase)</option>
-                <option value="YELLOW">🟡 Amarelo (Sobrecarga)</option>
-                <option value="PURPLE">🟣 Roxo (Exaustão/Sono)</option>
-                <option value="RED">🔴 Vermelho (Inaptidão Crítica)</option>
-            </select>
-        </div>
-
         <table>
             <thead>
                 <tr>
@@ -493,230 +243,29 @@
                     <th>Setor</th>
                     <th>Latência (ms)</th>
                     <th>Erros de Veto</th>
-                    <th>Score VSI</th>
+                    <th>VSI Score</th>
                     <th>Status Final</th>
                 </tr>
             </thead>
             <tbody id="tblIndividualBody">
-                <tr><td colspan="7" class="empty-row-text">Nenhum check-in registrado no sistema até o momento.</td></tr>
+                <tr><td colspan="7" class="empty-row-text">Nenhum registro encontrado.</td></tr>
             </tbody>
         </table>
-    </div>
-</div>
-
-<!-- ==================== ABA 3: VISÃO SAÚDE OCUPACIONAL ==================== -->
-<div id="view-medico" style="display: none;">
-    <div class="cards-grid">
-        <div class="card-metric">
-            <div class="lbl">Vidas Monitoradas SESMT</div>
-            <div class="val val-total" id="cardMedVidas">128 Vidas</div>
-            <div class="subtext">Acompanhamento contínuo</div>
-        </div>
-        <div class="card-metric">
-            <div class="lbl">Alertas de Sobrecarga Crítica</div>
-            <div class="val val-vermelho" id="cardMedAvc">0 Casos</div>
-            <div class="subtext">Sem ocorrências graves</div>
-        </div>
-        <div class="card-metric">
-            <div class="lbl">Sobrecarga Autonômica Elevada</div>
-            <div class="val val-amarelo" id="cardMedCardio">2 Colaboradores</div>
-            <div class="subtext">Acompanhamento VFC</div>
-        </div>
-        <div class="card-metric">
-            <div class="lbl">Restauro Fisiológico (VFC)</div>
-            <div class="val val-verde" id="cardMedVfc">48 ms</div>
-            <div class="subtext">Média rMSSD</div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-header">
-            <div>
-                <div class="panel-title">Triagem de Prontidão Ocupacional & Sobrecarga Fisiológica Auditada</div>
-                <div class="panel-subtitle">Painel Ocupacional Preventivo sob Diretrizes de Telemetria de Bem-Estar</div>
-            </div>
-            <span style="font-size:11px; color:var(--purple); font-weight:800;">🔐 Sigilo Médico CFM Preservado</span>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Prontuário ID</th>
-                    <th>Setor</th>
-                    <th>VFC (rMSSD)</th>
-                    <th>Status Autonômico</th>
-                    <th>Indicador de Risco Operacional</th>
-                    <th>Conduta Preventiva Prescrita</th>
-                </tr>
-            </thead>
-            <tbody id="tblMedicoBody">
-                <tr><td>PRT-9021</td><td>Operações / Logística</td><td>32 ms</td><td><span class="badge badge-amarelo">Sobrecarga Moderada</span></td><td>Médio</td><td>Pausa tática de 15 min + Hidratação</td></tr>
-                <tr><td>PRT-8842</td><td>Tecnologia / TI</td><td>28 ms</td><td><span class="badge badge-amarelo">Tensão Laríngea VSI</span></td><td>Médio</td><td>Ajuste de jornada e pausa de tela</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- ==================== ABA 4: MAPA DE CALOR & TEMPORAL ==================== -->
-<div id="view-heatmap" style="display: none;">
-    <div class="panel">
-        <div class="panel-header">
-            <div>
-                <div class="panel-title">🔥 Mapa de Calor de Carga Cognitiva por Setor (GHE)</div>
-                <div class="panel-subtitle">Visualização matricial do estresse e fadiga por dia da semana</div>
-            </div>
-        </div>
-        <div class="heatmap-grid" id="heatmapContainer">
-            <div class="heatmap-header-cell">Setor / Dia</div>
-            <div class="heatmap-header-cell">Seg</div>
-            <div class="heatmap-header-cell">Ter</div>
-            <div class="heatmap-header-cell">Qua</div>
-            <div class="heatmap-header-cell">Qui</div>
-            <div class="heatmap-header-cell">Sex</div>
-            <div class="heatmap-header-cell">Sáb/Dom</div>
-
-            <div style="font-weight:800; font-size:11px; align-self:center;">Operações</div>
-            <div class="heatmap-cell cell-green">4.8</div>
-            <div class="heatmap-cell cell-green">4.6</div>
-            <div class="heatmap-cell cell-yellow">3.8</div>
-            <div class="heatmap-cell cell-green">4.5</div>
-            <div class="heatmap-cell cell-green">4.2</div>
-            <div class="heatmap-cell cell-purple">3.9</div>
-
-            <div style="font-weight:800; font-size:11px; align-self:center;">Tecnologia</div>
-            <div class="heatmap-cell cell-green">4.9</div>
-            <div class="heatmap-cell cell-green">4.8</div>
-            <div class="heatmap-cell cell-green">4.7</div>
-            <div class="heatmap-cell cell-green">4.6</div>
-            <div class="heatmap-cell cell-yellow">3.9</div>
-            <div class="heatmap-cell cell-green">4.8</div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-header">
-            <div>
-                <div class="panel-title">📈 Gráfico de Acompanhamento Temporal da Prontidão</div>
-                <div class="panel-subtitle">Linha de tendência da latência de resposta ao longo dos check-ins</div>
-            </div>
-        </div>
-        <div style="height: 280px; position: relative;"><canvas id="trendChartCanvas"></canvas></div>
-    </div>
-</div>
-
-<!-- ==================== ABA 5: MATRIZ DE CONTÁGIO C-LEVEL ==================== -->
-<div id="view-contagio" style="display: none;">
-    <div class="panel">
-        <div class="panel-header">
-            <div>
-                <div class="panel-title">👑 Matriz de Contágio Top-Down C-Level vs. Equipe (Módulo v5.7 Grou)</div>
-                <div class="panel-subtitle">Cruzamento da energia do executivo (ES-Crise) com a exaustão acumulada do setor</div>
-            </div>
-            <span class="badge badge-roxo">Inovação Exclusiva Grou DHO</span>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Diretoria / C-Level</th>
-                    <th>Score Executivo (ES-Crise)</th>
-                    <th>Setor Liderado</th>
-                    <th>Exaustão do Setor (%)</th>
-                    <th>Diagnóstico de Governança</th>
-                    <th>Plano de Intervenção DHO Grou</th>
-                </tr>
-            </thead>
-            <tbody id="tblContagioBody">
-                <tr><td>Presidência / CEO</td><td>4.85 (Soberano)</td><td>Diretoria Executiva</td><td>5%</td><td><span class="badge badge-verde">Homeostase Perfeita</span></td><td>Manter cadência de decisões estratégicas</td></tr>
-                <tr><td>Diretoria Operacional</td><td>3.40 (Sobrecarga)</td><td>Operações / Logística</td><td>22%</td><td><span class="badge badge-amarelo">Fadiga Transmitida</span></td><td>Pausa tática pré-comitê + Rotação de turno</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- ==================== ABA 6: CENTRAL DE LAUDOS & COMPLIANCE ==================== -->
-<div id="view-laudos" style="display: none;">
-    <div class="panel">
-        <div class="panel-header">
-            <div>
-                <div class="panel-title">📄 Central de Laudos Regulatórios & Compliance SST</div>
-                <div class="panel-subtitle">Emissão de documentos auditáveis para entrega ao Ministério do Trabalho e eSocial</div>
-            </div>
-        </div>
-
-        <div class="grid-two">
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <button class="btn btn-green" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR01')">📄 Visualizar Laudo NR-01 (PGR - Riscos Psicossociais)</button>
-                <button class="btn btn-accent" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR17')">📋 Visualizar Laudo NR-17 (AEP - Carga Cognitiva)</button>
-                <button class="btn btn-purple" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('eSocial')">📊 Visualizar Evento eSocial S-2240 (Fatores de Risco)</button>
-            </div>
-
-            <div>
-                <div style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:8px;">Pré-visualização do Documento Auditável:</div>
-                <div class="report-preview-box" id="laudoPreviewText">Selecione um laudo à esquerda para visualizar o texto consolidado e realizar o download...</div>
-                <button class="btn btn-green" style="width:100%; justify-content:center; padding:12px;" onclick="window.print()">⬇️ Baixar Laudo Oficial em PDF Auditável</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ==================== ABA 7: GERENCIADOR DE SETORES & LINKS ==================== -->
-<div id="view-gerenciador" style="display: none;">
-    <div class="grid-two">
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">⚙️ Gerenciador Self-Service de Setores</div>
-            </div>
-            <div style="display:flex; gap:8px; margin-bottom:14px;">
-                <input type="text" id="new-dept-input" class="input-box" placeholder="Nome do novo setor/departamento..." style="flex:1;">
-                <button class="btn btn-green" onclick="addDepartment()">+ Adicionar Setor</button>
-            </div>
-            <div id="dept-list-manager" style="max-height: 250px; overflow-y: auto;">
-                <div style="font-size:11px; color:var(--muted); padding:10px;">Setores Padrão: Operações, Tecnologia, Comercial, Administrativo, RH</div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">🔗 Central de Links Parametrizados por Setor</div>
-            </div>
-            <p style="font-size:11px; color:var(--muted); margin-bottom:12px;">Link universal do aplicativo para distribuição aos colaboradores:</p>
-            <div class="input-box" style="word-break:break-all; font-size:11px; color:var(--accent);">
-                https://excelsilienceos-web.github.io/srt-bio-health/index-rh.html?company=excelsilience
-            </div>
-        </div>
     </div>
 </div>
 
 <script>
-    // CREDENCIAIS SUPABASE OFICIAIS DO PROJETO
     var SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     var SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
-
     var allCheckins = [];
 
-    // NAVEGAÇÃO DE ABAS
     function switchTab(tabId) {
-        var views = ['rh', 'individual', 'medico', 'heatmap', 'contagio', 'laudos', 'gerenciador'];
-        views.forEach(function(v, idx) {
-            var el = document.getElementById('view-' + v);
-            var btn = document.getElementById('btnTab' + (idx + 1));
-            if (el) el.style.display = (v === tabId) ? 'block' : 'none';
-            if (btn) btn.classList.toggle('active', v === tabId);
-        });
-
-        if (tabId === 'heatmap') {
-            initTrendChart();
-        }
+        document.getElementById('view-rh').style.display = (tabId === 'rh') ? 'block' : 'none';
+        document.getElementById('view-individual').style.display = (tabId === 'individual') ? 'block' : 'none';
+        document.getElementById('btnTab1').classList.toggle('active', tabId === 'rh');
+        document.getElementById('btnTab2').classList.toggle('active', tabId === 'individual');
     }
 
-    function setPeriod(p) {
-        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-        if (p === 'DAY') document.getElementById('pBtnDay').classList.add('active');
-        if (p === 'WEEK') document.getElementById('pBtnWeek').classList.add('active');
-        if (p === 'MONTH') document.getElementById('pBtnMonth').classList.add('active');
-    }
-
-    // BUSCA DE DADOS EM TEMPO REAL NO SUPABASE
     function fetchSupabaseData() {
         fetch(SUPABASE_URL + "/rest/v1/srt_rh_checkins?select=*&order=created_at.desc", {
             method: "GET",
@@ -727,47 +276,13 @@
         })
         .then(function(res) { return res.json(); })
         .then(function(data) {
-            console.log("Dados recebidos do Supabase:", data);
-            var localBackup = [];
-            try { localBackup = JSON.parse(localStorage.getItem('srt_rh_checkins') || '[]'); } catch(e) {}
             if (Array.isArray(data)) {
-                allCheckins = data.concat(localBackup);
-            } else {
-                allCheckins = localBackup;
+                allCheckins = data;
+                renderIndividualTable(data);
+                updateCardsAndSectors(data);
             }
-            renderAllDashboardViews(allCheckins);
         })
-        .catch(function(err) {
-            console.warn("Erro ao buscar no Supabase, usando backup local:", err);
-            try {
-                allCheckins = JSON.parse(localStorage.getItem('srt_rh_checkins') || '[]');
-            } catch(e) {
-                allCheckins = [];
-            }
-            renderAllDashboardViews(allCheckins);
-        });
-    }
-
-    function renderAllDashboardViews(list) {
-        renderIndividualTable(list);
-        updateCardsAndSectors(list);
-        populateSectorFilter(list);
-    }
-
-    function populateSectorFilter(list) {
-        var selSector = document.getElementById('selIndSector');
-        if (!selSector) return;
-
-        var sectors = {};
-        list.forEach(function(item) {
-            if (item.setor) sectors[item.setor] = true;
-        });
-
-        var html = '<option value="ALL">🏢 Todos os Setores</option>';
-        Object.keys(sectors).forEach(function(sec) {
-            html += '<option value="' + sec + '">' + sec + '</option>';
-        });
-        selSector.innerHTML = html;
+        .catch(function(err) { console.warn("Erro de busca:", err); });
     }
 
     function renderIndividualTable(list) {
@@ -775,7 +290,7 @@
         if (!tbody) return;
 
         if (!list || list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-row-text">Nenhum check-in registrado no sistema até o momento.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-row-text">Nenhum check-in registrado no Supabase.</td></tr>';
             return;
         }
 
@@ -820,13 +335,7 @@
         var cardAbsenteismo = document.getElementById('cardAbsenteismo');
         var tblSectors = document.getElementById('tblRhSectorsBody');
 
-        if (!list || list.length === 0) {
-            if (cardTotal) cardTotal.innerText = '0';
-            if (cardProntidao) cardProntidao.innerText = '100.0%';
-            if (cardAtestados) cardAtestados.innerText = '0';
-            if (cardAbsenteismo) cardAbsenteismo.innerText = '0.0%';
-            return;
-        }
+        if (!list || list.length === 0) return;
 
         if (cardTotal) cardTotal.innerText = list.length;
 
@@ -835,10 +344,9 @@
         var reds = list.filter(i => i.status === 'RED' || (!i.status && (i.veto_errors || 0) > 1)).length;
 
         var percentGreen = Math.round((greens / list.length) * 100);
-        var percentYellow = Math.round((yellows / list.length) * 100);
 
         if (cardProntidao) cardProntidao.innerText = percentGreen + '%';
-        if (cardAbsenteismo) cardAbsenteismo.innerText = percentYellow + '%';
+        if (cardAbsenteismo) cardAbsenteismo.innerText = yellows;
         if (cardAtestados) cardAtestados.innerText = reds;
 
         var sectorsMap = {};
@@ -855,11 +363,11 @@
             var obj = sectorsMap[sec];
             var avgLat = Math.round(obj.totalLatency / obj.count);
             var statusBadge = '<span class="badge badge-verde">🟢 Excelente</span>';
-            var pdca = 'Manter rotina e acompanhar';
+            var pdca = 'Manter rotina de acompanhamento';
 
             if (obj.errors > 0 || avgLat > 650) {
                 statusBadge = '<span class="badge badge-amarelo">🟡 Sobrecarga</span>';
-                pdca = 'Pausa tática de 15 min recomendada';
+                pdca = 'Pausa tática recomendada';
             }
 
             htmlSectors += '<tr>' +
@@ -876,113 +384,6 @@
         }
     }
 
-    function filtrarCheckinsIndividuais() {
-        var query = document.getElementById('srcIndividual').value.toLowerCase();
-        var selSector = document.getElementById('selIndSector').value;
-        var selStatus = document.getElementById('selIndStatus').value;
-
-        var filtered = allCheckins.filter(function(item) {
-            var matchQuery = (item.setor || '').toLowerCase().includes(query) || (item.company || '').toLowerCase().includes(query);
-            var matchSector = (selSector === 'ALL' || item.setor === selSector);
-            var matchStatus = (selStatus === 'ALL' || item.status === selStatus);
-            return matchQuery && matchSector && matchStatus;
-        });
-
-        renderIndividualTable(filtered);
-    }
-
-    function gerarPreviewLaudo(tipo) {
-        var preview = document.getElementById('laudoPreviewText');
-        var dataAtual = new Date().toLocaleDateString('pt-BR');
-
-        if (tipo === 'NR01') {
-            preview.innerText = "=========================================================\n" +
-                "LAUDO TÉCNICO FORMAL — NR-01 (PGR RISCOS PSICOSSOCIAL)\n" +
-                "EMPRESA: EXCELSILIENCE CORPORATE OPERATING SYSTEM\n" +
-                "DATA DE EMISSÃO: " + dataAtual + "\n" +
-                "=========================================================\n\n" +
-                "1. OBJETIVO:\n" +
-                "Avaliação e inventário contínuo de riscos psicossociais e estresse ocupacional com suporte do sistema de telemetria SRT-RH.\n\n" +
-                "2. AMOSTRAGEM E RESUMO DE DADOS:\n" +
-                "Total de check-ins registrados: " + allCheckins.length + "\n" +
-                "Índice de Prontidão Departamental: DENTRO DOS PARÂMETROS DA NR-01.\n\n" +
-                "3. PARECER TÉCNICO:\n" +
-                "Recomenda-se a manutenção do monitoramento de 30 segundos no início da jornada para prevenção contínua do Burnout.";
-        } else if (tipo === 'NR17') {
-            preview.innerText = "=========================================================\n" +
-                "LAUDO TÉCNICO ERGONÔMICO — NR-17 (AEP CARGA MENTAL)\n" +
-                "EMPRESA: EXCELSILIENCE CORPORATE OPERATING SYSTEM\n" +
-                "DATA DE EMISSÃO: " + dataAtual + "\n" +
-                "=========================================================\n\n" +
-                "1. AVALIAÇÃO DA CARGA COGNITIVA:\n" +
-                "Mapeamento do tempo de reação visuomotor e fadiga neuromuscular em episódios de tomada de decisão.\n\n" +
-                "2. RECOMENDAÇÕES:\n" +
-                "Aplicação do protocolo de pausas de descompressão (15 minutos) para colaboradores em sinal amarelo.";
-        } else {
-            preview.innerText = "=========================================================\n" +
-                "RELATÓRIO DE COMPLIANCE ESOCIAL — EVENTO S-2240\n" +
-                "EMPRESA: EXCELSILIENCE CORPORATE OPERATING SYSTEM\n" +
-                "DATA DE EMISSÃO: " + dataAtual + "\n" +
-                "=========================================================\n\n" +
-                "Monitoramento de fatores de risco organizacionais e controle preventivo de afastamentos.";
-        }
-    }
-
-    function abrirCentralLaudos(tipo) {
-        switchTab('laudos');
-        gerarPreviewLaudo(tipo);
-    }
-
-    function addDepartment() {
-        var input = document.getElementById('new-dept-input');
-        if (input && input.value.trim() !== '') {
-            alert('Setor "' + input.value + '" adicionado com sucesso!');
-            input.value = '';
-        }
-    }
-
-    function initTrendChart() {
-        var canvas = document.getElementById('trendChartCanvas');
-        if (!canvas) return;
-        var ctx = canvas.getContext('2d');
-
-        if (window.myTrendChart) window.myTrendChart.destroy();
-
-        var chartData = [420, 410, 450, 430, 390];
-        var chartLabels = ['Check-in 1', 'Check-in 2', 'Check-in 3', 'Check-in 4', 'Check-in 5'];
-
-        if (allCheckins && allCheckins.length > 0) {
-            var recent = allCheckins.slice(0, 10).reverse();
-            chartLabels = recent.map((item, idx) => 'C-' + (idx + 1));
-            chartData = recent.map(item => item.latency_ms || 420);
-        }
-
-        window.myTrendChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartLabels,
-                datasets: [{
-                    label: 'Latência de Resposta (ms)',
-                    data: chartData,
-                    borderColor: '#38bdf8',
-                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: '#94a3b8' } } },
-                scales: {
-                    x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
-                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
-                }
-            }
-        });
-    }
-
-    // INICIALIZAÇÃO AUTOMÁTICA
     window.addEventListener('DOMContentLoaded', function() {
         fetchSupabaseData();
     });
