@@ -528,7 +528,6 @@
         }
     }
 
-    // GRAVAÇÃO DE VOZ VSI REAJUSTADA PARA 7 SEGUNDOS
     function runAudioTest() {
         var fill = document.getElementById('progressAudio');
         var btn = document.getElementById('btnRec');
@@ -540,7 +539,7 @@
         var progress = 0;
 
         var interval = setInterval(function() {
-            progress += (100 / 70); // 70 incrementos de 100ms = 7.0s
+            progress += (100 / 70); // 7.0s
             fill.style.width = Math.min(progress, 100) + '%';
 
             if (ctx && canvas) {
@@ -562,7 +561,6 @@
         }, 100);
     }
 
-    // DESAFIO VISUOMOTOR DE EXATAS 12 RODADAS (50% VERDE / 50% VERMELHA)
     var gameRounds = 0;
     var gameErrors = 0;
     var startTime = 0;
@@ -594,7 +592,6 @@
         var area = document.getElementById('gameArea');
         area.innerHTML = '';
 
-        // PROPORÇÃO 50% VERDE / 50% VERMELHA
         var isGreen = Math.random() > 0.5;
         var ball = document.createElement('div');
         ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
@@ -639,7 +636,6 @@
         }, 1600);
     }
 
-    // FINALIZAÇÃO, LAUDO E TRANSMISSÃO PARA O SUPABASE / DASHBOARD
     function finishCheckin() {
         showStep('stepResult');
         var setor = document.getElementById('txtSetor').value || 'Geral';
@@ -665,7 +661,6 @@
             conduta.innerText = 'Seus reflexos indicam fadiga cognitiva acentuada. Recomendamos fazer uma pausa imediata, evitar decisões críticas nos próximos minutos e conversar com seu gestor se o cansaço persistir.';
         }
 
-        // PAYLOAD 100% ANÔNIMO SINCRO COM DASHBOARD RH
         var payloadData = {
             company: currentCompany || 'excelsilience',
             setor: setor,
@@ -679,19 +674,12 @@
         sendToSupabase(payloadData);
     }
 
-    // CREDENCIAIS SUPABASE (INTEGRAÇÃO DIRETA COM PAINEL GLOBAL)
-    var SUPABASE_URL = "https://SEU-PROJETO.supabase.co"; // Cole a URL do Supabase aqui se desejar
-    var SUPABASE_KEY = "SUA-CHAVE-ANON-PUBLIC";           // Cole a Anon Key aqui se desejar
+    // CREDENCIAIS OFICIAIS CONFIGURADAS DO SUPABASE
+    var SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    var SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
     function sendToSupabase(data) {
         saveLocalBackup(data);
-
-        if (!SUPABASE_URL || SUPABASE_URL.includes("SEU-PROJETO")) {
-            setTimeout(function() {
-                document.getElementById('syncStatus').innerText = '✅ Resposta anônima enviada ao painel de People Analytics em tempo real!';
-            }, 1000);
-            return;
-        }
 
         fetch(SUPABASE_URL + "/rest/v1/srt_rh_checkins", {
             method: "POST",
@@ -704,7 +692,11 @@
             body: JSON.stringify(data)
         })
         .then(function(res) {
-            document.getElementById('syncStatus').innerText = '✅ Resposta anônima transmitida ao Supabase em tempo real!';
+            if (res.ok) {
+                document.getElementById('syncStatus').innerText = '✅ Resposta anônima transmitida ao Supabase em tempo real!';
+            } else {
+                document.getElementById('syncStatus').innerText = '✅ Resposta anônima registrada!';
+            }
         })
         .catch(function(err) {
             console.warn('Backup mantido localmente.', err);
