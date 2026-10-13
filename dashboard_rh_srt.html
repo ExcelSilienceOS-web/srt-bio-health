@@ -435,7 +435,7 @@
                     </tr>
                 </thead>
                 <tbody id="tblRhSectorsBody">
-                    <tr><td colspan="5" class="empty-row-text">Aguardando primeiros check-ins da equipe... Cadastre os setores na Aba 7.</td></tr>
+                    <tr><td colspan="5" class="empty-row-text">Aguardando primeiros check-ins da equipe...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -443,7 +443,6 @@
         <div class="panel">
             <div class="panel-header">
                 <div class="panel-title">Métricas Customizadas do RH</div>
-                <button class="btn btn-green" style="font-size:10px; padding:4px 8px;" onclick="adicionarMetricaCustomizada()">+ Adicionar</button>
             </div>
             <div id="custom-container" style="display:flex; flex-direction:column; gap:10px;">
                 <div class="card-metric">
@@ -534,7 +533,7 @@
         <div class="panel-header">
             <div>
                 <div class="panel-title">Triagem de Prontidão Ocupacional & Sobrecarga Fisiológica Auditada</div>
-                <div class="panel-subtitle">Painel Ocupacional Preventivo sob Diretrizes de Telemetria de Bem-Estar (Isenção ANVISA SaMD)</div>
+                <div class="panel-subtitle">Painel Ocupacional Preventivo sob Diretrizes de Telemetria de Bem-Estar</div>
             </div>
             <span style="font-size:11px; color:var(--purple); font-weight:800;">🔐 Sigilo Médico CFM Preservado</span>
         </div>
@@ -729,25 +728,46 @@
         .then(function(res) { return res.json(); })
         .then(function(data) {
             console.log("Dados recebidos do Supabase:", data);
+            var localBackup = [];
+            try { localBackup = JSON.parse(localStorage.getItem('srt_rh_checkins') || '[]'); } catch(e) {}
             if (Array.isArray(data)) {
-                var localBackup = [];
-                try { localBackup = JSON.parse(localStorage.getItem('srt_rh_checkins') || '[]'); } catch(e) {}
                 allCheckins = data.concat(localBackup);
-                renderAllDashboardViews(allCheckins);
+            } else {
+                allCheckins = localBackup;
             }
+            renderAllDashboardViews(allCheckins);
         })
         .catch(function(err) {
             console.warn("Erro ao buscar no Supabase, usando backup local:", err);
             try {
                 allCheckins = JSON.parse(localStorage.getItem('srt_rh_checkins') || '[]');
-                renderAllDashboardViews(allCheckins);
-            } catch(e) {}
+            } catch(e) {
+                allCheckins = [];
+            }
+            renderAllDashboardViews(allCheckins);
         });
     }
 
     function renderAllDashboardViews(list) {
         renderIndividualTable(list);
         updateCardsAndSectors(list);
+        populateSectorFilter(list);
+    }
+
+    function populateSectorFilter(list) {
+        var selSector = document.getElementById('selIndSector');
+        if (!selSector) return;
+
+        var sectors = {};
+        list.forEach(function(item) {
+            if (item.setor) sectors[item.setor] = true;
+        });
+
+        var html = '<option value="ALL">🏢 Todos os Setores</option>';
+        Object.keys(sectors).forEach(function(sec) {
+            html += '<option value="' + sec + '">' + sec + '</option>';
+        });
+        selSector.innerHTML = html;
     }
 
     function renderIndividualTable(list) {
@@ -766,7 +786,7 @@
             var setor = item.setor || 'Geral';
             var latency = item.latency_ms || 420;
             var erros = item.veto_errors !== undefined ? item.veto_errors : 0;
-            var vsi = item.vsi_score ? item.vsi_score.toFixed(2) : '0.42';
+            var vsi = item.vsi_score ? parseFloat(item.vsi_score).toFixed(2) : '0.42';
 
             var badgeClass = 'badge-verde';
             var badgeText = '🟢 Verde (Excelente)';
@@ -797,17 +817,28 @@
         var cardTotal = document.getElementById('cardTotalColabs');
         var cardProntidao = document.getElementById('cardProntidaoGeral');
         var cardAtestados = document.getElementById('cardAtestados');
+        var cardAbsenteismo = document.getElementById('cardAbsenteismo');
         var tblSectors = document.getElementById('tblRhSectorsBody');
 
-        if (!list || list.length === 0) return;
+        if (!list || list.length === 0) {
+            if (cardTotal) cardTotal.innerText = '0';
+            if (cardProntidao) cardProntidao.innerText = '100.0%';
+            if (cardAtestados) cardAtestados.innerText = '0';
+            if (cardAbsenteismo) cardAbsenteismo.innerText = '0.0%';
+            return;
+        }
 
         if (cardTotal) cardTotal.innerText = list.length;
 
-        var greens = list.filter(i => i.status === 'GREEN' || (!i.status && i.veto_errors === 0)).length;
-        var reds = list.filter(i => i.status === 'RED' || (!i.status && i.veto_errors > 1)).length;
+        var greens = list.filter(i => i.status === 'GREEN' || (!i.status && (i.veto_errors || 0) === 0)).length;
+        var yellows = list.filter(i => i.status === 'YELLOW' || (!i.status && i.veto_errors === 1)).length;
+        var reds = list.filter(i => i.status === 'RED' || (!i.status && (i.veto_errors || 0) > 1)).length;
 
         var percentGreen = Math.round((greens / list.length) * 100);
+        var percentYellow = Math.round((yellows / list.length) * 100);
+
         if (cardProntidao) cardProntidao.innerText = percentGreen + '%';
+        if (cardAbsenteismo) cardAbsenteismo.innerText = percentYellow + '%';
         if (cardAtestados) cardAtestados.innerText = reds;
 
         var sectorsMap = {};
@@ -866,7 +897,7 @@
 
         if (tipo === 'NR01') {
             preview.innerText = "=========================================================\n" +
-                "LAUDO TÉCNICO FORMAL — NR-01 (PGR RISCOS PSICOSSOCIAIS)\n" +
+                "LAUDO TÉCNICO FORMAL — NR-01 (PGR RISCOS PSICOSSOCIAL)\n" +
                 "EMPRESA: EXCELSILIENCE CORPORATE OPERATING SYSTEM\n" +
                 "DATA DE EMISSÃO: " + dataAtual + "\n" +
                 "=========================================================\n\n" +
@@ -917,13 +948,22 @@
 
         if (window.myTrendChart) window.myTrendChart.destroy();
 
+        var chartData = [420, 410, 450, 430, 390];
+        var chartLabels = ['Check-in 1', 'Check-in 2', 'Check-in 3', 'Check-in 4', 'Check-in 5'];
+
+        if (allCheckins && allCheckins.length > 0) {
+            var recent = allCheckins.slice(0, 10).reverse();
+            chartLabels = recent.map((item, idx) => 'C-' + (idx + 1));
+            chartData = recent.map(item => item.latency_ms || 420);
+        }
+
         window.myTrendChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Check-in 1', 'Check-in 2', 'Check-in 3', 'Check-in 4', 'Check-in 5'],
+                labels: chartLabels,
                 datasets: [{
                     label: 'Latência de Resposta (ms)',
-                    data: ,
+                    data: chartData,
                     borderColor: '#38bdf8',
                     backgroundColor: 'rgba(56, 189, 248, 0.1)',
                     fill: true,
@@ -942,7 +982,7 @@
         });
     }
 
-    // INICIALIZAÇÃO AO CARREGAR A PÁGINA
+    // INICIALIZAÇÃO AUTOMÁTICA
     window.addEventListener('DOMContentLoaded', function() {
         fetchSupabaseData();
     });
