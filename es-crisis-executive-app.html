@@ -644,7 +644,7 @@
         printWin.document.close();
         setTimeout(function() { printWin.focus(); printWin.print(); }, 500);
     }
-</script>
+<script>
 // LEITOR AUTOMÁTICO DE NOME DE CLIENTE/PARCEIRO NA URL (?company=... OU ?c=...)
 window.addEventListener('DOMContentLoaded', function() {
     var urlParams = new URLSearchParams(window.location.search);
@@ -654,7 +654,6 @@ window.addEventListener('DOMContentLoaded', function() {
         var nomeFormatado = company.toUpperCase();
         var c = company.toLowerCase().replace(/_/g, '');
         
-        // Mapeamento automático dos nomes de parceiros
         if (c === 'aguiabranca') {
             nomeFormatado = 'GRUPO ÁGUIA BRANCA';
         } else if (c === 'ouroeprata') {
@@ -665,19 +664,18 @@ window.addEventListener('DOMContentLoaded', function() {
             nomeFormatado = 'EXCELSILIENCE';
         }
 
-        // Busca um badge existente no topo
-        var badge = document.querySelector('.badge-gov, .badge-anon, .badge-company, .badge, #companyBadgeContainer');
+        // Procura a tag de badge existente no topo do ES-Crise
+        var badge = document.querySelector('.badge-v60, .badge-gov, .badge-anon, .badge');
         
         if (badge) {
             badge.innerText = '🏢 PARCEIRO: ' + nomeFormatado;
             badge.style.background = 'rgba(56, 189, 248, 0.2)';
             badge.style.border = '1px solid #38bdf8';
             badge.style.color = '#38bdf8';
-            badge.style.display = 'block';
         } else {
-            // Se não houver um badge na tela, cria o banner dinamicamente no topo do container
-            var container = document.querySelector('.container') || document.body;
-            var headerBox = document.querySelector('.header-box');
+            // Caso não encontre badge, insere o banner no topo da tela
+            var container = document.querySelector('.app-container') || document.querySelector('.container') || document.body;
+            var headerBox = document.querySelector('.header-brand');
             
             var newBadge = document.createElement('div');
             newBadge.className = 'company-badge-banner';
@@ -692,5 +690,6 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+</script>
 </body>
 </html>
