@@ -327,7 +327,7 @@
         display: block;
     }
 
-    /* GAME ARENA DE BOLINHAS VISUOMOTOR - OTIMIZADO PARA RESPOSTA INSTANTÂNEA NO TOQUE */
+    /* GAME ARENA DE BOLINHAS VISUOMOTOR */
     .game-box {
         width: 100%;
         height: 250px;
@@ -583,11 +583,11 @@
         <canvas id="photoCanvas" width="200" height="200" style="display:none;"></canvas>
     </div>
 
-    <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI -->
+    <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
-            Clique no botão e leia a frase em voz alta no microfone durante 5 segundos:
+            Clique no botão e leia a frase em voz alta no microfone durante 7 segundos:
         </p>
 
         <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:14px;">
@@ -598,23 +598,23 @@
             <canvas id="audioCanvas" class="audio-canvas"></canvas>
         </div>
 
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (5s)</button>
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (7s)</button>
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO -->
+    <!-- PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO (12 RODADAS) -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação Visuomotora</h3>
         <div class="info-card">
             <p style="color:var(--accent-green-bright); margin-bottom:8px;">⚡ <b>Bolinha VERDE:</b> Toque na tela o mais rápido possível!</p>
             <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso e deixe desaparecer.</p>
         </div>
-        <button class="btn" onclick="startGame()">Start no Desafio (8 Rodadas) 🎯</button>
+        <button class="btn" onclick="startGame()">Start no Desafio (12 Rodadas) 🎯</button>
     </div>
 
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 8</b></span>
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
             <span>Erros de Impulso: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
@@ -661,8 +661,8 @@
                 <p style="margin-bottom:10px;"><b>Etapas:</b></p>
                 <ul style="padding-left:18px; margin-bottom:12px;">
                     <li>1. Foto de validação do condutor</li>
-                    <li>2. Leitura vocal de 5 segundos (VSI)</li>
-                    <li>3. Teste visuomotor das bolinhas (Go/No-Go)</li>
+                    <li>2. Leitura vocal de 7 segundos (VSI)</li>
+                    <li>3. Teste visuomotor das bolinhas (12 Rodadas)</li>
                 </ul>
                 <p>Todos os registros são criptografados e transmitidos em tempo real para o CCO da frota.</p>
             </div>
@@ -828,24 +828,29 @@
         capturedPhotoDataUrl = canvas.toDataURL('image/png');
     }
 
+    // GRAVAÇÃO E ANÁLISE DE VOZ REAJUSTADA PARA 7 SEGUNDOS REAIS (7000ms)
     function runAudioTest() {
         var fill = document.getElementById('progressAudio');
         var btn = document.getElementById('btnRec');
         btn.disabled = true;
-        btn.innerText = '🎙️ Gravando Voz (5s)...';
-        var width = 0;
+        btn.innerText = '🎙️ Gravando Voz (7s)...';
+        var progress = 0;
 
         var interval = setInterval(function() {
-            width += 4;
-            fill.style.width = width + '%';
-            if (width >= 100) {
+            progress += (100 / 70); // 70 incrementos de 100ms = 7.0 segundos exatos
+            fill.style.width = Math.min(progress, 100) + '%';
+
+            if (progress >= 100) {
                 clearInterval(interval);
-                showStep('stepInstruction');
+                btn.innerText = '✅ Análise Bioacústica Concluída!';
+                setTimeout(function() {
+                    showStep('stepInstruction');
+                }, 500);
             }
         }, 100);
     }
 
-    // DESAFIO VISUOMOTOR COM RESPOSTA INSTANTÂNEA AO TOQUE E JANELA DE 1.6S
+    // DESAFIO VISUOMOTOR AJUSTADO PARA 12 RODADAS
     var gameRounds = 0;
     var gameErrors = 0;
     var startTime = 0;
@@ -861,13 +866,13 @@
 
     function nextRound() {
         gameRounds++;
-        document.getElementById('lblRound').innerText = gameRounds + ' / 8';
+        document.getElementById('lblRound').innerText = gameRounds + ' / 12';
         document.getElementById('lblErrors').innerText = gameErrors;
 
         var area = document.getElementById('gameArea');
         area.innerHTML = '';
 
-        if (gameRounds > 8) {
+        if (gameRounds > 12) {
             finishCheckin();
             return;
         }
@@ -889,7 +894,7 @@
 
         startTime = Date.now();
 
-        // CAPTURA DO TOQUE SEM DELAY DO MOBILE
+        // CAPTURA DE TOQUE INSTANTÂNEA NO SMARTPHONE
         var handleAction = function(e) {
             if (e) e.preventDefault();
             var reaction = Date.now() - startTime;
@@ -905,7 +910,7 @@
 
         area.appendChild(ball);
 
-        // JANELA DE ATENÇÃO EXPANDIDA PARA 1.6 SEGUNDOS (1600ms)
+        // JANELA DE EXIBIÇÃO DE 1.6 SEGUNDOS POR BOLINHA
         setTimeout(function() {
             if (area.contains(ball)) {
                 if (isGreen) totalLatency += 850;
@@ -918,7 +923,7 @@
         showStep('stepResult');
         var name = document.getElementById('txtName').value;
         var role = document.getElementById('txtRole').value;
-        var avgLatency = Math.round(totalLatency / 8) || 420;
+        var avgLatency = Math.round(totalLatency / 12) || 420;
 
         document.getElementById('resName').innerText = name;
         document.getElementById('resRole').innerText = role;
