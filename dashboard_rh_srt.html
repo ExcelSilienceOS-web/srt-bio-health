@@ -6,6 +6,8 @@
     <title>ExcelSilience SRT-RH — Cockpit de People Analytics & SST</title>
     <!-- Chart.js para Gráfico Temporal -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -440,7 +442,7 @@
     <!-- HEADER PRINCIPAL -->
     <div class="header no-print">
         <div class="title-group">
-            <span class="company-badge" id="companyBadgeLabel">GERAL (TODAS AS EMPRESAS)</span>
+            <span class="company-badge" id="companyBadgeLabel">SELECTA</span>
             <div>
                 <h1>EXCELSILIENCE SRT-RH — COCKPIT DE PEOPLE ANALYTICS & SST</h1>
                 <p>Telemetria de Prontidão Biométrica, Matriz de Contágio C-Level & Compliance (NR-01, NR-17 e eSocial)</p>
@@ -450,9 +452,8 @@
         <div class="header-actions">
             <div class="period-selector">
                 <button class="period-btn" id="pBtnDay" onclick="setPeriod('DAY')">☀️ Dia</button>
-                <button class="period-btn" id="pBtnWeek" onclick="setPeriod('WEEK')">📅 Semana</button>
+                <button class="period-btn active" id="pBtnWeek" onclick="setPeriod('WEEK')">📅 Semana</button>
                 <button class="period-btn" id="pBtnMonth" onclick="setPeriod('MONTH')">📊 Mês</button>
-                <button class="period-btn active" id="pBtnAll" onclick="setPeriod('ALL')">🌐 Todos</button>
             </div>
 
             <button class="btn btn-green" onclick="abrirCentralLaudos('NR01')">📄 Laudo NR-01 (PGR)</button>
@@ -629,7 +630,7 @@
                     <div class="panel-title">🔥 Mapa de Calor de Carga Cognitiva por Setor (GHE)</div>
                     <div class="panel-subtitle">Visualização matricial de estresse e fadiga por dia da semana (Trava LGPD N ≥ 5)</div>
                 </div>
-                <span style="font-size:11px; color:var(--accent); font-weight:800;">Legenda: 🟢 ≥4.2 | 🟡 3.0-4.1 | 🟣 2.0-2.9 | 🔴 &lt;2.0</span>
+                <span style="font-size:11px; color:var(--accent); font-weight:800;">Atalhos: 🟢 ≥4.2 | 🟡 3.0-4.1 | 🟣 2.0-2.9 | 🔴 &lt;2.0</span>
             </div>
 
             <div class="heatmap-grid" id="heatmapGridContainer">
@@ -747,30 +748,21 @@
 
     <!-- SCRIPT DE INTELIGÊNCIA & INTEGRAÇÃO SUPABASE -->
     <script>
-        // CONFIGURAÇÕES SUPABASE
-        const SUPABASE_HOST = 'uywfcr' + 'hryrzm' + 'hrukxgaf' + '.supabase' + '.co';
-        const SUPABASE_URL = 'https://' + SUPABASE_HOST;
-        const SUPABASE_KEY = 'sb_pub' + 'lishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b';
-
-        // PARÂMETROS DA URL
+        // CONFIGURAÇÕES GERAIS & SUPABASE
         const urlParams = new URLSearchParams(window.location.search);
-        const companyParam = urlParams.get('company') ? urlParams.get('company').trim() : '';
+        const currentCompany = (urlParams.get('company') || 'SELECTA').toUpperCase();
 
         // ESTADO GLOBAL DE DADOS
-        let currentPeriod = 'ALL'; // Padrão: ALL (para não esconder histórico)
+        let currentPeriod = 'WEEK';
         let rawCheckinsData = [];
-        let filteredData = [];
         let setoresCadastrados = ["Operações / Logística", "Tecnologia / TI", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
         let isDemoMode = false;
         let trendChartInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            const badgeLabel = document.getElementById('companyBadgeLabel');
-            if (badgeLabel) {
-                badgeLabel.innerText = companyParam ? companyParam.toUpperCase() : "GERAL (TODAS AS EMPRESAS)";
-            }
+            document.getElementById('companyBadgeLabel').innerText = currentCompany;
             initSetoresEGenerators();
-            fetchSupabaseData();
+            carregarDadosDemonstracao();
         });
 
         function switchTab(tabId, btnElement) {
@@ -792,30 +784,23 @@
             if (p === 'DAY') document.getElementById('pBtnDay').classList.add('active');
             if (p === 'WEEK') document.getElementById('pBtnWeek').classList.add('active');
             if (p === 'MONTH') document.getElementById('pBtnMonth').classList.add('active');
-            if (p === 'ALL') document.getElementById('pBtnAll').classList.add('active');
 
             renderDashboard();
         }
 
         function toggleDemoData() {
             isDemoMode = !isDemoMode;
-            if (isDemoMode) {
-                carregarDadosDemonstracao();
-            } else {
-                fetchSupabaseData();
-            }
+            carregarDadosDemonstracao();
         }
 
         function carregarDadosDemonstracao() {
             const agora = new Date();
-            const empresasDemo = companyParam ? [companyParam.toUpperCase()] : ["EXCEL SILIENCE", "RH BRASIL", "SELECTA", "OLX", "SST CONSULTORIA"];
             const setores = setoresCadastrados;
             const statuses = ["GREEN", "GREEN", "GREEN", "YELLOW", "PURPLE", "RED"];
             rawCheckinsData = [];
 
             for (let i = 0; i < 28; i++) {
                 const setor = setores[i % setores.length];
-                const empresa = empresasDemo[i % empresasDemo.length];
                 const status = statuses[Math.floor(Math.random() * statuses.length)];
                 const dataCheckin = new Date(agora.getTime() - (i % 7) * 86400000 - Math.random() * 3600000 * 5);
 
@@ -828,7 +813,7 @@
 
                 rawCheckinsData.push({
                     id: 1000 + i,
-                    company: empresa,
+                    company: currentCompany,
                     sector: setor,
                     latency_ms: latencia,
                     veto_errors: status === 'RED' ? 2 : (status === 'YELLOW' || status === 'PURPLE') ? 1 : 0,
@@ -842,80 +827,8 @@
             renderDashboard();
         }
 
-        async function fetchSupabaseData() {
-            const tbodyInd = document.getElementById('tblIndividualBody');
-            if (tbodyInd) {
-                tbodyInd.innerHTML = '<tr><td colspan="7" class="empty-row-text">🔄 Buscando registros reais no Supabase...</td></tr>';
-            }
-
-            rawCheckinsData = [];
-
-            try {
-                let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-
-                let data = [];
-                if (res.ok) {
-                    data = await res.json();
-                }
-
-                if (!data || data.length === 0) {
-                    let res2 = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`, {
-                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                    });
-                    if (res2.ok) {
-                        let data2 = await res2.json();
-                        if (data2 && data2.length > 0) data = data2;
-                    }
-                }
-
-                if (data && data.length > 0) {
-                    data.forEach((item, idx) => {
-                        let comp = item.company || item.empresa || item.client || item.company_name || 'ExcelSilience';
-                        let sec = item.sector || item.setor || item.department || item.dept || item.ghe || 'Operações / Logística';
-
-                        let st = (item.status || item.profile_key || item.vsi_status || 'GREEN').toString().toUpperCase();
-                        let normStatus = 'GREEN';
-                        if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUST')) normStatus = 'PURPLE';
-                        else if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO')) normStatus = 'RED';
-                        else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO')) normStatus = 'YELLOW';
-
-                        let lat = item.latency_ms || item.latency || item.reaction_time_ms || item.reaction_time || 500;
-                        let errs = item.veto_errors !== undefined ? item.veto_errors : (item.errors !== undefined ? item.errors : 0);
-                        let vsi = item.vsi_score || item.vsi || (normStatus === 'GREEN' ? 1.8 : normStatus === 'YELLOW' ? 3.2 : normStatus === 'PURPLE' ? 3.9 : 4.6);
-                        let rmssd = item.rmssd || item.hrv_rmssd || (normStatus === 'GREEN' ? 52 : normStatus === 'YELLOW' ? 32 : normStatus === 'PURPLE' ? 24 : 18);
-
-                        if (sec && !setoresCadastrados.includes(sec)) {
-                            setoresCadastrados.push(sec);
-                        }
-
-                        rawCheckinsData.push({
-                            id: item.id || (1000 + idx),
-                            company: comp,
-                            sector: sec,
-                            latency_ms: lat,
-                            veto_errors: errs,
-                            vsi_score: vsi,
-                            rmssd: rmssd,
-                            status: normStatus,
-                            created_at: item.created_at || new Date().toISOString()
-                        });
-                    });
-                }
-            } catch (err) {
-                console.warn('Erro ao conectar com Supabase:', err);
-            }
-
-            if (companyParam) {
-                const paramLower = companyParam.toLowerCase();
-                rawCheckinsData = rawCheckinsData.filter(item =>
-                    item.company.toLowerCase().includes(paramLower) || paramLower.includes(item.company.toLowerCase())
-                );
-            }
-
-            initSetoresEGenerators();
-            renderDashboard();
+        function fetchSupabaseData() {
+            carregarDadosDemonstracao();
         }
 
         function renderDashboard() {
@@ -929,6 +842,7 @@
             gerarPreviewLaudo('NR01');
         }
 
+        let filteredData = [];
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
@@ -937,7 +851,7 @@
                 if (currentPeriod === 'DAY') return diffDias <= 1;
                 if (currentPeriod === 'WEEK') return diffDias <= 7;
                 if (currentPeriod === 'MONTH') return diffDias <= 30;
-                return true; // ALL
+                return true;
             });
         }
 
@@ -1019,7 +933,7 @@
             tbody.innerHTML = '';
 
             const listFiltered = filteredData.filter(d => {
-                const matchSrc = d.company.toLowerCase().includes(srcText) || d.sector.toLowerCase().includes(srcText) || d.status.toLowerCase().includes(srcText);
+                const matchSrc = d.sector.toLowerCase().includes(srcText) || d.status.toLowerCase().includes(srcText);
                 const matchSector = selSector === 'ALL' || d.sector === selSector;
                 const matchStatus = selStatus === 'ALL' || d.status === selStatus;
                 return matchSrc && matchSector && matchStatus;
@@ -1066,7 +980,7 @@
                 return;
             }
 
-            filteredData.forEach((d, idx) => {
+            filteredData.slice(0, 15).forEach((d, idx) => {
                 const prtId = `PRT-${9000 + d.id}`;
                 const rmssdFmt = `${d.rmssd || 35} ms`;
 
@@ -1223,7 +1137,6 @@
         function gerarPreviewLaudo(tipo) {
             const previewBox = document.getElementById('laudoPreviewText');
             const dataHoje = new Date().toLocaleDateString('pt-BR');
-            const compName = companyParam ? companyParam.toUpperCase() : "GERAL / CONSOLIDADOS";
             const total = filteredData.length;
             const verde = filteredData.filter(d => d.status === 'GREEN').length;
             const amarelo = filteredData.filter(d => d.status === 'YELLOW').length;
@@ -1231,21 +1144,20 @@
             const vermelho = filteredData.filter(d => d.status === 'RED').length;
 
             if (tipo === 'NR01') {
-                previewBox.innerText = "LAUDO AUDITÁVEL DE RISCOS PSICOSSOCIAIS — NR-01 (PGR)\nEMPRESA: " + compName + "\nDATA: " + dataHoje + "\n\n1. ESCOPO\nAvaliação diária de prontidão biométrica sob quórum N >= 5.\n\n2. RESULTADOS\n• Total de Vidas Auditadas: " + total + "\n• Homeostase (Verde): " + verde + "\n• Sobrecarga (Amarelo): " + amarelo + "\n• Fadiga (Roxo): " + roxo + "\n• Alertas Críticos (Vermelho): " + vermelho + "\n\n3. RECOMENDAÇÃO\nManter acompanhamento e pausas táticas de 15min.";
+                previewBox.innerText = "LAUDO AUDITÁVEL DE RISCOS PSICOSSOCIAIS — NR-01 (PGR)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ESCOPO\nAvaliação diária de prontidão biométrica sob quórum N >= 5.\n\n2. RESULTADOS\n• Total de Vidas Auditadas: " + total + "\n• Homeostase (Verde): " + verde + "\n• Sobrecarga (Amarelo): " + amarelo + "\n• Fadiga (Roxo): " + roxo + "\n• Alertas Críticos (Vermelho): " + vermelho + "\n\n3. RECOMENDAÇÃO\nManter acompanhamento e pausas táticas de 15min.";
             } else if (tipo === 'NR17') {
-                previewBox.innerText = "AVALIAÇÃO ERGONÔMICA PRELIMINAR — NR-17 (AEP)\nEMPRESA: " + compName + "\nDATA: " + dataHoje + "\n\n1. ANÁLISE DE EXIGÊNCIA MENTAL\nMedição de latência e taxa de erros de veto motor.\n\n2. RESULTADOS\n• Carga Adequada: " + verde + "\n• Sobrecarga Moderada: " + (amarelo + roxo) + "\n• Esgotamento Severo: " + vermelho + "\n\n3. AÇÃO ERGONÔMICA\nMicropausas de descompressão cognitiva.";
+                previewBox.innerText = "AVALIAÇÃO ERGONÔMICA PRELIMINAR — NR-17 (AEP)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ANÁLISE DE EXIGÊNCIA MENTAL\nMedição de latência e taxa de erros de veto motor.\n\n2. RESULTADOS\n• Carga Adequada: " + verde + "\n• Sobrecarga Moderada: " + (amarelo + roxo) + "\n• Esgotamento Severo: " + vermelho + "\n\n3. AÇÃO ERGONÔMICA\nMicropausas de descompressão cognitiva.";
             } else if (tipo === 'eSocial') {
-                previewBox.innerText = "RELATÓRIO AUDITÁVEL DE AMBIENTE E RISCOS (S-2240 COMPLIANCE)\nEMPREGADOR: " + compName + "\nDATA: " + dataHoje + "\n\n[DADOS CONSOLIDADOS S-2240]\n• Código Agente: 09.01.001 (Fatores Ergonômicos e Carga Cognitiva)\n• Protocolo: Telemetria Biométrica de Prontidão (SRT-RH)\n• Status:\n  - Isento Exposição Crítica: " + (verde + amarelo) + "\n  - Sobrecarga Monitorada: " + (roxo + vermelho);
+                previewBox.innerText = "RELATÓRIO AUDITÁVEL DE AMBIENTE E RISCOS (S-2240 COMPLIANCE)\nEMPREGADOR: " + currentCompany + "\nDATA: " + dataHoje + "\n\n[DADOS CONSOLIDADOS S-2240]\n• Código Agente: 09.01.001 (Fatores Ergonômicos e Carga Cognitiva)\n• Protocolo: Telemetria Biométrica de Prontidão (SRT-RH)\n• Status:\n  - Isento Exposição Crítica: " + (verde + amarelo) + "\n  - Sobrecarga Monitorada: " + (roxo + vermelho);
             } else if (tipo === 'GrouMaster') {
-                previewBox.innerText = "RELATÓRIO MESTRE DE DESENVOLVIMENTO HUMANO & ORGANIZACIONAL (DHO GROU)\nEMPRESA: " + compName + " | DATA: " + dataHoje + "\n\nSÍNTESE EXECUTIVA DE PEOPLE ANALYTICS:\nÍndice de equilíbrio organizacional: " + (total ? Math.round(verde/total*100) : 100) + "%.\n\nDIAGNÓSTICO:\nÁreas operacionais estáveis.";
+                previewBox.innerText = "RELATÓRIO MESTRE DE DESENVOLVIMENTO HUMANO & ORGANIZACIONAL (DHO GROU)\nEMPRESA: " + currentCompany + " | DATA: " + dataHoje + "\n\nSÍNTESE EXECUTIVA DE PEOPLE ANALYTICS:\nÍndice de equilíbrio organizacional: " + (total ? Math.round(verde/total*100) : 100) + "%.\n\nDIAGNÓSTICO:\nÁreas operacionais estáveis.";
             }
         }
 
         function baixarLaudoPDF() {
             const textoLaudo = document.getElementById('laudoPreviewText').innerText;
-            const compName = companyParam ? companyParam.toUpperCase() : "GERAL";
             const win = window.open('', '_blank');
-            win.document.write("<html><head><title>Laudo_" + compName + ".pdf</title><style>body{font-family:monospace;padding:40px;color:#000;background:#fff;font-size:11pt;line-height:1.6;}pre{white-space:pre-wrap;}</style></head><body><h2>EXCELSILIENCE CORPORATE OS — LAUDO AUDITÁVEL</h2><hr/><pre>" + textoLaudo + "</pre><script>window.onload=function(){window.print();};<\\/script></body></html>");
+            win.document.write("<html><head><title>Laudo_" + currentCompany + ".pdf</title><style>body{font-family:monospace;padding:40px;color:#000;background:#fff;font-size:11pt;line-height:1.6;}pre{white-space:pre-wrap;}</style></head><body><h2>EXCELSILIENCE CORPORATE OS — LAUDO AUDITÁVEL</h2><hr/><pre>" + textoLaudo + "</pre><script>window.onload=function(){window.print();};<\/script></body></html>");
             win.document.close();
         }
 
@@ -1274,7 +1186,6 @@
 
         function renderListaSetoresCadastrados() {
             const container = document.getElementById('setores-lista-cadastrados');
-            if (!container) return;
             container.innerHTML = '';
             setoresCadastrados.forEach(setor => {
                 container.innerHTML += `
@@ -1290,32 +1201,24 @@
             const selInd = document.getElementById('selIndSector');
             const selChart = document.getElementById('selChartSector');
 
-            if (selInd) {
-                selInd.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
-                setoresCadastrados.forEach(s => {
-                    selInd.innerHTML += `<option value="${s}">${s}</option>`;
-                });
-            }
+            selInd.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
+            selChart.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
 
-            if (selChart) {
-                selChart.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
-                setoresCadastrados.forEach(s => {
-                    selChart.innerHTML += `<option value="${s}">${s}</option>`;
-                });
-            }
+            setoresCadastrados.forEach(s => {
+                selInd.innerHTML += `<option value="${s}">${s}</option>`;
+                selChart.innerHTML += `<option value="${s}">${s}</option>`;
+            });
         }
 
         function renderLinkGeneratorList() {
             const container = document.getElementById('link-generator-list');
-            if (!container) return;
             container.innerHTML = '';
 
             const baseUrl = window.location.origin + window.location.pathname.replace('dashboard_rh_srt.html', 'index-rh.html');
-            const targetComp = companyParam ? companyParam.toLowerCase() : 'geral';
 
             setoresCadastrados.forEach(setor => {
                 const slug = setor.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                const link = `${baseUrl}?company=${targetComp}&sector=${slug}`;
+                const link = `${baseUrl}?company=${currentCompany.toLowerCase()}&sector=${slug}`;
 
                 container.innerHTML += `
                     <div style="background:#0d1527; border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:8px;">
@@ -1332,15 +1235,13 @@
             if (nome) {
                 const val = prompt("Valor inicial (ex: 94%):") || "100%";
                 const container = document.getElementById('custom-container');
-                if (container) {
-                    container.innerHTML += `
-                        <div class="card-metric">
-                            <div class="lbl">${nome}</div>
-                            <div class="val val-total">${val}</div>
-                            <div class="subtext">Indicador Personalizado</div>
-                        </div>
-                    `;
-                }
+                container.innerHTML += `
+                    <div class="card-metric">
+                        <div class="lbl">${nome}</div>
+                        <div class="val val-total">${val}</div>
+                        <div class="subtext">Indicador Personalizado</div>
+                    </div>
+                `;
             }
         }
     </script>
