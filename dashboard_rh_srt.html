@@ -750,7 +750,10 @@
     <script>
         // CONFIGURAÇÕES GERAIS & SUPABASE
         const urlParams = new URLSearchParams(window.location.search);
-        const currentCompany = (urlParams.get('company') || 'SELECTA').toUpperCase();
+        const companyParam = urlParams.get('company');
+        const isSingleCompanyMode = !!companyParam && companyParam.trim() !== '' && companyParam.toLowerCase() !== 'all' && companyParam.toLowerCase() !== 'geral';
+        const currentCompany = isSingleCompanyMode ? companyParam.trim().toUpperCase() : 'GERAL';
+        let empresasCadastradas = ["EXCEL SILIENCE", "RH BRASIL", "SELECTA", "OLX", "SST CONSULTORIA"];
 
         // ESTADO GLOBAL DE DADOS
         let currentPeriod = 'WEEK';
@@ -760,7 +763,10 @@
         let trendChartInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('companyBadgeLabel').innerText = currentCompany;
+            const badgeLabel = document.getElementById('companyBadgeLabel');
+            if (badgeLabel) {
+                badgeLabel.innerText = isSingleCompanyMode ? currentCompany : 'GERAL (TODAS AS EMPRESAS)';
+            }
             initSetoresEGenerators();
             carregarDadosDemonstracao();
         });
@@ -811,9 +817,11 @@
                 let vsi = status === 'GREEN' ? 1.8 : status === 'YELLOW' ? 3.2 : status === 'PURPLE' ? 3.9 : 4.6;
                 let rmssd = status === 'GREEN' ? 58 : status === 'YELLOW' ? 32 : status === 'PURPLE' ? 24 : 18;
 
+                let comp = isSingleCompanyMode ? currentCompany : empresasCadastradas[i % empresasCadastradas.length];
+
                 rawCheckinsData.push({
                     id: 1000 + i,
-                    company: currentCompany,
+                    company: comp,
                     sector: setor,
                     latency_ms: latencia,
                     veto_errors: status === 'RED' ? 2 : (status === 'YELLOW' || status === 'PURPLE') ? 1 : 0,
@@ -846,6 +854,9 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
+                if (isSingleCompanyMode && item.company && item.company.toUpperCase() !== currentCompany) {
+                    return false;
+                }
                 const d = new Date(item.created_at);
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
                 if (currentPeriod === 'DAY') return diffDias <= 1;
