@@ -750,19 +750,20 @@
     <script>
         // CONFIGURAÇÕES GERAIS & SUPABASE
         const urlParams = new URLSearchParams(window.location.search);
-        const currentCompany = (urlParams.get('company') || 'SELECTA').toUpperCase();
+        const companyFromUrl = urlParams.get('company');
+        const currentCompany = companyFromUrl ? companyFromUrl.toUpperCase() : 'GERAL (TODAS AS EMPRESAS)';
 
         // ESTADO GLOBAL DE DADOS
-        let currentPeriod = 'WEEK';
+        let currentPeriod = 'ALL';
         let rawCheckinsData = [];
         let setoresCadastrados = ["Operações / Logística", "Tecnologia / TI", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
         let isDemoMode = false;
         let trendChartInstance = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('companyBadgeLabel').innerText = currentCompany;
             initSetoresEGenerators();
-            carregarDadosDemonstracao();
+            await fetchSupabaseData();
         });
 
         function switchTab(tabId, btnElement) {
@@ -827,9 +828,67 @@
             renderDashboard();
         }
 
-        function fetchSupabaseData() {
-            carregarDadosDemonstracao();
+        const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyyl3b";
+
+async function fetchSupabaseData() {
+    try {
+        let allFetched = [];
+        try {
+            let res1 = await fetch(SUPABASE_URL + "/rest/v1/srt_checkins?select=*&order=created_at.desc", {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
+            });
+            if (res1.ok) {
+                let data1 = await res1.json();
+                if (Array.isArray(data1) && data1.length > 0) allFetched = allFetched.concat(data1);
+            }
+        } catch(e1) { console.warn("Erro srt_checkins:", e1); }
+
+        try {
+            let res2 = await fetch(SUPABASE_URL + "/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc", {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
+            });
+            if (res2.ok) {
+                let data2 = await res2.json();
+                if (Array.isArray(data2) && data2.length > 0) allFetched = allFetched.concat(data2);
+            }
+        } catch(e2) { console.warn("Erro es_crisis_exec_checkins:", e2); }
+
+        if (allFetched.length > 0) {
+            rawCheckinsData = allFetched.map((item, idx) => {
+                let comp = item.company || item.empresa || item.company_name || (companyFromUrl ? currentCompany : "GERAL");
+                let setr = item.sector || item.setor || item.department || item.dept || "Operações / Logística";
+                let lat = item.latency_ms || item.reaction_time_ms || item.latency || 500;
+                let vet = item.veto_errors !== undefined ? item.veto_errors : (item.erros_veto || 0);
+                let vsi = item.vsi_score || item.vsi || 1.8;
+                let rmssd = item.rmssd || item.vfc || 35;
+                let stRaw = (item.status || item.profile_key || "GREEN").toString().toUpperCase();
+                let st = "GREEN";
+                if (stRaw.includes("YELLOW") || stRaw.includes("AMARELO")) st = "YELLOW";
+                else if (stRaw.includes("PURPLE") || stRaw.includes("ROXO")) st = "PURPLE";
+                else if (stRaw.includes("RED") || stRaw.includes("VERMELHO")) st = "RED";
+
+                return {
+                    id: item.id || (2000 + idx),
+                    company: comp.toString().toUpperCase().trim(),
+                    sector: setr,
+                    latency_ms: Number(lat) || 500,
+                    veto_errors: Number(vet) || 0,
+                    vsi_score: Number(vsi) || 1.8,
+                    rmssd: Number(rmssd) || 35,
+                    status: st,
+                    created_at: item.created_at || new Date().toISOString()
+                };
+            });
+        } else {
+            rawCheckinsData = [];
         }
+    } catch (err) {
+        console.warn("Erro Supabase:", err);
+        rawCheckinsData = [];
+    }
+    renderDashboard();
+}
 
         function renderDashboard() {
             filtrarDadosPorPeriodo();
@@ -846,9 +905,13 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
+                if (companyFromUrl && companyFromUrl.trim() !== '') {
+                    if (!item.company.toUpperCase().includes(companyFromUrl.toUpperCase())) return false;
+                }
+                if (currentPeriod === 'ALL') return true;
                 const d = new Date(item.created_at);
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
-                if (currentPeriod === 'DAY') return diffDias <= 1;
+                if (currentPeriod === 'DAY') return diffDias <= 1.5;
                 if (currentPeriod === 'WEEK') return diffDias <= 7;
                 if (currentPeriod === 'MONTH') return diffDias <= 30;
                 return true;
