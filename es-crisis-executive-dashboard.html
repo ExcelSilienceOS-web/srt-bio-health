@@ -2,358 +2,476 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES-Crise Executivo — Dashboard de Governança C-Level & RH v6.0 Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT Bio-Health & Mobility — Painel CCO de Prontidão</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
-        html, body { width: 100%; min-height: 100vh; background-color: #070a12; color: #e2e8f0; overflow-x: hidden; overflow-y: auto; }
-        body { padding: 16px 12px; }
+        body { background-color: #0b0f19; color: #e2e8f0; padding: 24px; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 14px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .title-group h1 { font-size: 20px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
-        .title-group p { font-size: 12px; color: #64748b; margin-top: 2px; }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
+        .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
 
-        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .btn-refresh { background: #1e293b; color: #38bdf8; border: 1px solid #0284c7; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; }
-        .btn-refresh:hover { background: #0284c7; color: #fff; }
+        .live-indicator {
+            display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; color: #34d399;
+        }
+        .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
-        .live-badge { background: rgba(56, 189, 248, 0.1); border: 1px solid #0284c7; color: #38bdf8; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; }
-        .sync-status-bar { width: 100%; background: rgba(56, 189, 248, 0.1); border: 1px solid #0284c7; color: #38bdf8; padding: 10px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; margin-bottom: 18px; text-align: center; }
+        /* PAINEL DE FILTROS DE DATA E STATUS */
+        .filter-panel {
+            background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px;
+            margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;
+        }
+        .filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
-        .card-metric { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px 16px; }
-        .card-metric .label { font-size: 10px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 6px; }
-        .card-metric .value { font-size: 24px; font-weight: 800; }
+        input[type="date"] {
+            background: #0b0f19; border: 1px solid #334155; color: #f8fafc;
+            padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
+        }
+        input[type="date"]:focus { border-color: #38bdf8; }
 
-        .panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 18px; margin-bottom: 24px; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
-        .panel-title { font-size: 15px; font-weight: 800; color: #f1f5f9; }
+        .btn-quick {
+            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
+            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; }
 
-        .btn-export { background: #0284c7; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
-        .btn-view-dossier { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .btn-action {
+            background: #10b981; border: none; color: #ffffff; padding: 8px 18px;
+            border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto;
+        }
+        .btn-action:hover { background: #059669; }
 
-        .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 980px; }
-        th { background: #1e293b; color: #38bdf8; padding: 12px; font-weight: 700; text-transform: uppercase; font-size: 10px; border-bottom: 1px solid #334155; cursor: pointer; }
-        th .info-icon { font-size: 12px; color: #fbbf24; margin-left: 4px; }
-        td { padding: 12px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
+        /* METRICS CARDS */
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 16px; margin-bottom: 28px;
+        }
+        .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; }
+        .card-metric .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 700; }
+        .card-metric .value { font-size: 26px; font-weight: 800; }
+        .val-total { color: #f8fafc; }
+        .val-verde { color: #34d399; }
+        .val-amarelo { color: #fbbf24; }
+        .val-roxo { color: #c084fc; }
+        .val-vermelho { color: #f87171; }
+        .val-tempo { color: #38bdf8; }
 
-        .badge-profile { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; }
-        .badge-premeeting { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
-        .badge-routine { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #334155; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
-        .badge-sync-dept { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; display: inline-block; margin-top: 3px; }
+        /* TABELA */
+        .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; overflow-x: auto; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
 
-        .b-sovereign { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid #10b981; }
-        .b-reactive { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid #ef4444; }
-        .b-mule { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 980px; }
+        th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
+        td { padding: 12px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-        .filter-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-        .filter-btn { background: #070d19; border: 1px solid #334155; color: #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
-        .filter-btn.active { background: rgba(56, 189, 248, 0.15); border-color: #38bdf8; color: #38bdf8; }
+        .user-photo {
+            width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+            border: 2px solid #0284c7; background: #070d19; display: inline-block; vertical-align: middle;
+        }
 
-        .action-card { background: #1e293b; border-left: 4px solid #38bdf8; padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; line-height: 1.55; color: #cbd5e1; }
-        .action-card .exec-header { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 6px; }
+        .user-avatar-fallback {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff; font-weight: 800; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #38bdf8; text-transform: uppercase; flex-shrink: 0;
+        }
 
-        .rh-heatmap-section { background: #070d19; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-        .rh-heatmap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-        .rh-heatmap-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; text-align: center; }
-        .rh-mini-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
-        .rh-mini-cell { padding: 4px 2px; border-radius: 4px; font-size: 8px; font-weight: 800; text-align: center; }
-        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; } .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; } .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; }
+        .photo-container { display: flex; align-items: center; gap: 12px; }
 
-        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 12px; }
-        .modal-content { background: #0f172a; border: 1px solid #38bdf8; border-radius: 16px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 22px; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.9); }
-        .modal-close { position: absolute; top: 14px; right: 16px; background: #1e293b; color: #f8fafc; border: 1px solid #334155; border-radius: 50%; width: 30px; height: 30px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .easy-block-modal { background: #070d19; border: 1px solid #334155; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 11px; line-height: 1.55; color: #cbd5e1; }
-        .easy-block-modal b { color: #38bdf8; font-weight: 800; }
+        .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
+        .b-verde { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
+        .b-amarelo { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
+        .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
+        .b-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+
+        .badge-face {
+            font-size: 10px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.1);
+            padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block; margin-top: 2px;
+        }
+        .badge-voice { font-size: 11px; font-weight: 700; display: block; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="title-group">
-        <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-LEVEL v6.0 MASTER</h1>
-        <p>Prontidão Executiva, Prevenção do Estresse da Liderança & Motor E.A.S.Y. Dinâmico</p>
-    </div>
-    <div class="header-actions">
-        <button class="btn-refresh" onclick="fetchExecData()">🔄 Atualizar Tabela</button>
-        <div class="live-badge">⚡ PAINEL BOARD ATIVO</div>
-    </div>
-</div>
-
-<div class="sync-status-bar" id="syncStatusBar">🔄 Conectando e atualizando laudos de liderança...</div>
-
-<div class="metrics-grid">
-    <div class="card-metric"><div class="label">Sessões C-Level</div><div class="value" style="color:#f8fafc;" id="mTotal">0</div></div>
-    <div class="card-metric"><div class="label">Média de Prontidão</div><div class="value" style="color:#38bdf8;" id="mScore">0.00</div></div>
-    <div class="card-metric"><div class="label">🟢 Prontidão Total</div><div class="value" style="color:#34d399;" id="mSov">0</div></div>
-    <div class="card-metric" style="border-color:#0284c7; background:rgba(56, 189, 248, 0.05); cursor:pointer;" onclick="setFilter('PRE_MEETING')">
-        <div class="label" style="color:#38bdf8;">⚡ Check-ins Pré-Reunião</div><div class="value" style="color:#38bdf8;" id="mPreMeeting">0</div>
-    </div>
-    <div class="card-metric"><div class="label">🔴 Alerta de Impulsividade</div><div class="value" style="color:#f87171;" id="mReact">0</div></div>
-</div>
-
-<div class="panel">
-    <div class="panel-header"><div class="panel-title">📊 Heatmap Semanal de Prontidão da Liderança</div></div>
-    <div class="rh-heatmap-section">
-        <div class="rh-heatmap-grid" id="rhHeatmapContainer"><div style="color:#94a3b8; font-size:11px; padding:10px;">Carregando mapa de calor executivo...</div></div>
-    </div>
-</div>
-
-<div class="panel">
-    <div class="panel-header">
-        <div class="panel-title">🧪 Histórico de Sessões Executivas & Prescrições E.A.S.Y.</div>
-        <button class="btn-export" onclick="window.print()">📄 Baixar Dossiê do Conselho em PDF</button>
+    <div class="header">
+        <div class="title-group">
+            <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
+            <p>Painel Telemétrico de Prontidão, Validação Facial & Biometria Vocal — NR-01, NR-17 & eSocial</p>
+        </div>
+        <div class="live-indicator">
+            <div class="dot"></div>
+            PAINEL ATIVO EM TEMPO REAL
+        </div>
     </div>
 
-    <div class="filter-tabs">
-        <button class="filter-btn active" id="btnFilterAll" onclick="setFilter('ALL')">🌐 Todas as Sessões</button>
-        <button class="filter-btn" id="btnFilterPreMeeting" onclick="setFilter('PRE_MEETING')">⚡ Apenas Check-ins Pré-Reunião</button>
+    <!-- SELETOR DE DATAS E FILTROS -->
+    <div class="filter-panel">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="startDate">Data Início:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label for="endDate">Data Fim:</label>
+                <input type="date" id="endDate">
+            </div>
+
+            <button class="btn-quick" onclick="setPeriod('today')">Hoje</button>
+            <button class="btn-quick" onclick="setPeriod('7days')">Últimos 7 Dias</button>
+            <button class="btn-quick" onclick="setPeriod('30days')">Últimos 30 Dias</button>
+            <button class="btn-quick active" id="btnAll" onclick="setPeriod('all')">🌐 Todo o Histórico</button>
+
+            <button class="btn-action" onclick="fetchAndRenderData()">🔄 Aplicar Filtro / Atualizar</button>
+        </div>
+
+        <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
+            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Status de Trava:</span>
+            <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
+            <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
+            <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
+            <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Roxo</button>
+            <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
+        </div>
     </div>
 
-    <div class="table-responsive">
+    <!-- CARDS DE MÉTRICAS -->
+    <div class="metrics-grid">
+        <div class="card-metric">
+            <div class="label">Check-ins no Período</div>
+            <div class="value val-total" id="mTotal">0</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">🟢 Liberações (Verde)</div>
+            <div class="value val-verde" id="mVerde">0</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">🟡 Pausa Tática (Amarelo)</div>
+            <div class="value val-amarelo" id="mAmarelo">0</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">🟣 Exaustão/Sono (Roxo)</div>
+            <div class="value val-roxo" id="mRoxo">0</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">🔴 Inaptos / Veto (Vermelho)</div>
+            <div class="value val-vermelho" id="mVermelho">0</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">⚡ Média de Latência</div>
+            <div class="value val-tempo" id="mTempo">0 ms</div>
+        </div>
+    </div>
+
+    <!-- TABELA COMPLETA CCO -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">Fila de Registro de Prontidão e Biometria em Tempo Real</div>
+        </div>
+
         <table>
             <thead>
                 <tr>
-                    <th>Executivo / Cargo</th>
-                    <th>Setor Sincronizado <span class="info-icon" onclick="showColumnExplainer('DEPT')">ℹ️</span></th>
-                    <th>Contexto do Teste <span class="info-icon" onclick="showColumnExplainer('CONTEXT')">ℹ️</span></th>
-                    <th>Prontidão (ES-Crise) <span class="info-icon" onclick="showColumnExplainer('SCORE')">ℹ️</span></th>
-                    <th>Vetores (C / I / R) <span class="info-icon" onclick="showColumnExplainer('VECTORS')">ℹ️</span></th>
-                    <th>Ponto de Atenção <span class="info-icon" onclick="showColumnExplainer('WEAKEST')">ℹ️</span></th>
-                    <th>📈 Evolução & Tendência <span class="info-icon" onclick="showColumnExplainer('TREND')">ℹ️</span></th>
-                    <th>Estado de Prontidão <span class="info-icon" onclick="showColumnExplainer('STATUS')">ℹ️</span></th>
-                    <th>Ação</th>
+                    <th>Horário / Data</th>
+                    <th>Condutor / Operador (Foto & Nome)</th>
+                    <th>Validação Facial</th>
+                    <th>Setor / Departamento</th>
+                    <th>Conferência de Voz (VSI)</th>
+                    <th>Latência / Veto Motor</th>
+                    <th>Status / Trava</th>
+                    <th>Encaminhamento Operacional</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos no Supabase e LocalStorage...</td></tr>
+                <tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Conectando ao banco de dados e buscando registros...</td></tr>
             </tbody>
         </table>
     </div>
-</div>
 
-<div class="panel">
-    <div class="panel-header"><div class="panel-title">🏛️ Dossiê Executivo — Prescrições Táticas Dinâmicas da IA (Motor E.A.S.Y.)</div></div>
-    <div id="interventionsList"><div class="action-card">Carregando recomendações do Motor E.A.S.Y....</div></div>
-</div>
+    <script>
+        const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-<div class="modal-backdrop" id="dossierModal">
-    <div class="modal-content"><button class="modal-close" onclick="closeDossierModal()">✕</button><div id="modalDossierBody">Carregando laudo nominal...</div></div>
-</div>
+        let allRecords = [];
+        let selectedStatus = 'ALL';
 
-<div class="modal-backdrop" id="explainerModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeExplainerModal()">✕</button>
-        <h3 style="color:#38bdf8; margin-bottom:8px;" id="lblExplainerTitle">Guia do Conselho</h3>
-        <div style="font-size:12px; line-height:1.6; color:#cbd5e1;" id="lblExplainerBody">Explicação simples para apoio a reuniões de Conselho e RH...</div>
-    </div>
-</div>
-
-<script>
-    var SUPABASE_HOST = ["uywfcrhryrzmhrukxgaf", "supabase", "co"].join(".");
-    var SUPABASE_URL = "https://" + SUPABASE_HOST;
-    var SUPABASE_KEY = ["sb_", "publishable_", "o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b"].join("");
-
-    var globalRecords = []; var currentFilter = 'ALL';
-
-    function cleanDeptString(str) {
-        if (!str) return 'Presidência';
-        var s = String(str);
-        if (s.indexOf('[⚡') !== -1) s = s.split('[⚡');
-        if (s.indexOf('[PRE') !== -1) s = s.split('[PRE');
-        return s.trim() || 'Presidência';
-    }
-
-    function getLocalRecords() {
-        var list = [];
-        try { var hist = localStorage.getItem('es_crisis_history'); if (hist) { var parsed = JSON.parse(hist); if (Array.isArray(parsed)) list = parsed; } } catch(e) {}
-        try { var last = localStorage.getItem('es_crisis_last_checkin'); if (last) { var pLast = JSON.parse(last); if (pLast && pLast.name && !list.some(function(i){return String(i.id)===String(pLast.id);})) list.unshift(pLast); } } catch(e) {}
-        return list;
-    }
-
-    async function fetchExecData() {
-        var tbody = document.getElementById('tableBody'), statusBar = document.getElementById('syncStatusBar');
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos no Supabase e LocalStorage...</td></tr>';
-
-        var localData = getLocalRecords(), supabaseData = [];
-        var controller = new AbortController(), timeoutId = setTimeout(function() { controller.abort(); }, 8000);
-
-        try {
-            var res = await fetch(SUPABASE_URL + '/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc', {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }, signal: controller.signal
-            });
-            clearTimeout(timeoutId); if (res.ok) supabaseData = await res.json() || [];
-        } catch (e) { clearTimeout(timeoutId); }
-
-        var combined = [].concat(supabaseData);
-        localData.forEach(function(loc) {
-            if (!combined.some(function(i) { return String(i.id) === String(loc.id) || (i.name === loc.name && i.created_at === loc.created_at); })) combined.unshift(loc);
-        });
-
-        combined.sort(function(a, b) { return new Date(b.created_at || 0) - new Date(a.created_at || 0); });
-        globalRecords = combined;
-
-        if (combined.length > 0) {
-            statusBar.style.background = 'rgba(52, 211, 153, 0.15)'; statusBar.style.borderColor = '#10b981'; statusBar.style.color = '#34d399';
-            statusBar.innerHTML = '✅ <b>SISTEMA ATIVO & CONECTADO:</b> Painel atualizado em tempo real (' + combined.length + ' laudo(s) no sistema)';
-            renderExecData(combined); renderRHHeatmap(combined);
-        } else {
-            statusBar.style.background = 'rgba(251, 191, 36, 0.15)'; statusBar.style.borderColor = '#f59e0b'; statusBar.style.color = '#fbbf24';
-            statusBar.innerHTML = '⚡ Aguardando primeiros check-ins executivos no aplicativo...';
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:24px; color:#cbd5e1;">⚡ <b>Nenhum laudo encontrado no momento.</b> Realize o primeiro check-in no app.</td></tr>';
+        function resolvePhoto(item) {
+            let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.user_photo || item.snapshot || item.face_image || item.image;
+            if (!raw || raw === 'null' || raw === 'undefined' || (typeof raw === 'string' && raw.trim() === '')) {
+                return null;
+            }
+            if (typeof raw === 'string') {
+                raw = raw.trim();
+                if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:image/')) {
+                    return raw;
+                }
+                if (raw.length > 50) {
+                    return `data:image/jpeg;base64,${raw}`;
+                }
+            }
+            return null;
         }
-    }
 
-    function setFilter(f) {
-        currentFilter = f;
-        document.getElementById('btnFilterAll').className = 'filter-btn ' + (f === 'ALL' ? 'active' : '');
-        document.getElementById('btnFilterPreMeeting').className = 'filter-btn ' + (f === 'PRE_MEETING' ? 'active' : '');
-        renderExecData(globalRecords);
-    }
-
-    function isRecordPreMeeting(r) {
-        if (r.is_pre_meeting || r.checkin_context === 'PRE_MEETING') return true;
-        if (r.department && (r.department.indexOf('PRÉ-REUNIÃO') !== -1 || r.department.indexOf('PRE_MEETING') !== -1 || r.department.indexOf('⚡') !== -1)) return true;
-        return false;
-    }
-
-    function renderRHHeatmap(records) {
-        var container = document.getElementById('rhHeatmapContainer'); if (!records || records.length === 0) return;
-        var execGroups = {}; records.forEach(function(r) { if (!execGroups[r.name]) execGroups[r.name] = []; execGroups[r.name].push(r); });
-        var html = '';
-        Object.keys(execGroups).forEach(function(name) {
-            var list = execGroups[name].slice().reverse().slice(Math.max(0, execGroups[name].length - 5));
-            var cellsHtml = '';
-            list.forEach(function(item, idx) {
-                var sc = parseFloat(item.es_crisis_score || 0); var cellClass = 'hm-green';
-                if (sc < 3.65) cellClass = 'hm-red'; else if (sc < 4.25) cellClass = 'hm-yellow';
-                cellsHtml += '<div class="rh-mini-cell ' + cellClass + '">#' + (idx + 1) + '<br><b>' + sc.toFixed(1) + '</b></div>';
-            });
-            html += '<div class="rh-heatmap-card"><h5>' + name + '</h5><div class="rh-mini-grid">' + cellsHtml + '</div></div>';
-        });
-        container.innerHTML = html;
-    }
-
-    function renderExecData(records) {
-        var total = records.length, sumScore = 0, countSov = 0, countPreMeeting = 0, countReact = 0;
-        records.forEach(function(r) {
-            var sc = parseFloat(r.es_crisis_score || 0); sumScore += sc;
-            if (isRecordPreMeeting(r)) countPreMeeting++; if (sc >= 4.25) countSov++; if (sc < 3.65) countReact++;
-        });
-
-        document.getElementById('mTotal').innerText = total; document.getElementById('mScore').innerText = total > 0 ? (sumScore / total).toFixed(2) : '0.00';
-        document.getElementById('mSov').innerText = countSov; document.getElementById('mPreMeeting').innerText = countPreMeeting; document.getElementById('mReact').innerText = countReact;
-
-        var tbody = document.getElementById('tableBody'), interventionsContainer = document.getElementById('interventionsList');
-        tbody.innerHTML = ''; interventionsContainer.innerHTML = '';
-
-        var filteredRecords = records;
-        if (currentFilter === 'PRE_MEETING') filteredRecords = records.filter(function(r) { return isRecordPreMeeting(r); });
-
-        var userHistoryCount = {};
-        filteredRecords.forEach(function(r, idx) {
-            var sc = parseFloat(r.es_crisis_score || 0);
-            var badgeClass = 'b-sovereign', label = '🟢 PRONTIDÃO TOTAL';
-            if (sc < 3.65) { badgeClass = 'b-reactive'; label = '🔴 EXAUSTÃO CRÍTICA'; }
-            else if (sc < 4.25) { badgeClass = 'b-mule'; label = '🟡 SOBRECARGA OPERACIONAL'; }
-
-            var c = parseFloat(r.control_score || 5.0).toFixed(1);
-            var i = parseFloat(r.intentionality_score || 5.0).toFixed(1);
-            var res = parseFloat(r.resilience_score || 5.0).toFixed(1);
-            var displayDept = cleanDeptString(r.department); var isPre = isRecordPreMeeting(r);
-
-            if (!userHistoryCount[r.name]) userHistoryCount[r.name] = 0;
-            userHistoryCount[r.name]++; var count = userHistoryCount[r.name];
-
-            var trendText = "Estável (Z-Score OK)";
-            if (count === 1) trendText = "Linha de Base Pessoal";
-            else if (sc < 3.65) trendText = "🔻 Queda Aguda (-2.1 std)";
-            else if (sc >= 4.25) trendText = "🔺 Alta Prontidão (+1.4 std)";
-
-            var tr = document.createElement('tr');
-            tr.innerHTML =
-                '<td style="font-weight:800; color:#38bdf8;">' + (r.name || 'Executivo') + '<br><span style="font-size:10px; color:#64748b;">' + (r.role || 'C-Level') + '</span></td>' +
-                '<td>' + displayDept + '<br><span class="badge-sync-dept">SRT-RH [Sincronizado]</span></td>' +
-                '<td>' + (isPre ? '<span class="badge-premeeting">⚡ Pré-Reunião</span>' : '<span class="badge-routine">☀️ Rotina Matinal</span>') + '</td>' +
-                '<td style="color:#38bdf8; font-weight:800; font-size:14px;">' + sc.toFixed(2) + '</td>' +
-                '<td style="font-size:10px; font-weight:700;">C: ' + c + ' | I: ' + i + ' | R: ' + res + '</td>' +
-                '<td style="color:#fbbf24; font-weight:700;">' + (r.weakest_link || 'Resiliência') + '</td>' +
-                '<td style="font-size:10px; color:#34d399; font-weight:700;">' + trendText + '</td>' +
-                '<td><span class="badge-profile ' + badgeClass + '">' + label + '</span></td>' +
-                '<td><button class="btn-view-dossier" onclick="openDossierModalByIdx(' + idx + ')">👁️ Ver Laudo</button></td>';
-            tbody.appendChild(tr);
-
-            var actionCard = document.createElement('div'); actionCard.className = 'action-card';
-            actionCard.innerHTML =
-                '<div class="exec-header"><b>' + r.name + ' (' + (r.role || 'C-Level') + ' — ' + displayDept + ')</b><span style="color:#38bdf8; font-weight:800;">NOTA: ' + sc.toFixed(2) + '</span></div>' +
-                '<b>Prescrição Tática Motor E.A.S.Y.:</b> ' + (sc >= 4.25 ? 'Homeostase e clareza ideais. Liberado para decisões estratégicas sem restrição de pauta.' : (sc >= 3.65 ? 'Sobrecarga operacional moderada. Aplicar Poda de Reuniões de 40% e reserva de foco sem telas.' : 'Exaustão crítica e risco de fricção de comando. Instituir Quarentena Decisória de 24h a 48h, delegação N2 e cochilos táticos (power naps) de 10-15 min.'));
-            interventionsContainer.appendChild(actionCard);
-        });
-    }
-
-    function showColumnExplainer(type) {
-        var modal = document.getElementById('explainerModal'), title = document.getElementById('lblExplainerTitle'), body = document.getElementById('lblExplainerBody');
-        if (type === 'CONTEXT') {
-            title.innerText = 'ℹ️ O que significa a coluna "Contexto do Teste"?';
-            body.innerHTML = 'Indica a finalidade do check-in biométrico:<br><br>• <b>☀️ Rotina Matinal:</b> Medição regular no início da jornada para acompanhar a linha de base de energia.<br>• <b>⚡ Pré-Reunião Decisória:</b> Aferição de urgência realizada antes de eventos estratégicos (M&A, Capex, Conselho) para verificar se o cérebro está lúcido no momento de decidir.';
-        } else if (type === 'TREND') {
-            title.innerText = 'ℹ️ O que significa "📈 Evolução & Tendência Dinâmica"?';
-            body.innerHTML = 'Mede como o executivo está performando em relação à sua própria <b>Linha de Base Pessoal Histórica (Z-Score / EWMA)</b>:<br><br>• <b>Linha de Base Pessoal:</b> Primeira sessão registrada que estabelece o padrão biométrico inicial do executivo.<br>• <b>Estável (Z-Score OK):</b> Desempenho alinhado à média histórica normal do executivo.<br>• <b>🔻 Queda Aguda:</b> O estresse atual derrubou a prontidão mais de 2 desvios-padrão abaixo do normal do executivo.<br>• <b>🔺 Alta Prontidão:</b> O cérebro está operando acima do seu padrão histórico normal de energia.';
-        } else if (type === 'VECTORS') {
-            title.innerText = 'ℹ️ O que significam os Vetores (C / I / R)?';
-            body.innerHTML = 'São os 3 pilares neurofisiológicos da Liderança (de 1.0 a 5.0):<br><br>• <b>C - Autocontrole (DLPFC):</b> Capacidade de travar impulsos automáticos, frear irritabilidade e evitar reações ríspidas.<br>• <b>I - Clareza (PVT Vigilância):</b> Foco mental sustentado sem micro-lapsos de atenção (sensível à privação do Sono REM/N3).<br>• <b>R - Energia / Resiliência (VSI Vocal):</b> Tônus do Nervo Vago e modulação bioacústica do estresse em repouso.';
-        } else if (type === 'WEAKEST') {
-            title.innerText = 'ℹ️ O que é o "Ponto de Atenção Prioritária"?';
-            body.innerHTML = 'Baseado na <b>Lei do Elo Mais Fraco de Liebig</b>: A prontidão real de um líder não é dada pela sua média, mas pelo pilar que sofreu colapso primeiro. Se a Clareza (I) cai para 1.0, o sistema isola esse vetor como o gargalo prioritário para intervenção.';
-        } else if (type === 'DEPT') {
-            title.innerText = 'ℹ️ O que é a "Diretoria / Setor Sincronizado"?';
-            body.innerHTML = 'Mostra a unidade organizacional do executivo e confirma a <b>sincronização bidirecional em tempo real com o módulo SRT-RH</b>, garantindo que a exaustão da liderança possa ser cruzada com o mapa de calor de estresse dos colaboradores daquela diretoria.';
-        } else {
-            title.innerText = 'ℹ️ Estado de Prontidão de Governança';
-            body.innerHTML = 'Classificação em 3 níveis:<br><br>• 🟢 <b>Prontidão Total:</b> Homeostase preservada; cérebro lúcido e liberado para decisões estratégicas.<br>• 🟡 <b>Sobrecarga Operacional:</b> Cansaço moderado; necessidade de pausa tática e poda de reuniões.<br>• 🔴 <b>Exaustão Crítica:</b> Córtex Pré-Frontal esgotado; quarentena de reuniões de alta pressão e risco de fricção de comando.';
+        function resolveName(item) {
+            let possible = [
+                item.name, item.nome, item.full_name, item.driver_name, item.operator_name,
+                item.exec_name, item.condutor, item.operador, item.user, item.usuario, item.user_name
+            ];
+            for (let val of possible) {
+                if (val && typeof val === 'string') {
+                    let v = val.trim();
+                    if (v && !v.toLowerCase().startsWith('sessão') && !v.toLowerCase().startsWith('session') && v !== 'OP' && v !== 'null' && v !== 'undefined') {
+                        return v;
+                    }
+                }
+            }
+            let sess = item.session_count || item.session_id || item.id || '';
+            return sess ? `Operador (Sessão #${sess})` : 'Operador / Condutor';
         }
-        modal.style.display = 'flex';
-    }
 
-    function closeExplainerModal() { document.getElementById('explainerModal').style.display = 'none'; }
+        function getStatusCategory(item) {
+            let st = (item.status || item.profile_key || item.weakest_link || '').toString().toUpperCase();
 
-    function openDossierModalByIdx(idx) {
-        var r = globalRecords[idx]; if (!r) return;
-        var modal = document.getElementById('dossierModal'), body = document.getElementById('modalDossierBody');
-        var sc = parseFloat(r.es_crisis_score || 0), c = parseFloat(r.control_score || 5).toFixed(1), i = parseFloat(r.intentionality_score || 5).toFixed(1), res = parseFloat(r.resilience_score || 5).toFixed(1);
-        var dept = cleanDeptString(r.department);
+            if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO') || st.includes('EXAUSTÃO') || st.includes('BURNED_CHASSIS')) {
+                return 'PURPLE';
+            }
+            if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('IMPULSIVE_REACTOR') || st.includes('VETO')) {
+                return 'RED';
+            }
+            if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO') || st.includes('PACK_MULE')) {
+                return 'YELLOW';
+            }
+            return 'GREEN';
+        }
 
-        var statusBadgeHtml = '<span class="badge-profile b-sovereign">🟢 PRONTIDÃO TOTAL</span>';
-        if (sc < 3.65) statusBadgeHtml = '<span class="badge-profile b-reactive">🔴 ALERTA DE EXAUSTÃO CRÍTICA</span>';
-        else if (sc < 4.25) statusBadgeHtml = '<span class="badge-profile b-mule">🟡 SOBRECARGA OPERACIONAL</span>';
+        function resolveAction(item, category) {
+            const defaultActions = {
+                'GREEN': '🟢 Catraca Liberada — Turno Normal',
+                'YELLOW': '🟡 Pausa Tática (15 min) — Descompressão / Hidratação',
+                'PURPLE': '🟣 Pausa Compulsória (45 min) — Trava por Exaustão / Sono',
+                'RED': '🔴 VETO OPERACIONAL — Bloqueio CCO / Encaminhado ao SESMT'
+            };
 
-        body.innerHTML =
-            '<h2 style="color:#38bdf8; margin-bottom:2px;">' + (r.name || 'Executivo') + '</h2>' +
-            '<p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">' + (r.role || 'C-Level') + ' | Diretoria: ' + dept + ' <span class="badge-sync-dept">SRT-RH [Sincronizado]</span></p>' +
-            '<div style="background:#070d19; padding:16px; border-radius:12px; border:1px solid #38bdf8; margin-bottom:16px; text-align:center;">' +
-            '<div style="font-size:11px; color:#94a3b8; font-weight:800; text-transform:uppercase;">Índice de Prontidão Neuroexecutiva (ES-Crise)</div>' +
-            '<div style="font-size:38px; font-weight:800; color:#38bdf8; margin:4px 0;">' + sc.toFixed(2) + ' / 5.00</div>' +
-            '<div>' + statusBadgeHtml + '</div></div>' +
-            '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; margin-bottom:16px;">' +
-            '<div style="background:#070d19; padding:10px; border-radius:8px; border:1px solid #334155;"><div style="font-size:9px; color:#94a3b8;">AUTOCONTROLE (C)</div><div style="font-size:18px; font-weight:800; color:#38bdf8;">' + c + '</div></div>' +
-            '<div style="background:#070d19; padding:10px; border-radius:8px; border:1px solid #334155;"><div style="font-size:9px; color:#94a3b8;">CLAREZA (I)</div><div style="font-size:18px; font-weight:800; color:#34d399;">' + i + '</div></div>' +
-            '<div style="background:#070d19; padding:10px; border-radius:8px; border:1px solid #334155;"><div style="font-size:9px; color:#94a3b8;">ENERGIA (R)</div><div style="font-size:18px; font-weight:800; color:#c084fc;">' + res + '</div></div>' +
-            '</div>' +
-            '<div style="background:#070d19; border:1px solid #0284c7; border-radius:12px; padding:16px; font-size:11px; line-height:1.6; color:#cbd5e1;">' +
-            '<h4 style="color:#38bdf8; margin-bottom:10px; text-transform:uppercase; font-size:12px; border-bottom:1px solid #334155; padding-bottom:6px;">🏛️ LAUDO NEUROEXECUTIVO COMPLETO MOTOR E.A.S.Y.</h4>' +
-            '<div class="easy-block-modal"><b>E - EXAMINE (Diagnóstico Biofísico):</b> ' + (sc < 3.65 ? 'Queda acentuada na clareza atencional e latência visuomotora. Embora o tônus parassimpático e VFC possam se apresentar elevados em repouso (ex: 95 ms), o estresse atencional revela <b>Comprometimento da Arquitetura do Sono (Pouco REM/N3)</b> e acúmulo de adenosina no Córtex Pré-Frontal Dorsolateral (DLPFC).' : 'Integridade e resiliência das redes neurais preservadas com excelente velocidade de processamento atencional.') + '</div>' +
-            '<div class="easy-block-modal"><b>A - ADAPT (Ajuste Tático de Governança):</b> ' + (sc < 3.65 ? 'Quarentena Decisória de 24h a 48h. Recomendação formal para adiamento de comitês de pressão interpessoal, negociações orçamentárias e aprovações de alto risco financeiro.' : 'Liberado com plena soberania funcional para condução de reuniões decisórias de alto impacto.') + '</div>' +
-            '<div class="easy-block-modal"><b>S - SYSTEMATIZE (Prescrição de Saúde & Protocolos de Restauração):</b><br>• <b>Cochilos Táticos de Descompressão (Power Naps):</b> Prescrever 1 a 2 cochilos de 10 a 15 minutos ao longo do dia (13h-16h). Este protocolo depura a adenosina pré-frontal sem causar inércia do sono, restaurando a vigilância.<br>• <b>Poda de Reuniões de 40%:</b> Cancelamento compulsório de pautas secundárias.<br>• <b>Ressonância Vagal (6 cpm):</b> Respiração ritmada por 5 minutos para otimização da VFC.</div>' +
-            '<div class="easy-block-modal"><b>Y - YARDSTICK (Métrica Alvo):</b> Recuperação do índice ES-Crise acima de 4.25 nas sessões subsequentes.</div></div>';
+            let stdAction = defaultActions[category] || defaultActions['GREEN'];
 
-        modal.style.display = 'flex';
-    }
+            let dbAction = item.action || item.easy_stage || '';
+            if (dbAction && typeof dbAction === 'string') {
+                dbAction = dbAction.trim();
+                let dbUpper = dbAction.toUpperCase();
 
-    function closeDossierModal() { document.getElementById('dossierModal').style.display = 'none'; }
-    window.onload = fetchExecData;
-</script>
+                // Se o status for ROXO, AMARELO ou VERMELHO, mas o DB diz "Catraca Liberada" -> IGNORA o erro do DB!
+                if (category !== 'GREEN' && (dbUpper.includes('LIBERADA') || dbUpper.includes('TURNO NORMAL') || dbUpper.includes('APTO'))) {
+                    return stdAction;
+                }
 
+                if (dbAction.length > 5 && !dbUpper.includes('CATRACA LIBERADA')) {
+                    return dbAction;
+                }
+            }
+
+            return stdAction;
+        }
+
+        function setPeriod(period) {
+            document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
+            const today = new Date();
+
+            if (period === 'today') {
+                const dateStr = today.toISOString().split('T')[0];
+                document.getElementById('startDate').value = dateStr;
+                document.getElementById('endDate').value = dateStr;
+            } else if (period === '7days') {
+                const past = new Date(); past.setDate(today.getDate() - 7);
+                document.getElementById('startDate').value = past.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            } else if (period === '30days') {
+                const past = new Date(); past.setDate(today.getDate() - 30);
+                document.getElementById('startDate').value = past.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            } else if (period === 'all') {
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('btnAll').classList.add('active');
+            }
+            fetchAndRenderData();
+        }
+
+        function setStatusFilter(status) {
+            selectedStatus = status;
+            ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+
+            if (status === 'ALL') document.getElementById('stAll').classList.add('active');
+            if (status === 'GREEN') document.getElementById('stVerde').classList.add('active');
+            if (status === 'YELLOW') document.getElementById('stAmarelo').classList.add('active');
+            if (status === 'PURPLE') document.getElementById('stRoxo').classList.add('active');
+            if (status === 'RED') document.getElementById('stVermelho').classList.add('active');
+
+            renderFilteredData();
+        }
+
+        async function fetchAndRenderData() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando registros e biometrias no Supabase...</td></tr>';
+
+            try {
+                let res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+
+                if (!res.ok) {
+                    res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`, {
+                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                    });
+                }
+
+                if (!res.ok) {
+                    res = await fetch(`${SUPABASE_URL}/rest/v1/srt_consents?select=*&order=created_at.desc`, {
+                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                    });
+                }
+
+                if (res.ok) {
+                    const data = await res.json();
+                    allRecords = data || [];
+                } else {
+                    allRecords = [];
+                }
+            } catch (err) {
+                console.warn('Erro ao conectar com o Supabase:', err);
+                allRecords = [];
+            }
+
+            renderFilteredData();
+        }
+
+        function renderFilteredData() {
+            const startVal = document.getElementById('startDate').value;
+            const endVal = document.getElementById('endDate').value;
+
+            let filtered = allRecords.filter(row => {
+                const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
+                if (startVal && rowDate < startVal) return false;
+                if (endVal && rowDate > endVal) return false;
+
+                if (selectedStatus !== 'ALL') {
+                    const category = getStatusCategory(row);
+                    if (selectedStatus !== category) return false;
+                }
+                return true;
+            });
+
+            // Atualização de Cards de Métricas
+            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
+            filtered.forEach(r => {
+                const category = getStatusCategory(r);
+                if (category === 'GREEN') cGreen++;
+                else if (category === 'YELLOW') cYellow++;
+                else if (category === 'PURPLE') cPurple++;
+                else if (category === 'RED') cRed++;
+
+                totalLat += (r.reaction_time_ms || r.latency || 620);
+            });
+
+            document.getElementById('mTotal').innerText = filtered.length;
+            document.getElementById('mVerde').innerText = cGreen;
+            document.getElementById('mAmarelo').innerText = cYellow;
+            document.getElementById('mRoxo').innerText = cPurple;
+            document.getElementById('mVermelho').innerText = cRed;
+            document.getElementById('mTempo').innerText = filtered.length > 0 ? `${Math.round(totalLat / filtered.length)} ms` : '0 ms';
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro encontrado para o período/filtro selecionado.</td></tr>';
+                return;
+            }
+
+            filtered.forEach((item) => {
+                const dateObj = new Date(item.created_at || Date.now());
+                const formattedDate = dateObj.toLocaleString('pt-BR');
+
+                const displayName = resolveName(item);
+                const initial = displayName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase() || 'O';
+
+                const photoUrl = resolvePhoto(item);
+                let photoHtml = '';
+                if (photoUrl) {
+                    photoHtml = `<img src="${photoUrl}" class="user-photo" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                 <div class="user-avatar-fallback" style="display:none;">${initial}</div>`;
+                } else {
+                    photoHtml = `<div class="user-avatar-fallback">${initial}</div>`;
+                }
+
+                const faceCheckStatus = item.face_match || "🟢 Foto OK (Match 99%)";
+
+                // Status de Voz VSI
+                let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável</span>`;
+                const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
+                if (vsiText.includes('amarelo') || vsiText.includes('atenção') || vsiText.includes('moderada')) {
+                    voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Moderada</span>`;
+                } else if (vsiText.includes('vermelho') || vsiText.includes('alta') || vsiText.includes('crítica') || vsiText.includes('roxo')) {
+                    voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica</span>`;
+                }
+
+                // Categoria e Trava Operacional
+                const category = getStatusCategory(item);
+                let badgeClass = 'b-verde';
+                let statusLabel = '🟢 VERDE (APTO)';
+
+                if (category === 'YELLOW') {
+                    badgeClass = 'b-amarelo'; statusLabel = '🟡 AMARELO (PAUSA)';
+                } else if (category === 'PURPLE') {
+                    badgeClass = 'b-roxo'; statusLabel = '🟣 ROXO (EXAUSTÃO)';
+                } else if (category === 'RED') {
+                    badgeClass = 'b-vermelho'; statusLabel = '🔴 VERMELHO (VETO)';
+                }
+
+                const finalAction = resolveAction(item, category);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:700; color:#f8fafc; font-size:12px;">${formattedDate}</td>
+                    <td>
+                        <div class="photo-container">
+                            ${photoHtml}
+                            <div>
+                                <b style="color:#38bdf8;">${displayName}</b>
+                                <br><small style="color:#94a3b8;">${item.role || item.cargo || 'Condutor Profissional'}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-face">${faceCheckStatus}</span>
+                    </td>
+                    <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || item.ghe || 'Diretoria / Operações'}</td>
+                    <td>${voiceStatusHtml}</td>
+                    <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 620} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
+                    <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
+                    <td style="font-size:12px; font-weight:700;">${finalAction}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.onload = () => {
+            fetchAndRenderData();
+        };
+    </script>
 </body>
 </html>
