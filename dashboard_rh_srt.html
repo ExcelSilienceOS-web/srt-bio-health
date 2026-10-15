@@ -524,7 +524,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const companyFromUrl = urlParams.get('company');
-        const currentCompany = companyFromUrl ? companyFromUrl.toUpperCase().trim() : null;
+        const currentCompany = (companyFromUrl && companyFromUrl.trim() !== '') ? companyFromUrl.toUpperCase().trim() : null;
 
         // VERIFICAÇÃO DE MODO ADMIN/DEMO NA URL:
         // O botão '🔓 Modo Ao Vivo' só é liberado se a URL contiver &admin=true, &demo=true ou &live=true
@@ -695,14 +695,16 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
+                // Filtra por empresa APENAS se houver empresa especificada na URL (?company=...)
+                // Se a URL não trouxer empresa, EXIBE TODOS OS REGISTROS de todas as empresas!
                 if (currentCompany) {
                     const itemComp = (item.company || '').toUpperCase().trim();
-                    const matchesComp = !currentCompany || itemComp.includes(currentCompany) || currentCompany.includes(itemComp) || itemComp === 'CORPORATIVO ANÔNIMO (RH)' || itemComp === '' || itemComp === 'NULL' || itemComp === 'GERAL' || itemComp === 'EXCEL SILIENCE';
+                    const matchesComp = itemComp.includes(currentCompany) || currentCompany.includes(itemComp) || itemComp === 'CORPORATIVO ANÔNIMO (RH)';
                     if (!matchesComp) return false;
                 }
                 const d = new Date(item.created_at);
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
-                if (currentPeriod === 'DAY') return diffDias <= 2.0 && diffDias >= -0.5; // Margem de segurança de fuso horário
+                if (currentPeriod === 'DAY') return diffDias <= 2.0 && diffDias >= -0.5; // Margem de fuso horário
                 if (currentPeriod === 'WEEK') return diffDias <= 7;
                 if (currentPeriod === 'MONTH') return diffDias <= 30;
                 return true; // 'ALL' (Todos)
@@ -945,7 +947,7 @@ EMPRESA : ${empNome} | DATA: ${dataHoje}
         function removerSetor(nome) { setoresCadastrados = setoresCadastrados.filter(s => s !== nome); initSetoresEGenerators(); renderDashboard(); }
         function renderListaSetoresCadastrados() { const container = document.getElementById('setores-lista-cadastrados'); if (!container) return; container.innerHTML = ''; setoresCadastrados.forEach(setor => { container.innerHTML += `<div class="dept-item-row"><span>🏢 ${setor}</span><button class="btn" style="background:#ef4444; color:#fff; font-size:10px; padding:2px 8px;" onclick="removerSetor('${setor}')">Excluir</button></div>`; }); }
         function populateSectorDropdowns() { const selInd = document.getElementById('selIndSector'); const selChart = document.getElementById('selChartSector'); if (selInd) { selInd.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`; setoresCadastrados.forEach(s => { selInd.innerHTML += `<option value="${s}">${s}</option>`; }); } if (selChart) { selChart.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`; setoresCadastrados.forEach(s => { selChart.innerHTML += `<option value="${s}">${s}</option>`; }); } }
-        function renderLinkGeneratorList() { const container = document.getElementById('link-generator-list'); if (!container) return; container.innerHTML = ''; const baseUrl = window.location.origin + window.location.pathname.replace('dashboard_rh_srt.html', 'index-rh.html'); const compParam = currentCompany ? currentCompany.toLowerCase() : 'selecta'; setoresCadastrados.forEach(setor => { const slug = setor.toLowerCase().replace(/[^a-z0-9]/g, '_'); const link = `${baseUrl}?company=${compParam}&sector=${slug}`; container.innerHTML += `<div style="background:#0d1527; border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:8px;"><div style="font-size:11px; font-weight:800; color:var(--accent);">${setor}</div><input type="text" value="${link}" readonly style="width:100%; background:#0b0f19; border:1px solid var(--border); color:#cbd5e1; font-size:10px; padding:4px; margin:4px 0; border-radius:4px;"><button class="btn btn-green" style="font-size:10px; padding:3px 8px;" onclick="navigator.clipboard.writeText('${link}'); alert('Link copiado!')">📋 Copiar Link</button></div>`; }); }
+        function renderLinkGeneratorList() { const container = document.getElementById('link-generator-list'); if (!container) return; container.innerHTML = ''; const baseUrl = window.location.origin + window.location.pathname.replace('dashboard_rh_srt.html', 'index-rh.html'); const compParam = currentCompany ? currentCompany.toLowerCase() : 'geral'; setoresCadastrados.forEach(setor => { const slug = setor.toLowerCase().replace(/[^a-z0-9]/g, '_'); const link = `${baseUrl}?company=${compParam}&sector=${slug}`; container.innerHTML += `<div style="background:#0d1527; border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:8px;"><div style="font-size:11px; font-weight:800; color:var(--accent);">${setor}</div><input type="text" value="${link}" readonly style="width:100%; background:#0b0f19; border:1px solid var(--border); color:#cbd5e1; font-size:10px; padding:4px; margin:4px 0; border-radius:4px;"><button class="btn btn-green" style="font-size:10px; padding:3px 8px;" onclick="navigator.clipboard.writeText('${link}'); alert('Link copiado!')">📋 Copiar Link</button></div>`; }); }
         function adicionarMetricaCustomizada() { const nome = prompt("Nome da nova métrica customizada de RH:"); if (nome) { const val = prompt("Valor inicial:") || "100%"; const container = document.getElementById('custom-container'); if (container) { container.innerHTML += `<div class="card-metric"><div class="lbl">${nome}</div><div class="val val-total">${val}</div><div class="subtext">Indicador Personalizado</div></div>`; } } }
     </script>
 </body>
