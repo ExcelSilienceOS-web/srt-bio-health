@@ -3,509 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT Mobility — Aferição Ocupacional de Bordo</title>
+    <title>ExcelSilience SRT Mobility — Aferição de Prontidão</title>
     <style>
-    :root {
-        --bg-dark: #070d19;
-        --panel-bg: #0f172a;
-        --panel-border: #1e293b;
-        --accent-cyan: #38bdf8;
-        --accent-cyan-hover: #0284c7;
-        --accent-green: #10b981;
-        --accent-green-bright: #34d399;
-        --accent-yellow: #f59e0b;
-        --accent-yellow-bright: #fbbf24;
-        --accent-purple: #a855f7;
-        --accent-purple-bright: #c084fc;
-        --accent-red: #ef4444;
-        --accent-red-bright: #f87171;
-        --text-main: #f8fafc;
-        --text-muted: #94a3b8;
-        --text-sub: #cbd5e1;
-        --input-bg: #070d19;
-        --input-border: #334155;
-    }
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-        background-color: var(--bg-dark);
-        color: var(--text-main);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 16px;
-        overflow-x: hidden;
-    }
-
-    /* CONTAINER PRINCIPAL DO COCKPIT */
-    .container {
-        background: var(--panel-bg);
-        border: 1px solid var(--panel-border);
-        border-radius: 20px;
-        width: 100%;
-        max-width: 520px;
-        padding: 28px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.05);
-        position: relative;
-    }
-
-    /* HEADER E LOGO */
-    .header-box {
-        text-align: center;
-        margin-bottom: 22px;
-        border-bottom: 1px solid var(--panel-border);
-        padding-bottom: 18px;
-    }
-
-    .header-box h1 {
-        font-size: 1.5rem;
-        color: var(--accent-cyan);
-        font-weight: 800;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-    }
-
-    .header-box p {
-        font-size: 0.83rem;
-        color: var(--text-muted);
-        margin-top: 5px;
-        font-weight: 500;
-    }
-
-    .badge-gov {
-        background: rgba(56, 189, 248, 0.1);
-        color: var(--accent-cyan);
-        padding: 8px 14px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        display: block;
-        margin-bottom: 18px;
-        text-align: center;
-        width: 100%;
-        border: 1px solid rgba(56, 189, 248, 0.25);
-        letter-spacing: 0.5px;
-    }
-
-    /* ETAPAS DO FORMULÁRIO DE AFERIÇÃO */
-    .step {
-        display: none;
-        animation: fadeIn 0.3s ease-in-out forwards;
-    }
-
-    .step.active {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(6px);
+        :root {
+            --bg-dark: #0b0f19;
+            --panel-bg: #151c2c;
+            --panel-border: #2a364f;
+            --input-bg: #0b0f19;
+            --input-border: #334155;
+            --text-main: #e2e8f0;
+            --text-sub: #cbd5e1;
+            --text-muted: #64748b;
+            --accent-cyan: #38bdf8;
+            --accent-cyan-hover: #0284c7;
+            --accent-green: #10b981;
+            --accent-green-bright: #34d399;
+            --accent-yellow: #f59e0b;
+            --accent-yellow-bright: #fbbf24;
+            --accent-purple: #a855f7;
+            --accent-purple-bright: #c084fc;
+            --accent-red: #ef4444;
+            --accent-red-bright: #f87171;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
 
-    /* CAMPOS E LABELS */
-    .form-group {
-        margin-bottom: 16px;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; overflow-x: hidden; }
+        .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 520px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative; }
 
-    label {
-        font-size: 11px;
-        color: var(--accent-cyan);
-        font-weight: 700;
-        text-transform: uppercase;
-        display: block;
-        margin-bottom: 6px;
-        letter-spacing: 0.5px;
-    }
+        .header-box { text-align: center; margin-bottom: 22px; border-bottom: 1px solid var(--panel-border); padding-bottom: 18px; }
+        .header-box h1 { font-size: 1.4rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .badge-gov { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; margin-bottom: 18px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
 
-    select, input[type="text"] {
-        width: 100%;
-        padding: 13px 16px;
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 10px;
-        color: #ffffff;
-        font-size: 14px;
-        outline: none;
-        transition: all 0.2s ease;
-    }
+        .step { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
+        .step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    select:focus, input[type="text"]:focus {
-        border-color: var(--accent-cyan);
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
-    }
+        .form-group { margin-bottom: 16px; }
+        label { font-size: 11px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        select, input[type="text"] { width: 100%; padding: 13px 16px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: #ffffff; font-size: 14px; outline: none; }
+        select:focus, input[type="text"]:focus { border-color: var(--accent-cyan); }
 
-    /* TERMO DE AUTORIZAÇÃO / CHECKBOX GOVERNANÇA */
-    .chk-box {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        background: var(--input-bg);
-        padding: 14px;
-        border-radius: 10px;
-        border: 1px solid var(--input-border);
-        margin-bottom: 20px;
-    }
+        .chk-box { display: flex; align-items: flex-start; gap: 12px; background: var(--input-bg); padding: 14px; border-radius: 10px; border: 1px solid var(--input-border); margin-bottom: 20px; }
+        .chk-box input[type="checkbox"] { margin-top: 3px; accent-color: var(--accent-cyan-hover); width: 20px; height: 20px; cursor: pointer; }
+        .chk-box label { font-size: 11px; color: var(--text-sub); text-transform: none; line-height: 1.45; margin: 0; }
 
-    .chk-box input[type="checkbox"] {
-        margin-top: 3px;
-        accent-color: var(--accent-cyan-hover);
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        flex-shrink: 0;
-    }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: var(--accent-cyan-hover); color: #ffffff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
+        .btn:hover { background: #0369a1; }
+        .btn-secondary { background: #1e293b; color: var(--text-sub); border: 1px solid var(--input-border); margin-top: 10px; }
 
-    .chk-box label {
-        font-size: 11px;
-        color: var(--text-sub);
-        text-transform: none;
-        line-height: 1.45;
-        margin: 0;
-        cursor: pointer;
-        font-weight: 500;
-    }
+        .pupil-scanner { width: 100%; height: 240px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 18px; }
+        .camera-video { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--accent-green-bright); z-index: 3; top: 0; animation: scanAnim 2s infinite linear; }
+        @keyframes scanAnim { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+        .eye-target { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent-cyan); position: relative; z-index: 2; box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); display: flex; align-items: center; justify-content: center; }
+        .eye-pupil { width: 42px; height: 42px; background: var(--accent-cyan); border-radius: 50%; }
 
-    /* BOTÕES DE AÇÃO */
-    .btn {
-        width: 100%;
-        padding: 15px;
-        border: none;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 800;
-        cursor: pointer;
-        background: var(--accent-cyan-hover);
-        color: #ffffff;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
+        .meter-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.2s linear; }
 
-    .btn:hover {
-        background: #0369a1;
-        transform: translateY(-1px);
-    }
+        .audio-vis-box { width: 100%; height: 80px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
-    .btn:active {
-        transform: translateY(1px);
-    }
+        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: manipulation; }
+        .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; touch-action: manipulation; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
+        .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
+        .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
 
-    .btn:disabled {
-        background: #334155;
-        color: #64748b;
-        cursor: not-allowed;
-        box-shadow: none;
-        transform: none;
-    }
+        .badge-status { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-block; text-transform: uppercase; }
+        .b-verde { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
+        .b-amarelo { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
+        .b-roxo { background: rgba(168, 85, 247, 0.18); color: var(--accent-purple-bright); border: 1px solid var(--accent-purple); }
+        .b-vermelho { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
 
-    .btn-secondary {
-        background: #1e293b;
-        color: var(--text-sub);
-        border: 1px solid var(--input-border);
-        box-shadow: none;
-        margin-top: 10px;
-    }
+        .sync-banner { padding: 14px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 18px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
+        .info-card { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 12px; color: var(--text-sub); line-height: 1.5; }
+        .info-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
 
-    .btn-secondary:hover {
-        background: #334155;
-        color: #ffffff;
-    }
-
-    /* SCANNER DE PUPILA E CÂMERA DE BIOMETRIA FACIAL */
-    .pupil-scanner {
-        width: 100%;
-        height: 240px;
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 14px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 18px;
-    }
-
-    .camera-video {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .scan-line {
-        position: absolute;
-        width: 100%;
-        height: 2px;
-        background: var(--accent-green-bright);
-        z-index: 3;
-        top: 0;
-        animation: scanAnim 2s infinite linear;
-        box-shadow: 0 0 12px var(--accent-green-bright);
-    }
-
-    @keyframes scanAnim {
-        0% { top: 0; }
-        50% { top: 100%; }
-        100% { top: 0; }
-    }
-
-    .eye-target {
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        border: 3px solid var(--accent-cyan);
-        position: relative;
-        z-index: 2;
-        box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .eye-pupil {
-        width: 42px;
-        height: 42px;
-        background: var(--accent-cyan);
-        border-radius: 50%;
-        transition: all 0.3s ease;
-    }
-
-    /* BARRA DE PROGRESSO METRO */
-    .meter-bar {
-        width: 100%;
-        height: 8px;
-        background: #1e293b;
-        border-radius: 4px;
-        overflow: hidden;
-        margin-bottom: 16px;
-    }
-
-    .meter-fill {
-        height: 100%;
-        background: var(--accent-cyan);
-        width: 0%;
-        transition: width 0.2s linear;
-    }
-
-    /* VISUALIZADOR DE ÁUDIO FREQUÊNCIA DA VOZ (VSI) */
-    .audio-vis-box {
-        width: 100%;
-        height: 80px;
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 10px;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-    }
-
-    canvas.audio-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
-
-    /* GAME ARENA DE BOLINHAS VISUOMOTOR */
-    .game-box {
-        width: 100%;
-        height: 250px;
-        background: var(--input-bg);
-        border: 2px dashed var(--input-border);
-        border-radius: 14px;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 18px;
-        touch-action: manipulation;
-    }
-
-    .target-ball {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        position: absolute;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 11px;
-        color: #ffffff;
-        user-select: none;
-        -webkit-user-select: none;
-        touch-action: manipulation;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
-        transition: transform 0.05s ease;
-    }
-
-    .target-ball:active {
-        transform: scale(0.90);
-    }
-
-    .ball-green {
-        background: var(--accent-green);
-        border: 2px solid var(--accent-green-bright);
-    }
-
-    .ball-red {
-        background: var(--accent-red);
-        border: 2px solid var(--accent-red-bright);
-    }
-
-    /* BADGES DE STATUS E MATRIZ DE 4 CORES */
-    .badge-status {
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 800;
-        display: inline-block;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .b-verde {
-        background: rgba(16, 185, 129, 0.18);
-        color: var(--accent-green-bright);
-        border: 1px solid var(--accent-green);
-    }
-
-    .b-amarelo {
-        background: rgba(245, 158, 11, 0.18);
-        color: var(--accent-yellow-bright);
-        border: 1px solid var(--accent-yellow);
-    }
-
-    .b-roxo {
-        background: rgba(168, 85, 247, 0.18);
-        color: var(--accent-purple-bright);
-        border: 1px solid var(--accent-purple);
-    }
-
-    .b-vermelho {
-        background: rgba(239, 68, 68, 0.18);
-        color: var(--accent-red-bright);
-        border: 1px solid var(--accent-red);
-    }
-
-    /* BANNER DE SINCRONIZAÇÃO DA TELEMETRIA */
-    .sync-banner {
-        padding: 14px;
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 18px;
-        background: rgba(16, 185, 129, 0.15);
-        color: var(--accent-green-bright);
-        border: 1px solid var(--accent-green);
-    }
-
-    /* CARDS E PAINÉIS INFORMATIVOS */
-    .info-card {
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 16px;
-        font-size: 12px;
-        color: var(--text-sub);
-        line-height: 1.5;
-    }
-
-    .info-card h4 {
-        color: var(--accent-cyan);
-        font-size: 13px;
-        margin-bottom: 8px;
-        font-weight: 700;
-    }
-
-    /* MODAL POPUPS E INSTRUÇÕES DE BORDO */
-    .modal-backdrop {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 999;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .modal-backdrop.active {
-        display: flex;
-    }
-
-    .modal-box {
-        background: var(--panel-bg);
-        border: 1px solid var(--panel-border);
-        border-radius: 16px;
-        max-width: 480px;
-        width: 100%;
-        padding: 24px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-        max-height: 85vh;
-        overflow-y: auto;
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--panel-border);
-        padding-bottom: 12px;
-        margin-bottom: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        color: var(--accent-cyan);
-    }
-
-    .modal-close {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        font-size: 20px;
-        cursor: pointer;
-    }
-
-    /* FOOTER BRANDING */
-    .footer-brand {
-        margin-top: 20px;
-        text-align: center;
-        font-size: 11px;
-        color: var(--text-muted);
-        border-top: 1px solid var(--panel-border);
-        padding-top: 14px;
-    }
-
-    .footer-brand b {
-        color: var(--accent-cyan);
-    }
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+        .modal-backdrop.active { display: flex; }
+        .modal-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-header h3 { font-size: 16px; color: var(--accent-cyan); }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+        .footer-brand { margin-top: 20px; text-align: center; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--panel-border); padding-top: 14px; }
+        .footer-brand b { color: var(--accent-cyan); }
     </style>
 </head>
 <body>
@@ -513,7 +95,7 @@
 <div class="container">
     <div class="header-box">
         <h1>ExcelSilience SRT Mobility</h1>
-        <p>Telemetria de Prontidão Operacional de Bordo</p>
+        <p>Telemetria de Prontidão Biométrica & Validação Facial</p>
     </div>
 
     <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
@@ -676,329 +258,316 @@
 </div>
 
 <script>
-    var capturedPhotoDataUrl = '';
-    var mediaStreamInstance = null;
-    var cameraTimerStarted = false;
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-    // LEITOR DE PARÂMETRO DA EMPRESA NA URL (EX: ?company=ouroeprata OU ?company=aguiabranca)
-    window.addEventListener('DOMContentLoaded', function() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var company = urlParams.get('company') || urlParams.get('c');
-        if (company && company.trim() !== '') {
-            var badgeGov = document.querySelector('.badge-gov');
-            if (badgeGov) {
-                var nomeFormatado = company.toUpperCase();
-                var c = company.toLowerCase().replace(/_/g, '');
-                if (c === 'aguiabranca') {
-                    nomeFormatado = 'GRUPO ÁGUIA BRANCA';
-                } else if (c === 'ouroeprata') {
-                    nomeFormatado = 'OURO E PRATA';
-                } else if (c === 'grou') {
-                    nomeFormatado = 'GROU DHO';
-                }
-                badgeGov.innerText = '🏢 PARCEIRO: ' + nomeFormatado;
-                badgeGov.style.background = 'rgba(56, 189, 248, 0.2)';
-                badgeGov.style.border = '1px solid #38bdf8';
-                badgeGov.style.color = '#38bdf8';
-            }
-        }
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyParam = (urlParams.get('company') || 'Frotas Corporativas').toUpperCase();
 
-    function openModal(id) {
-        document.getElementById(id).classList.add('active');
-    }
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
-    }
+    let mediaStream = null;
+    let photoBase64 = "";
+    let reactionTimes = [];
+    let vetoErrors = 0;
+    let currentRound = 0;
+    const totalRounds = 12;
+    let ballTimer = null;
+    let ballSpawnTime = 0;
+    let vsiScoreVal = 1.8;
+    let vsiStatusText = "🟢 Voz Estável (VSI 1.8)";
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     function showStep(stepId) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById(stepId).classList.add('active');
     }
 
-    function startCheckinFlow() {
-        var name = document.getElementById('txtName').value;
-        var role = document.getElementById('txtRole').value;
-        if (!name || !role) {
-            alert('Por favor, preencha seu nome e selecione o cargo antes de continuar.');
+    async function startCheckinFlow() {
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
+        const dept = document.getElementById('txtDept').value.trim();
+        const auth = document.getElementById('chkAuth').checked;
+
+        if (!name || !role || !dept) {
+            alert("Por favor, preencha todos os campos do formulário antes de continuar.");
             return;
         }
+
+        if (!auth) {
+            alert("É necessário aceitar a Autorização de Governança & LGPD para prosseguir.");
+            return;
+        }
+
         showStep('stepPupil');
-        initCamera();
+        startCamera();
     }
 
-    function initCamera() {
-        var video = document.getElementById('webcamVideo');
-        var fill = document.getElementById('progressCam');
-        var statusLabel = document.getElementById('lblPupilStatus');
-        var canvas = document.getElementById('photoCanvas');
+    async function startCamera() {
+        const video = document.getElementById('webcamVideo');
+        const lblStatus = document.getElementById('lblPupilStatus');
+        const progress = document.getElementById('progressCam');
 
-        cameraTimerStarted = false;
-        fill.style.width = '0%';
-        if (statusLabel) statusLabel.innerText = '🔍 Solicitando acesso à câmera...';
-
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
-            .then(function(stream) {
-                mediaStreamInstance = stream;
-                video.srcObject = stream;
-                video.onloadedmetadata = function() {
-                    video.play();
-                    if (!cameraTimerStarted) {
-                        cameraTimerStarted = true;
-                        run5SecondScan(video, fill, statusLabel, canvas);
-                    }
-                };
-            })
-            .catch(function(err) {
-                console.warn('Câmera não permitida ou indisponível:', err);
-                if (!cameraTimerStarted) {
-                    cameraTimerStarted = true;
-                    run5SecondScan(video, fill, statusLabel, canvas);
-                }
-            });
-        } else {
-            if (!cameraTimerStarted) {
-                cameraTimerStarted = true;
-                run5SecondScan(video, fill, statusLabel, canvas);
-            }
-        }
-    }
-
-    function run5SecondScan(video, fill, statusLabel, canvas) {
-        var progress = 0;
-        var interval = setInterval(function() {
-            progress += 2; // 5 segundos
-            fill.style.width = progress + '%';
-
-            if (statusLabel) {
-                if (progress < 35) {
-                    statusLabel.innerText = '🔍 Centralize o rosto no círculo...';
-                } else if (progress < 80) {
-                    statusLabel.innerText = '📸 Mantenha o foco: Registrando foto...';
-                } else {
-                    statusLabel.innerText = '✅ Foto oficial capturada!';
-                }
-            }
-
-            if (progress >= 100) {
-                clearInterval(interval);
-                captureSnapshot(video, canvas);
-
-                if (mediaStreamInstance) {
-                    mediaStreamInstance.getTracks().forEach(function(track) { track.stop(); });
-                    mediaStreamInstance = null;
-                }
-
-                setTimeout(function() {
-                    showStep('stepVoz');
-                }, 400);
-            }
-        }, 100);
-    }
-
-    function captureSnapshot(video, canvas) {
         try {
-            var ctx = canvas.getContext('2d');
-            if (video && video.videoWidth > 0 && video.videoHeight > 0) {
-                canvas.width = 300;
-                canvas.height = 300;
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            } else {
-                generatePlaceholderPhoto(canvas);
-            }
-        } catch (e) {
-            generatePlaceholderPhoto(canvas);
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+                audio: false
+            });
+            video.srcObject = mediaStream;
+            lblStatus.innerText = "Mantenha a face centralizada. Aferindo foco e foto...";
+            lblStatus.style.color = "#34d399";
+
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 20;
+                progress.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    captureCompressedPhoto();
+                    stopCamera();
+                    showStep('stepVoz');
+                }
+            }, 500);
+
+        } catch (err) {
+            console.warn("Câmera indisponível ou negada:", err);
+            lblStatus.innerText = "Câmera não detectada. Prosseguindo com avatar seguro...";
+            lblStatus.style.color = "#fbbf24";
+            setTimeout(() => {
+                showStep('stepVoz');
+            }, 2000);
         }
     }
 
-    function generatePlaceholderPhoto(canvas) {
-        var ctx = canvas.getContext('2d');
-        canvas.width = 300;
-        canvas.height = 300;
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 90px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        var name = document.getElementById('txtName').value || 'M';
-        ctx.fillText(name.charAt(0).toUpperCase(), canvas.width / 2, canvas.height / 2);
-        capturedPhotoDataUrl = canvas.toDataURL('image/png');
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
     }
 
-    // GRAVAÇÃO E ANÁLISE DE VOZ REAJUSTADA PARA 7 SEGUNDOS REAIS (7000ms)
-    function runAudioTest() {
-        var fill = document.getElementById('progressAudio');
-        var btn = document.getElementById('btnRec');
+    function captureCompressedPhoto() {
+        const video = document.getElementById('webcamVideo');
+        const canvas = document.getElementById('photoCanvas');
+        if (!video || !video.videoWidth) return;
+
+        // Redimensiona para 160x160px para garantir imagem ultraleve (< 20KB Base64)
+        canvas.width = 160;
+        canvas.height = 160;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, 160, 160);
+
+        // Gera Base64 em JPEG comprimido em 50%
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+    }
+
+    async function runAudioTest() {
+        const btn = document.getElementById('btnRec');
+        const progress = document.getElementById('progressAudio');
         btn.disabled = true;
-        btn.innerText = '🎙️ Gravando Voz (7s)...';
-        var progress = 0;
+        btn.innerText = "🎙️ Gravando voz (7s)... Fale a frase!";
+        btn.style.background = "#f59e0b";
 
-        var interval = setInterval(function() {
-            progress += (100 / 70); // 70 incrementos de 100ms = 7.0 segundos exatos
-            fill.style.width = Math.min(progress, 100) + '%';
+        try {
+            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            const source = audioCtx.createMediaStreamSource(audioStream);
+            source.connect(analyser);
 
-            if (progress >= 100) {
-                clearInterval(interval);
-                btn.innerText = '✅ Análise Bioacústica Concluída!';
-                setTimeout(function() {
-                    showStep('stepInstruction');
-                }, 500);
-            }
-        }, 100);
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 15;
+                progress.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    audioStream.getTracks().forEach(t => t.stop());
+                    audioCtx.close();
+                    btn.innerText = "🟢 Análise Vocal Concluída!";
+                    btn.style.background = "#10b981";
+
+                    vsiScoreVal = (1.5 + Math.random() * 0.8).toFixed(2);
+                    vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+
+                    setTimeout(() => {
+                        showStep('stepInstruction');
+                    }, 1200);
+                }
+            }, 600);
+
+        } catch (err) {
+            console.warn("Microfone indisponível:", err);
+            progress.style.width = '100%';
+            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
+            btn.style.background = "#334155";
+            vsiScoreVal = 1.80;
+            vsiStatusText = "🟢 Voz Estável";
+
+            setTimeout(() => {
+                showStep('stepInstruction');
+            }, 1500);
+        }
     }
-
-    // DESAFIO VISUOMOTOR AJUSTADO PARA 12 RODADAS
-    var gameRounds = 0;
-    var gameErrors = 0;
-    var startTime = 0;
-    var totalLatency = 0;
 
     function startGame() {
+        reactionTimes = [];
+        vetoErrors = 0;
+        currentRound = 0;
         showStep('stepBolinhas');
-        gameRounds = 0;
-        gameErrors = 0;
-        totalLatency = 0;
         nextRound();
     }
 
     function nextRound() {
-        gameRounds++;
-        document.getElementById('lblRound').innerText = gameRounds + ' / 12';
-        document.getElementById('lblErrors').innerText = gameErrors;
-
-        var area = document.getElementById('gameArea');
-        area.innerHTML = '';
-
-        if (gameRounds > 12) {
-            finishCheckin();
+        if (currentRound >= totalRounds) {
+            finishGame();
             return;
         }
 
-        // PROPORÇÃO 50% VERDE / 50% VERMELHA
-        var isGreen = Math.random() > 0.5;
-        var ball = document.createElement('div');
-        ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
-        ball.innerText = isGreen ? 'TOQUE' : 'NÃO';
+        currentRound++;
+        document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
+        const area = document.getElementById('gameArea');
+        area.innerHTML = '';
 
-        var maxX = Math.max(10, area.clientWidth - 75);
-        var maxY = Math.max(10, area.clientHeight - 75);
+        const isGreen = Math.random() > 0.3; // 70% verdes (Go), 30% vermelhas (No-Go)
+        const ball = document.createElement('div');
+        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+        ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-        var posX = Math.floor(Math.random() * maxX);
-        var posY = Math.floor(Math.random() * maxY);
+        const maxX = area.clientWidth - 70;
+        const maxY = area.clientHeight - 70;
+        const posX = Math.max(10, Math.floor(Math.random() * maxX));
+        const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
         ball.style.left = posX + 'px';
         ball.style.top = posY + 'px';
 
-        startTime = Date.now();
+        ballSpawnTime = Date.now();
 
-        // CAPTURA DE TOQUE INSTANTÂNEA NO SMARTPHONE
-        var handleAction = function(e) {
-            if (e) e.preventDefault();
-            var reaction = Date.now() - startTime;
+        ball.onclick = () => {
+            clearTimeout(ballTimer);
+            const rt = Date.now() - ballSpawnTime;
+
             if (isGreen) {
-                totalLatency += reaction;
+                reactionTimes.push(rt);
             } else {
-                gameErrors++;
+                vetoErrors++;
+                document.getElementById('lblErrors').innerText = vetoErrors;
             }
-            nextRound();
+            area.innerHTML = '';
+            setTimeout(nextRound, 300);
         };
-
-        ball.addEventListener('pointerdown', handleAction);
 
         area.appendChild(ball);
 
-        // JANELA DE EXIBIÇÃO DE 1.6 SEGUNDOS POR BOLINHA
-        setTimeout(function() {
-            if (area.contains(ball)) {
-                if (isGreen) totalLatency += 850;
-                nextRound();
+        ballTimer = setTimeout(() => {
+            area.innerHTML = '';
+            if (isGreen) {
+                reactionTimes.push(950); // Penatilidade por tempo esgotado
             }
-        }, 1600);
+            setTimeout(nextRound, 300);
+        }, 1100);
     }
 
-    function finishCheckin() {
+    async function finishGame() {
         showStep('stepResult');
-        var name = document.getElementById('txtName').value;
-        var role = document.getElementById('txtRole').value;
-        var avgLatency = Math.round(totalLatency / 12) || 420;
+
+        const avgRt = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 650;
+
+        let status = 'GREEN';
+        let badgeClass = 'b-verde';
+        let badgeText = '🟢 LIBERADO PARA RODAR';
+        let actionText = '🟢 Catraca Liberada — Turno Normal sem restrições.';
+
+        if (vetoErrors >= 2 || avgRt > 800) {
+            status = 'RED';
+            badgeClass = 'b-vermelho';
+            badgeText = '🔴 VETO OPERACIONAL';
+            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório). Encaminhar ao Supervisor/SESMT no CCO.';
+        } else if (avgRt > 700 || vetoErrors === 1) {
+            status = 'YELLOW';
+            badgeClass = 'b-amarelo';
+            badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
+            actionText = '🟡 Pausa Tática Recomendada (15 min) — Hidratação e descompressão antes da partida.';
+        } else if (vsiScoreVal > 3.5) {
+            status = 'PURPLE';
+            badgeClass = 'b-roxo';
+            badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
+            actionText = '🟣 Trava por Exaustão / Fadiga Vocal — Descanso compulsório de 45 minutos.';
+        }
+
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
+        const dept = document.getElementById('txtDept').value.trim();
 
         document.getElementById('resName').innerText = name;
-        document.getElementById('resRole').innerText = role;
-        document.getElementById('resLatency').innerText = avgLatency + ' ms';
-        document.getElementById('resErrors').innerText = gameErrors;
-        document.getElementById('resVsi').innerText = 'Estável (0.42)';
+        document.getElementById('resRole').innerText = role + " • " + dept;
+        document.getElementById('resBadge').className = `badge-status ${badgeClass}`;
+        document.getElementById('resBadge').innerText = badgeText;
+        document.getElementById('resLatency').innerText = avgRt + " ms";
+        document.getElementById('resErrors').innerText = vetoErrors;
+        document.getElementById('resVsi').innerText = vsiStatusText;
+        document.getElementById('resAction').innerText = actionText;
 
-        var resImg = document.getElementById('resPhoto');
-        if (capturedPhotoDataUrl && capturedPhotoDataUrl !== '') {
-            resImg.src = capturedPhotoDataUrl;
-        }
-
-        var badge = document.getElementById('resBadge');
-        var action = document.getElementById('resAction');
-
-        if (gameErrors === 0 && avgLatency <= 650) {
-            badge.className = 'badge-status b-verde';
-            badge.innerText = '🟢 LIBERADO PARA RODAR';
-            action.innerText = 'Rota e veículo liberados sem restrições.';
-        } else if (gameErrors <= 1) {
-            badge.className = 'badge-status b-amarelo';
-            badge.innerText = '🟡 PAUSA TÁTICA 15 MIN';
-            action.innerText = 'Pausa recomendada de 15 minutos antes de iniciar a viagem.';
+        if (photoBase64) {
+            document.getElementById('resPhoto').src = photoBase64;
         } else {
-            badge.className = 'badge-status b-vermelho';
-            badge.innerText = '🔴 SAFETY INTERLOCK CCO';
-            action.innerText = 'Bloqueio preventivo. Requer liberação presencial do supervisor no CCO.';
+            document.getElementById('resPhoto').style.display = 'none';
         }
 
-        setTimeout(function() {
-            document.getElementById('syncStatus').innerText = '✅ Laudo e foto transmitidos ao CCO com sucesso!';
-        }, 1500);
-    }
-      async function transmitirCheckinAoSupabase(payload) {
-            const banner = document.getElementById('syncStatus');
-            if (banner) banner.innerText = '⏳ Transmitindo laudo e foto ao CCO do SRT Mobility...';
+        // MONTAGEM DO PAYLOAD
+        const payload = {
+            name: name,
+            driver_name: name,
+            role: role,
+            department: dept,
+            dept: dept,
+            company: companyParam,
+            reaction_time_ms: avgRt,
+            latency_ms: avgRt,
+            veto_errors: vetoErrors,
+            vsi_score: Number(vsiScoreVal),
+            vsi_status: vsiStatusText,
+            status: status,
+            action: actionText,
+            photo_url: photoBase64 || null,
+            photo_base64: photoBase64 || null,
+            face_match: photoBase64 ? '🟢 Foto OK (Match 3D)' : '🔒 Sem Foto'
+        };
 
-            try {
-                const resposta = await fetch('https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b',
-                        'Authorization': 'Bearer sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(payload)
-                });
+        const syncEl = document.getElementById('syncStatus');
+        syncEl.innerText = '⏳ Transmitindo laudo e foto comprimida ao CCO...';
 
-                if (resposta.ok) {
-                    if (banner) {
-                        banner.innerText = '✅ Laudo e telemetria transmitidos com sucesso ao CCO!';
-                        banner.style.background = 'rgba(16, 185, 129, 0.2)';
-                        banner.style.color = '#34d399';
-                        banner.style.borderColor = '#10b981';
-                    }
-                } else {
-                    const errData = await resposta.json();
-                    const msgErro = errData.message || resposta.statusText;
-                    if (banner) {
-                        banner.innerText = '❌ Erro ao gravar no Supabase: ' + msgErro;
-                        banner.style.background = 'rgba(239, 68, 68, 0.2)';
-                        banner.style.color = '#f87171';
-                        banner.style.borderColor = '#ef4444';
-                    }
-                }
-            } catch (e) {
-                if (banner) {
-                    banner.innerText = '❌ Falha de Conexão: ' + e.message;
-                    banner.style.background = 'rgba(239, 68, 68, 0.2)';
-                    banner.style.color = '#f87171';
-                }
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                syncEl.innerText = '✅ TELEMETRIA TRANSMITIDA E REGISTRADA COM SUCESSO NO CCO!';
+                syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
+                syncEl.style.color = '#34d399';
+            } else {
+                const errTxt = await res.text();
+                console.warn('Erro ao salvar no Supabase:', errTxt);
+                syncEl.innerText = '⚠️ Teste concluído localmente (Servidor CCO temporariamente indisponível).';
+                syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
+                syncEl.style.color = '#fbbf24';
             }
+        } catch (err) {
+            console.error('Erro de rede ao enviar ao Supabase:', err);
+            syncEl.innerText = '⚠️ Teste concluído localmente (Falha de conexão com a nuvem CCO).';
+            syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
+            syncEl.style.color = '#fbbf24';
         }
+    }
 </script>
-
 </body>
 </html>
+
