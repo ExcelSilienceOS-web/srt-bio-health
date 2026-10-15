@@ -635,33 +635,7 @@
             localStorage.setItem('srt_rh_checkins', JSON.stringify(history));
         } catch(e) {}
     }
-   <script>
-        // ... outros códigos e funções do seu aplicativo ...
-
-        // 📍 COLE A FUNÇÃO DO PASSO 2 AQUI:
-        async function enviarCheckinParaSupabase(dadosDoTeste) {
-            try {
-                const resposta = await fetch('https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b',
-                        'Authorization': 'Bearer sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(dadosDoTeste)
-                });
-
-                if (resposta.ok) {
-                    alert('✅ Check-in registrado com sucesso no Supabase!');
-                } else {
-                    const erro = await resposta.json();
-                    alert('⚠️ Falha ao salvar no Supabase: ' + (erro.message || resposta.statusText));
-                }
-            } catch (e) {
-                alert('❌ Erro de conexão com o Supabase: ' + e.message);
-            }
-        }
+  
     </script>
 
 </body>
