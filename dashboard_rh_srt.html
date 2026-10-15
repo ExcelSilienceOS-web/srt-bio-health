@@ -442,7 +442,7 @@
     <!-- HEADER PRINCIPAL -->
     <div class="header no-print">
         <div class="title-group">
-            <span class="company-badge" id="companyBadgeLabel">TODAS AS EMPRESAS</span>
+            <span class="company-badge" id="companyBadgeLabel">SELECTA</span>
             <div>
                 <h1>EXCELSILIENCE SRT-RH — COCKPIT DE PEOPLE ANALYTICS & SST</h1>
                 <p>Telemetria de Prontidão Biométrica, Matriz de Contágio C-Level & Compliance (NR-01, NR-17 e eSocial)</p>
@@ -749,8 +749,10 @@
     <!-- SCRIPT DE INTELIGÊNCIA & INTEGRAÇÃO SUPABASE -->
     <script>
         // CONFIGURAÇÕES GERAIS & SUPABASE
+        const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
         const urlParams = new URLSearchParams(window.location.search);
-        const currentCompany = (urlParams.get('company') || '').toUpperCase();
+        const currentCompany = (urlParams.get('company') || 'TODAS').toUpperCase();
 
         // ESTADO GLOBAL DE DADOS
         let currentPeriod = 'WEEK';
@@ -760,10 +762,9 @@
         let trendChartInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            const hasCompanyParam = urlParams.has('company');
-            document.getElementById('companyBadgeLabel').innerText = hasCompanyParam ? currentCompany : 'TODAS AS EMPRESAS';
+            document.getElementById('companyBadgeLabel').innerText = currentCompany;
             initSetoresEGenerators();
-            fetchSupabaseData(); // Carrega automaticamente os dados reais do Supabase
+            fetchSupabaseData(); // Carrega automaticamente os dados reais do Supabase na inicialização
         });
 
         function switchTab(tabId, btnElement) {
@@ -825,6 +826,9 @@
                 });
             }
 
+            // Ordena os dados de demonstração cronologicamente (mais recente primeiro)
+            rawCheckinsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
             renderDashboard();
         }
 
@@ -865,7 +869,7 @@
                         seenKeys.add(uniqueKey);
 
                         let rawEmp = item.company || item.empresa || item.company_id || item.organization;
-                        let emp = (rawEmp && rawEmp.toString().trim() !== 'null' && rawEmp.toString().trim() !== '' && rawEmp.toString().trim() !== 'undefined') ? rawEmp.toString().toUpperCase().trim() : 'CORPORATIVO / RH';
+                        let emp = (rawEmp && rawEmp.toString().trim() !== 'null' && rawEmp.toString().trim() !== '' && rawEmp.toString().trim() !== 'undefined') ? rawEmp.toString().toUpperCase().trim() : 'CORPORATIVO ANÔNIMO (RH)';
                         let sec = item.sector || item.department || item.setor || item.ghe || item.dept || 'Geral';
                         let lat = item.latency_ms || item.reaction_time_ms || item.latency || item.reaction_time || 500;
                         let errs = item.veto_errors !== undefined ? item.veto_errors : (item.errors || 0);
@@ -897,11 +901,13 @@
 
                     rawCheckinsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 } else {
-                    rawCheckinsData = [];
+                    carregarDadosDemonstracao();
+                    return;
                 }
             } catch (err) {
                 console.warn('Erro ao conectar com Supabase:', err);
-                rawCheckinsData = [];
+                carregarDadosDemonstracao();
+                return;
             }
 
             renderDashboard();
@@ -922,22 +928,15 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
-                // Filtro por Empresa (se especificada na URL)
-                if (currentCompany && currentCompany !== 'TODAS' && currentCompany !== 'SELECTA' && item.company && item.company !== currentCompany) {
-                    // Se o usuário passou uma empresa específica na URL (ex: ?company=OLX), filtra por ela
-                    if (!item.company.includes(currentCompany)) return false;
-                }
-
                 const d = new Date(item.created_at);
+                if (isNaN(d.getTime())) return true;
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
-                if (currentPeriod === 'DAY') return diffDias <= 1;
-                if (currentPeriod === 'WEEK') return diffDias <= 7;
-                if (currentPeriod === 'MONTH') return diffDias <= 30;
+                if (currentPeriod === 'DAY') return diffDias <= 1.5;
+                if (currentPeriod === 'WEEK') return diffDias <= 7.5;
+                if (currentPeriod === 'MONTH') return diffDias <= 30.5;
                 return true;
             });
-
-            // Garantir ordenação decrescente por data/hora (mais recente no topo)
-            filteredData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            filteredData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         }
 
         function renderMetricsCards() {
@@ -1029,12 +1028,10 @@
                 return;
             }
 
-            // Ordenação estrita: Mais recente (data/hora) no topo
-            listFiltered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
+            listFiltered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             listFiltered.forEach(d => {
                 const dt = new Date(d.created_at);
-                const dtFmt = `${dt.toLocaleDateString('pt-BR')} ${dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
+                const dtFmt = `${dt.toLocaleDateString('pt-BR')} ${dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'})}`;
 
                 let statusBadge = `<span class="badge badge-verde">🟢 Verde (Homeostase)</span>`;
                 if (d.status === 'YELLOW') statusBadge = `<span class="badge badge-amarelo">🟡 Amarelo (Sobrecarga)</span>`;
@@ -1232,13 +1229,13 @@
             const vermelho = filteredData.filter(d => d.status === 'RED').length;
 
             if (tipo === 'NR01') {
-                previewBox.innerText = "LAUDO AUDITÁVEL DE RISCOS PSICOSSOCIAIS — NR-01 (PGR)\nEMPRESA: " + (currentCompany || "TODAS AS EMPRESAS") + "\nDATA: " + dataHoje + "\n\n1. ESCOPO\nAvaliação diária de prontidão biométrica sob quórum N >= 5.\n\n2. RESULTADOS\n• Total de Vidas Auditadas: " + total + "\n• Homeostase (Verde): " + verde + "\n• Sobrecarga (Amarelo): " + amarelo + "\n• Fadiga (Roxo): " + roxo + "\n• Alertas Críticos (Vermelho): " + vermelho + "\n\n3. RECOMENDAÇÃO\nManter acompanhamento e pausas táticas de 15min.";
+                previewBox.innerText = "LAUDO AUDITÁVEL DE RISCOS PSICOSSOCIAIS — NR-01 (PGR)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ESCOPO\nAvaliação diária de prontidão biométrica sob quórum N >= 5.\n\n2. RESULTADOS\n• Total de Vidas Auditadas: " + total + "\n• Homeostase (Verde): " + verde + "\n• Sobrecarga (Amarelo): " + amarelo + "\n• Fadiga (Roxo): " + roxo + "\n• Alertas Críticos (Vermelho): " + vermelho + "\n\n3. RECOMENDAÇÃO\nManter acompanhamento e pausas táticas de 15min.";
             } else if (tipo === 'NR17') {
-                previewBox.innerText = "AVALIAÇÃO ERGONÔMICA PRELIMINAR — NR-17 (AEP)\nEMPRESA: " + (currentCompany || "TODAS AS EMPRESAS") + "\nDATA: " + dataHoje + "\n\n1. ANÁLISE DE EXIGÊNCIA MENTAL\nMedição de latência e taxa de erros de veto motor.\n\n2. RESULTADOS\n• Carga Adequada: " + verde + "\n• Sobrecarga Moderada: " + (amarelo + roxo) + "\n• Esgotamento Severo: " + vermelho + "\n\n3. AÇÃO ERGONÔMICA\nMicropausas de descompressão cognitiva.";
+                previewBox.innerText = "AVALIAÇÃO ERGONÔMICA PRELIMINAR — NR-17 (AEP)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ANÁLISE DE EXIGÊNCIA MENTAL\nMedição de latência e taxa de erros de veto motor.\n\n2. RESULTADOS\n• Carga Adequada: " + verde + "\n• Sobrecarga Moderada: " + (amarelo + roxo) + "\n• Esgotamento Severo: " + vermelho + "\n\n3. AÇÃO ERGONÔMICA\nMicropausas de descompressão cognitiva.";
             } else if (tipo === 'eSocial') {
                 previewBox.innerText = "RELATÓRIO AUDITÁVEL DE AMBIENTE E RISCOS (S-2240 COMPLIANCE)\nEMPREGADOR: " + currentCompany + "\nDATA: " + dataHoje + "\n\n[DADOS CONSOLIDADOS S-2240]\n• Código Agente: 09.01.001 (Fatores Ergonômicos e Carga Cognitiva)\n• Protocolo: Telemetria Biométrica de Prontidão (SRT-RH)\n• Status:\n  - Isento Exposição Crítica: " + (verde + amarelo) + "\n  - Sobrecarga Monitorada: " + (roxo + vermelho);
             } else if (tipo === 'GrouMaster') {
-                previewBox.innerText = "RELATÓRIO MESTRE DE DESENVOLVIMENTO HUMANO & ORGANIZACIONAL (DHO GROU)\nEMPRESA: " + (currentCompany || "TODAS AS EMPRESAS") + " | DATA: " + dataHoje + "\n\nSÍNTESE EXECUTIVA DE PEOPLE ANALYTICS:\nÍndice de equilíbrio organizacional: " + (total ? Math.round(verde/total*100) : 100) + "%.\n\nDIAGNÓSTICO:\nÁreas operacionais estáveis.";
+                previewBox.innerText = "RELATÓRIO MESTRE DE DESENVOLVIMENTO HUMANO & ORGANIZACIONAL (DHO GROU)\nEMPRESA: " + currentCompany + " | DATA: " + dataHoje + "\n\nSÍNTESE EXECUTIVA DE PEOPLE ANALYTICS:\nÍndice de equilíbrio organizacional: " + (total ? Math.round(verde/total*100) : 100) + "%.\n\nDIAGNÓSTICO:\nÁreas operacionais estáveis.";
             }
         }
 
