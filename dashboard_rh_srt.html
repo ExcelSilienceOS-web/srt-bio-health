@@ -761,7 +761,14 @@
         let isDemoMode = false;
         let trendChartInstance = null;
 
+
+        const isMasterMode = (urlParams.get('master') === 'true' || urlParams.get('admin') === 'true' || urlParams.get('key') === 'master');
         window.addEventListener('DOMContentLoaded', () => {
+            if (isMasterMode) {
+                const btnInd = document.getElementById('tabBtnIndividual');
+                if (btnInd) btnInd.style.display = 'inline-block';
+            }
+
             document.getElementById('companyBadgeLabel').innerText = currentCompany;
             initSetoresEGenerators();
             fetchSupabaseData(); // Carrega automaticamente os dados reais do Supabase na inicialização
