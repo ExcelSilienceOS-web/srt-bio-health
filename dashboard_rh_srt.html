@@ -6,6 +6,8 @@
     <title>ExcelSilience SRT-RH — Cockpit de People Analytics & SST</title>
     <!-- Chart.js para Gráfico Temporal -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -133,7 +135,6 @@
         .btn-accent:hover { background: #0369a1; }
         .btn-purple { background: #7e22ce; color: #fff; border: none; }
         .btn-purple:hover { background: #9333ea; }
-        .btn-toggle-live { background: #10b981; color: #fff; border: 1px solid #34d399; font-weight: 800; display: none; }
 
         /* NAV TABS */
         .nav-tabs {
@@ -170,8 +171,12 @@
         }
 
         /* TAB CONTENT SECTIONS */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
 
         /* CARDS GRID */
         .cards-grid {
@@ -198,8 +203,17 @@
             margin-bottom: 6px;
         }
 
-        .card-metric .val { font-size: 26px; font-weight: 800; }
-        .card-metric .subtext { font-size: 10px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+        .card-metric .val {
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .card-metric .subtext {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 600;
+        }
 
         .val-total { color: var(--accent); }
         .val-verde { color: var(--green); }
@@ -225,8 +239,20 @@
             gap: 10px;
         }
 
-        .panel-title { font-size: 15px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .panel-subtitle { font-size: 11px; color: var(--muted); font-weight: 600; }
+        .panel-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-subtitle {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+        }
 
         /* TABELAS */
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
@@ -234,14 +260,29 @@
         td { padding: 12px 10px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
         tr:hover td { background: rgba(255,255,255,0.02); }
 
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-block;
+        }
+
         .badge-verde { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid var(--green); }
         .badge-amarelo { background: rgba(251, 191, 36, 0.15); color: var(--yellow); border: 1px solid var(--yellow); }
         .badge-roxo { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid var(--purple); }
         .badge-vermelho { background: rgba(248, 113, 113, 0.15); color: var(--red); border: 1px solid var(--red); }
 
-        .grid-two { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
-        @media (max-width: 960px) { .grid-two { grid-template-columns: 1fr; } }
+        .grid-two {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 960px) {
+            .grid-two { grid-template-columns: 1fr; }
+        }
 
         .select-box, .input-box {
             background: #0d1527;
@@ -255,10 +296,45 @@
         }
 
         /* HEATMAP STYLES */
-        .heatmap-grid { display: grid; grid-template-columns: 1.5fr repeat(6, 1fr); gap: 8px; overflow-x: auto; }
-        .heatmap-header-cell { background: #0d1527; border: 1px solid var(--border); padding: 10px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--accent); text-align: center; text-transform: uppercase; }
-        .heatmap-sector-title { background: var(--card-inner); border: 1px solid var(--border); padding: 10px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #fff; display: flex; align-items: center; }
-        .heatmap-cell { padding: 10px 6px; border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: 1.5fr repeat(6, 1fr);
+            gap: 8px;
+            overflow-x: auto;
+        }
+        .heatmap-header-cell {
+            background: #0d1527;
+            border: 1px solid var(--border);
+            padding: 10px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--accent);
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .heatmap-sector-title {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+        .heatmap-cell {
+            padding: 10px 6px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
         .cell-green { background: rgba(52, 211, 153, 0.2); border: 1px solid var(--green); color: var(--green); }
         .cell-yellow { background: rgba(251, 191, 36, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
         .cell-purple { background: rgba(192, 132, 252, 0.2); border: 1px solid var(--purple); color: var(--purple); }
@@ -280,19 +356,84 @@
             overflow-y: auto;
         }
 
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-        .empty-row-text { text-align: center; padding: 30px; color: var(--muted); font-weight: 600; }
-        .dept-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #0d1527; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; font-size: 11px; font-weight: 700; }
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
 
+        .empty-row-text {
+            text-align: center;
+            padding: 30px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .dept-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #0d1527;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* REGRA ISOLADA DE IMPRESSÃO LIMPA EM A4 SEM VAZAMENTO DA UI */
         @media print {
-            body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; margin: 0 !important; }
-            .header, .nav-tabs, .period-selector, .filter-bar, .no-print, button, .btn, .cards-grid { display: none !important; }
-            .tab-content { display: none !important; }
-            #tab-laudos.tab-content.active { display: block !important; }
-            .panel { border: none !important; background: #ffffff !important; color: #000000 !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
-            .grid-two { display: block !important; }
-            .grid-two > div:first-child { display: none !important; }
-            .report-preview-box { background: #ffffff !important; color: #000000 !important; border: 2px solid #000000 !important; font-family: 'Courier New', Courier, monospace !important; font-size: 11pt !important; line-height: 1.5 !important; white-space: pre-wrap !important; max-height: none !important; overflow: visible !important; padding: 20px !important; }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .header, .nav-tabs, .period-selector, .filter-bar, .no-print, button, .btn, .cards-grid {
+                display: none !important;
+            }
+
+            .tab-content {
+                display: none !important;
+            }
+
+            #tab-laudos.tab-content.active {
+                display: block !important;
+            }
+
+            .panel {
+                border: none !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .grid-two {
+                display: block !important;
+            }
+
+            .grid-two > div:first-child {
+                display: none !important;
+            }
+
+            .report-preview-box {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: 2px solid #000000 !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                font-size: 11pt !important;
+                line-height: 1.5 !important;
+                white-space: pre-wrap !important;
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 20px !important;
+            }
         }
     </style>
 </head>
@@ -301,7 +442,7 @@
     <!-- HEADER PRINCIPAL -->
     <div class="header no-print">
         <div class="title-group">
-            <span class="company-badge" id="companyBadgeLabel">CORPORATIVO ANÔNIMO (RH)</span>
+            <span class="company-badge" id="companyBadgeLabel">SELECTA</span>
             <div>
                 <h1>EXCELSILIENCE SRT-RH — COCKPIT DE PEOPLE ANALYTICS & SST</h1>
                 <p>Telemetria de Prontidão Biométrica, Matriz de Contágio C-Level & Compliance (NR-01, NR-17 e eSocial)</p>
@@ -309,22 +450,17 @@
         </div>
 
         <div class="header-actions">
-            <!-- BOTÃO DE MODO AO VIVO: Visível apenas se URL contiver ?admin=true, ?demo=true ou ?live=true -->
-            <button class="btn btn-toggle-live" id="btnLiveDemoModeToggle" onclick="toggleLiveDemoMode()">
-                🔓 Modo Ao Vivo / Degustação (Sem Trava N≥5)
-            </button>
-
             <div class="period-selector">
                 <button class="period-btn" id="pBtnDay" onclick="setPeriod('DAY')">☀️ Dia</button>
-                <button class="period-btn" id="pBtnWeek" onclick="setPeriod('WEEK')">📅 Semana</button>
+                <button class="period-btn active" id="pBtnWeek" onclick="setPeriod('WEEK')">📅 Semana</button>
                 <button class="period-btn" id="pBtnMonth" onclick="setPeriod('MONTH')">📊 Mês</button>
-                <button class="period-btn active" id="pBtnAll" onclick="setPeriod('ALL')">🌐 Todos</button>
             </div>
 
             <button class="btn btn-green" onclick="abrirCentralLaudos('NR01')">📄 Laudo NR-01 (PGR)</button>
             <button class="btn btn-accent" onclick="abrirCentralLaudos('NR17')">📋 Laudo NR-17 (AEP)</button>
             <button class="btn btn-purple" onclick="abrirCentralLaudos('eSocial')">📊 eSocial (S-2240)</button>
             <button class="btn" style="background:#0284c7; color:#fff;" onclick="fetchSupabaseData()">🔄 Atualizar Dados</button>
+            <button class="btn" style="background:#f59e0b; color:#000;" onclick="toggleDemoData()">⚡ Alternar Dados Demo</button>
         </div>
     </div>
 
@@ -341,30 +477,56 @@
 
     <!-- CARDS DE MÉTRICAS EXECUTIVAS -->
     <div class="cards-grid no-print">
-        <div class="card-metric"><div class="lbl">Vidas Monitoradas</div><div class="val val-total" id="metricTotalCheckins">0</div><div class="subtext">Check-ins na janela de análise</div></div>
-        <div class="card-metric"><div class="lbl">Homeostase (Apto)</div><div class="val val-verde" id="metricVerde">0</div><div class="subtext">Sinal Verde (Prontidão Ideal)</div></div>
-        <div class="card-metric"><div class="lbl">Sobrecarga (Atenção)</div><div class="val val-amarelo" id="metricAmarelo">0</div><div class="subtext">Sinal Amarelo (Pausa 15m)</div></div>
-        <div class="card-metric"><div class="lbl">Fadiga / Sono</div><div class="val val-purple" id="metricRoxo">0</div><div class="subtext">Sinal Roxo (Pausa 45m)</div></div>
-        <div class="card-metric"><div class="lbl">Alertas Críticos</div><div class="val val-vermelho" id="metricVermelho">0</div><div class="subtext">Sinal Vermelho (Risco Severo)</div></div>
+        <div class="card-metric">
+            <div class="lbl">Vidas Monitoradas</div>
+            <div class="val val-total" id="metricTotalCheckins">0</div>
+            <div class="subtext">Check-ins na janela de análise</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">Homeostase (Apto)</div>
+            <div class="val val-verde" id="metricVerde">0</div>
+            <div class="subtext">Sinal Verde (Prontidão Ideal)</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">Sobrecarga (Atenção)</div>
+            <div class="val val-amarelo" id="metricAmarelo">0</div>
+            <div class="subtext">Sinal Amarelo (Pausa 15m)</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">Fadiga / Sono</div>
+            <div class="val val-purple" id="metricRoxo">0</div>
+            <div class="subtext">Sinal Roxo (Pausa 45m)</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">Alertas Críticos</div>
+            <div class="val val-vermelho" id="metricVermelho">0</div>
+            <div class="subtext">Sinal Vermelho (Risco Severo)</div>
+        </div>
     </div>
 
-    <!-- ABA 1 -->
+    <!-- ABA 1: VISÃO PEOPLE ANALYTICS & RH -->
     <div id="tab-visao-geral" class="tab-content active">
         <div class="grid-two">
             <div class="panel">
                 <div class="panel-header">
                     <div>
-                        <div class="panel-title">Mapeamento de Carga de Estresse por Setor (GHE)</div>
+                        <div class="panel-title">Mapeamento de Carga de Estresse por Setor (GHE — Trava N ≥ 5)</div>
                         <div class="panel-subtitle">Auditoria de Riscos Psicossociais em Tempo Real</div>
                     </div>
-                    <span id="lgpdModeBadge" style="font-size:11px; color:var(--accent); font-weight:800;">🔒 Blindagem LGPD Ativa (N≥5)</span>
+                    <span style="font-size:11px; color:var(--accent); font-weight:800;">🔒 Blindagem LGPD Ativa</span>
                 </div>
                 <table>
                     <thead>
-                        <tr><th>Setor / Departamento</th><th>Nº Check-ins</th><th>Latência Média</th><th>Status Prontidão</th><th>Ação Recomendada (PDCA)</th></tr>
+                        <tr>
+                            <th>Setor / Departamento</th>
+                            <th>Nº Check-ins</th>
+                            <th>Latência Média</th>
+                            <th>Status Prontidão</th>
+                            <th>Ação Recomendada (PDCA)</th>
+                        </tr>
                     </thead>
                     <tbody id="tblRhSectorsBody">
-                        <tr><td colspan="5" class="empty-row-text">Carregando dados reais do Supabase...</td></tr>
+                        <tr><td colspan="5" class="empty-row-text">Aguardando primeiros check-ins da equipe... Cadastre os setores na Aba 7.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -375,25 +537,35 @@
                     <button class="btn btn-green" style="font-size:10px; padding:4px 8px;" onclick="adicionarMetricaCustomizada()">+ Adicionar</button>
                 </div>
                 <div id="custom-container" style="display:flex; flex-direction:column; gap:10px;">
-                    <div class="card-metric"><div class="lbl">Turnover Voluntário Projetado</div><div class="val val-verde" id="valCustomTurnover">1.8%</div><div class="subtext">Dentro da meta anual</div></div>
-                    <div class="card-metric"><div class="lbl">VFC Média do Grupo (rMSSD)</div><div class="val val-total" id="valCustomVFC">42 ms</div><div class="subtext">Carga Alostática Departamental</div></div>
+                    <div class="card-metric">
+                        <div class="lbl">Turnover Voluntário Projetado</div>
+                        <div class="val val-verde" id="valCustomTurnover">1.8%</div>
+                        <div class="subtext">Dentro da meta anual</div>
+                    </div>
+                    <div class="card-metric">
+                        <div class="lbl">Horas Extras Acumuladas</div>
+                        <div class="val val-amarelo" id="valCustomHoras">12h / mês</div>
+                        <div class="subtext">Média por colaborador</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ABA 2 -->
+    <!-- ABA 2: CHECK-INS INDIVIDUAIS & HISTÓRICO -->
     <div id="tab-checkins-historico" class="tab-content">
         <div class="panel">
             <div class="panel-header">
                 <div>
-                    <div class="panel-title">Histórico Geral de Check-ins de Telemetria (SRT-RH Anônimo)</div>
-                    <div class="panel-subtitle">Registro cronológico de avaliações biométricas sem identificação nominal</div>
+                    <div class="panel-title">Histórico Geral de Check-ins de Telemetria</div>
+                    <div class="panel-subtitle">Registro cronológico de avaliações biométricas</div>
                 </div>
             </div>
             <div class="filter-bar">
-                <input type="text" class="input-box" id="srcIndividual" placeholder="🔍 Buscar por Setor, Empresa ou Status..." onkeyup="filtrarCheckinsIndividuais()">
-                <select class="select-box" id="selIndSector" onchange="filtrarCheckinsIndividuais()"><option value="ALL">🏢 Todos os Setores</option></select>
+                <input type="text" class="input-box" id="srcIndividual" placeholder="🔍 Buscar por Setor ou Status..." onkeyup="filtrarCheckinsIndividuais()">
+                <select class="select-box" id="selIndSector" onchange="filtrarCheckinsIndividuais()">
+                    <option value="ALL">🏢 Todos os Setores</option>
+                </select>
                 <select class="select-box" id="selIndStatus" onchange="filtrarCheckinsIndividuais()">
                     <option value="ALL">🎨 Todos os Status</option>
                     <option value="GREEN">🟢 Verde (Homeostase)</option>
@@ -402,14 +574,27 @@
                     <option value="RED">🔴 Vermelho (Inaptidão Crítica)</option>
                 </select>
             </div>
+
             <table>
-                <thead><tr><th>Data / Hora</th><th>Empresa</th><th>Setor</th><th>Latência (ms)</th><th>Erros de Veto</th><th>Score VSI</th><th>Status Final</th></tr></thead>
-                <tbody id="tblIndividualBody"><tr><td colspan="7" class="empty-row-text">Buscando check-ins no Supabase...</td></tr></tbody>
+                <thead>
+                    <tr>
+                        <th>Data / Hora</th>
+                        <th>Empresa</th>
+                        <th>Setor</th>
+                        <th>Latência (ms)</th>
+                        <th>Erros de Veto</th>
+                        <th>Score VSI</th>
+                        <th>Status Final</th>
+                    </tr>
+                </thead>
+                <tbody id="tblIndividualBody">
+                    <tr><td colspan="7" class="empty-row-text">Nenhum check-in registrado no sistema até o momento.</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ABA 3 -->
+    <!-- ABA 3: SAÚDE OCUPACIONAL (CLINICAL COCKPIT CFM) -->
     <div id="tab-saude-ocupacional" class="tab-content">
         <div class="panel">
             <div class="panel-header">
@@ -420,25 +605,44 @@
                 <span style="font-size:11px; color:var(--purple); font-weight:800;">🔐 Sigilo Médico CFM Preservado</span>
             </div>
             <table>
-                <thead><tr><th>Prontuário ID</th><th>Setor / Departamento</th><th>VFC (rMSSD)</th><th>Status Autonômico</th><th>Indicador de Risco Operacional</th><th>Conduta Preventiva Prescrita</th></tr></thead>
-                <tbody id="tblMedicoBody"><tr><td colspan="6" class="empty-row-text">Carregando prontuários de saúde ocupacional...</td></tr></tbody>
+                <thead>
+                    <tr>
+                        <th>Prontuário ID</th>
+                        <th>Setor / Departamento</th>
+                        <th>VFC (rMSSD)</th>
+                        <th>Status Autonômico</th>
+                        <th>Indicador de Risco Operacional</th>
+                        <th>Conduta Preventiva Prescrita</th>
+                    </tr>
+                </thead>
+                <tbody id="tblMedicoBody">
+                    <!-- Preenchido dinamicamente via JS baseado nos check-ins do Supabase -->
+                </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ABA 4 -->
+    <!-- ABA 4: MAPA DE CALOR & ACOMPANHAMENTO TEMPORAL -->
     <div id="tab-mapa-calor" class="tab-content">
         <div class="panel">
             <div class="panel-header">
                 <div>
                     <div class="panel-title">🔥 Mapa de Calor de Carga Cognitiva por Setor (GHE)</div>
-                    <div class="panel-subtitle">Visualização matricial de estresse e fadiga por dia da semana</div>
+                    <div class="panel-subtitle">Visualização matricial de estresse e fadiga por dia da semana (Trava LGPD N ≥ 5)</div>
                 </div>
-                <span style="font-size:11px; color:var(--accent); font-weight:800;">Legenda: 🟢 ≥4.2 | 🟡 3.0-4.1 | 🟣 2.0-2.9 | 🔴 &lt;2.0</span>
+                <span style="font-size:11px; color:var(--accent); font-weight:800;">Atalhos: 🟢 ≥4.2 | 🟡 3.0-4.1 | 🟣 2.0-2.9 | 🔴 &lt;2.0</span>
             </div>
+
             <div class="heatmap-grid" id="heatmapGridContainer">
                 <div class="heatmap-header-cell">Setor / Dia</div>
-                <div class="heatmap-header-cell">Seg</div><div class="heatmap-header-cell">Ter</div><div class="heatmap-header-cell">Qua</div><div class="heatmap-header-cell">Qui</div><div class="heatmap-header-cell">Sex</div><div class="heatmap-header-cell">Sáb/Dom</div>
+                <div class="heatmap-header-cell">Seg</div>
+                <div class="heatmap-header-cell">Ter</div>
+                <div class="heatmap-header-cell">Qua</div>
+                <div class="heatmap-header-cell">Qui</div>
+                <div class="heatmap-header-cell">Sex</div>
+                <div class="heatmap-header-cell">Sáb/Dom</div>
+
+                <!-- Células geradas dinamicamente via JS -->
             </div>
         </div>
 
@@ -448,13 +652,17 @@
                     <div class="panel-title">📈 Gráfico de Acompanhamento Temporal da Prontidão</div>
                     <div class="panel-subtitle">Linha de tendência da latência de resposta ao longo dos check-ins (ms)</div>
                 </div>
-                <select class="select-box" id="selChartSector" onchange="renderTemporalChart()"><option value="ALL">🏢 Todos os Setores</option></select>
+                <select class="select-box" id="selChartSector" onchange="renderTemporalChart()">
+                    <option value="ALL">🏢 Todos os Setores</option>
+                </select>
             </div>
-            <div style="height: 280px; position: relative;"><canvas id="trendChartCanvas"></canvas></div>
+            <div style="height: 280px; position: relative;">
+                <canvas id="trendChartCanvas"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- ABA 5 -->
+    <!-- ABA 5: MATRIZ DE CONTÁGIO C-LEVEL -->
     <div id="tab-matriz-contagio" class="tab-content">
         <div class="panel">
             <div class="panel-header">
@@ -464,7 +672,16 @@
                 </div>
             </div>
             <table>
-                <thead><tr><th>Diretoria / C-Level</th><th>Score Executivo (ES-Crise)</th><th>Setor Liderado</th><th>Exaustão do Setor (%)</th><th>Diagnóstico de Governança</th><th>Plano de Intervenção DHO Grou</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Diretoria / C-Level</th>
+                        <th>Score Executivo (ES-Crise)</th>
+                        <th>Setor Liderado</th>
+                        <th>Exaustão do Setor (%)</th>
+                        <th>Diagnóstico de Governança</th>
+                        <th>Plano de Intervenção DHO Grou</th>
+                    </tr>
+                </thead>
                 <tbody id="tblContagioBody">
                     <tr><td>Presidência / CEO</td><td>4.85 (Soberano)</td><td>Diretoria Executiva</td><td>5%</td><td><span class="badge badge-verde">Homeostase Perfeita</span></td><td>Manter cadência de decisões estratégicas</td></tr>
                     <tr><td>Diretoria Operacional</td><td>3.40 (Sobrecarga)</td><td>Operações / Logística</td><td>22%</td><td><span class="badge badge-amarelo">Fadiga Transmitida</span></td><td>Pausa tática pré-comitê + Rotação de turno</td></tr>
@@ -474,138 +691,143 @@
         </div>
     </div>
 
-    <!-- ABA 6 -->
+    <!-- ABA 6: CENTRAL DE LAUDOS & COMPLIANCE -->
     <div id="tab-laudos" class="tab-content">
         <div class="panel">
             <div class="panel-header">
                 <div>
-                    <div class="panel-title">📄 Central de Laudos Regulatórios & Compliance SST (Motor E.A.S.Y. + IA)</div>
-                    <div class="panel-subtitle">Emissão de pareceres técnicos auditáveis sob governança E.A.S.Y. (Examine, Adapt, Systematize, Yardstick)</div>
+                    <div class="panel-title">📄 Central de Laudos Regulatórios & Compliance SST</div>
+                    <div class="panel-subtitle">Emissão de documentos auditáveis para entrega ao Ministério do Trabalho e eSocial</div>
                 </div>
             </div>
+
             <div class="grid-two">
                 <div style="display:flex; flex-direction:column; gap:12px;">
-                    <button class="btn btn-green" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR01')">📄 Laudo NR-01 (PGR - Riscos Psicossociais)</button>
-                    <button class="btn btn-accent" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR17')">📋 Laudo NR-17 (AEP - Carga Cognitiva)</button>
-                    <button class="btn btn-purple" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('eSocial')">📊 Evento eSocial S-2240 (Fatores Ergonômicos)</button>
-                    <button class="btn" style="padding:14px; justify-content:center; background:#334155;" onclick="gerarPreviewLaudo('GrouMaster')">🏢 Relatório Mestre DHO & Motor E.A.S.Y.</button>
+                    <button class="btn btn-green" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR01')">📄 Visualizar Laudo NR-01 (PGR - Riscos Psicossociais)</button>
+                    <button class="btn btn-accent" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR17')">📋 Visualizar Laudo NR-17 (AEP - Carga Cognitiva)</button>
+                    <button class="btn btn-purple" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('eSocial')">📊 Visualizar Evento eSocial S-2240 (Fatores de Risco)</button>
+                    <button class="btn" style="padding:14px; justify-content:center; background:#334155;" onclick="gerarPreviewLaudo('GrouMaster')">🏢 Visualizar Relatório Mestre DHO</button>
                 </div>
+
                 <div>
                     <div style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:8px;" class="no-print">Pré-visualização do Documento Auditável:</div>
-                    <div class="report-preview-box" id="laudoPreviewText">Selecione um laudo à esquerda para visualizar o parecer técnico estruturado...</div>
+                    <div class="report-preview-box" id="laudoPreviewText">Selecione um laudo à esquerda para visualizar o texto consolidado e realizar o download em PDF limpo...</div>
                     <button class="btn btn-green no-print" style="width:100%; justify-content:center; padding:12px; margin-top:10px;" onclick="baixarLaudoPDF()">⬇️ Baixar Laudo Oficial em PDF Auditável (Limpo)</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ABA 7 -->
+    <!-- ABA 7: GERENCIADOR DE SETORES & LINKS -->
     <div id="tab-gerenciador-setores" class="tab-content">
         <div class="grid-two">
             <div class="panel">
-                <div class="panel-header"><div class="panel-title">🏢 Cadastro de Setores / Departamentos (GHE)</div></div>
+                <div class="panel-header">
+                    <div class="panel-title">🏢 Cadastro de Setores / Departamentos (GHE)</div>
+                </div>
                 <div style="display:flex; gap:10px; margin-bottom:16px;">
-                    <input type="text" class="input-box" id="inpNovoSetor" placeholder="Nome do novo setor" style="flex:1;">
+                    <input type="text" class="input-box" id="inpNovoSetor" placeholder="Nome do novo setor (ex: Consultoria, RH, Vendas)" style="flex:1;">
                     <button class="btn btn-accent" onclick="cadastrarNovoSetor()">+ Cadastrar</button>
                 </div>
-                <div id="setores-lista-cadastrados"></div>
+                <div id="setores-lista-cadastrados">
+                    <!-- Gerado dinamicamente -->
+                </div>
             </div>
+
             <div class="panel">
-                <div class="panel-header"><div class="panel-title">🔗 Central de Links Parametrizados por Setor</div></div>
-                <p style="font-size:11px; color:var(--muted); margin-bottom:12px;">Gere e copie links parametrizados:</p>
-                <div id="link-generator-list" style="max-height: 280px; overflow-y: auto;"></div>
+                <div class="panel-header">
+                    <div class="panel-title">🔗 Central de Links Parametrizados por Setor</div>
+                </div>
+                <p style="font-size:11px; color:var(--muted); margin-bottom:12px;">Gere e copie links parametrizados para envio no WhatsApp, Slack ou e-mail:</p>
+                <div id="link-generator-list" style="max-height: 280px; overflow-y: auto;">
+                    <!-- Preenchido via JavaScript -->
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPT DE INTELIGÊNCIA & INTEGRAÇÃO SUPABASE -->
     <script>
-        const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
-
+        // CONFIGURAÇÕES GERAIS & SUPABASE
         const urlParams = new URLSearchParams(window.location.search);
-        const companyFromUrl = urlParams.get('company');
-        const currentCompany = (companyFromUrl && companyFromUrl.trim() !== '' && companyFromUrl.toUpperCase().trim() !== 'NULL') ? companyFromUrl.toUpperCase().trim() : null;
+        const currentCompany = (urlParams.get('company') || 'SELECTA').toUpperCase();
 
-        const isAdminDemoUser = urlParams.has('admin') || urlParams.has('demo') || urlParams.has('live');
-
-        let currentPeriod = 'ALL';
+        // ESTADO GLOBAL DE DADOS
+        let currentPeriod = 'WEEK';
         let rawCheckinsData = [];
         let setoresCadastrados = ["Operações / Logística", "Tecnologia / TI", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
         let isDemoMode = false;
-        
-        let isLiveDemoMode = isAdminDemoUser; 
         let trendChartInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            const badgeLabel = document.getElementById('companyBadgeLabel');
-            if (badgeLabel) badgeLabel.innerText = currentCompany ? currentCompany : 'CORPORATIVO ANÔNIMO (RH)';
-            
-            const btnToggle = document.getElementById('btnLiveDemoModeToggle');
-            if (btnToggle) {
-                if (isAdminDemoUser) {
-                    btnToggle.style.display = 'inline-flex';
-                } else {
-                    btnToggle.style.display = 'none';
-                }
-            }
-
-            updateLiveDemoBadge();
+            document.getElementById('companyBadgeLabel').innerText = currentCompany;
             initSetoresEGenerators();
-            fetchSupabaseData();
+            carregarDadosDemonstracao();
         });
-
-        function toggleLiveDemoMode() {
-            if (!isAdminDemoUser) return;
-            isLiveDemoMode = !isLiveDemoMode;
-            updateLiveDemoBadge();
-            renderDashboard();
-        }
-
-        function updateLiveDemoBadge() {
-            const btn = document.getElementById('btnLiveDemoModeToggle');
-            const badge = document.getElementById('lgpdModeBadge');
-            if (isLiveDemoMode) {
-                if (btn) { btn.innerText = "🔓 Modo Ao Vivo (Sem Trava N≥5)"; btn.style.background = "#10b981"; btn.style.borderColor = "#34d399"; }
-                if (badge) { badge.innerText = "🔓 Modo Ao Vivo / Degustação (Sem Trava N≥5)"; badge.style.color = "var(--green)"; }
-            } else {
-                if (btn) { btn.innerText = "🔒 Modo Corporativo (Blindagem N≥5)"; btn.style.background = "#0284c7"; btn.style.borderColor = "#38bdf8"; }
-                if (badge) { badge.innerText = "🔒 Blindagem LGPD Ativa (N≥5)"; badge.style.color = "var(--accent)"; }
-            }
-        }
 
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.nav-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-            const allTabBtns = document.querySelectorAll('.nav-tabs .tab-btn');
-            if (typeof btnElement === 'number' && allTabBtns[btnElement]) {
-                allTabBtns[btnElement].classList.add('active');
-            } else if (btnElement && btnElement.classList) {
-                btnElement.classList.add('active');
-            }
-
+            if (btnElement) btnElement.classList.add('active');
             const target = document.getElementById('tab-' + tabId);
             if (target) target.classList.add('active');
 
             if (tabId === 'mapa-calor') {
                 setTimeout(() => { renderTemporalChart(); }, 100);
             }
-            if (tabId === 'laudos') {
-                gerarPreviewLaudo('NR01');
-            }
         }
 
         function setPeriod(p) {
             currentPeriod = p;
             document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-            if (p === 'DAY' && document.getElementById('pBtnDay')) document.getElementById('pBtnDay').classList.add('active');
-            if (p === 'WEEK' && document.getElementById('pBtnWeek')) document.getElementById('pBtnWeek').classList.add('active');
-            if (p === 'MONTH' && document.getElementById('pBtnMonth')) document.getElementById('pBtnMonth').classList.add('active');
-            if (p === 'ALL' && document.getElementById('pBtnAll')) document.getElementById('pBtnAll').classList.add('active');
+            if (p === 'DAY') document.getElementById('pBtnDay').classList.add('active');
+            if (p === 'WEEK') document.getElementById('pBtnWeek').classList.add('active');
+            if (p === 'MONTH') document.getElementById('pBtnMonth').classList.add('active');
+
             renderDashboard();
         }
 
-        async function fetchSupabaseData() {
+        function toggleDemoData() {
+            isDemoMode = !isDemoMode;
+            carregarDadosDemonstracao();
+        }
+
+        function carregarDadosDemonstracao() {
+            const agora = new Date();
+            const setores = setoresCadastrados;
+            const statuses = ["GREEN", "GREEN", "GREEN", "YELLOW", "PURPLE", "RED"];
+            rawCheckinsData = [];
+
+            for (let i = 0; i < 28; i++) {
+                const setor = setores[i % setores.length];
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const dataCheckin = new Date(agora.getTime() - (i % 7) * 86400000 - Math.random() * 3600000 * 5);
+
+                let latencia = status === 'GREEN' ? 450 + Math.floor(Math.random() * 100) :
+                               status === 'YELLOW' ? 680 + Math.floor(Math.random() * 80) :
+                               status === 'PURPLE' ? 790 + Math.floor(Math.random() * 90) : 920 + Math.floor(Math.random() * 150);
+
+                let vsi = status === 'GREEN' ? 1.8 : status === 'YELLOW' ? 3.2 : status === 'PURPLE' ? 3.9 : 4.6;
+                let rmssd = status === 'GREEN' ? 58 : status === 'YELLOW' ? 32 : status === 'PURPLE' ? 24 : 18;
+
+                rawCheckinsData.push({
+                    id: 1000 + i,
+                    company: currentCompany,
+                    sector: setor,
+                    latency_ms: latencia,
+                    veto_errors: status === 'RED' ? 2 : (status === 'YELLOW' || status === 'PURPLE') ? 1 : 0,
+                    vsi_score: vsi,
+                    rmssd: rmssd,
+                    status: status,
+                    created_at: dataCheckin.toISOString()
+                });
+            }
+
+            renderDashboard();
+        }
+
+                async function fetchSupabaseData() {
             try {
                 let h = {
                     'apikey': SUPABASE_KEY,
@@ -613,6 +835,7 @@
                 };
 
                 const tables = [
+                    { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` },
                     { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` },
                     { name: 'es_crisis_exec_checkins', url: `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc` },
                     { name: 'srt_consents', url: `${SUPABASE_URL}/rest/v1/srt_consents?select=*&order=created_at.desc` },
@@ -636,7 +859,6 @@
                     rawCheckinsData = [];
 
                     allFetched.forEach((item, idx) => {
-                        // CHAVE ÚNICA QUALIFICADA POR TABELA - EVITA DESCARTAR TESTES COM MESMO ID DE OUTRAS TABELAS
                         const uniqueKey = `${item._tableName}_${item.id || idx}_${item.created_at}_${item.latency_ms || item.reaction_time_ms}`;
                         if (seenKeys.has(uniqueKey)) return;
                         seenKeys.add(uniqueKey);
@@ -699,17 +921,12 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
-                if (currentCompany) {
-                    const itemComp = (item.company || '').toUpperCase().trim();
-                    const matchesComp = itemComp.includes(currentCompany) || currentCompany.includes(itemComp) || itemComp === 'CORPORATIVO ANÔNIMO (RH)';
-                    if (!matchesComp) return false;
-                }
                 const d = new Date(item.created_at);
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
-                if (currentPeriod === 'DAY') return diffDias <= 2.0 && diffDias >= -0.5;
+                if (currentPeriod === 'DAY') return diffDias <= 1;
                 if (currentPeriod === 'WEEK') return diffDias <= 7;
                 if (currentPeriod === 'MONTH') return diffDias <= 30;
-                return true; // 'ALL'
+                return true;
             });
         }
 
@@ -719,106 +936,207 @@
             document.getElementById('metricAmarelo').innerText = filteredData.filter(d => d.status === 'YELLOW').length;
             document.getElementById('metricRoxo').innerText = filteredData.filter(d => d.status === 'PURPLE').length;
             document.getElementById('metricVermelho').innerText = filteredData.filter(d => d.status === 'RED').length;
-            if (filteredData.length > 0) {
-                const avgVFC = Math.round(filteredData.reduce((acc, c) => acc + (c.rmssd || 42), 0) / filteredData.length);
-                const elVfc = document.getElementById('valCustomVFC');
-                if (elVfc) elVfc.innerText = `${avgVFC} ms`;
-            }
         }
 
         function renderRhSectorsTable() {
             const tbody = document.getElementById('tblRhSectorsBody');
             tbody.innerHTML = '';
+
             const setoresMap = {};
             setoresCadastrados.forEach(s => { setoresMap[s] = []; });
-            filteredData.forEach(d => { if (!setoresMap[d.sector]) setoresMap[d.sector] = []; setoresMap[d.sector].push(d); });
 
+            filteredData.forEach(d => {
+                if (!setoresMap[d.sector]) setoresMap[d.sector] = [];
+                setoresMap[d.sector].push(d);
+            });
+
+            let hasRows = false;
             Object.keys(setoresMap).forEach(setor => {
                 const list = setoresMap[setor];
                 const count = list.length;
-                
-                if (count < 5 && !isLiveDemoMode) {
-                    tbody.innerHTML += `<tr><td><strong>${setor}</strong></td><td><span class="badge" style="background:#334155; color:#94a3b8;">${count} check-ins</span></td><td>—</td><td><span class="badge" style="background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid #fbbf24;">🔒 Coleta N &lt; 5</span></td><td>Aguardando quórum de 5 colaboradores.</td></tr>`;
-                } else if (count > 0) {
+                hasRows = true;
+
+                if (count < 5) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${setor}</strong></td>
+                            <td><span class="badge" style="background:#334155; color:#94a3b8;">${count} check-ins</span></td>
+                            <td>—</td>
+                            <td><span class="badge" style="background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid #fbbf24;">🔒 Coleta N &lt; 5</span></td>
+                            <td>Aguardando quórum de 5 colaboradores para liberar gráfico setorial.</td>
+                        </tr>
+                    `;
+                } else {
                     const avgLat = Math.round(list.reduce((acc, c) => acc + c.latency_ms, 0) / count);
                     const redCount = list.filter(c => c.status === 'RED').length;
                     const yellowCount = list.filter(c => c.status === 'YELLOW' || c.status === 'PURPLE').length;
+
                     let statusBadge = `<span class="badge badge-verde">🟢 Homeostase</span>`;
                     let acaoPdca = `Manter acompanhamento diário de 30s.`;
-                    if (redCount > 0) { statusBadge = `<span class="badge badge-vermelho">🔴 Risco Crítico</span>`; acaoPdca = `Intervenção imediata de DHO.`; }
-                    else if (yellowCount > 0) { statusBadge = `<span class="badge badge-amarelo">🟡 Sobrecarga Moderada</span>`; acaoPdca = `Promover pausa tática de 15min.`; }
-                    tbody.innerHTML += `<tr><td><strong>${setor}</strong></td><td><span class="badge badge-verde">${count} check-ins</span></td><td>${avgLat} ms</td><td>${statusBadge}</td><td>${acaoPdca}</td></tr>`;
-                } else {
-                    tbody.innerHTML += `<tr><td><strong>${setor}</strong></td><td><span class="badge" style="background:#1e293b; color:#64748b;">0 check-ins</span></td><td>—</td><td><span class="badge" style="background:#1e293b; color:#64748b;">Sem registros</span></td><td>Aguardando avaliações no setor.</td></tr>`;
+
+                    if (redCount > 0) {
+                        statusBadge = `<span class="badge badge-vermelho">🔴 Risco Crítico</span>`;
+                        acaoPdca = `Intervenção imediata de DHO + Ajuste de carga horária.`;
+                    } else if (yellowCount > 2) {
+                        statusBadge = `<span class="badge badge-amarelo">🟡 Sobrecarga Moderada</span>`;
+                        acaoPdca = `Promover pausa tática de 15min + Hidratação no turno.`;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${setor}</strong></td>
+                            <td><span class="badge badge-verde">${count} check-ins</span></td>
+                            <td>${avgLat} ms</td>
+                            <td>${statusBadge}</td>
+                            <td>${acaoPdca}</td>
+                        </tr>
+                    `;
                 }
             });
-            if (filteredData.length === 0) tbody.innerHTML = `<tr><td colspan="5" class="empty-row-text">Nenhum check-in registrado no período para os setores cadastrados.</td></tr>`;
+
+            if (!hasRows) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-row-text">Nenhum setor cadastrado.</td></tr>`;
+            }
         }
 
         function renderIndividualTable() {
             const tbody = document.getElementById('tblIndividualBody');
-            const srcText = (document.getElementById('srcIndividual').value || '').toLowerCase();
+            const srcText = document.getElementById('srcIndividual').value.toLowerCase();
             const selSector = document.getElementById('selIndSector').value;
             const selStatus = document.getElementById('selIndStatus').value;
+
             tbody.innerHTML = '';
+
             const listFiltered = filteredData.filter(d => {
-                const matchSrc = d.sector.toLowerCase().includes(srcText) || d.company.toLowerCase().includes(srcText) || d.status.toLowerCase().includes(srcText);
+                const matchSrc = d.sector.toLowerCase().includes(srcText) || d.status.toLowerCase().includes(srcText);
                 const matchSector = selSector === 'ALL' || d.sector === selSector;
                 const matchStatus = selStatus === 'ALL' || d.status === selStatus;
                 return matchSrc && matchSector && matchStatus;
             });
 
-            if (listFiltered.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="empty-row-text">Nenhum check-in encontrado com os filtros selecionados.</td></tr>`; return; }
+            if (listFiltered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-row-text">Nenhum check-in encontrado com os filtros selecionados.</td></tr>`;
+                return;
+            }
 
             listFiltered.forEach(d => {
                 const dt = new Date(d.created_at);
                 const dtFmt = `${dt.toLocaleDateString('pt-BR')} ${dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
+
                 let statusBadge = `<span class="badge badge-verde">🟢 Verde (Homeostase)</span>`;
                 if (d.status === 'YELLOW') statusBadge = `<span class="badge badge-amarelo">🟡 Amarelo (Sobrecarga)</span>`;
                 if (d.status === 'PURPLE') statusBadge = `<span class="badge badge-roxo">🟣 Roxo (Fadiga/Sono)</span>`;
                 if (d.status === 'RED') statusBadge = `<span class="badge badge-vermelho">🔴 Vermelho (Inaptidão)</span>`;
-                tbody.innerHTML += `<tr><td>${dtFmt}</td><td><strong>${d.company}</strong></td><td>${d.sector}</td><td>${d.latency_ms} ms</td><td>${d.veto_errors}</td><td>${d.vsi_score}</td><td>${statusBadge}</td></tr>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${dtFmt}</td>
+                        <td><strong>${d.company}</strong></td>
+                        <td>${d.sector}</td>
+                        <td>${d.latency_ms} ms</td>
+                        <td>${d.veto_errors}</td>
+                        <td>${d.vsi_score}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
             });
         }
 
-        function filtrarCheckinsIndividuais() { renderIndividualTable(); }
+        function filtrarCheckinsIndividuais() {
+            renderIndividualTable();
+        }
 
         function renderSaudeOcupacionalTable() {
             const tbody = document.getElementById('tblMedicoBody');
             tbody.innerHTML = '';
-            if (filteredData.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="empty-row-text">Nenhum registro clínico de prontidão no período selecionado.</td></tr>`; return; }
-            filteredData.slice(0, 25).forEach((d, idx) => {
-                const prtId = `PRT-${9000 + (d.id || idx)}`;
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-row-text">Nenhum registro clínico de prontidão no período selecionado.</td></tr>`;
+                return;
+            }
+
+            filteredData.slice(0, 15).forEach((d, idx) => {
+                const prtId = `PRT-${9000 + d.id}`;
                 const rmssdFmt = `${d.rmssd || 35} ms`;
+
                 let statusAutonomico = `<span class="badge badge-verde">Homeostase Preservada</span>`;
-                let riscoOp = `Baixo`; let conduta = `Liberado Turno Normal`;
-                if (d.status === 'YELLOW') { statusAutonomico = `<span class="badge badge-amarelo">Sobrecarga Moderada</span>`; riscoOp = `Médio`; conduta = `Pausa tática de 15 min + Hidratação`; }
-                else if (d.status === 'PURPLE') { statusAutonomico = `<span class="badge badge-roxo">Tensão Laríngea / Fadiga</span>`; riscoOp = `Médio / Alto`; conduta = `Ajuste de jornada + Pausa de tela (45m)`; }
-                else if (d.status === 'RED') { statusAutonomico = `<span class="badge badge-vermelho">Disfunção Autonômica Crítica</span>`; riscoOp = `Alto / Crítico`; conduta = `Veto Operacional + Avaliação presencial SESMT`; }
-                tbody.innerHTML += `<tr><td><strong>${prtId}</strong></td><td>${d.sector}</td><td>${rmssdFmt}</td><td>${statusAutonomico}</td><td><strong>${riscoOp}</strong></td><td>${conduta}</td></tr>`;
+                let riscoOp = `Baixo`;
+                let conduta = `Liberado Turno Normal`;
+
+                if (d.status === 'YELLOW') {
+                    statusAutonomico = `<span class="badge badge-amarelo">Sobrecarga Moderada</span>`;
+                    riscoOp = `Médio`;
+                    conduta = `Pausa tática de 15 min + Hidratação`;
+                } else if (d.status === 'PURPLE') {
+                    statusAutonomico = `<span class="badge badge-roxo">Tensão Laríngea / Fadiga</span>`;
+                    riscoOp = `Médio / Alto`;
+                    conduta = `Ajuste de jornada + Pausa de tela (45m)`;
+                } else if (d.status === 'RED') {
+                    statusAutonomico = `<span class="badge badge-vermelho">Disfunção Autonômica Crítica</span>`;
+                    riscoOp = `Alto / Crítico`;
+                    conduta = `Veto Operacional + Avaliação presencial SESMT`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${prtId}</strong></td>
+                        <td>${d.sector}</td>
+                        <td>${rmssdFmt}</td>
+                        <td>${statusAutonomico}</td>
+                        <td><strong>${riscoOp}</strong></td>
+                        <td>${conduta}</td>
+                    </tr>
+                `;
             });
         }
 
         function renderHeatmapGrid() {
             const container = document.getElementById('heatmapGridContainer');
-            if (!container) return;
-            container.innerHTML = `<div class="heatmap-header-cell">Setor / Dia</div><div class="heatmap-header-cell">Seg</div><div class="heatmap-header-cell">Ter</div><div class="heatmap-header-cell">Qua</div><div class="heatmap-header-cell">Qui</div><div class="heatmap-header-cell">Sex</div><div class="heatmap-header-cell">Sáb/Dom</div>`;
-            const setoresMap = {}; setoresCadastrados.forEach(s => { setoresMap[s] = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] }; });
+
+            container.innerHTML = `
+                <div class="heatmap-header-cell">Setor / Dia</div>
+                <div class="heatmap-header-cell">Seg</div>
+                <div class="heatmap-header-cell">Ter</div>
+                <div class="heatmap-header-cell">Qua</div>
+                <div class="heatmap-header-cell">Qui</div>
+                <div class="heatmap-header-cell">Sex</div>
+                <div class="heatmap-header-cell">Sáb/Dom</div>
+            `;
+
+            const setoresMap = {};
+            setoresCadastrados.forEach(s => {
+                setoresMap[s] = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+            });
+
             filteredData.forEach(d => {
                 const day = new Date(d.created_at).getDay();
                 const dayKey = (day === 0 || day === 6) ? 6 : day;
-                if (!setoresMap[d.sector]) setoresMap[d.sector] = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+                if (!setoresMap[d.sector]) {
+                    setoresMap[d.sector] = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+                }
                 setoresMap[d.sector][dayKey].push(d);
             });
+
             Object.keys(setoresMap).forEach(setor => {
                 container.innerHTML += `<div class="heatmap-sector-title">${setor}</div>`;
+
                 for (let day = 1; day <= 6; day++) {
                     const list = setoresMap[setor][day];
-                    if (list.length === 0) container.innerHTML += `<div class="heatmap-cell cell-empty">—</div>`;
-                    else {
-                        const avgScore = (list.reduce((acc, c) => acc + (c.status === 'GREEN' ? 4.8 : c.status === 'YELLOW' ? 3.8 : c.status === 'PURPLE' ? 2.8 : 1.5), 0) / list.length).toFixed(1);
+                    const count = list.length;
+
+                    if (count === 0) {
+                        container.innerHTML += `<div class="heatmap-cell cell-empty">—</div>`;
+                    } else {
+                        const avgScore = (list.reduce((acc, c) => {
+                            let score = c.status === 'GREEN' ? 4.8 : c.status === 'YELLOW' ? 3.8 : c.status === 'PURPLE' ? 2.8 : 1.5;
+                            return acc + score;
+                        }, 0) / count).toFixed(1);
+
                         let cellClass = 'cell-green';
-                        if (avgScore < 2.0) cellClass = 'cell-red'; else if (avgScore < 3.0) cellClass = 'cell-purple'; else if (avgScore < 4.2) cellClass = 'cell-yellow';
+                        if (avgScore < 2.0) cellClass = 'cell-red';
+                        else if (avgScore < 3.0) cellClass = 'cell-purple';
+                        else if (avgScore < 4.2) cellClass = 'cell-yellow';
+
                         container.innerHTML += `<div class="heatmap-cell ${cellClass}">${avgScore}</div>`;
                     }
                 }
@@ -826,136 +1144,181 @@
         }
 
         function renderTemporalChart() {
-            const canvas = document.getElementById('trendChartCanvas'); if (!canvas) return;
+            const canvas = document.getElementById('trendChartCanvas');
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
+
             const selSector = document.getElementById('selChartSector').value;
             const listData = selSector === 'ALL' ? filteredData : filteredData.filter(d => d.sector === selSector);
+
             const datesMap = {};
-            listData.forEach(d => { const dtStr = new Date(d.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}); if (!datesMap[dtStr]) datesMap[dtStr] = []; datesMap[dtStr].push(d.latency_ms); });
+            listData.forEach(d => {
+                const dtStr = new Date(d.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+                if (!datesMap[dtStr]) datesMap[dtStr] = [];
+                datesMap[dtStr].push(d.latency_ms);
+            });
+
             const labels = Object.keys(datesMap).reverse();
-            const values = labels.map(l => Math.round(datesMap[l].reduce((a, b) => a + b, 0) / datesMap[l].length));
-            if (trendChartInstance) trendChartInstance.destroy();
+            const values = labels.map(l => {
+                const arr = datesMap[l];
+                return Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+            });
+
+            if (trendChartInstance) {
+                trendChartInstance.destroy();
+            }
+
             trendChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: { labels: labels.length > 0 ? labels : ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Latência Média de Resposta (ms)', data: values.length > 0 ? values : [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#38bdf8' }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, title: { display: true, text: 'Latência (ms)', color: '#94a3b8' } }, x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { labels: { color: '#fff', font: { weight: 'bold' } } } } }
+                data: {
+                    labels: labels.length > 0 ? labels : ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
+                    datasets: [{
+                        label: 'Latência Média de Resposta (ms)',
+                        data: values.length > 0 ? values : [520, 490, 580, 610, 540],
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#38bdf8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8' },
+                            title: { display: true, text: 'Latência (ms)', color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#fff', font: { weight: 'bold' } } }
+                    }
+                }
             });
         }
 
         function abrirCentralLaudos(tipo) {
-            switchTab('laudos', 5);
+            switchTab('laudos', document.querySelectorAll('.nav-tabs .tab-btn')[5]);
             gerarPreviewLaudo(tipo);
         }
 
         function gerarPreviewLaudo(tipo) {
             const previewBox = document.getElementById('laudoPreviewText');
-            if (!previewBox) return;
-
             const dataHoje = new Date().toLocaleDateString('pt-BR');
-            const empNome = (currentCompany && currentCompany !== 'NULL') ? currentCompany : "CORPORATIVO ANÔNIMO (RH)";
             const total = filteredData.length;
             const verde = filteredData.filter(d => d.status === 'GREEN').length;
             const amarelo = filteredData.filter(d => d.status === 'YELLOW').length;
             const roxo = filteredData.filter(d => d.status === 'PURPLE').length;
             const vermelho = filteredData.filter(d => d.status === 'RED').length;
-            const avgVFC = total > 0 ? Math.round(filteredData.reduce((acc, c) => acc + (c.rmssd || 42), 0) / total) : 42;
 
             if (tipo === 'NR01') {
-                previewBox.innerText = `====================================================================
-LAUDO AUDITÁVEL DE RISCOS PSICOSSOCIAIS — NR-01 (PGR)
-GOVERNANÇA E.A.S.Y. — ENGINE BIOMÉTRICA DE PRONTIDÃO
-====================================================================
-EMPRESA AVALIADA : ${empNome}
-DATA DO PARECER : ${dataHoje}
-MÓDULO SST     : SRT-RH Anônimo (Isento de Câmera / LGPD Art. 7/11)
-
-1. E (EXAMINE) — AUDITORIA DE BIOMARCADORES DE CARGA MENTAL
-• Amostra Total Auditada: ${total} avaliações biométricas.
-• Distribuição Semafórica de Estresse:
-  - 🟢 Homeostase (Prontidão Ideal) : ${verde} (${total ? Math.round(verde/total*100) : 100}%)
-  - 🟡 Sobrecarga Moderada         : ${amarelo}
-  - 🟣 Fadiga / Exaustão           : ${roxo}
-  - 🔴 Inaptidão Crítica          : ${vermelho}
-• Variabilidade da Frequência Cardíaca Média (VFC rMSSD): ${avgVFC} ms.
-
-2. A (ADAPT) — MATRIZ DE INTERVENÇÃO ERGONÔMICA E ORGANIZACIONAL
-• Diretriz para Sinal Amarelo/Roxo: Implantação imediata de pausas táticas de 15 a 45 minutos com hidratação e descompressão pré-frontal.
-• Diretriz para Sinal Vermelho: Remanejamento temporário de demandas de alta exigência cognitiva e notificação ao DHO.
-
-3. S (SYSTEMATIZE) — ROTINA PREVENTIVA E PROTOCOLO PDCA
-• Cadência de Check-in: Acompanhamento diário no início do turno (Work Shift Start) em 30s.
-• Indicador de Alerta Precoce: Mapeamento de sobrecarga autonômica antes da conversão em atestados médicos ou Burnout.
-
-4. Y (YARDSTICK) — CONFORMIDADE REGULATÓRIA & LEGAL
-• Certificamos que este parecer atende às exigências do Gerenciamento de Riscos Ocupacionais (PGR - NR-01) do Ministério do Trabalho e Emprego (MTE).`;
+                previewBox.innerText = "LAUDO AUDITÁVEL DE RISCOS PSICOSSOCIAIS — NR-01 (PGR)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ESCOPO\nAvaliação diária de prontidão biométrica sob quórum N >= 5.\n\n2. RESULTADOS\n• Total de Vidas Auditadas: " + total + "\n• Homeostase (Verde): " + verde + "\n• Sobrecarga (Amarelo): " + amarelo + "\n• Fadiga (Roxo): " + roxo + "\n• Alertas Críticos (Vermelho): " + vermelho + "\n\n3. RECOMENDAÇÃO\nManter acompanhamento e pausas táticas de 15min.";
             } else if (tipo === 'NR17') {
-                previewBox.innerText = `====================================================================
-AVALIAÇÃO ERGONÔMICA PRELIMINAR (AEP) — NR-17
-PARECER TÉCNICO DE EXIGÊNCIA COGNITIVA & FATOR VISUOMOTOR
-====================================================================
-EMPRESA AVALIADA : ${empNome}
-DATA DA AVALIAÇÃO: ${dataHoje}
-
-1. E (EXAMINE) — MENSURAÇÃO DA EXIGÊNCIA COGNITIVA DA JORNADA
-• Análise da Latência Neuromotora (ms) e Controle Inibitório Veto Pré-Frontal.
-• Total de Colaboradores Avaliados: ${total} vidas.
-• Equilíbrio Ergonométrico: ${verde} aptos (${total ? Math.round(verde/total*100) : 100}%) | ${amarelo + roxo + vermelho} sob fadiga.
-
-2. A (ADAPT) — READEQUAÇÃO DE POSTO DE TRABALHO E PAUSAS
-• Recomendação Ergonômica: Rotação de tarefas e micropausas de tela a cada 90 minutos para evitar a estagnação vagal e a fadiga ocular.
-
-3. S (SYSTEMATIZE) — MONITORAMENTO CONTÍNUO
-• Monitoramento não-invasivo de 30s integrado à rotina laboral sem atrito operacional.
-
-4. Y (YARDSTICK) — ADERÊNCIA À NR-17 E REGISTRO AUDITÁVEL
-• Laudo em conformidade com as diretrizes de ergonomia da NR-17 para apresentação à fiscalização do MTE.`;
+                previewBox.innerText = "AVALIAÇÃO ERGONÔMICA PRELIMINAR — NR-17 (AEP)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ANÁLISE DE EXIGÊNCIA MENTAL\nMedição de latência e taxa de erros de veto motor.\n\n2. RESULTADOS\n• Carga Adequada: " + verde + "\n• Sobrecarga Moderada: " + (amarelo + roxo) + "\n• Esgotamento Severo: " + vermelho + "\n\n3. AÇÃO ERGONÔMICA\nMicropausas de descompressão cognitiva.";
             } else if (tipo === 'eSocial') {
-                previewBox.innerText = `====================================================================
-RELATÓRIO AUDITÁVEL DE AMBIENTE E RISCOS — eSocial (S-2240)
-AGENTE DE RISCO: 09.01.001 (FATORES ERGONÔMICOS E CARGA MENTAL)
-====================================================================
-EMPREGADOR: ${empNome} | DATA DA TRANSMISSÃO: ${dataHoje}
-
-1. ESPECIFICAÇÃO DO AGENTE NOCIVO
-• Código do Agente de Risco: 09.01.001 (Fatores Ergonométricos Psicossociais)
-• Protocolo Telemétrico: Análise Bioacústica VSI + Veto Visuomotor SRT-RH
-
-2. CONSOLIDAÇÃO DOS DADOS S-2240
-• Isentos de Exposição Crítica: ${verde + amarelo} vidas
-• Sobrecarga Monitorada Sob Protocolo Preventivo: ${roxo + vermelho} vidas
-• Trava de Blindagem LGPD: Garantida sob consolidação anônima setorial.`;
+                previewBox.innerText = "RELATÓRIO AUDITÁVEL DE AMBIENTE E RISCOS (S-2240 COMPLIANCE)\nEMPREGADOR: " + currentCompany + "\nDATA: " + dataHoje + "\n\n[DADOS CONSOLIDADOS S-2240]\n• Código Agente: 09.01.001 (Fatores Ergonômicos e Carga Cognitiva)\n• Protocolo: Telemetria Biométrica de Prontidão (SRT-RH)\n• Status:\n  - Isento Exposição Crítica: " + (verde + amarelo) + "\n  - Sobrecarga Monitorada: " + (roxo + vermelho);
             } else if (tipo === 'GrouMaster') {
-                previewBox.innerText = `====================================================================
-RELATÓRIO MESTRE DE DESENVOLVIMENTO HUMANO (DHO GROU)
-SÍNTESE DE HEALTH PEOPLE ANALYTICS & RESILIÊNCIA ORGANIZACIONAL
-====================================================================
-EMPRESA : ${empNome} | DATA: ${dataHoje}
-
-1. DIAGNÓSTICO DO MOTOR E.A.S.Y.
-• Índice de Saúde Orgânica do Grupo: ${total ? Math.round(verde/total*100) : 100}% de Homeostase.
-• Carga Alostática Média (VFC rMSSD): ${avgVFC} ms.
-
-2. PLANO DE AÇÃO DHO GROU
-• Intervenções prioritárias nos setores sob sinal Amarelo e Roxo.
-• Treinamento de liderança para prevenção de contágio de estresse na equipe.`;
+                previewBox.innerText = "RELATÓRIO MESTRE DE DESENVOLVIMENTO HUMANO & ORGANIZACIONAL (DHO GROU)\nEMPRESA: " + currentCompany + " | DATA: " + dataHoje + "\n\nSÍNTESE EXECUTIVA DE PEOPLE ANALYTICS:\nÍndice de equilíbrio organizacional: " + (total ? Math.round(verde/total*100) : 100) + "%.\n\nDIAGNÓSTICO:\nÁreas operacionais estáveis.";
             }
         }
 
         function baixarLaudoPDF() {
             const textoLaudo = document.getElementById('laudoPreviewText').innerText;
-            const empNome = currentCompany || "CORPORATIVO_ANONIMO_RH";
             const win = window.open('', '_blank');
-            win.document.write("<html><head><title>Laudo_" + empNome + ".pdf</title><style>body{font-family:monospace;padding:40px;color:#000;background:#fff;font-size:11pt;line-height:1.6;}pre{white-space:pre-wrap;}</style></head><body><h2>EXCELSILIENCE CORPORATE OS — LAUDO AUDITÁVEL</h2><hr/><pre>" + textoLaudo + "</pre><script>window.onload=function(){window.print();};<\\/script></body></html>");
+            win.document.write("<html><head><title>Laudo_" + currentCompany + ".pdf</title><style>body{font-family:monospace;padding:40px;color:#000;background:#fff;font-size:11pt;line-height:1.6;}pre{white-space:pre-wrap;}</style></head><body><h2>EXCELSILIENCE CORPORATE OS — LAUDO AUDITÁVEL</h2><hr/><pre>" + textoLaudo + "</pre><script>window.onload=function(){window.print();};<\/script></body></html>");
             win.document.close();
         }
 
-        function initSetoresEGenerators() { renderListaSetoresCadastrados(); renderLinkGeneratorList(); populateSectorDropdowns(); }
-        function cadastrarNovoSetor() { const input = document.getElementById('inpNovoSetor'); const nome = input.value.trim(); if (nome && !setoresCadastrados.includes(nome)) { setoresCadastrados.push(nome); input.value = ''; initSetoresEGenerators(); renderDashboard(); } }
-        function removerSetor(nome) { setoresCadastrados = setoresCadastrados.filter(s => s !== nome); initSetoresEGenerators(); renderDashboard(); }
-        function renderListaSetoresCadastrados() { const container = document.getElementById('setores-lista-cadastrados'); if (!container) return; container.innerHTML = ''; setoresCadastrados.forEach(setor => { container.innerHTML += `<div class="dept-item-row"><span>🏢 ${setor}</span><button class="btn" style="background:#ef4444; color:#fff; font-size:10px; padding:2px 8px;" onclick="removerSetor('${setor}')">Excluir</button></div>`; }); }
-        function populateSectorDropdowns() { const selInd = document.getElementById('selIndSector'); const selChart = document.getElementById('selChartSector'); if (selInd) { selInd.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`; setoresCadastrados.forEach(s => { selInd.innerHTML += `<option value="${s}">${s}</option>`; }); } if (selChart) { selChart.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`; setoresCadastrados.forEach(s => { selChart.innerHTML += `<option value="${s}">${s}</option>`; }); } }
-        function renderLinkGeneratorList() { const container = document.getElementById('link-generator-list'); if (!container) return; container.innerHTML = ''; const baseUrl = window.location.origin + window.location.pathname.replace('dashboard_rh_srt.html', 'index-rh.html'); const compParam = currentCompany ? currentCompany.toLowerCase() : 'geral'; setoresCadastrados.forEach(setor => { const slug = setor.toLowerCase().replace(/[^a-z0-9]/g, '_'); const link = `${baseUrl}?company=${compParam}&sector=${slug}`; container.innerHTML += `<div style="background:#0d1527; border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:8px;"><div style="font-size:11px; font-weight:800; color:var(--accent);">${setor}</div><input type="text" value="${link}" readonly style="width:100%; background:#0b0f19; border:1px solid var(--border); color:#cbd5e1; font-size:10px; padding:4px; margin:4px 0; border-radius:4px;"><button class="btn btn-green" style="font-size:10px; padding:3px 8px;" onclick="navigator.clipboard.writeText('${link}'); alert('Link copiado!')">📋 Copiar Link</button></div>`; }); }
-        function adicionarMetricaCustomizada() { const nome = prompt("Nome da nova métrica customizada de RH:"); if (nome) { const val = prompt("Valor inicial:") || "100%"; const container = document.getElementById('custom-container'); if (container) { container.innerHTML += `<div class="card-metric"><div class="lbl">${nome}</div><div class="val val-total">${val}</div><div class="subtext">Indicador Personalizado</div></div>`; } } }
+        function initSetoresEGenerators() {
+            renderListaSetoresCadastrados();
+            renderLinkGeneratorList();
+            populateSectorDropdowns();
+        }
+
+        function cadastrarNovoSetor() {
+            const input = document.getElementById('inpNovoSetor');
+            const nome = input.value.trim();
+            if (nome && !setoresCadastrados.includes(nome)) {
+                setoresCadastrados.push(nome);
+                input.value = '';
+                initSetoresEGenerators();
+                renderDashboard();
+            }
+        }
+
+        function removerSetor(nome) {
+            setoresCadastrados = setoresCadastrados.filter(s => s !== nome);
+            initSetoresEGenerators();
+            renderDashboard();
+        }
+
+        function renderListaSetoresCadastrados() {
+            const container = document.getElementById('setores-lista-cadastrados');
+            container.innerHTML = '';
+            setoresCadastrados.forEach(setor => {
+                container.innerHTML += `
+                    <div class="dept-item-row">
+                        <span>🏢 ${setor}</span>
+                        <button class="btn" style="background:#ef4444; color:#fff; font-size:10px; padding:2px 8px;" onclick="removerSetor('${setor}')">Excluir</button>
+                    </div>
+                `;
+            });
+        }
+
+        function populateSectorDropdowns() {
+            const selInd = document.getElementById('selIndSector');
+            const selChart = document.getElementById('selChartSector');
+
+            selInd.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
+            selChart.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
+
+            setoresCadastrados.forEach(s => {
+                selInd.innerHTML += `<option value="${s}">${s}</option>`;
+                selChart.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+        }
+
+        function renderLinkGeneratorList() {
+            const container = document.getElementById('link-generator-list');
+            container.innerHTML = '';
+
+            const baseUrl = window.location.origin + window.location.pathname.replace('dashboard_rh_srt.html', 'index-rh.html');
+
+            setoresCadastrados.forEach(setor => {
+                const slug = setor.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                const link = `${baseUrl}?company=${currentCompany.toLowerCase()}&sector=${slug}`;
+
+                container.innerHTML += `
+                    <div style="background:#0d1527; border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:8px;">
+                        <div style="font-size:11px; font-weight:800; color:var(--accent);">${setor}</div>
+                        <input type="text" value="${link}" readonly style="width:100%; background:#0b0f19; border:1px solid var(--border); color:#cbd5e1; font-size:10px; padding:4px; margin:4px 0; border-radius:4px;">
+                        <button class="btn btn-green" style="font-size:10px; padding:3px 8px;" onclick="navigator.clipboard.writeText('${link}'); alert('Link copiado!')">📋 Copiar Link</button>
+                    </div>
+                `;
+            });
+        }
+
+        function adicionarMetricaCustomizada() {
+            const nome = prompt("Nome da nova métrica customizada de RH:");
+            if (nome) {
+                const val = prompt("Valor inicial (ex: 94%):") || "100%";
+                const container = document.getElementById('custom-container');
+                container.innerHTML += `
+                    <div class="card-metric">
+                        <div class="lbl">${nome}</div>
+                        <div class="val val-total">${val}</div>
+                        <div class="subtext">Indicador Personalizado</div>
+                    </div>
+                `;
+            }
+        }
     </script>
 </body>
 </html>
