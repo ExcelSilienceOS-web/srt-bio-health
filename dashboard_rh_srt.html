@@ -526,7 +526,6 @@
         const companyFromUrl = urlParams.get('company');
         const currentCompany = (companyFromUrl && companyFromUrl.trim() !== '' && companyFromUrl.toUpperCase().trim() !== 'NULL') ? companyFromUrl.toUpperCase().trim() : null;
 
-        // VERIFICAÇÃO DE MODO ADMIN/DEMO NA URL:
         const isAdminDemoUser = urlParams.has('admin') || urlParams.has('demo') || urlParams.has('live');
 
         let currentPeriod = 'ALL';
@@ -613,26 +612,22 @@
                     'Authorization': 'Bearer ' + SUPABASE_KEY
                 };
 
-                const urls = [
-                    `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`,
-                    `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`,
-                    `${SUPABASE_URL}/rest/v1/srt_consents?select=*&order=created_at.desc`,
-                    `${SUPABASE_URL}/rest/v1/chapter_test_results?select=*&order=created_at.desc`
+                const tables = [
+                    { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` },
+                    { name: 'es_crisis_exec_checkins', url: `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc` },
+                    { name: 'srt_consents', url: `${SUPABASE_URL}/rest/v1/srt_consents?select=*&order=created_at.desc` },
+                    { name: 'chapter_test_results', url: `${SUPABASE_URL}/rest/v1/chapter_test_results?select=*&order=created_at.desc` }
                 ];
 
-                const results = await Promise.allSettled(urls.map(url => fetch(url, { headers: h })));
+                const results = await Promise.allSettled(tables.map(t => fetch(t.url, { headers: h }).then(r => r.ok ? r.json().then(d => ({ table: t.name, data: d })) : { table: t.name, data: [] })));
                 let allFetched = [];
 
                 for (const resObj of results) {
-                    if (resObj.status === 'fulfilled' && resObj.value && resObj.value.ok) {
-                        try {
-                            const data = await resObj.value.json();
-                            if (Array.isArray(data)) {
-                                allFetched.push(...data);
-                            }
-                        } catch (e) {
-                            console.warn('Error parsing JSON:', e);
-                        }
+                    if (resObj.status === 'fulfilled' && resObj.value && Array.isArray(resObj.value.data)) {
+                        const tableName = resObj.value.table;
+                        resObj.value.data.forEach(item => {
+                            allFetched.push({ ...item, _tableName: tableName });
+                        });
                     }
                 }
 
@@ -641,7 +636,8 @@
                     rawCheckinsData = [];
 
                     allFetched.forEach((item, idx) => {
-                        const uniqueKey = item.id ? `id_${item.id}` : `${item.created_at}_${item.latency_ms || item.reaction_time_ms}_${item.sector || item.department}`;
+                        // CHAVE ÚNICA QUALIFICADA POR TABELA - EVITA DESCARTAR TESTES COM MESMO ID DE OUTRAS TABELAS
+                        const uniqueKey = `${item._tableName}_${item.id || idx}_${item.created_at}_${item.latency_ms || item.reaction_time_ms}`;
                         if (seenKeys.has(uniqueKey)) return;
                         seenKeys.add(uniqueKey);
 
@@ -659,7 +655,8 @@
                         else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO')) st = 'YELLOW';
                         else st = 'GREEN';
 
-                        let dtObj = new Date(item.created_at);
+                        let rawDt = item.created_at || new Date().toISOString();
+                        let dtObj = new Date(rawDt);
                         if (isNaN(dtObj.getTime())) dtObj = new Date();
 
                         rawCheckinsData.push({
