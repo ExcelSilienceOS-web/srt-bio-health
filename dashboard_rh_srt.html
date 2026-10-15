@@ -133,7 +133,7 @@
         .btn-accent:hover { background: #0369a1; }
         .btn-purple { background: #7e22ce; color: #fff; border: none; }
         .btn-purple:hover { background: #9333ea; }
-        .btn-toggle-live { background: #10b981; color: #fff; border: 1px solid #34d399; font-weight: 800; }
+        .btn-toggle-live { background: #10b981; color: #fff; border: 1px solid #34d399; font-weight: 800; display: none; }
 
         /* NAV TABS */
         .nav-tabs {
@@ -309,6 +309,7 @@
         </div>
 
         <div class="header-actions">
+            <!-- BOTÃO DE MODO AO VIVO: Visível apenas se URL contiver ?admin=true, ?demo=true ou ?live=true -->
             <button class="btn btn-toggle-live" id="btnLiveDemoModeToggle" onclick="toggleLiveDemoMode()">
                 🔓 Modo Ao Vivo / Degustação (Sem Trava N≥5)
             </button>
@@ -356,7 +357,7 @@
                         <div class="panel-title">Mapeamento de Carga de Estresse por Setor (GHE)</div>
                         <div class="panel-subtitle">Auditoria de Riscos Psicossociais em Tempo Real</div>
                     </div>
-                    <span id="lgpdModeBadge" style="font-size:11px; color:var(--green); font-weight:800;">🔓 Modo Ao Vivo (Sem Trava N≥5)</span>
+                    <span id="lgpdModeBadge" style="font-size:11px; color:var(--accent); font-weight:800;">🔒 Blindagem LGPD Ativa (N≥5)</span>
                 </div>
                 <table>
                     <thead>
@@ -525,34 +526,54 @@
         const companyFromUrl = urlParams.get('company');
         const currentCompany = companyFromUrl ? companyFromUrl.toUpperCase().trim() : null;
 
-        let currentPeriod = 'ALL';
+        // VERIFICAÇÃO DE MODO ADMIN/DEMO NA URL:
+        // O botão '🔓 Modo Ao Vivo' só é liberado se a URL contiver &admin=true, &demo=true ou &live=true
+        const isAdminDemoUser = urlParams.has('admin') || urlParams.has('demo') || urlParams.has('live');
+
+        let currentPeriod = 'ALL'; // Abre por padrão em '🌐 Todos' para garantir visibilidade total
         let rawCheckinsData = [];
         let setoresCadastrados = ["Operações / Logística", "Tecnologia / TI", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
         let isDemoMode = false;
-        let isLiveDemoMode = true;
+        
+        // Se for acesso normal do cliente, isLiveDemoMode = false (Blindagem LGPD N>=5 estrita)
+        // Se for acesso com ?demo=true, ?admin=true ou ?live=true, isLiveDemoMode = true (Modo Ao Vivo / Apresentação)
+        let isLiveDemoMode = isAdminDemoUser; 
         let trendChartInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const badgeLabel = document.getElementById('companyBadgeLabel');
             if (badgeLabel) badgeLabel.innerText = currentCompany ? currentCompany : 'CORPORATIVO ANÔNIMO (RH)';
+            
+            // Exibe o botão de alternância APENAS se for o Flavio/Admin com o parâmetro na URL
+            const btnToggle = document.getElementById('btnLiveDemoModeToggle');
+            if (btnToggle) {
+                if (isAdminDemoUser) {
+                    btnToggle.style.display = 'inline-flex';
+                } else {
+                    btnToggle.style.display = 'none'; // Clientes normais NÃO enxergam o botão
+                }
+            }
+
             updateLiveDemoBadge();
             initSetoresEGenerators();
             fetchSupabaseData();
         });
 
         function toggleLiveDemoMode() {
+            if (!isAdminDemoUser) return; // Proteção adicional
             isLiveDemoMode = !isLiveDemoMode;
             updateLiveDemoBadge();
             renderDashboard();
         }
+
         function updateLiveDemoBadge() {
             const btn = document.getElementById('btnLiveDemoModeToggle');
             const badge = document.getElementById('lgpdModeBadge');
             if (isLiveDemoMode) {
-                if (btn) { btn.innerText = "🔓 Modo Ao Vivo (Sem Trava N≥5)"; btn.classList.add('active'); }
-                if (badge) { badge.innerText = "🔓 Modo Ao Vivo (Sem Trava N≥5)"; badge.style.color = "var(--green)"; }
+                if (btn) { btn.innerText = "🔓 Modo Ao Vivo (Sem Trava N≥5)"; btn.style.background = "#10b981"; btn.style.borderColor = "#34d399"; }
+                if (badge) { badge.innerText = "🔓 Modo Ao Vivo / Degustação (Sem Trava N≥5)"; badge.style.color = "var(--green)"; }
             } else {
-                if (btn) { btn.innerText = "🔒 Modo Corporativo (Blindagem N≥5)"; btn.classList.remove('active'); }
+                if (btn) { btn.innerText = "🔒 Modo Corporativo (Blindagem N≥5)"; btn.style.background = "#0284c7"; btn.style.borderColor = "#38bdf8"; }
                 if (badge) { badge.innerText = "🔒 Blindagem LGPD Ativa (N≥5)"; badge.style.color = "var(--accent)"; }
             }
         }
@@ -583,6 +604,7 @@
                     'Authorization': 'Bearer ' + SUPABASE_KEY
                 };
 
+                // Consulta em PARALELO em todas as tabelas possíveis do Supabase
                 const urls = [
                     `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`,
                     `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`,
@@ -629,6 +651,10 @@
                         else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO')) st = 'YELLOW';
                         else st = 'GREEN';
 
+                        // Parsing seguro da data para evitar fuso horário descartando linhas
+                        let dtObj = new Date(item.created_at);
+                        if (isNaN(dtObj.getTime())) dtObj = new Date();
+
                         rawCheckinsData.push({
                             id: item.id || (2000 + idx),
                             company: emp,
@@ -638,7 +664,7 @@
                             vsi_score: Number(vsiVal),
                             rmssd: Number(rmssdVal),
                             status: st,
-                            created_at: item.created_at || new Date().toISOString()
+                            created_at: dtObj.toISOString()
                         });
                     });
 
@@ -671,15 +697,15 @@
             filteredData = rawCheckinsData.filter(item => {
                 if (currentCompany) {
                     const itemComp = (item.company || '').toUpperCase().trim();
-                    const matchesComp = itemComp.includes(currentCompany) || currentCompany.includes(itemComp) || itemComp === 'CORPORATIVO ANÔNIMO (RH)' || itemComp === 'EXCEL SILIENCE' || itemComp === 'GERAL';
+                    const matchesComp = !currentCompany || itemComp.includes(currentCompany) || currentCompany.includes(itemComp) || itemComp === 'CORPORATIVO ANÔNIMO (RH)' || itemComp === '' || itemComp === 'NULL' || itemComp === 'GERAL' || itemComp === 'EXCEL SILIENCE';
                     if (!matchesComp) return false;
                 }
                 const d = new Date(item.created_at);
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
-                if (currentPeriod === 'DAY') return diffDias <= 1.5;
+                if (currentPeriod === 'DAY') return diffDias <= 2.0 && diffDias >= -0.5; // Margem de segurança de fuso horário
                 if (currentPeriod === 'WEEK') return diffDias <= 7;
                 if (currentPeriod === 'MONTH') return diffDias <= 30;
-                return true; // 'ALL'
+                return true; // 'ALL' (Todos)
             });
         }
 
@@ -706,6 +732,8 @@
             Object.keys(setoresMap).forEach(setor => {
                 const list = setoresMap[setor];
                 const count = list.length;
+                
+                // Se isLiveDemoMode for false (acesso normal do cliente), bloqueia setores com menos de 5 check-ins
                 if (count < 5 && !isLiveDemoMode) {
                     tbody.innerHTML += `<tr><td><strong>${setor}</strong></td><td><span class="badge" style="background:#334155; color:#94a3b8;">${count} check-ins</span></td><td>—</td><td><span class="badge" style="background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid #fbbf24;">🔒 Coleta N &lt; 5</span></td><td>Aguardando quórum de 5 colaboradores.</td></tr>`;
                 } else if (count > 0) {
@@ -806,12 +834,12 @@
             if (trendChartInstance) trendChartInstance.destroy();
             trendChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: { labels: labels.length > 0 ? labels : ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Latência Média de Resposta (ms)', data: values.length > 0 ? values : [520, 490, 580, 610, 540], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#38bdf8' }] },
+                data: { labels: labels.length > 0 ? labels : ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Latência Média de Resposta (ms)', data: values.length > 0 ? values : [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#38bdf8' }] },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, title: { display: true, text: 'Latência (ms)', color: '#94a3b8' } }, x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } } }, plugins: { legend: { labels: { color: '#fff', font: { weight: 'bold' } } } } }
             });
         }
 
-        function abrirCentralLaudos(tipo) { switchTab('laudos', document.querySelectorAll('.nav-tabs .tab-btn')[5]); gerarPreviewLaudo(tipo); }
+        function abrirCentralLaudos(tipo) { switchTab('laudos', document.querySelectorAll('.nav-tabs .tab-btn')); gerarPreviewLaudo(tipo); }
         function gerarPreviewLaudo(tipo) {
             const previewBox = document.getElementById('laudoPreviewText');
             const dataHoje = new Date().toLocaleDateString('pt-BR');
