@@ -443,7 +443,8 @@
                     photoHtml = `<div class="user-avatar-fallback">${initial}</div>`;
                 }
 
-                const faceCheckStatus = item.face_match || "🟢 Foto OK (Match 99%)";
+                const isRH = (item._tableName === 'srt_rh_checkins');
+                const faceCheckStatus = item.face_match || (isRH ? "🔒 Isento de Foto (SRT-RH Anônimo)" : (photoUrl ? "🟢 Foto OK (Match 99%)" : "🔒 Sem Foto Capturada"));
 
                 // Status de Voz VSI
                 let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável</span>`;
