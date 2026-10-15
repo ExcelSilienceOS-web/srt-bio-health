@@ -957,6 +957,47 @@
             document.getElementById('syncStatus').innerText = '✅ Laudo e foto transmitidos ao CCO com sucesso!';
         }, 1500);
     }
+      async function transmitirCheckinAoSupabase(payload) {
+            const banner = document.getElementById('syncStatus');
+            if (banner) banner.innerText = '⏳ Transmitindo laudo e foto ao CCO do SRT Mobility...';
+
+            try {
+                const resposta = await fetch('https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/srt_checkins', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': 'sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b',
+                        'Authorization': 'Bearer sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (resposta.ok) {
+                    if (banner) {
+                        banner.innerText = '✅ Laudo e telemetria transmitidos com sucesso ao CCO!';
+                        banner.style.background = 'rgba(16, 185, 129, 0.2)';
+                        banner.style.color = '#34d399';
+                        banner.style.borderColor = '#10b981';
+                    }
+                } else {
+                    const errData = await resposta.json();
+                    const msgErro = errData.message || resposta.statusText;
+                    if (banner) {
+                        banner.innerText = '❌ Erro ao gravar no Supabase: ' + msgErro;
+                        banner.style.background = 'rgba(239, 68, 68, 0.2)';
+                        banner.style.color = '#f87171';
+                        banner.style.borderColor = '#ef4444';
+                    }
+                }
+            } catch (e) {
+                if (banner) {
+                    banner.innerText = '❌ Falha de Conexão: ' + e.message;
+                    banner.style.background = 'rgba(239, 68, 68, 0.2)';
+                    banner.style.color = '#f87171';
+                }
+            }
+        }
 </script>
 
 </body>
