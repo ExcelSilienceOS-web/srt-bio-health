@@ -524,19 +524,16 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const companyFromUrl = urlParams.get('company');
-        const currentCompany = (companyFromUrl && companyFromUrl.trim() !== '') ? companyFromUrl.toUpperCase().trim() : null;
+        const currentCompany = (companyFromUrl && companyFromUrl.trim() !== '' && companyFromUrl.toUpperCase().trim() !== 'NULL') ? companyFromUrl.toUpperCase().trim() : null;
 
         // VERIFICAÇÃO DE MODO ADMIN/DEMO NA URL:
-        // O botão '🔓 Modo Ao Vivo' só é liberado se a URL contiver &admin=true, &demo=true ou &live=true
         const isAdminDemoUser = urlParams.has('admin') || urlParams.has('demo') || urlParams.has('live');
 
-        let currentPeriod = 'ALL'; // Abre por padrão em '🌐 Todos' para garantir visibilidade total
+        let currentPeriod = 'ALL';
         let rawCheckinsData = [];
         let setoresCadastrados = ["Operações / Logística", "Tecnologia / TI", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
         let isDemoMode = false;
         
-        // Se for acesso normal do cliente, isLiveDemoMode = false (Blindagem LGPD N>=5 estrita)
-        // Se for acesso com ?demo=true, ?admin=true ou ?live=true, isLiveDemoMode = true (Modo Ao Vivo / Apresentação)
         let isLiveDemoMode = isAdminDemoUser; 
         let trendChartInstance = null;
 
@@ -544,13 +541,12 @@
             const badgeLabel = document.getElementById('companyBadgeLabel');
             if (badgeLabel) badgeLabel.innerText = currentCompany ? currentCompany : 'CORPORATIVO ANÔNIMO (RH)';
             
-            // Exibe o botão de alternância APENAS se for o Flavio/Admin com o parâmetro na URL
             const btnToggle = document.getElementById('btnLiveDemoModeToggle');
             if (btnToggle) {
                 if (isAdminDemoUser) {
                     btnToggle.style.display = 'inline-flex';
                 } else {
-                    btnToggle.style.display = 'none'; // Clientes normais NÃO enxergam o botão
+                    btnToggle.style.display = 'none';
                 }
             }
 
@@ -560,7 +556,7 @@
         });
 
         function toggleLiveDemoMode() {
-            if (!isAdminDemoUser) return; // Proteção adicional
+            if (!isAdminDemoUser) return;
             isLiveDemoMode = !isLiveDemoMode;
             updateLiveDemoBadge();
             renderDashboard();
@@ -581,10 +577,23 @@
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.nav-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            if (btnElement) btnElement.classList.add('active');
+
+            const allTabBtns = document.querySelectorAll('.nav-tabs .tab-btn');
+            if (typeof btnElement === 'number' && allTabBtns[btnElement]) {
+                allTabBtns[btnElement].classList.add('active');
+            } else if (btnElement && btnElement.classList) {
+                btnElement.classList.add('active');
+            }
+
             const target = document.getElementById('tab-' + tabId);
             if (target) target.classList.add('active');
-            if (tabId === 'mapa-calor') setTimeout(() => { renderTemporalChart(); }, 100);
+
+            if (tabId === 'mapa-calor') {
+                setTimeout(() => { renderTemporalChart(); }, 100);
+            }
+            if (tabId === 'laudos') {
+                gerarPreviewLaudo('NR01');
+            }
         }
 
         function setPeriod(p) {
@@ -604,7 +613,6 @@
                     'Authorization': 'Bearer ' + SUPABASE_KEY
                 };
 
-                // Consulta em PARALELO em todas as tabelas possíveis do Supabase
                 const urls = [
                     `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`,
                     `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`,
@@ -651,7 +659,6 @@
                         else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO')) st = 'YELLOW';
                         else st = 'GREEN';
 
-                        // Parsing seguro da data para evitar fuso horário descartando linhas
                         let dtObj = new Date(item.created_at);
                         if (isNaN(dtObj.getTime())) dtObj = new Date();
 
@@ -695,8 +702,6 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
-                // Filtra por empresa APENAS se houver empresa especificada na URL (?company=...)
-                // Se a URL não trouxer empresa, EXIBE TODOS OS REGISTROS de todas as empresas!
                 if (currentCompany) {
                     const itemComp = (item.company || '').toUpperCase().trim();
                     const matchesComp = itemComp.includes(currentCompany) || currentCompany.includes(itemComp) || itemComp === 'CORPORATIVO ANÔNIMO (RH)';
@@ -704,10 +709,10 @@
                 }
                 const d = new Date(item.created_at);
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
-                if (currentPeriod === 'DAY') return diffDias <= 2.0 && diffDias >= -0.5; // Margem de fuso horário
+                if (currentPeriod === 'DAY') return diffDias <= 2.0 && diffDias >= -0.5;
                 if (currentPeriod === 'WEEK') return diffDias <= 7;
                 if (currentPeriod === 'MONTH') return diffDias <= 30;
-                return true; // 'ALL' (Todos)
+                return true; // 'ALL'
             });
         }
 
@@ -735,7 +740,6 @@
                 const list = setoresMap[setor];
                 const count = list.length;
                 
-                // Se isLiveDemoMode for false (acesso normal do cliente), bloqueia setores com menos de 5 check-ins
                 if (count < 5 && !isLiveDemoMode) {
                     tbody.innerHTML += `<tr><td><strong>${setor}</strong></td><td><span class="badge" style="background:#334155; color:#94a3b8;">${count} check-ins</span></td><td>—</td><td><span class="badge" style="background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid #fbbf24;">🔒 Coleta N &lt; 5</span></td><td>Aguardando quórum de 5 colaboradores.</td></tr>`;
                 } else if (count > 0) {
@@ -841,17 +845,23 @@
             });
         }
 
-        function abrirCentralLaudos(tipo) { switchTab('laudos', document.querySelectorAll('.nav-tabs .tab-btn')); gerarPreviewLaudo(tipo); }
+        function abrirCentralLaudos(tipo) {
+            switchTab('laudos', 5);
+            gerarPreviewLaudo(tipo);
+        }
+
         function gerarPreviewLaudo(tipo) {
             const previewBox = document.getElementById('laudoPreviewText');
+            if (!previewBox) return;
+
             const dataHoje = new Date().toLocaleDateString('pt-BR');
-            const empNome = currentCompany || "CORPORATIVO ANÔNIMO (RH)";
+            const empNome = (currentCompany && currentCompany !== 'NULL') ? currentCompany : "CORPORATIVO ANÔNIMO (RH)";
             const total = filteredData.length;
             const verde = filteredData.filter(d => d.status === 'GREEN').length;
             const amarelo = filteredData.filter(d => d.status === 'YELLOW').length;
             const roxo = filteredData.filter(d => d.status === 'PURPLE').length;
             const vermelho = filteredData.filter(d => d.status === 'RED').length;
-            const avgVFC = total > 0 ? Math.round(filteredData.reduce((a, b) => a + (b.rmssd || 42), 0) / total) : 42;
+            const avgVFC = total > 0 ? Math.round(filteredData.reduce((acc, c) => acc + (c.rmssd || 42), 0) / total) : 42;
 
             if (tipo === 'NR01') {
                 previewBox.innerText = `====================================================================
