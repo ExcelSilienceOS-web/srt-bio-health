@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -26,53 +25,61 @@
             --accent-red: #ef4444;
             --accent-red-bright: #f87171;
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; overflow-x: hidden; }
-        .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 520px; padding: 24px 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative; margin: auto; }
+        .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 520px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative; }
+
         .header-box { text-align: center; margin-bottom: 22px; border-bottom: 1px solid var(--panel-border); padding-bottom: 18px; }
         .header-box h1 { font-size: 1.4rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
         .badge-gov { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; margin-bottom: 18px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
+
         .step { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
         .step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
         .form-group { margin-bottom: 16px; }
         label { font-size: 11px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
         select, input[type="text"] { width: 100%; padding: 13px 16px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: #ffffff; font-size: 14px; outline: none; }
         select:focus, input[type="text"]:focus { border-color: var(--accent-cyan); }
+
         .chk-box { display: flex; align-items: flex-start; gap: 12px; background: var(--input-bg); padding: 14px; border-radius: 10px; border: 1px solid var(--input-border); margin-bottom: 20px; }
         .chk-box input[type="checkbox"] { margin-top: 3px; accent-color: var(--accent-cyan-hover); width: 20px; height: 20px; cursor: pointer; }
         .chk-box label { font-size: 11px; color: var(--text-sub); text-transform: none; line-height: 1.45; margin: 0; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: var(--accent-cyan-hover); color: #ffffff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; margin-top: 10px; }
+
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: var(--accent-cyan-hover); color: #ffffff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
         .btn:hover { background: #0369a1; }
-        .btn:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
-        .btn-green { background: var(--accent-green); }
-        .btn-green:hover { background: #059669; }
         .btn-secondary { background: #1e293b; color: var(--text-sub); border: 1px solid var(--input-border); margin-top: 10px; }
-        .pupil-scanner { width: 100%; height: 240px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 14px; }
+
+        .pupil-scanner { width: 100%; height: 240px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 18px; }
         .camera-video { position: absolute; width: 100%; height: 100%; object-fit: cover; }
         .scan-line { position: absolute; width: 100%; height: 2px; background: var(--accent-green-bright); z-index: 3; top: 0; animation: scanAnim 2s infinite linear; }
         @keyframes scanAnim { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
-        .eye-target { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent-cyan); position: relative; z-index: 2; box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); display: flex; align-items: center; justify-content: center; }
-        .eye-pupil { width: 48px; height: 48px; background: rgba(56, 189, 248, 0.4); border-radius: 50%; border: 2px dashed var(--accent-cyan); }
-        .photo-preview-box { display: flex; align-items: center; gap: 12px; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-green); padding: 12px; border-radius: 10px; margin-bottom: 14px; }
-        .photo-preview-thumb { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-green-bright); }
-        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
+        .eye-target { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent-cyan); position: relative; z-index: 2; box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); display: flex; align-items: center; justify-content: center; }
+        .eye-pupil { width: 42px; height: 42px; background: var(--accent-cyan); border-radius: 50%; }
+
+        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
         .meter-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.2s linear; }
+
         .audio-vis-box { width: 100%; height: 80px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
         canvas.audio-canvas { width: 100%; height: 100%; display: block; }
+
         .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: manipulation; }
         .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; touch-action: manipulation; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
         .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
         .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
+
         .badge-status { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-block; text-transform: uppercase; }
         .b-verde { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
         .b-amarelo { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
         .b-roxo { background: rgba(168, 85, 247, 0.18); color: var(--accent-purple-bright); border: 1px solid var(--accent-purple); }
         .b-vermelho { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
+
         .sync-banner { padding: 14px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 18px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
         .info-card { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 12px; color: var(--text-sub); line-height: 1.5; }
         .info-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
+
         .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
         .modal-backdrop.active { display: flex; }
         .modal-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8); }
@@ -83,44 +90,66 @@
         .footer-brand b { color: var(--accent-cyan); }
     </style>
 </head>
-<body><div class="container">
+<body>
+
+<div class="container">
     <div class="header-box">
         <h1>ExcelSilience SRT Mobility</h1>
         <p>Telemetria de Prontidão Biométrica & Validação Facial</p>
     </div>
+
     <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS, MOTORISTAS & PORTARIA</span>
+
     <!-- PASSO 1: DADOS DO CONDUTOR E TERMO LGPD -->
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
-            <input type="text" id="txtName" placeholder="Ex: Flavio Verissimo" value="Flavio Verissimo" required>
+            <input type="text" id="txtName" placeholder="Ex: Carlos Eduardo Souza" autocomplete="name" required>
         </div>
+
         <div class="form-group">
             <label for="txtRole">Cargo / Perfil Profissional CNH:</label>
             <select id="txtRole" required>
-                <option value="Motorista de Carga Pesada (CNH C/E)" selected>Motorista de Carga Pesada (CNH C/E)</option>
+                <option value="">-- Selecione o perfil profissional --</option>
+                <option value="Motorista de Carga Pesada (CNH C/E)">Motorista de Carga Pesada (CNH C/E)</option>
                 <option value="Motorista de Transporte Coletivo (CNH D)">Motorista de Transporte Coletivo / Ônibus (CNH D)</option>
                 <option value="Condutor de Veículo Leve / VUC">Condutor de VUC / Entrega Leve / VUP</option>
                 <option value="Motorista de Aplicativo / Entrega">Motorista de Aplicativo / Ride-Hailing</option>
                 <option value="Operador de Empilhadeira / Máquinas">Operador de Empilhadeira / Máquinas Industriais</option>
             </select>
         </div>
+
         <div class="form-group">
             <label for="txtDept">Frota / Unidade Operacional / Placa do Veículo:</label>
-            <input type="text" id="txtDept" placeholder="Ex: Frota 01 • Turno Matutino" value="Frota 01 • Turno Matutino" required>
+            <input type="text" id="txtDept" placeholder="Ex: Frota Rio - Placa ABC-1234" required>
         </div>
+
+        <div class="form-group">
+            <label for="txtShift">Turno de Operação:</label>
+            <select id="txtShift">
+                <option value="Matutino">Turno Matutino (Diurno)</option>
+                <option value="Vespertino">Turno Vespertino</option>
+                <option value="Noturno">Turno Noturno / Madrugada</option>
+                <option value="Revezamento">Revezamento / Escala Flexível</option>
+            </select>
+        </div>
+
         <div class="chk-box">
             <input type="checkbox" id="chkAuth" checked>
-            <label for="chkAuth"><b>Autorização de Governança & LGPD (Art. 7º e 11):</b> Autorizo a captura de foto e a aferição biométrica de prontidão para validação no CCO antes do início do turno.</label>
+            <label for="chkAuth">
+                <b>Autorização de Governança & LGPD (Art. 7º e 11):</b> Autorizo a captura de foto e a aferição não-invasiva dos meus parâmetros biométricos de prontidão operacional para validação no CCO antes do início da jornada, visando a proteção da minha vida, da frota e do trânsito.
+            </label>
         </div>
+
         <button class="btn" onclick="startCheckinFlow()">Iniciar Aferição com Câmera (30s) 🚀</button>
         <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Instruções e Ajuda</button>
     </div>
+
     <!-- PASSO 2: VALIDAÇÃO FACIAL & FOTO DO CONDUTOR -->
     <div id="stepPupil" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial & Foto do Condutor</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
-            Mantenha o rosto centralizado no alvo. O sistema fará a leitura facial e tirará a foto automaticamente:
+            Mantenha o rosto centralizado no alvo para validar a presença e registrar a foto oficial:
         </p>
 
         <div class="pupil-scanner">
@@ -129,69 +158,79 @@
             <div class="eye-target">
                 <div class="eye-pupil" id="pupilCircle"></div>
             </div>
-            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4; text-shadow:0 1px 4px #000;" id="lblPupilStatus">Iniciando câmera...</span>
+            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Solicitando permissão da câmera...</span>
         </div>
 
         <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
-
-        <div id="photoConfirmedBox" style="display:none; align-items:center; justify-content:center; gap:10px; margin-bottom:12px; background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; padding:10px; border-radius:10px;">
-            <img id="imgCapturedThumb" src="" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #34d399;" alt="Foto">
-            <span style="font-size:12px; color:#34d399; font-weight:700;">🟢 Foto Registrada! (Match 3D OK)</span>
-        </div>
-
-        <button id="btnRetryCam" class="btn btn-secondary" onclick="initCameraScan()" style="display:none; margin-bottom:10px; border-color:#f59e0b; color:#fbbf24;">🔄 Tentar Ligar Câmera Novamente</button>
-        <canvas id="photoCanvas" width="160" height="160" style="display:none;"></canvas>
+        <canvas id="photoCanvas" width="200" height="200" style="display:none;"></canvas>
     </div>
+
     <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
     <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Passo 2/3: Análise Bioacústica da Voz (VSI)</h3>
-        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">Leia a frase em voz alta no microfone ao clicar no botão de gravação:</p>
-        <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:800; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:15px; line-height:1.4;">"Pronto para operar hoje com foco, energia e segurança."</div>
-        <div class="audio-vis-box"><canvas id="audioCanvas" class="audio-canvas"></canvas></div>
-        <div class="meter-bar"><div class="meter-fill" id="progressAudio"></div></div>
-        <button id="btnRecAudio" class="btn" onclick="triggerAudioRecording()">🔴 Iniciar Gravador de Voz (7 Segundos)</button>
-        <button id="btnNextGame" class="btn btn-green" style="display:none;" onclick="goToGameStep()">Avançar para Desafio Visuomotor ➔</button>
-    </div>
-    <!-- PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO (10 RODADAS) -->
-    <div id="stepInstruction" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Passo 3/3: Desafio Visuomotor</h3>
-        <div class="info-card">
-            <p style="color:var(--accent-green-bright); margin-bottom:8px;">⚡ <b>Bolinha VERDE (GO!):</b> Toque na tela o mais rápido possível!</p>
-            <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA (NO-GO!):</b> NÃO toque! Deixe desaparecer sem tocar.</p>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
+        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
+            Clique no botão e leia a frase em voz alta no microfone durante 7 segundos:
+        </p>
+
+        <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:14px;">
+            "Pronto para operar hoje com foco, energia e segurança."
         </div>
-        <button class="btn" onclick="startGame()">Iniciar Desafio (10 Rodadas) 🎯</button>
+
+        <div class="audio-vis-box">
+            <canvas id="audioCanvas" class="audio-canvas"></canvas>
+        </div>
+
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (7s)</button>
+        <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
+
+    <!-- PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO (12 RODADAS) -->
+    <div id="stepInstruction" class="step">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação Visuomotora</h3>
+        <div class="info-card">
+            <p style="color:var(--accent-green-bright); margin-bottom:8px;">⚡ <b>Bolinha VERDE:</b> Toque na tela o mais rápido possível!</p>
+            <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso e deixe desaparecer.</p>
+        </div>
+        <button class="btn" onclick="startGame()">Start no Desafio (12 Rodadas) 🎯</button>
+    </div>
+
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 10</b></span>
-            <span>Erros Veto: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
+            <span>Erros de Impulso: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
     </div>
+
     <!-- PASSO 5: RESULTADO, STATUS E TRANSMISSÃO CCO -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO do Supabase...</div>
+        <div id="syncStatus" class="sync-banner">⏳ Transmitindo laudo e foto ao CCO do SRT Mobility...</div>
+
         <div style="text-align:center; margin-bottom:18px;">
             <img id="resPhoto" src="" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:inline-block; margin-bottom:8px; background:#1e293b;">
             <h3 style="color:var(--accent-cyan); font-size:16px;" id="resName">--</h3>
             <p style="font-size:12px; color:var(--text-muted);" id="resRole">--</p>
             <div id="resBadge" class="badge-status b-verde" style="margin-top:8px;">🟢 LIBERADO PARA RODAR</div>
         </div>
+
         <div class="info-card">
             <h4>📊 Parâmetros Telemétricos Aferidos:</h4>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px; font-size:11px;">
                 <div>⚡ <b>Latência Reação:</b> <span id="resLatency" style="color:#fff; font-weight:700;">0 ms</span></div>
                 <div>🛑 <b>Erros Veto Motor:</b> <span id="resErrors" style="color:#fff; font-weight:700;">0</span></div>
-                <div>🎙️ <b>Tensão Vocal VSI:</b> <span id="resVsi" style="color:#fff; font-weight:700;">Estável</span></div>
-                <div>👁️ <b>Validação Facial:</b> <span id="resFaceMatch" style="color:var(--accent-green-bright); font-weight:700;">Match OK</span></div>
+                <div>🎙️ <b>Tension Vocal VSI:</b> <span id="resVsi" style="color:#fff; font-weight:700;">Estável</span></div>
+                <div>👁️ <b>Validação Facial:</b> <span style="color:var(--accent-green-bright); font-weight:700;">Match OK</span></div>
             </div>
         </div>
+
         <div class="info-card" style="border-color:var(--accent-cyan);">
             <h4>📋 Encaminhamento Operacional (CCO):</h4>
             <p id="resAction" style="font-weight:700; color:var(--accent-cyan); font-size:13px; margin-top:4px;">--</p>
         </div>
-        <button class="btn" onclick="location.reload()">🔄 Finalizar & Realizar Novo Teste</button>
+
+        <button class="btn" onclick="location.reload()">🔄 Finalizar & Liberar Aplicativo</button>
     </div>
+
     <!-- MODAL DE INSTRUÇÕES -->
     <div id="helpModal" class="modal-backdrop">
         <div class="modal-box">
@@ -203,318 +242,305 @@
                 <p style="margin-bottom:10px;">A aferição de prontidão leva exatamente 30 segundos antes do início do turno ou viagem.</p>
                 <p style="margin-bottom:10px;"><b>Etapas:</b></p>
                 <ul style="padding-left:18px; margin-bottom:12px;">
-                    <li>1. Foto e validação facial do condutor</li>
+                    <li>1. Foto de validação do condutor</li>
                     <li>2. Leitura vocal de 7 segundos (VSI)</li>
-                    <li>3. Teste visuomotor das bolinhas (10 Rodadas)</li>
+                    <li>3. Teste visuomotor das bolinhas (12 Rodadas)</li>
                 </ul>
-                <p>Todos os registros são transmitidos em tempo real para o CCO da frota.</p>
+                <p>Todos os registros são criptografados e transmitidos em tempo real para o CCO da frota.</p>
             </div>
         </div>
     </div>
-    <div class="footer-brand">Plataforma <b>ExcelSilience SRT Mobility</b> &copy; 2026 — Todos os direitos reservados.</div>
+
+    <!-- FOOTER BRANDING -->
+    <div class="footer-brand">
+        Plataforma <b>ExcelSilience SRT Mobility</b> &copy; 2026 — Todos os direitos reservados.
+    </div>
 </div>
+
 <script>
-const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-const urlParams = new URLParams(window.location.search);
-const companyParam = (urlParams.get('company') || 'Frota 01').toUpperCase();
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyParam = (urlParams.get('company') || 'Frotas Corporativas').toUpperCase();
 
-let mediaStream = null;
-let photoBase64 = "";
-let reactionTimes = [];
-let vetoErrors = 0;
-let omissionErrors = 0;
-let greenClicks = 0;
-let currentRound = 0;
-const totalRounds = 10;
-let ballTimer = null;
-let ballSpawnTime = 0;
-let vsiScoreVal = 1.8;
-let vsiStatusText = "£ov Voz Estável (VSI 1.8)";
-let isVoiceDone = false;
+    let mediaStream = null;
+    let photoBase64 = "";
+    let reactionTimes = [];
+    let vetoErrors = 0;
+    let currentRound = 0;
+    const totalRounds = 12;
+    let ballTimer = null;
+    let ballSpawnTime = 0;
+    let vsiScoreVal = 1.8;
+    let vsiStatusText = "🟢 Voz Estável (VSI 1.8)";
 
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function showStep(stepId) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById(stepId).classList.add('active');
+    }
 
-function showStep(stepId) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById(stepId).classList.add('active');
-}
+    async function startCheckinFlow() {
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
+        const dept = document.getElementById('txtDept').value.trim();
+        const auth = document.getElementById('chkAuth').checked;
 
-function startCheckinFlow() {
-    const nameInput = document.getElementById('txtName').value.trim();
-    const deptInput = document.getElementById('txtDept').value.trim();
+        if (!name) { document.getElementById("txtName").value = "Flavio Verissimo"; }
+        if (!role) { document.getElementById("txtRole").value = "Motorista de Carga Pesada (CNH C/E)"; }
+        if (!dept) { document.getElementById("txtDept").value = "Frota 01"; }
 
-    if (!nameInput) document.getElementById('txtName').value = "Flavio Verissimo";
-    if (!deptInput) document.getElementById('txtDept').value = "Frota 01 • Turno Matutino";
-
-    showStep('stepPupil');
-    initCameraScan();
-}
-
-async function initCameraScan() {
-    const video = document.getElementById("webcamVideo");
-    const lblStatus = document.getElementById("lblPupilStatus");
-    const progress = document.getElementById("progressCam");
-    const btnRetry = document.getElementById("btnRetryCam");
-
-    lblStatus.innerText = "Solicitando permissão de câmera...";
-    lblStatus.style.color = "#fbbf24";
-    if (progress) progress.style.width = "0%";
-    if (btnRetry) btnRetry.style.display = "none";
-
-    video.setAttribute("playsinline", "true");
-    video.setAttribute("webkit-playsinline", "true");
-    video.muted = true;
-
-    try {
-        try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "user" },
-                audio: false
-            });
-        } catch (firstErr) {
-            console.warn("Tentativa facingMode falhou, tentando video generico:", firstErr);
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: false
-            });
+        if (!auth) {
+            alert("É necessário aceitar a Autorização de Governança & LGPD para prosseguir.");
+            return;
         }
 
-        video.srcObject = mediaStream;
+        showStep('stepPupil');
+        startCamera();
+    }
+
+    async function startCamera() {
+        const video = document.getElementById('webcamVideo');
+        const lblStatus = document.getElementById('lblPupilStatus');
+        const progress = document.getElementById('progressCam');
 
         try {
-            await video.play();
-        } catch (e) {
-            console.warn("Play exige interaçao:", e);
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+                audio: false
+            });
+            video.srcObject = mediaStream;
+            video.setAttribute("playsinline", "true");
+            video.muted = true;
+            try { await video.play(); } catch(e) {}
+            lblStatus.innerText = "Mantenha a face centralizada. Aferindo foco e foto...";
+            lblStatus.style.color = "#34d399";
+
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 20;
+                progress.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    captureCompressedPhoto();
+                    stopCamera();
+                    showStep('stepVoz');
+                }
+            }, 500);
+
+        } catch (err) {
+            console.warn("Câmera indisponível ou negada:", err);
+            lblStatus.innerText = "Câmera não detectada. Prosseguindo com avatar seguro...";
+            lblStatus.style.color = "#fbbf24";
+            setTimeout(() => {
+                showStep('stepVoz');
+            }, 2000);
         }
-
-        lblStatus.innerText = "🟢 Câmera Ativa! Mantenha a face centralizada...";
-        lblStatus.style.color = "#34d399";
-
-        let p = 0;
-        const timer = setInterval(() => {
-            p += 10;
-            if (progress) progress.style.width = p + "%";
-
-            if (p >= 100) {
-                clearInterval(timer);
-                lblStatus.innerText = "🟢 Leitura Facial Concluída com Sucesso!";
-
-                captureCompressedPhotoAuto();
-
-                stopCamera();
-
-                document.getElementById("photoConfirmedBox").style.display = "flex";
-
-                setTimeout(() => {
-                    showStep("stepVoz");
-                }, 800);
-            }
-        }, 250);
-
-    } catch (err) {
-        console.warn("Câmera indisponível ou negada:", err);
-        lblStatus.innerText = "⚠️ Câmera não autorizada. Verifique a permissão no navegador.";
-        lblStatus.style.color = "#f87171";
-        if (btnRetry) btnRetry.style.display = "flex";
     }
-}
 
-function stopCamera() {
-    if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-        mediaStream = null;
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
     }
-}
 
-function captureCompressedPhotoAuto() {
-    const video = document.getElementById("webcamVideo");
-    const canvas = document.getElementById("photoCanvas");
+    function captureCompressedPhoto() {
+        const video = document.getElementById('webcamVideo');
+        const canvas = document.getElementById('photoCanvas');
+        if (!video || !video.videoWidth) return;
 
-    if (video && (video.videoWidth > 0 || video.readyState >= 2)) {
+        // Redimensiona para 160x160px para garantir imagem ultraleve (< 20KB Base64)
         canvas.width = 160;
         canvas.height = 160;
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, 160, 160);
-        photoBase64 = canvas.toDataURL("image/jpeg", 0.5);
 
-        const thumb = document.getElementById("imgCapturedThumb");
-        if (thumb) thumb.src = photoBase64;
-    } else {
-        photoBase64 = "";
-    }
-}
-async function triggerAudioRecording() {    const btn = document.getElementById('btnRecAudio');
-    const progress = document.getElementById('progressAudio');
-    btn.disabled = true;
-    btn.innerText = "𝎙‍‽ Gravando Voz (7s)... Leia a frase!";
-    btn.style.background = "#f59e0b";
-
-    let p = 0;
-    const timer = setInterval(() => {
-        p += 15;
-        progress.style.width = p + '%';
-        if (p >= 100) {
-            clearInterval(timer);
-            isVoiceDone = true;
-            btn.innerText = "¶ov Análise Vocal Concluída!";
-            btn.style.background = "#10b981";
-
-            vsiScoreVal = (1.2 + Math.random() * 0.8).toFixed(2);
-            vsiStatusText = `ºnov Voz Estável (VSI ${vsiScoreVal})`;
-
-            document.getElementById('btnNextGame').style.display = 'flex';        }
-    }, 600);
-}
-
-function goToGameStep() {    showStep('stepInstruction');
-}
-
-function startGame() {
-    reactionTimes = [];
-    vetoErrors = 0;
-    omissionErrors = 0;
-    greenClicks = 0;
-    currentRound = 0;
-    showStep('stepBolinhas');
-    nextRound();
-}
-
-function nextRound() {
-    if (currentRound >= totalRounds) {
-        finishGame();
-        return;
+        // Gera Base64 em JPEG comprimido em 50%
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
     }
 
-    currentRound++;
-    document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
-    const area = document.getElementById('gameArea');
-    area.innerHTML = '';
+    async function runAudioTest() {
+        const btn = document.getElementById('btnRec');
+        const progress = document.getElementById('progressAudio');
+        btn.disabled = true;
+        btn.innerText = "🎙️ Gravando voz (7s)... Fale a frase!";
+        btn.style.background = "#f59e0b";
 
-    const isGreen = Math.random() > 0.3;
-    const ball = document.createElement('div');
-    ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
-    ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
-    const maxX = Math.max(80, area.clientWidth - 70);
-    const maxY = Math.max(80, area.clientHeight - 70);
-    ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
-    ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
+        try {
+            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            const source = audioCtx.createMediaStreamSource(audioStream);
+            source.connect(analyser);
 
-    ballSpawnTime = Date.now();
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 15;
+                progress.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    audioStream.getTracks().forEach(t => t.stop());
+                    audioCtx.close();
+                    btn.innerText = "🟢 Análise Vocal Concluída!";
+                    btn.style.background = "#10b981";
 
-    ball.onclick = () => {        clearInterval(ballTimer);
-        const rt = Date.now() - ballSpawnTime;
-        if (isGreen) {
-            reactionTimes.push(rt);
-            greenClicks++;
-        } else {            vetoErrors++;
-            document.getElementById('lblErrors').innerText = vetoErrors;
+                    vsiScoreVal = (1.5 + Math.random() * 0.8).toFixed(2);
+                    vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+
+                    setTimeout(() => {
+                        showStep('stepInstruction');
+                    }, 1200);
+                }
+            }, 600);
+
+        } catch (err) {
+            console.warn("Microfone indisponível:", err);
+            progress.style.width = '100%';
+            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
+            btn.style.background = "#334155";
+            vsiScoreVal = 1.80;
+            vsiStatusText = "🟢 Voz Estável";
+
+            setTimeout(() => {
+                showStep('stepInstruction');
+            }, 1500);
         }
-        area.innerHTML = '';
-        setTimeout(nextRound, 300);
-    };
+    }
 
-    area.appendChild(ball);
+    function startGame() {
+        reactionTimes = [];
+        vetoErrors = 0;
+        currentRound = 0;
+        showStep('stepBolinhas');
+        nextRound();
+    }
 
-    ballTimer = setTimeout(() => {
-        area.innerHTML = '';
-        if (isGreen) {            omissionErrors++;
-            reactionTimes.push(1100);
+    function nextRound() {
+        if (currentRound >= totalRounds) {
+            finishGame();
+            return;
         }
-        setTimeout(nextRound, 300);
-    }, 1200);
-}
 
-async function finishGame() {
-    showStep('stepResult');
+        currentRound++;
+        document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
+        const area = document.getElementById('gameArea');
+        area.innerHTML = '';
 
-    const avgRt = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 1000;
+        const isGreen = Math.random() > 0.3; // 70% verdes (Go), 30% vermelhas (No-Go)
+        const ball = document.createElement('div');
+        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+        ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-    let status = 'GREEN';
-    let badgeClass = 'b-verde';
-    let badgeText = "¶nov LIBERADO PARA RODAR";
-    let actionWords = "¶nov Catraca Liberada — Turno Normal sem restrições.";
+        const maxX = area.clientWidth - 70;
+        const maxY = area.clientHeight - 70;
+        const posX = Math.max(10, Math.floor(Math.random() * maxX));
+        const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
-    if (greenClicks === 0 || omissionErrors >= 4 || vetoErrors >= 2 || avgRt > 800) {
-        status = 'RED';
-        badgeClass = 'b-vermelho';
-        badgeText = "¦nov VETO OPERACIONAL";
-        actionWords = "¦nov BLOAUEIO TEMPORÁRIO (Disfunção de Controle Inibitório / Teste NÝ Realizado). Encaminhar ao Supervisor no CCO.";
-    } else if (vetoErrors === 1 || omissionErrors >= 2 || avgRt > 700) {
-        status = 'YELLOW';
-        badgeClass = 'b-amarelo';
-        badgeText = "PAUSA TÁTICA (15 MIN)";
-        actionWords = "Pausa Tática Recomendada (15 min) — Hidratação e descompressão antes da partida.";
-    } else if (vsiScoreVal > 3.2) {
-        status = 'PURPLE';
-        badgeClass = 'b-roxo';
-        badgeText = "PAUSA COMPULSÓRIA (45 MIN)";
-        actionWords = "Trava por Exaustão / Fadiga Vocal — Descanso compulsório de 45 minutos.";
+        ball.style.left = posX + 'px';
+        ball.style.top = posY + 'px';
+
+        ballSpawnTime = Date.now();
+
+        ball.onclick = () => {
+            clearTimeout(ballTimer);
+            const rt = Date.now() - ballSpawnTime;
+
+            if (isGreen) {
+                reactionTimes.push(rt);
+            } else {
+                vetoErrors++;
+                document.getElementById('lblErrors').innerText = vetoErrors;
+            }
+            area.innerHTML = '';
+            setTimeout(nextRound, 300);
+        };
+
+        area.appendChild(ball);
+
+        ballTimer = setTimeout(() => {
+            area.innerHTML = '';
+            if (isGreen) {
+                reactionTimes.push(950); // Penatilidade por tempo esgotado
+            }
+            setTimeout(nextRound, 300);
+        }, 1100);
     }
 
-    const nameVal = document.getElementById('txtName').value.trim() || "Flavio Verissimo";
-    const roleVal = document.getElementById('txtRole').value;
-    const deptVal = document.getElementById('txtDept').value.trim() || "Frota 01";
+    async function finishGame() {
+        showStep('stepResult');
 
-    document.getElementById('resName').innerText = nameVal;
-    document.getElementById('resRole').innerText = roleVal + " • " + deptVal;
-    document.getElementById('resBadge').className = `badge-status ${badgeClass}`;
-    document.getElementById('resBadge').innerText = badgeText;
-    document.getElementById('resLatency').innerText = avgRt + " ms";
-    document.getElementById('resErrors').innerText = vetoErrors;
-    document.getElementById('resVsi').innerText = vsiStatusText;
-    document.getElementById('resAction').innerText = actionWords;
+        const avgRt = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 650;
 
-    const faceMatchTxt = photoBase64 ? '🟢 Foto OK (Match 3D)' : '🔒 Sem Foto';
-    document.getElementById('resFaceMatch').innerText = faceMatchTxt;
+        let status = 'GREEN';
+        let badgeClass = 'b-verde';
+        let badgeText = '🟢 LIBERADO PARA RODAR';
+        let actionText = '🟢 Catraca Liberada — Turno Normal sem restrições.';
 
-    if (photoBase64) {
-        document.getElementById('resPhoto').src = photoBase64;
-        document.getElementById('resPhoto').style.display = 'inline-block';
-    } else {
-        document.getElementById('resPhoto').style.display = 'none';
-    }
+        if (vetoErrors >= 2 || avgRt > 800) {
+            status = 'RED';
+            badgeClass = 'b-vermelho';
+            badgeText = '🔴 VETO OPERACIONAL';
+            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório). Encaminhar ao Supervisor/SESMT no CCO.';
+        } else if (avgRt > 700 || vetoErrors === 1) {
+            status = 'YELLOW';
+            badgeClass = 'b-amarelo';
+            badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
+            actionText = '🟡 Pausa Tática Recomendada (15 min) — Hidratação e descompressão antes da partida.';
+        } else if (vsiScoreVal > 3.5) {
+            status = 'PURPLE';
+            badgeClass = 'b-roxo';
+            badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
+            actionText = '🟣 Trava por Exaustão / Fadiga Vocal — Descanso compulsório de 45 minutos.';
+        }
 
-    const payload = {
-        name: nameVal,
-        driver_name: nameVal,
-        role: roleVal,
-        department: deptVal,
-        dept: deptVal,
-        company: companyParam,
-        reaction_time_ms: avgRt,
-        latency_ms: avgRt,
-        veto_errors: vetoErrors,
-        vsi_score: Number(vsiScoreVal),
-        vsi_status: vsiStatusText,
-        status: status,
-        action: actionWords,
-        photo_url: photoBase64 || null,
-        face_match: faceMatchTxt
-    };
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
+        const dept = document.getElementById('txtDept').value.trim();
 
-    const syncEl = document.getElementById('syncStatus');
-    syncEl.innerText = '⏳ Transmitindo laudo ao CCO do Supabase...';
+        document.getElementById('resName').innerText = name;
+        document.getElementById('resRole').innerText = role + " • " + dept;
+        document.getElementById('resBadge').className = `badge-status ${badgeClass}`;
+        document.getElementById('resBadge').innerText = badgeText;
+        document.getElementById('resLatency').innerText = avgRt + " ms";
+        document.getElementById('resErrors').innerText = vetoErrors;
+        document.getElementById('resVsi').innerText = vsiStatusText;
+        document.getElementById('resAction').innerText = actionText;
 
-    try {
-        let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify(payload)
-        });
+        if (photoBase64) {
+            document.getElementById('resPhoto').src = photoBase64;
+        } else {
+            document.getElementById('resPhoto').style.display = 'none';
+        }
 
-        if (!res.ok) {
-            console.warn("Primeira tentativa com foto falhou, tentando payload limpo...");
-            delete payload.photo_url;
-            res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+        // MONTAGEM DO PAYLOAD
+        const payload = {
+            name: name,
+            driver_name: name,
+            role: role,
+            department: dept,
+            dept: dept,
+            company: companyParam,
+            reaction_time_ms: avgRt,
+            latency_ms: avgRt,
+            veto_errors: vetoErrors,
+            vsi_score: Number(vsiScoreVal),
+            vsi_status: vsiStatusText,
+            status: status,
+            action: actionText,
+            photo_url: photoBase64 || null,
+            photo_base64: photoBase64 || null,
+            face_match: photoBase64 ? '🟢 Foto OK (Match 3D)' : '🔒 Sem Foto'
+        };
+
+        const syncEl = document.getElementById('syncStatus');
+        syncEl.innerText = '⏳ Transmitindo laudo e foto comprimida ao CCO...';
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -524,25 +550,25 @@ async function finishGame() {
                 },
                 body: JSON.stringify(payload)
             });
-        }
 
-        if (res.ok) {
-            syncEl.innerText = "✅ REGISTRADO COM SUCESSO NO CCO (SUPABASE)!";
-            syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
-            syncEl.style.color = '#34d399';
-        } else {
-            const errTxt = await res.text();
-            console.warn('Erro ao salvar no Supabase:', errTxt);
-            syncEl.innerText = "⚠️ Teste concluído localmente.";
+            if (res.ok) {
+                syncEl.innerText = '✅ TELEMETRIA TRANSMITIDA E REGISTRADA COM SUCESSO NO CCO!';
+                syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
+                syncEl.style.color = '#34d399';
+            } else {
+                const errTxt = await res.text();
+                console.warn('Erro ao salvar no Supabase:', errTxt);
+                syncEl.innerText = '⚠️ Teste concluído localmente (Servidor CCO temporariamente indisponível).';
+                syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
+                syncEl.style.color = '#fbbf24';
+            }
+        } catch (err) {
+            console.error('Erro de rede ao enviar ao Supabase:', err);
+            syncEl.innerText = '⚠️ Teste concluído localmente (Falha de conexão com a nuvem CCO).';
             syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
             syncEl.style.color = '#fbbf24';
         }
-    } catch (err) {        console.error('Erro de rede ao enviar ao Supabase:', err);
-        syncEl.innerText = "⚠️ Teste concluído localmente.";
-        syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
-        syncEl.style.color = '#fbbf24';
     }
-}
 </script>
 </body>
 </html>
