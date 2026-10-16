@@ -463,6 +463,7 @@
                     vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
 
                     // Salva / Confere VSI de referência
+                    const baselineVsi = localStorage.getItem('srt_baseline_vsi') || "0.37";
                     localStorage.setItem('srt_baseline_vsi', vsiScoreVal);
 
                     setTimeout(() => {
@@ -519,10 +520,12 @@
 
         ballSpawnTime = Date.now();
 
+        let hitProcessed = false;
         function handleBallHit(e) {
+            if (hitProcessed) return;
+            hitProcessed = true;
             if (e) {
-                e.preventDefault();
-                e.stopPropagation();
+                try { e.preventDefault(); e.stopPropagation(); } catch(err){}
             }
             clearTimeout(ballTimer);
             const rt = Date.now() - ballSpawnTime;
