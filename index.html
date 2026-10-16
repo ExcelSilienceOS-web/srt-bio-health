@@ -243,7 +243,7 @@ function startCheckinFlow() {
     const deptInput = document.getElementById('txtDept').value.trim();
 
     if (!nameInput) document.getElementById('txtName').value = "Flavio Verissimo";
-    if (#deptInput) document.getElementById('txtDept').value = "Frota 01';
+    if (!deptInput) document.getElementById('txtDept').value = "Frota 01 • Turno Matutino";
 
     showStep('stepPupil');
     initCamera();
@@ -360,7 +360,7 @@ function nextRound() {
     ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
     const maxX = Math.max(80, area.clientWidth - 70);
     const maxY = Math.max(80, area.clientHeight - 70);
-    ball.style.left = Math.max(10, Math.floor(Math.random() * maxX*) + 'px';
+    ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
     ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
 
     ballSpawnTime = Date.now();
@@ -406,13 +406,13 @@ async function finishGame() {
     } else if (vetoErrors === 1 || omissionErrors >= 2 || avgRt > 700) {
         status = 'YELLOW';
         badgeClass = 'b-amarelo';
-        badgeText = "¦nov PAUSA TÁTICA (15 MIN)";
-        actionWords = "¦nov Pausa Tática Recomendada (15 min) — Hidratação e descompressão antes da partida.";
+        badgeText = "PAUSA TÁTICA (15 MIN)";
+        actionWords = "Pausa Tática Recomendada (15 min) — Hidratação e descompressão antes da partida.";
     } else if (vsiScoreVal > 3.2) {
         status = 'PURPLE';
         badgeClass = 'b-roxo';
-        badgeText = "¦nov PAUSA COMPULSCHA (45 MIN)";
-        actionWords = "¶nov Trava por Exaustão / Fadiga Vocal — Descanso compulsório de 45 minutos.";
+        badgeText = "PAUSA COMPULSÓRIA (45 MIN)";
+        actionWords = "Trava por Exaustão / Fadiga Vocal — Descanso compulsório de 45 minutos.";
     }
 
     const nameVal = document.getElementById('txtName').value.trim() || "Flavio Verissimo";
@@ -425,18 +425,17 @@ async function finishGame() {
     document.getElementById('resBadge').innerText = badgeText;
     document.getElementById('resLatency').innerText = avgRt + " ms";
     document.getElementById('resErrors').innerText = vetoErrors;
-    document.getElementById('resVói').innerText = vsiStatusText;
+    document.getElementById('resVsi').innerText = vsiStatusText;
     document.getElementById('resAction').innerText = actionWords;
 
-    const faceMatchTxt = photoBase64 ? 'ºmov Foto OK (Match 3D)' : 'ڤ
- Sem Foto';
+    const faceMatchTxt = photoBase64 ? '🟢 Foto OK (Match 3D)' : '🔒 Sem Foto';
     document.getElementById('resFaceMatch').innerText = faceMatchTxt;
 
     if (photoBase64) {
         document.getElementById('resPhoto').src = photoBase64;
         document.getElementById('resPhoto').style.display = 'inline-block';
     } else {
-        document.getElementById('checkPhoto').style.display = 'none';
+        document.getElementById('resPhoto').style.display = 'none';
     }
 
     const payload = {
@@ -458,7 +457,7 @@ async function finishGame() {
     };
 
     const syncEl = document.getElementById('syncStatus');
-    syncEl.innerText = '±̶ Transmitindo laudo ao CCO do Supabase...';
+    syncEl.innerText = '⏳ Transmitindo laudo ao CCO do Supabase...';
 
     try {
         let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
@@ -466,7 +465,7 @@ async function finishGame() {
             headers: {
                 'Content-Type': 'application/json',
                 'apikey': SUPABASE_KEY,
-                'Authorization': bBearer ${SUPABASE_KEY}`,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
                 'Prefer': 'return=minimal'
             },
             body: JSON.stringify(payload)
@@ -488,18 +487,18 @@ async function finishGame() {
         }
 
         if (res.ok) {
-            syncEl.innerText = "¶nov REGISTRADO COM SUCESSO NO CCO (SUPABASE)!";
+            syncEl.innerText = "✅ REGISTRADO COM SUCESSO NO CCO (SUPABASE)!";
             syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
             syncEl.style.color = '#34d399';
         } else {
             const errTxt = await res.text();
             console.warn('Erro ao salvar no Supabase:', errTxt);
-            syncEl.innerText = "¶nov Teste concluíido localmente.";
+            syncEl.innerText = "⚠️ Teste concluído localmente.";
             syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
             syncEl.style.color = '#fbbf24';
         }
     } catch (err) {        console.error('Erro de rede ao enviar ao Supabase:', err);
-        syncEl.innerText = "¾nov Teste concluído localmente.";
+        syncEl.innerText = "⚠️ Teste concluído localmente.";
         syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
         syncEl.style.color = '#fbbf24';
     }
