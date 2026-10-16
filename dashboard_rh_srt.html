@@ -757,9 +757,32 @@
         // ESTADO GLOBAL DE DADOS
         let currentPeriod = 'WEEK';
         let rawCheckinsData = [];
-        let setoresCadastrados = ["Operações / Logística", "Tecnologia / TI", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
+        let setoresCadastrados = ["TI", "Operações / Logística", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
         let isDemoMode = false;
         let trendChartInstance = null;
+
+        function normalizarNomeSetor(secRaw) {
+            if (!secRaw) return "TI";
+            let s = secRaw.toString().trim();
+            let sUpper = s.toUpperCase();
+            if (sUpper === "TI" || sUpper.includes("TECNOLOGIA") || sUpper.includes("INFORMÁTICA") || sUpper.includes("INFORMATICA") || sUpper.includes("DEPT TI")) {
+                return "TI";
+            }
+            if (sUpper.includes("OPERAÇ") || sUpper.includes("LOGÍSTICA") || sUpper.includes("LOGISTICA")) {
+                return "Operações / Logística";
+            }
+            if (sUpper.includes("COMERCIAL") || sUpper.includes("VENDAS")) {
+                return "Comercial / Vendas";
+            }
+            if (sUpper.includes("CONSULTORIA") || sUpper.includes("DHO")) {
+                return "Consultoria / DHO";
+            }
+            if (sUpper.includes("RECURSOS HUMANOS") || sUpper.includes("RH")) {
+                return "Recursos Humanos";
+            }
+            return s;
+        }
+
 
 
         const isMasterMode = (urlParams.get('master') === 'true' || urlParams.get('admin') === 'true' || urlParams.get('key') === 'master');
@@ -769,7 +792,7 @@
                 if (btnInd) btnInd.style.display = 'inline-block';
             }
 
-            document.getElementById('companyBadgeLabel').innerText = currentCompany;
+            document.getElementById('companyBadgeLabel').innerText = (currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany) ? 'GROU' : currentCompany;
             initSetoresEGenerators();
             fetchSupabaseData(); // Carrega automaticamente os dados reais do Supabase na inicialização
         });
@@ -893,10 +916,15 @@
                         let dtObj = new Date(rawDt);
                         if (isNaN(dtObj.getTime())) dtObj = new Date();
 
+                        let normSector = normalizarNomeSetor(sec);
+                        if (!setoresCadastrados.includes(normSector)) {
+                            setoresCadastrados.push(normSector);
+                        }
+
                         rawCheckinsData.push({
                             id: item.id || (2000 + idx),
                             company: emp,
-                            sector: sec.toString().trim(),
+                            sector: normSector,
                             latency_ms: Number(lat),
                             veto_errors: Number(errs),
                             vsi_score: Number(vsiVal),
@@ -935,6 +963,20 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
+                // Filtro de Empresa (Company)
+                if (currentCompany !== 'TODAS' && currentCompany !== 'ALL' && currentCompany !== '') {
+                    const itemCompany = (item.company || '').toString().toUpperCase().trim();
+                    const targetCompany = currentCompany.toUpperCase().trim();
+                    if (itemCompany !== targetCompany && !itemCompany.includes(targetCompany) && !targetCompany.includes(itemCompany)) {
+                        // Se for corporativo anônimo ou grou, aceita
+                        if (targetCompany === 'GROU' && (itemCompany.includes('GROU') || itemCompany.includes('CORPORATIVO') || itemCompany === '')) {
+                            // ok
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+
                 const d = new Date(item.created_at);
                 if (isNaN(d.getTime())) return true;
                 const diffDias = (agora - d) / (1000 * 3600 * 24);
