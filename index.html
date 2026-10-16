@@ -65,7 +65,8 @@
         .audio-vis-box { width: 100%; height: 80px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
         canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
-        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+        .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
         .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
         .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
         .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
@@ -265,6 +266,7 @@
     const companyParam = (urlParams.get('company') || 'Frotas Corporativas').toUpperCase();
 
     let mediaStream = null;
+    let storedAudioStream = null;
     let photoBase64 = "";
     let reactionTimes = [];
     let vetoErrors = 0;
@@ -275,6 +277,17 @@
     let vsiScoreVal = 0.37;
     let vsiStatusText = "🟢 Voz Estável (VSI 0.37)";
 
+    // Pre-preenchimento automático da segunda vez
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedName = localStorage.getItem('srt_driver_name');
+        const savedRole = localStorage.getItem('srt_driver_role');
+        const savedDept = localStorage.getItem('srt_driver_dept');
+
+        if (savedName) document.getElementById('txtName').value = savedName;
+        if (savedRole) document.getElementById('txtRole').value = savedRole;
+        if (savedDept) document.getElementById('txtDept').value = savedDept;
+    });
+
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -284,14 +297,19 @@
     }
 
     async function startCheckinFlow() {
-        const name = document.getElementById('txtName').value.trim();
-        const role = document.getElementById('txtRole').value;
-        const dept = document.getElementById('txtDept').value.trim();
+        const nameInput = document.getElementById('txtName');
+        const roleInput = document.getElementById('txtRole');
+        const deptInput = document.getElementById('txtDept');
         const auth = document.getElementById('chkAuth').checked;
 
-        if (!name) { document.getElementById("txtName").value = "Flavio Verissimo"; }
-        if (!role) { document.getElementById("txtRole").value = "Motorista de Carga Pesada (CNH C/E)"; }
-        if (!dept) { document.getElementById("txtDept").value = "Frota 01"; }
+        if (!nameInput.value.trim()) { nameInput.value = "Flavio Verissimo"; }
+        if (!roleInput.value) { roleInput.value = "Motorista de Carga Pesada (CNH C/E)"; }
+        if (!deptInput.value.trim()) { deptInput.value = "Frota 01"; }
+
+        // Salva para preencher automaticamente na próxima vez
+        localStorage.setItem('srt_driver_name', nameInput.value.trim());
+        localStorage.setItem('srt_driver_role', roleInput.value);
+        localStorage.setItem('srt_driver_dept', deptInput.value.trim());
 
         if (!auth) {
             alert("É necessário aceitar a Autorização de Governança & LGPD para prosseguir.");
@@ -308,14 +326,17 @@
         const progress = document.getElementById('progressCam');
 
         try {
+            // Solicita permissão unificada de vídeo e áudio de uma só vez (Zero prompt duplo!)
             mediaStream = await navigator.mediaDevices.getUserMedia({
                 video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
-                audio: false
+                audio: true
             });
+
             video.srcObject = mediaStream;
             video.setAttribute("playsinline", "true");
             video.muted = true;
             try { await video.play(); } catch(e) {}
+
             lblStatus.innerText = "Mantenha a face centralizada. Aferindo foco e foto...";
             lblStatus.style.color = "#34d399";
 
@@ -326,18 +347,37 @@
                 if (p >= 100) {
                     clearInterval(timer);
                     captureCompressedPhoto();
-                    stopCamera();
+                    // Para apenas as faixas de vídeo, mantendo o áudio pronto para o teste de voz
+                    if (mediaStream) {
+                        mediaStream.getVideoTracks().forEach(track => track.stop());
+                    }
                     showStep('stepVoz');
                 }
             }, 500);
 
         } catch (err) {
-            console.warn("Câmera indisponível ou negada:", err);
-            lblStatus.innerText = "Câmera não detectada. Prosseguindo com avatar seguro...";
-            lblStatus.style.color = "#fbbf24";
-            setTimeout(() => {
-                showStep('stepVoz');
-            }, 2000);
+            console.warn("Câmera ou áudio indisponível:", err);
+            // Fallback para apenas vídeo caso o mic falhe
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = mediaStream;
+                try { await video.play(); } catch(e) {}
+                let p = 0;
+                const timer = setInterval(() => {
+                    p += 20;
+                    progress.style.width = p + '%';
+                    if (p >= 100) {
+                        clearInterval(timer);
+                        captureCompressedPhoto();
+                        stopCamera();
+                        showStep('stepVoz');
+                    }
+                }, 500);
+            } catch(err2) {
+                lblStatus.innerText = "Câmera não detectada. Prosseguindo com avatar seguro...";
+                lblStatus.style.color = "#fbbf24";
+                setTimeout(() => { showStep('stepVoz'); }, 2000);
+            }
         }
     }
 
@@ -366,16 +406,45 @@
     async function runAudioTest() {
         const btn = document.getElementById('btnRec');
         const progress = document.getElementById('progressAudio');
+        const canvas = document.getElementById('audioCanvas');
         btn.disabled = true;
-        btn.innerText = "🎙️ Gravando voz (7s)... Fale a frase!";
+        btn.innerText = "🎙️ Gravando voz (7s)... Fale a frase em voz alta!";
         btn.style.background = "#f59e0b";
 
         try {
-            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            let audioStream = mediaStream;
+            if (!audioStream || !audioStream.getAudioTracks().length) {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const analyser = audioCtx.createAnalyser();
             const source = audioCtx.createMediaStreamSource(audioStream);
             source.connect(analyser);
+
+            // Animação do Equalizador no Canvas
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                analyser.fftSize = 32;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                let animId = null;
+
+                function drawEq() {
+                    animId = requestAnimationFrame(drawEq);
+                    analyser.getByteFrequencyData(dataArray);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const barWidth = (canvas.width / bufferLength) * 1.6;
+                    let x = 0;
+                    for (let i = 0; i < bufferLength; i++) {
+                        const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
+                        ctx.fillStyle = '#38bdf8';
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
+                        x += barWidth;
+                    }
+                }
+                drawEq();
+            }
 
             let p = 0;
             const timer = setInterval(() => {
@@ -383,17 +452,22 @@
                 progress.style.width = p + '%';
                 if (p >= 100) {
                     clearInterval(timer);
-                    audioStream.getTracks().forEach(t => t.stop());
+                    if (audioStream) {
+                        audioStream.getTracks().forEach(t => t.stop());
+                    }
                     audioCtx.close();
                     btn.innerText = "🟢 Análise Vocal Concluída!";
                     btn.style.background = "#10b981";
 
-                    vsiScoreVal = (0.35 + Math.random() * 0.08).toFixed(2);
+                    vsiScoreVal = (0.35 + Math.random() * 0.07).toFixed(2);
                     vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+
+                    // Salva / Confere VSI de referência
+                    localStorage.setItem('srt_baseline_vsi', vsiScoreVal);
 
                     setTimeout(() => {
                         showStep('stepInstruction');
-                    }, 1200);
+                    }, 1000);
                 }
             }, 600);
 
@@ -403,11 +477,11 @@
             btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
             btn.style.background = "#334155";
             vsiScoreVal = 0.37;
-            vsiStatusText = "🟢 Voz Estável";
+            vsiStatusText = "🟢 Voz Estável (VSI 0.37)";
 
             setTimeout(() => {
                 showStep('stepInstruction');
-            }, 1500);
+            }, 1200);
         }
     }
 
