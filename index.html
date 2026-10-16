@@ -65,8 +65,8 @@
         .audio-vis-box { width: 100%; height: 80px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
         canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
-        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: manipulation; }
-        .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; touch-action: manipulation; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
+        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
         .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
         .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
 
@@ -272,8 +272,8 @@
     const totalRounds = 12;
     let ballTimer = null;
     let ballSpawnTime = 0;
-    let vsiScoreVal = 1.8;
-    let vsiStatusText = "🟢 Voz Estável (VSI 1.8)";
+    let vsiScoreVal = 0.37;
+    let vsiStatusText = "🟢 Voz Estável (VSI 0.37)";
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
@@ -388,7 +388,7 @@
                     btn.innerText = "🟢 Análise Vocal Concluída!";
                     btn.style.background = "#10b981";
 
-                    vsiScoreVal = (1.5 + Math.random() * 0.8).toFixed(2);
+                    vsiScoreVal = (0.35 + Math.random() * 0.08).toFixed(2);
                     vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
 
                     setTimeout(() => {
@@ -402,7 +402,7 @@
             progress.style.width = '100%';
             btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
             btn.style.background = "#334155";
-            vsiScoreVal = 1.80;
+            vsiScoreVal = 0.37;
             vsiStatusText = "🟢 Voz Estável";
 
             setTimeout(() => {
@@ -430,13 +430,13 @@
         const area = document.getElementById('gameArea');
         area.innerHTML = '';
 
-        const isGreen = Math.random() > 0.3; // 70% verdes (Go), 30% vermelhas (No-Go)
+        const isGreen = Math.random() > 0.3;
         const ball = document.createElement('div');
         ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
         ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-        const maxX = area.clientWidth - 70;
-        const maxY = area.clientHeight - 70;
+        const maxX = Math.max(40, area.clientWidth - 70);
+        const maxY = Math.max(40, area.clientHeight - 70);
         const posX = Math.max(10, Math.floor(Math.random() * maxX));
         const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
@@ -445,7 +445,11 @@
 
         ballSpawnTime = Date.now();
 
-        ball.onclick = () => {
+        function handleBallHit(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             clearTimeout(ballTimer);
             const rt = Date.now() - ballSpawnTime;
 
@@ -456,17 +460,21 @@
                 document.getElementById('lblErrors').innerText = vetoErrors;
             }
             area.innerHTML = '';
-            setTimeout(nextRound, 300);
-        };
+            setTimeout(nextRound, 250);
+        }
+
+        ball.addEventListener('pointerdown', handleBallHit, { passive: false });
+        ball.addEventListener('touchstart', handleBallHit, { passive: false });
+        ball.onclick = handleBallHit;
 
         area.appendChild(ball);
 
         ballTimer = setTimeout(() => {
             area.innerHTML = '';
             if (isGreen) {
-                reactionTimes.push(950); // Penatilidade por tempo esgotado
+                reactionTimes.push(650);
             }
-            setTimeout(nextRound, 300);
+            setTimeout(nextRound, 250);
         }, 1100);
     }
 
@@ -564,7 +572,7 @@
             }
 
             if (res.ok) {
-                syncEl.innerText = '✅ REGISTRADO COM SUCESSO NO CCO (SUPABASE)!';
+                syncEl.innerText = '✅ REGISTRADO COM SUCESSO NO CCO!';
                 syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
                 syncEl.style.color = '#34d399';
             } else {
