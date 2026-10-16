@@ -1,3 +1,5 @@
+---
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -123,7 +125,7 @@
             <video id="webcamVideo" class="camera-video" autoplay playsinline muted></video>
             <div class="scan-line"></div>
             <div class="eye-target"><div class="eye-pupil"></div></div>
-            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Iniciando câmera...</span>
+            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Solicitando permissão da câmera...</span>
         </div>
         <div id="photoConfirmedBox" class="photo-preview-box" style="display:none;">
             <img id="imgCapturedThumb" src="" class="photo-preview-thumb" alt="Foto">
@@ -134,7 +136,9 @@
         </div>
         <button id="btnCapPhoto" class="btn btn-green" onclick="doCapturePhoto()">📸 Capturar Foto & Validar Rosto</button>
         <button id="btnNextVoz" class="btn" style="display:none;" onclick="goToVoiceStep()">Avançar para Análise de Voz ➔</button>
-        <button class="btn btn-secondary" onclick="skipCameraAndGoVoice()">⚠️ Continuar sem Câmera</button>
+        <input type="file" id="nativeCamInput" accept="image/*" capture="user" style="display:none;" onchange="handleNativeCamFile(this)">
+        <button id="btnNativeCam" class="btn btn-secondary" onclick="document.getElementById('nativeCamInput').click()">📷 Tirar Foto com Câmera do Celular</button>
+        <button class="btn btn-secondary" style="margin-top:6px;" onclick="skipCameraAndGoVoice()">⚠️ Continuar sem Foto</button>
         <canvas id="photoCanvas" width="160" height="160" style="display:none;"></canvas>
     </div>
     <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
@@ -252,19 +256,67 @@ function startCheckinFlow() {
 async function initCamera() {
     const video = document.getElementById('webcamVideo');
     const lblStatus = document.getElementById('lblPupilStatus');
+    lblStatus.innerText = "Solicitando acesso à câmera...";
+    lblStatus.style.color = "#fbbf24";
 
-    try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: "user" },
-            audio: false
-        });
-        video.srcObject = mediaStream;
-        lblStatus.innerText = "Câmera Ativa. Rosto detectado!";
-        lblStatus.style.color = "#34d399";
-    } catch (err) {
-        console.warn("Câmera indisponível:", err);
-        lblStatus.innerText = "Câmera indisponível. Você pode prosseguir sem foto.";
+    const constraintOptions = [
+        { video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
+        { video: { facingMode: "user" }, audio: false },
+        { video: true, audio: false }
+    ];
+
+    mediaStream = null;
+    for (let opt of constraintOptions) {
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia(opt);
+            if (mediaStream) break;
+        } catch (e) {
+            console.warn("Opção de câmera falhou:", e);
+        }
+    }
+
+    if (mediaStream && video) {
+        try {
+            video.srcObject = mediaStream;
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('muted', 'true');
+            await video.play();
+            lblStatus.innerText = "🟢 Câmera Ativa! Centralize o rosto.";
+            lblStatus.style.color = "#34d399";
+        } catch (playErr) {
+            console.warn("Erro ao iniciar reprodução de vídeo:", playErr);
+            lblStatus.innerText = "Câmera conectada. Clique em Capturar Foto.";
+            lblStatus.style.color = "#34d399";
+        }
+    } else {
+        lblStatus.innerText = "Câmera bloqueada. Use o botão abaixo de Câmera do Celular.";
         lblStatus.style.color = "#fbbf24";
+    }
+}
+
+function handleNativeCamFile(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.getElementById('photoCanvas');
+                canvas.width = 160;
+                canvas.height = 160;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, 160, 160);
+                photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                document.getElementById('imgCapturedThumb').src = photoBase64;
+                document.getElementById('photoConfirmedBox').style.display = 'flex';
+                document.getElementById('btnCapPhoto').style.display = 'none';
+                document.getElementById('btnNativeCam').style.display = 'none';
+                document.getElementById('btnNextVoz').style.display = 'flex';
+                document.getElementById('lblPupilStatus').innerText = "🟢 Foto tirada via Câmera do Celular!";
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 }
 
