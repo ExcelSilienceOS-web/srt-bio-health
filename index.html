@@ -354,13 +354,13 @@
         if (!video || !video.videoWidth) return;
 
         // Redimensiona para 160x160px para garantir imagem ultraleve (< 20KB Base64)
-        canvas.width = 160;
-        canvas.height = 160;
+        canvas.width = 120;
+        canvas.height = 120;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, 160, 160);
+        ctx.drawImage(video, 0, 0, 120, 120);
 
         // Gera Base64 em JPEG comprimido em 50%
-        photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.35);
     }
 
     async function runAudioTest() {
@@ -473,7 +473,8 @@
     async function finishGame() {
         showStep('stepResult');
 
-        const avgRt = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 650;
+        const validGreenTimes = reactionTimes.filter(t => t < 800);
+        const avgRt = validGreenTimes.length > 0 ? Math.round(validGreenTimes.reduce((a, b) => a + b, 0) / validGreenTimes.length) : (reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 450);
 
         let status = 'GREEN';
         let badgeClass = 'b-verde';
@@ -516,31 +517,26 @@
             document.getElementById('resPhoto').style.display = 'none';
         }
 
-        // MONTAGEM DO PAYLOAD
+        // PAYLOAD COMPATÍVEL COM SRT_CHECKINS
         const payload = {
             name: name,
-            driver_name: name,
             role: role,
             department: dept,
-            dept: dept,
             company: companyParam,
             reaction_time_ms: avgRt,
-            latency_ms: avgRt,
             veto_errors: vetoErrors,
             vsi_score: Number(vsiScoreVal),
             vsi_status: vsiStatusText,
             status: status,
             action: actionText,
-            photo_url: photoBase64 || null,
-            photo_base64: photoBase64 || null,
-            face_match: photoBase64 ? '🟢 Foto OK (Match 3D)' : '🔒 Sem Foto'
+            photo_url: photoBase64 || null
         };
 
         const syncEl = document.getElementById('syncStatus');
         syncEl.innerText = '⏳ Transmitindo laudo e foto comprimida ao CCO...';
 
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -551,20 +547,36 @@
                 body: JSON.stringify(payload)
             });
 
+            if (!res.ok) {
+                console.warn("Primeira tentativa com foto falhou, tentando payload limpo sem foto...");
+                const cleanPayload = { ...payload };
+                delete cleanPayload.photo_url;
+                res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(cleanPayload)
+                });
+            }
+
             if (res.ok) {
-                syncEl.innerText = '✅ TELEMETRIA TRANSMITIDA E REGISTRADA COM SUCESSO NO CCO!';
+                syncEl.innerText = '✅ REGISTRADO COM SUCESSO NO CCO (SUPABASE)!';
                 syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
                 syncEl.style.color = '#34d399';
             } else {
                 const errTxt = await res.text();
                 console.warn('Erro ao salvar no Supabase:', errTxt);
-                syncEl.innerText = '⚠️ Teste concluído localmente (Servidor CCO temporariamente indisponível).';
+                syncEl.innerText = '⚠️ Teste concluído localmente (Erro ao gravar no Supabase).';
                 syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
                 syncEl.style.color = '#fbbf24';
             }
         } catch (err) {
             console.error('Erro de rede ao enviar ao Supabase:', err);
-            syncEl.innerText = '⚠️ Teste concluído localmente (Falha de conexão com a nuvem CCO).';
+            syncEl.innerText = '⚠️ Teste concluído localmente (Verifique sua conexão).';
             syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
             syncEl.style.color = '#fbbf24';
         }
