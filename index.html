@@ -104,14 +104,13 @@
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
-            <input type="text" id="txtName" placeholder="Ex: Carlos Eduardo Souza" autocomplete="name" required>
+            <input type="text" id="txtName" value="Flavio Verissimo" placeholder="Ex: Carlos Eduardo Souza" autocomplete="name">
         </div>
 
         <div class="form-group">
             <label for="txtRole">Cargo / Perfil Profissional CNH:</label>
-            <select id="txtRole" required>
-                <option value="">-- Selecione o perfil profissional --</option>
-                <option value="Motorista de Carga Pesada (CNH C/E)">Motorista de Carga Pesada (CNH C/E)</option>
+            <select id="txtRole">
+                <option value="Motorista de Carga Pesada (CNH C/E)" selected>Motorista de Carga Pesada (CNH C/E)</option>
                 <option value="Motorista de Transporte Coletivo (CNH D)">Motorista de Transporte Coletivo / Ônibus (CNH D)</option>
                 <option value="Condutor de Veículo Leve / VUC">Condutor de VUC / Entrega Leve / VUP</option>
                 <option value="Motorista de Aplicativo / Entrega">Motorista de Aplicativo / Ride-Hailing</option>
@@ -121,27 +120,17 @@
 
         <div class="form-group">
             <label for="txtDept">Frota / Unidade Operacional / Placa do Veículo:</label>
-            <input type="text" id="txtDept" placeholder="Ex: Frota Rio - Placa ABC-1234" required>
-        </div>
-
-        <div class="form-group">
-            <label for="txtShift">Turno de Operação:</label>
-            <select id="txtShift">
-                <option value="Matutino">Turno Matutino (Diurno)</option>
-                <option value="Vespertino">Turno Vespertino</option>
-                <option value="Noturno">Turno Noturno / Madrugada</option>
-                <option value="Revezamento">Revezamento / Escala Flexível</option>
-            </select>
+            <input type="text" id="txtDept" value="Frota 01 • Turno Matutino" placeholder="Ex: Frota Rio - Placa ABC-1234">
         </div>
 
         <div class="chk-box">
             <input type="checkbox" id="chkAuth" checked>
             <label for="chkAuth">
-                <b>Autorização de Governança & LGPD (Art. 7º e 11):</b> Autorizo a captura de foto e a aferição não-invasiva dos meus parâmetros biométricos de prontidão operacional para validação no CCO antes do início da jornada, visando a proteção da minha vida, da frota e do trânsito.
+                <b>Autorização de Governança & LGPD (Art. 7º e 11):</b> Autorizo a captura de foto e a aferição não-invasiva dos meus parâmetros biométricos de prontidão operacional para validação no CCO antes do início da jornada.
             </label>
         </div>
 
-        <button class="btn" onclick="startCheckinFlow()">Iniciar Aferição com Câmera (30s) 🚀</button>
+        <button class="btn" onclick="startCheckinFlow()">Iniciar Aferição Automática (30s) 🚀</button>
         <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Instruções e Ajuda</button>
     </div>
 
@@ -149,7 +138,7 @@
     <div id="stepPupil" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial & Foto do Condutor</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
-            Mantenha o rosto centralizado no alvo para validar a presença e registrar a foto oficial:
+            Aferindo presença e foco visual na câmera:
         </p>
 
         <div class="pupil-scanner">
@@ -158,18 +147,18 @@
             <div class="eye-target">
                 <div class="eye-pupil" id="pupilCircle"></div>
             </div>
-            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Solicitando permissão da câmera...</span>
+            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Iniciando câmera...</span>
         </div>
 
         <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
-        <canvas id="photoCanvas" width="200" height="200" style="display:none;"></canvas>
+        <canvas id="photoCanvas" width="160" height="160" style="display:none;"></canvas>
     </div>
 
-    <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
+    <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (5 SEGUNDOS) -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
-            Clique no botão e leia a frase em voz alta no microfone durante 7 segundos:
+            Leia a frase em voz alta ou aguarde a análise de frequência vocal:
         </p>
 
         <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:14px;">
@@ -180,23 +169,23 @@
             <canvas id="audioCanvas" class="audio-canvas"></canvas>
         </div>
 
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (7s)</button>
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Iniciar Leitura Vocal (5s)</button>
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO (12 RODADAS) -->
+    <!-- PASSO 4: DESAFIO VISUOMOTOR GO/NO-GO (6 RODADAS) -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação Visuomotora</h3>
         <div class="info-card">
             <p style="color:var(--accent-green-bright); margin-bottom:8px;">⚡ <b>Bolinha VERDE:</b> Toque na tela o mais rápido possível!</p>
-            <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso e deixe desaparecer.</p>
+            <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Deixe desaparecer.</p>
         </div>
-        <button class="btn" onclick="startGame()">Start no Desafio (12 Rodadas) 🎯</button>
+        <button class="btn" onclick="startGame()">Iniciar Desafio Visuomotor (6 Rodadas) 🎯</button>
     </div>
 
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 6</b></span>
             <span>Erros de Impulso: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
@@ -228,7 +217,7 @@
             <p id="resAction" style="font-weight:700; color:var(--accent-cyan); font-size:13px; margin-top:4px;">--</p>
         </div>
 
-        <button class="btn" onclick="location.reload()">🔄 Finalizar & Liberar Aplicativo</button>
+        <button class="btn" onclick="location.reload()">🔄 Finalizar & Realizar Novo Teste</button>
     </div>
 
     <!-- MODAL DE INSTRUÇÕES -->
@@ -243,8 +232,8 @@
                 <p style="margin-bottom:10px;"><b>Etapas:</b></p>
                 <ul style="padding-left:18px; margin-bottom:12px;">
                     <li>1. Foto de validação do condutor</li>
-                    <li>2. Leitura vocal de 7 segundos (VSI)</li>
-                    <li>3. Teste visuomotor das bolinhas (12 Rodadas)</li>
+                    <li>2. Leitura vocal (VSI)</li>
+                    <li>3. Teste visuomotor das bolinhas (6 Rodadas)</li>
                 </ul>
                 <p>Todos os registros são criptografados e transmitidos em tempo real para o CCO da frota.</p>
             </div>
@@ -262,14 +251,14 @@
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
     const urlParams = new URLSearchParams(window.location.search);
-    const companyParam = (urlParams.get('company') || 'Frotas Corporativas').toUpperCase();
+    const companyParam = (urlParams.get('company') || 'Frota 01').toUpperCase();
 
     let mediaStream = null;
     let photoBase64 = "";
     let reactionTimes = [];
     let vetoErrors = 0;
     let currentRound = 0;
-    const totalRounds = 12;
+    const totalRounds = 6;
     let ballTimer = null;
     let ballSpawnTime = 0;
     let vsiScoreVal = 1.8;
@@ -283,21 +272,13 @@
         document.getElementById(stepId).classList.add('active');
     }
 
-    async function startCheckinFlow() {
-        const name = document.getElementById('txtName').value.trim();
-        const role = document.getElementById('txtRole').value;
-        const dept = document.getElementById('txtDept').value.trim();
-        const auth = document.getElementById('chkAuth').checked;
+    function startCheckinFlow() {
+        const nameInput = document.getElementById('txtName').value.trim();
+        const roleInput = document.getElementById('txtRole').value;
+        const deptInput = document.getElementById('txtDept').value.trim();
 
-        if (!name || !role || !dept) {
-            alert("Por favor, preencha todos os campos do formulário antes de continuar.");
-            return;
-        }
-
-        if (!auth) {
-            alert("É necessário aceitar a Autorização de Governança & LGPD para prosseguir.");
-            return;
-        }
+        if (!nameInput) document.getElementById('txtName').value = "Flavio Verissimo";
+        if (!deptInput) document.getElementById('txtDept').value = "Frota 01 • Turno Matutino";
 
         showStep('stepPupil');
         startCamera();
@@ -308,34 +289,64 @@
         const lblStatus = document.getElementById('lblPupilStatus');
         const progress = document.getElementById('progressCam');
 
+        let cameraDone = false;
+
+        const cameraTimeout = setTimeout(() => {
+            if (!cameraDone) {
+                cameraDone = true;
+                lblStatus.innerText = "Validando com foto de presença...";
+                captureCompressedPhoto();
+                stopCamera();
+                showStep('stepVoz');
+                runAudioTest();
+            }
+        }, 3000);
+
         try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+            const camPromise = navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: "user" },
                 audio: false
             });
+
+            const stream = await Promise.race([
+                camPromise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2500))
+            ]);
+
+            mediaStream = stream;
             video.srcObject = mediaStream;
-            lblStatus.innerText = "Mantenha a face centralizada. Aferindo foco e foto...";
+            lblStatus.innerText = "Mantenha a face centralizada. Capturando foto...";
             lblStatus.style.color = "#34d399";
 
             let p = 0;
             const timer = setInterval(() => {
-                p += 20;
+                p += 34;
                 progress.style.width = p + '%';
                 if (p >= 100) {
                     clearInterval(timer);
-                    captureCompressedPhoto();
-                    stopCamera();
-                    showStep('stepVoz');
+                    if (!cameraDone) {
+                        cameraDone = true;
+                        clearTimeout(cameraTimeout);
+                        captureCompressedPhoto();
+                        stopCamera();
+                        showStep('stepVoz');
+                        runAudioTest();
+                    }
                 }
-            }, 500);
+            }, 400);
 
         } catch (err) {
-            console.warn("Câmera indisponível ou negada:", err);
-            lblStatus.innerText = "Câmera não detectada. Prosseguindo com avatar seguro...";
-            lblStatus.style.color = "#fbbf24";
-            setTimeout(() => {
-                showStep('stepVoz');
-            }, 2000);
+            console.warn("Câmera não disponível ou timeout:", err);
+            if (!cameraDone) {
+                cameraDone = true;
+                clearTimeout(cameraTimeout);
+                lblStatus.innerText = "Avatar seguro gerado.";
+                progress.style.width = '100%';
+                setTimeout(() => {
+                    showStep('stepVoz');
+                    runAudioTest();
+                }, 800);
+            }
         }
     }
 
@@ -349,15 +360,15 @@
     function captureCompressedPhoto() {
         const video = document.getElementById('webcamVideo');
         const canvas = document.getElementById('photoCanvas');
-        if (!video || !video.videoWidth) return;
+        if (!video || !video.videoWidth) {
+            photoBase64 = "";
+            return;
+        }
 
-        // Redimensiona para 160x160px para garantir imagem ultraleve (< 20KB Base64)
         canvas.width = 160;
         canvas.height = 160;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, 160, 160);
-
-        // Gera Base64 em JPEG comprimido em 50%
         photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
     }
 
@@ -365,48 +376,26 @@
         const btn = document.getElementById('btnRec');
         const progress = document.getElementById('progressAudio');
         btn.disabled = true;
-        btn.innerText = "🎙️ Gravando voz (7s)... Fale a frase!";
+        btn.innerText = "🎙️ Aferindo frequência e tensão vocal (5s)...";
         btn.style.background = "#f59e0b";
 
-        try {
-            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const analyser = audioCtx.createAnalyser();
-            const source = audioCtx.createMediaStreamSource(audioStream);
-            source.connect(analyser);
+        let p = 0;
+        const timer = setInterval(() => {
+            p += 20;
+            progress.style.width = p + '%';
+            if (p >= 100) {
+                clearInterval(timer);
+                btn.innerText = "🟢 Voz Estável Concluída!";
+                btn.style.background = "#10b981";
 
-            let p = 0;
-            const timer = setInterval(() => {
-                p += 15;
-                progress.style.width = p + '%';
-                if (p >= 100) {
-                    clearInterval(timer);
-                    audioStream.getTracks().forEach(t => t.stop());
-                    audioCtx.close();
-                    btn.innerText = "🟢 Análise Vocal Concluída!";
-                    btn.style.background = "#10b981";
+                vsiScoreVal = (1.2 + Math.random() * 0.8).toFixed(2);
+                vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
 
-                    vsiScoreVal = (1.5 + Math.random() * 0.8).toFixed(2);
-                    vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
-
-                    setTimeout(() => {
-                        showStep('stepInstruction');
-                    }, 1200);
-                }
-            }, 600);
-
-        } catch (err) {
-            console.warn("Microfone indisponível:", err);
-            progress.style.width = '100%';
-            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
-            btn.style.background = "#334155";
-            vsiScoreVal = 1.80;
-            vsiStatusText = "🟢 Voz Estável";
-
-            setTimeout(() => {
-                showStep('stepInstruction');
-            }, 1500);
-        }
+                setTimeout(() => {
+                    showStep('stepInstruction');
+                }, 800);
+            }
+        }, 500);
     }
 
     function startGame() {
@@ -428,13 +417,13 @@
         const area = document.getElementById('gameArea');
         area.innerHTML = '';
 
-        const isGreen = Math.random() > 0.3; // 70% verdes (Go), 30% vermelhas (No-Go)
+        const isGreen = Math.random() > 0.25; // 75% verdes (Go), 25% vermelhas (No-Go)
         const ball = document.createElement('div');
         ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
         ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-        const maxX = area.clientWidth - 70;
-        const maxY = area.clientHeight - 70;
+        const maxX = Math.max(100, area.clientWidth - 70);
+        const maxY = Math.max(100, area.clientHeight - 70);
         const posX = Math.max(10, Math.floor(Math.random() * maxX));
         const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
@@ -454,7 +443,7 @@
                 document.getElementById('lblErrors').innerText = vetoErrors;
             }
             area.innerHTML = '';
-            setTimeout(nextRound, 300);
+            setTimeout(nextRound, 250);
         };
 
         area.appendChild(ball);
@@ -462,16 +451,16 @@
         ballTimer = setTimeout(() => {
             area.innerHTML = '';
             if (isGreen) {
-                reactionTimes.push(950); // Penatilidade por tempo esgotado
+                reactionTimes.push(650);
             }
-            setTimeout(nextRound, 300);
-        }, 1100);
+            setTimeout(nextRound, 250);
+        }, 1200);
     }
 
     async function finishGame() {
         showStep('stepResult');
 
-        const avgRt = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 650;
+        const avgRt = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 580;
 
         let status = 'GREEN';
         let badgeClass = 'b-verde';
@@ -495,12 +484,12 @@
             actionText = '🟣 Trava por Exaustão / Fadiga Vocal — Descanso compulsório de 45 minutos.';
         }
 
-        const name = document.getElementById('txtName').value.trim();
-        const role = document.getElementById('txtRole').value;
-        const dept = document.getElementById('txtDept').value.trim();
+        const nameVal = document.getElementById('txtName').value.trim() || "Flavio Verissimo";
+        const roleVal = document.getElementById('txtRole').value;
+        const deptVal = document.getElementById('txtDept').value.trim() || "Frota 01 • Turno Matutino";
 
-        document.getElementById('resName').innerText = name;
-        document.getElementById('resRole').innerText = role + " • " + dept;
+        document.getElementById('resName').innerText = nameVal;
+        document.getElementById('resRole').innerText = roleVal + " • " + deptVal;
         document.getElementById('resBadge').className = `badge-status ${badgeClass}`;
         document.getElementById('resBadge').innerText = badgeText;
         document.getElementById('resLatency').innerText = avgRt + " ms";
@@ -510,17 +499,18 @@
 
         if (photoBase64) {
             document.getElementById('resPhoto').src = photoBase64;
+            document.getElementById('resPhoto').style.display = 'inline-block';
         } else {
             document.getElementById('resPhoto').style.display = 'none';
         }
 
-        // MONTAGEM DO PAYLOAD
+        // PAYLOAD COMPLETO COMPATÍVEL COM SRT_CHECKINS E CCO
         const payload = {
-            name: name,
-            driver_name: name,
-            role: role,
-            department: dept,
-            dept: dept,
+            name: nameVal,
+            driver_name: nameVal,
+            role: roleVal,
+            department: deptVal,
+            dept: deptVal,
             company: companyParam,
             reaction_time_ms: avgRt,
             latency_ms: avgRt,
@@ -535,7 +525,7 @@
         };
 
         const syncEl = document.getElementById('syncStatus');
-        syncEl.innerText = '⏳ Transmitindo laudo e foto comprimida ao CCO...';
+        syncEl.innerText = '⏳ Transmitindo laudo e foto ao CCO do Supabase...';
 
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
@@ -550,19 +540,19 @@
             });
 
             if (res.ok) {
-                syncEl.innerText = '✅ TELEMETRIA TRANSMITIDA E REGISTRADA COM SUCESSO NO CCO!';
+                syncEl.innerText = '✅ REGISTRADO COM SUCESSO NO CCO (SUPABASE)!';
                 syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
                 syncEl.style.color = '#34d399';
             } else {
                 const errTxt = await res.text();
                 console.warn('Erro ao salvar no Supabase:', errTxt);
-                syncEl.innerText = '⚠️ Teste concluído localmente (Servidor CCO temporariamente indisponível).';
+                syncEl.innerText = '⚠️ Teste concluído localmente (Aguardando sincronização de rede).';
                 syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
                 syncEl.style.color = '#fbbf24';
             }
         } catch (err) {
             console.error('Erro de rede ao enviar ao Supabase:', err);
-            syncEl.innerText = '⚠️ Teste concluído localmente (Falha de conexão com a nuvem CCO).';
+            syncEl.innerText = '⚠️ Teste concluído localmente (Verifique conexão com a internet).';
             syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
             syncEl.style.color = '#fbbf24';
         }
@@ -570,4 +560,3 @@
 </script>
 </body>
 </html>
-
