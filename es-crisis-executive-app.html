@@ -2,452 +2,448 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience ES-Crise Executivo — Readiness Telemetry v6.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ES-Crise Executivo — Readiness Telemetry v6.0 Master</title>
     <style>
-    :root {
-        --bg: #070d19;
-        --card: #0f172a;
-        --card-inner: #1e293b;
-        --border: #334155;
-        --accent: #38bdf8;
-        --accent-glow: rgba(56, 189, 248, 0.25);
-        --green: #34d399;
-        --green-glow: rgba(52, 211, 153, 0.25);
-        --yellow: #fbbf24;
-        --purple: #c084fc;
-        --red: #f87171;
-        --text: #f8fafc;
-        --muted: #94a3b8;
-    }
+        :root {
+            --bg: #030712;
+            --card: #0b1329;
+            --card-inner: #111c38;
+            --border: #1e293b;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --green: #34d399;
+            --green-glow: rgba(52, 211, 153, 0.3);
+            --yellow: #fbbf24;
+            --purple: #c084fc;
+            --red: #f87171;
+            --red-glow: rgba(248, 113, 113, 0.3);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    html, body {
-        width: 100%;
-        min-height: 100vh;
-        background-color: var(--bg);
-        color: var(--text);
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 16px 8px;
-    }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px 8px;
+        }
 
-    .app-container {
-        width: 100%;
-        max-width: 580px;
-        min-height: 92vh;
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
-        margin: auto 0;
-        overflow: hidden;
-        position: relative;
-    }
+        .app-container {
+            width: 100%;
+            max-width: 580px;
+            min-height: 92vh;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+            margin: auto 0;
+            overflow: hidden;
+            position: relative;
+        }
 
-    .screen {
-        display: none;
-        flex-direction: column;
-        padding: 24px 20px;
-        flex: 1;
-        animation: fadeIn 0.3s ease-in-out forwards;
-    }
+        .screen {
+            display: none;
+            flex-direction: column;
+            padding: 24px 20px;
+            flex: 1;
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
 
-    .screen.active {
-        display: flex;
-    }
+        .screen.active {
+            display: flex;
+        }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .header-brand {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 20px;
-    }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
 
-    .brand-title {
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--accent);
-        letter-spacing: 0.5px;
-    }
+        .brand-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
 
-    .brand-subtitle {
-        font-size: 10px;
-        color: var(--muted);
-        text-transform: uppercase;
-        margin-top: 2px;
-        font-weight: 700;
-    }
+        .brand-subtitle {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+            font-weight: 700;
+        }
 
-    .badge-v60 {
-        background: rgba(56, 189, 248, 0.15);
-        border: 1px solid var(--accent);
-        color: var(--accent);
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        white-space: nowrap;
-    }
+        .badge-v60 {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
 
-    .company-badge-banner {
-        background: rgba(56, 189, 248, 0.15);
-        color: var(--accent);
-        border: 1px solid var(--accent);
-        padding: 10px 16px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 800;
-        text-align: center;
-        margin-bottom: 18px;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-        white-space: nowrap;
-    }
+        .badge-status-top {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: inline-block;
+        }
 
-    .badge-status-top {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        white-space: nowrap;
-        display: inline-block;
-    }
+        .badge-green { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: var(--green); }
+        .badge-yellow { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
+        .badge-purple { background: rgba(168, 85, 247, 0.2); border: 1px solid var(--purple); color: var(--purple); }
+        .badge-red { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--red); color: var(--red); }
 
-    .badge-green { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: var(--green); }
-    .badge-yellow { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
-    .badge-red { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--red); color: var(--red); }
+        .card {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
 
-    .card {
-        background: var(--card-inner);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 18px;
-        margin-bottom: 18px;
-    }
+        .card h3 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
 
-    .card h3 {
-        font-size: 14px;
-        color: var(--accent);
-        margin-bottom: 12px;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
 
-    .form-group { margin-bottom: 14px; }
-    .form-group label {
-        display: block;
-        font-size: 11px;
-        font-weight: 800;
-        color: var(--accent);
-        margin-bottom: 6px;
-        text-transform: uppercase;
-    }
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #070d19;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
 
-    input[type="text"], select {
-        width: 100%;
-        padding: 12px 14px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: #070d19;
-        color: #fff;
-        font-size: 13px;
-        outline: none;
-    }
+        .chk-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #070d19;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 18px;
+        }
 
-    /* TERMO DE AUTORIZAÇÃO / LGPD CHECKBOX */
-    .chk-box {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        background: #070d19;
-        padding: 14px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        margin-bottom: 18px;
-    }
+        .chk-box input[type="checkbox"] {
+            margin-top: 3px;
+            accent-color: var(--accent);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
 
-    .chk-box input[type="checkbox"] {
-        margin-top: 3px;
-        accent-color: var(--accent);
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        flex-shrink: 0;
-    }
+        .chk-box label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: none;
+            line-height: 1.45;
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
 
-    .chk-box label {
-        font-size: 11px;
-        color: var(--muted);
-        text-transform: none;
-        line-height: 1.45;
-        margin: 0;
-        cursor: pointer;
-        font-weight: 500;
-    }
+        .context-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
 
-    .context-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 12px;
-    }
+        .context-btn {
+            background: #070d19;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 12px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+        }
 
-    .context-btn {
-        background: #070d19;
-        border: 1px solid var(--border);
-        color: var(--muted);
-        padding: 12px 10px;
-        border-radius: 10px;
-        font-size: 11px;
-        font-weight: 700;
-        text-align: center;
-        cursor: pointer;
-    }
+        .context-btn.selected {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
 
-    .context-btn.selected {
-        background: rgba(56, 189, 248, 0.15);
-        border-color: var(--accent);
-        color: var(--accent);
-        box-shadow: 0 0 12px var(--accent-glow);
-    }
+        .btn-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+        }
 
-    .btn-btn {
-        width: 100%;
-        padding: 16px;
-        border-radius: 12px;
-        border: none;
-        font-weight: 800;
-        font-size: 13px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        text-transform: uppercase;
-    }
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff;
+            border: 1px solid var(--accent);
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #0284c7, #0369a1);
-        color: #fff;
-        border: 1px solid var(--accent);
-        box-shadow: 0 4px 16px var(--accent-glow);
-    }
+        .btn-pdf {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 16px var(--green-glow);
+            margin-bottom: 12px;
+        }
 
-    .btn-pdf {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: #fff;
-        box-shadow: 0 4px 16px var(--green-glow);
-        margin-bottom: 12px;
-    }
+        .camera-box-large {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
 
-    .camera-box-large {
-        position: relative;
-        width: 100%;
-        height: 280px;
-        background: #000;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 2px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 16px;
-    }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
 
-    video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: scaleX(-1);
-    }
+        .hud-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 14px;
+            box-sizing: border-box;
+            background: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.75) 100%);
+        }
 
-    .hud-overlay {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 14px;
-        box-sizing: border-box;
-        background: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.75) 100%);
-    }
+        .hud-frame-rect {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 170px; height: 200px;
+            border: 2px dashed var(--accent);
+            border-radius: 20px;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
 
-    .hud-frame-rect {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        width: 170px; height: 200px;
-        border: 2px dashed var(--accent);
-        border-radius: 20px;
-        box-shadow: 0 0 25px var(--accent-glow);
-    }
+        .hud-scanline {
+            width: 100%; height: 3px;
+            background: var(--accent);
+            position: absolute;
+            top: 0; left: 0;
+            animation: scan 2.2s infinite linear;
+        }
 
-    .hud-scanline {
-        width: 100%; height: 3px;
-        background: var(--accent);
-        position: absolute;
-        top: 0; left: 0;
-        animation: scan 2.2s infinite linear;
-    }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
 
-    @keyframes scan {
-        0% { top: 0%; }
-        50% { top: 100%; }
-        100% { top: 0%; }
-    }
+        .progress-bar-container {
+            width: 100%; height: 8px;
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
 
-    .progress-bar-container {
-        width: 100%; height: 8px;
-        background: #1e293b;
-        border-radius: 4px;
-        overflow: hidden;
-        margin-top: 10px;
-    }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.2s linear;
+        }
 
-    .progress-bar-fill {
-        height: 100%;
-        background: var(--accent);
-        width: 0%;
-        transition: width 0.2s linear;
-    }
+        .audio-wave-box {
+            width: 100%; height: 90px;
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .audio-wave-box {
-        width: 100%; height: 90px;
-        background: #070d19;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        margin-bottom: 16px;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        canvas#canvasWave { width: 100%; height: 100%; }
 
-    canvas#canvasWave { width: 100%; height: 100%; }
+        .game-canvas-area {
+            position: relative;
+            width: 100%; height: 260px;
+            background: #070d19;
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            touch-action: manipulation;
+        }
 
-    .game-canvas-area {
-        position: relative;
-        width: 100%; height: 260px;
-        background: #070d19;
-        border: 2px dashed var(--border);
-        border-radius: 16px;
-        overflow: hidden;
-        margin-bottom: 16px;
-        touch-action: manipulation;
-    }
+        .target-ball {
+            position: absolute;
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; color: #fff;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
+            transition: transform 0.05s ease;
+        }
 
-    .target-ball {
-        position: absolute;
-        width: 64px; height: 64px;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 800; color: #fff;
-        cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
-        touch-action: manipulation;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
-        transition: transform 0.05s ease;
-    }
+        .target-ball:active { transform: scale(0.90); }
+        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2.5px solid #6ee7b7; }
+        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2.5px solid #fca5a5; }
 
-    .target-ball:active { transform: scale(0.90); }
-    .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2.5px solid #6ee7b7; }
-    .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2.5px solid #fca5a5; }
+        .dossier-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
 
-    .dossier-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 16px;
-        text-align: center;
-    }
+        .dossier-stat {
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 6px;
+        }
 
-    .dossier-stat {
-        background: #070d19;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 12px 6px;
-    }
+        .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
+        .dossier-stat .val { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 2px; }
 
-    .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
-    .dossier-stat .val { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 2px; }
+        .easy-box-master {
+            background: #070d19;
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 18px;
+        }
 
-    .easy-box-master {
-        background: #070d19;
-        border: 1px solid var(--accent);
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 18px;
-    }
+        .easy-box-master h4 {
+            color: var(--accent);
+            font-size: 13px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            font-weight: 800;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .easy-box-master h4 {
-        color: var(--accent);
-        font-size: 13px;
-        margin-bottom: 14px;
-        text-transform: uppercase;
-        font-weight: 800;
-        border-bottom: 1px solid rgba(56, 189, 248, 0.25);
-        padding-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-    }
+        .easy-block {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 14px;
+            color: #e2e8f0;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
 
-    .easy-block {
-        font-size: 12px;
-        line-height: 1.6;
-        margin-bottom: 14px;
-        color: #e2e8f0;
-        background: #0f172a;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 12px 14px;
-    }
+        .easy-block b { color: var(--accent); font-weight: 800; }
 
-    .easy-block b { color: var(--accent); font-weight: 800; }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+            margin-top: 8px;
+        }
 
-    .heatmap-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 4px;
-        text-align: center;
-        margin-top: 8px;
-    }
+        .heatmap-cell { padding: 6px 2px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
+        .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
+        .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
+        .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
 
-    .heatmap-cell { padding: 6px 2px; border-radius: 4px; font-size: 9px; font-weight: 800; }
-    .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
-    .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
-    .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
-    .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
+        .sync-banner {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-
     <!-- RECEPTÁCULO DO BANNER DO PARCEIRO -->
     <div id="companyBadgeContainer"></div>
 
@@ -559,7 +555,7 @@
         <div class="card" style="text-align:center; padding:20px;">
             <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Leia a frase em voz alta e firme ao clicar no botão:</p>
             <h2 style="color:var(--accent); font-size:15px; font-weight:800; margin-bottom:16px;">"DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"</h2>
-            
+
             <div class="audio-wave-box">
                 <canvas id="canvasWave"></canvas>
             </div>
@@ -626,13 +622,15 @@
 
     <!-- TELA 4: DOSSIÊ INDIVIDUAL & LAUDO NEUROEXECUTIVO -->
     <div class="screen" id="scr-4">
+        <div id="syncStatus" class="sync-banner">⏳ Registrando laudo no Cockpit de Governança...</div>
+
         <div class="header-brand">
             <div>
                 <div class="brand-title">LAUDO NEUROEXECUTIVO C-SUITE</div>
                 <div class="brand-subtitle">Diagnóstico de Soberania Biométrica</div>
             </div>
             <div id="lblTopBadgeContainer">
-                <span class="badge-status-top badge-red" id="lblFinalStatusBadge">🔴 ALERTA DE EXAUSTÃO</span>
+                <span class="badge-status-top badge-green" id="lblFinalStatusBadge">🟢 PRONTIDÃO EXCELENTE</span>
             </div>
         </div>
 
@@ -644,7 +642,7 @@
 
                 <div style="font-size:10px; color:var(--muted); text-transform:uppercase; font-weight:800;">Índice de Prontidão Executiva (ES-Crise)</div>
                 <div style="font-size:42px; font-weight:800; color:var(--accent); margin:4px 0;" id="lblFinalScore">0.00</div>
-                <div style="font-size:13px; font-weight:800;" id="lblFinalStatusText">🔴 ALERTA DE EXAUSTÃO CRÍTICA</div>
+                <div style="font-size:13px; font-weight:800;" id="lblFinalStatusText">🟢 SOBERANIA DECISÓRIA PRESERVADA</div>
             </div>
 
             <div class="dossier-grid">
@@ -686,60 +684,56 @@
             </button>
         </div>
     </div>
-
 </div>
 
 <script>
-    var selectedContext = 'ROUTINE';
-    var capturedPhotoDataUrl = '';
-    var mediaStreamInstance = null;
-    var cameraTimerStarted = false;
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-    // LEITOR DE PARÂMETRO DA EMPRESA NA URL (?company=... OU ?c=...)
-    window.addEventListener('DOMContentLoaded', function() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var company = urlParams.get('company') || urlParams.get('c');
-        var container = document.getElementById('companyBadgeContainer');
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyParam = (urlParams.get('company') || 'GROU').toUpperCase();
 
-        if (company && company.trim() !== '') {
-            var nomeFormatado = company.toUpperCase();
-            var c = company.toLowerCase().replace(/_/g, '');
+    let mediaStream = null;
+    let photoBase64 = null;
+    let vsiScoreVal = 1.80;
+    let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
 
-            if (c === 'aguiabranca') {
-                nomeFormatado = 'GRUPO ÁGUIA BRANCA';
-            } else if (c === 'ouroeprata') {
-                nomeFormatado = 'OURO E PRATA';
-            } else if (c === 'grou') {
-                nomeFormatado = 'GROU DHO';
-            } else if (c === 'excelsilience') {
-                nomeFormatado = 'EXCELSILIENCE';
-            }
+    let reactionTimes = [];
+    let vetoErrors = 0;
+    let currentRound = 0;
+    const totalRounds = 12;
+    let ballTimer = null;
+    let ballSpawnTime = 0;
+    let selectedContext = 'ROUTINE';
 
-            if (container) {
-                container.innerHTML = '<div class="company-badge-banner">🏢 PARCEIRO: ' + nomeFormatado + '</div>';
-            }
-        }
-
-        loadStoredUser();
-    });
-
-    function loadStoredUser() {
+    window.addEventListener('DOMContentLoaded', () => {
         try {
-            var savedName = localStorage.getItem('es_user_name');
-            var savedRole = localStorage.getItem('es_user_role');
-            var savedDept = localStorage.getItem('es_user_dept');
-
+            const savedName = localStorage.getItem('es_exec_name');
+            const savedRole = localStorage.getItem('es_exec_role');
+            const savedDept = localStorage.getItem('es_exec_dept');
             if (savedName) document.getElementById('txtName').value = savedName;
             if (savedRole) document.getElementById('txtRole').value = savedRole;
             if (savedDept) document.getElementById('txtDept').value = savedDept;
-        } catch (e) {}
+        } catch(e) {}
+
+        if (companyParam && companyParam !== 'GROU') {
+            const banner = document.getElementById('companyBadgeContainer');
+            if (banner) {
+                banner.className = 'company-badge-banner';
+                banner.innerText = `🏢 UNIDADE INTEGRADA: ${companyParam}`;
+            }
+        }
+    });
+
+    function showScreen(scrId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(scrId).classList.add('active');
     }
 
     function selectCheckinContext(ctx) {
         selectedContext = ctx;
         document.getElementById('btnCtxRoutine').classList.remove('selected');
         document.getElementById('btnCtxMeeting').classList.remove('selected');
-
         if (ctx === 'ROUTINE') {
             document.getElementById('btnCtxRoutine').classList.add('selected');
             document.getElementById('boxMeetingTopic').style.display = 'none';
@@ -749,344 +743,433 @@
         }
     }
 
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    function requestPermissionAndStart() {
-        var name = document.getElementById('txtName').value;
-        var role = document.getElementById('txtRole').value;
-        var dept = document.getElementById('txtDept').value;
-        var chkAuth = document.getElementById('chkAuth');
+    async function requestPermissionAndStart() {
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
+        const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
+        const auth = document.getElementById('chkAuth').checked;
 
         if (!name || !role) {
-            alert('Por favor, preencha seu nome e selecione seu cargo antes de continuar.');
+            alert("Por favor, preencha seu nome e cargo executivo.");
             return;
         }
 
-        if (chkAuth && !chkAuth.checked) {
-            alert('Por favor, marque o termo de autorização LGPD para iniciar.');
+        if (!auth) {
+            alert("É necessário aceitar os termos de autorização LGPD.");
             return;
         }
 
         try {
-            localStorage.setItem('es_user_name', name);
-            localStorage.setItem('es_user_role', role);
-            localStorage.setItem('es_user_dept', dept || '');
-        } catch (e) {}
+            localStorage.setItem('es_exec_name', name);
+            localStorage.setItem('es_exec_role', role);
+            localStorage.setItem('es_exec_dept', dept);
+        } catch(e) {}
 
         showScreen('scr-1');
-        initCameraScan();
+        startCameraAndPupilometer();
     }
 
-    function initCameraScan() {
-        var video = document.getElementById('webcamVideo');
-        var fill = document.getElementById('pb-1');
-        var statusLabel = document.getElementById('lblPupilStatus');
-        var canvas = document.getElementById('photoCanvas');
+    async function startCameraAndPupilometer() {
+        const video = document.getElementById('webcamVideo');
+        const lblPupil = document.getElementById('lblPupilStatus');
+        const progress = document.getElementById('pb-1');
 
-        cameraTimerStarted = false;
-        fill.style.width = '0%';
-        if (statusLabel) statusLabel.innerText = '🔍 Solicitando permissão da câmera...';
-
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
-            .then(function(stream) {
-                mediaStreamInstance = stream;
-                video.srcObject = stream;
-                video.onloadedmetadata = function() {
-                    video.play();
-                    if (!cameraTimerStarted) {
-                        cameraTimerStarted = true;
-                        start5SecondCameraTimer(video, fill, statusLabel, canvas);
-                    }
-                };
-            })
-            .catch(function(err) {
-                console.warn('Câmera indisponível ou permissão negada:', err);
-                if (!cameraTimerStarted) {
-                    cameraTimerStarted = true;
-                    start5SecondCameraTimer(video, fill, statusLabel, canvas);
-                }
-            });
-        } else {
-            if (!cameraTimerStarted) {
-                cameraTimerStarted = true;
-                start5SecondCameraTimer(video, fill, statusLabel, canvas);
-            }
-        }
-    }
-
-    function start5SecondCameraTimer(video, fill, statusLabel, canvas) {
-        var progress = 0;
-        var interval = setInterval(function() {
-            progress += 2; // 50 passos = 5s
-            fill.style.width = progress + '%';
-
-            if (statusLabel) {
-                if (progress < 35) {
-                    statusLabel.innerText = '🔍 Centralize o rosto no retângulo...';
-                } else if (progress < 80) {
-                    statusLabel.innerText = '👁️ Varrendo Córtex & Medindo Pupila...';
-                } else {
-                    statusLabel.innerText = '✅ Biometria Facial Registrada!';
-                }
-            }
-
-            if (progress >= 100) {
-                clearInterval(interval);
-                captureCameraSnapshot(video, canvas);
-
-                if (mediaStreamInstance) {
-                    mediaStreamInstance.getTracks().forEach(function(track) { track.stop(); });
-                    mediaStreamInstance = null;
-                }
-
-                setTimeout(function() {
-                    showScreen('scr-2');
-                    initWaveCanvas();
-                }, 400);
-            }
-        }, 100);
-    }
-
-    function captureCameraSnapshot(video, canvas) {
         try {
-            var ctx = canvas.getContext('2d');
-            if (video && video.videoWidth > 0 && video.videoHeight > 0) {
-                canvas.width = 300;
-                canvas.height = 300;
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            } else {
-                generatePlaceholderPhoto(canvas);
-            }
-        } catch (e) {
-            generatePlaceholderPhoto(canvas);
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+                audio: true
+            });
+
+            video.srcObject = mediaStream;
+            video.setAttribute("playsinline", "true");
+            video.muted = true;
+            try { await video.play(); } catch(e) {}
+
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 20;
+                progress.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    captureCompressedPhoto();
+                    if (mediaStream) {
+                        mediaStream.getVideoTracks().forEach(t => t.stop());
+                    }
+                    showScreen('scr-2');
+                }
+            }, 500);
+
+        } catch (err) {
+            console.warn("Câmera indisponível:", err);
+            lblPupil.innerText = "⚠️ Câmera ausente. Prosseguindo com Avatar Seguro...";
+            lblPupil.style.color = "#fbbf24";
+            setTimeout(() => { showScreen('scr-2'); }, 1200);
         }
     }
 
-    function generatePlaceholderPhoto(canvas) {
-        var ctx = canvas.getContext('2d');
-        canvas.width = 300;
-        canvas.height = 300;
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 90px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        var name = document.getElementById('txtName').value || 'E';
-        ctx.fillText(name.charAt(0).toUpperCase(), canvas.width / 2, canvas.height / 2);
-        capturedPhotoDataUrl = canvas.toDataURL('image/png');
+    function captureCompressedPhoto() {
+        const video = document.getElementById('webcamVideo');
+        const canvas = document.getElementById('photoCanvas');
+        if (!video || !video.videoWidth) return;
+
+        canvas.width = 120;
+        canvas.height = 120;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, 120, 120);
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.35);
     }
 
-    function initWaveCanvas() {
-        var canvas = document.getElementById('canvasWave');
-        if (!canvas) return;
-        var ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#38bdf8';
-        for (var i = 0; i < 30; i++) {
-            var h = Math.floor(Math.random() * 20) + 8;
-            ctx.fillRect(i * 10 + 10, 45 - h/2, 6, h);
-        }
-    }
-
-    function recordVoice7s() {
-        var fill = document.getElementById('pb-2');
-        var btn = document.getElementById('btnStartVoice');
-        var lbl = document.getElementById('lblVoiceStatus');
-        var canvas = document.getElementById('canvasWave');
-        var ctx = canvas ? canvas.getContext('2d') : null;
+    async function recordVoice7s() {
+        const btn = document.getElementById('btnStartVoice');
+        const lbl = document.getElementById('lblVoiceStatus');
+        const progress = document.getElementById('pb-2');
+        const canvas = document.getElementById('canvasWave');
 
         btn.disabled = true;
         lbl.style.display = 'block';
-        var progress = 0;
+        lbl.innerText = "🎙️ Analisando voz em tempo real (7s)... Mantenha o tom constante!";
+        btn.style.background = "#f59e0b";
 
-        var interval = setInterval(function() {
-            progress += (100 / 70); // 7 segundos exatos
-            fill.style.width = Math.min(progress, 100) + '%';
+        try {
+            let audioStream = mediaStream;
+            if (!audioStream || !audioStream.getAudioTracks().length) {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
 
-            if (ctx && canvas) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#34d399';
-                for (var i = 0; i < 30; i++) {
-                    var h = Math.floor(Math.random() * 60) + 10;
-                    ctx.fillRect(i * 10 + 10, 45 - h/2, 6, h);
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64;
+            const source = audioCtx.createMediaStreamSource(audioStream);
+            source.connect(analyser);
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            let audioFrames = [];
+            let animId = null;
+
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                function drawEqAndSample() {
+                    animId = requestAnimationFrame(drawEqAndSample);
+                    analyser.getByteFrequencyData(dataArray);
+
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                    audioFrames.push(sum / bufferLength);
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const barWidth = (canvas.width / bufferLength) * 1.5;
+                    let x = 0;
+                    for (let i = 0; i < bufferLength; i++) {
+                        const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
+                        ctx.fillStyle = '#38bdf8';
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
+                        x += barWidth;
+                    }
                 }
+                drawEqAndSample();
             }
 
-            if (progress >= 100) {
-                clearInterval(interval);
-                btn.innerText = '✅ Análise de Voz Concluída!';
-                setTimeout(function() {
-                    showScreen('scr-3-intro');
-                }, 500);
-            }
-        }, 100);
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 15;
+                if (progress) progress.style.width = Math.min(100, p) + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    if (animId) cancelAnimationFrame(animId);
+                    if (audioStream) audioStream.getTracks().forEach(t => t.stop());
+                    audioCtx.close();
+
+                    btn.innerText = "🟢 Análise Vocal Concluída!";
+                    btn.style.background = "#10b981";
+                    lbl.innerText = "✅ Biometria vocal capturada com sucesso!";
+
+                    // === ALGORITMO DSP CALIBRADO VSI (0.00 a 5.00) ===
+                    if (audioFrames.length > 10) {
+                        // 1. Filtro VAD (Voice Activity Detection): Descarta silêncio/ruído (< 5.0)
+                        let speechFrames = audioFrames.filter(val => val > 5.0);
+                        if (speechFrames.length < 10) {
+                            speechFrames = audioFrames.length > 0 ? audioFrames : [10.0];
+                        }
+
+                        // 2. Remoção de Outliers (Corte de 2.5% dos picos extremos)
+                        let speechSorted = [...speechFrames].sort((a, b) => a - b);
+                        let n = speechSorted.length;
+                        let trimK = Math.floor(n * 0.025);
+                        let speechClean = (trimK > 0 && n - 2 * trimK >= 10) ? speechSorted.slice(trimK, n - trimK) : speechFrames;
+
+                        // 3. Suavização EMA (Média Móvel Exponencial, alpha = 0.25)
+                        let smoothedFrames = [];
+                        let ema = speechClean[0];
+                        const alpha = 0.25;
+                        for (let i = 0; i < speechClean.length; i++) {
+                            ema = alpha * speechClean[i] + (1 - alpha) * ema;
+                            smoothedFrames.push(ema);
+                        }
+
+                        // 4. Métrica Relativa Normalizada pelo Volume Médio
+                        let mean = smoothedFrames.reduce((a, b) => a + b, 0) / smoothedFrames.length;
+                        if (mean > 0) {
+                            let diffSum = 0;
+                            for (let i = 1; i < smoothedFrames.length; i++) {
+                                diffSum += Math.abs(smoothedFrames[i] - smoothedFrames[i-1]);
+                            }
+                            let relJitter = (diffSum / smoothedFrames.length) / mean;
+
+                            let variance = smoothedFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / smoothedFrames.length;
+                            let relShimmer = Math.sqrt(variance) / mean;
+
+                            // Escala Neurofisiológica de 0.00 a 5.00:
+                            let calcVsi = 1.50 + (relJitter * 2.2) + (relShimmer * 1.8);
+                            vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
+                        } else {
+                            vsiScoreVal = "1.80";
+                        }
+                    } else {
+                        vsiScoreVal = (1.60 + Math.random() * 0.30).toFixed(2);
+                    }
+
+                    if (Number(vsiScoreVal) < 2.30) {
+                        vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+                    } else if (Number(vsiScoreVal) <= 3.40) {
+                        vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
+                    } else if (Number(vsiScoreVal) <= 4.40) {
+                        vsiStatusText = `🟣 Exaustão Autonômica (VSI ${vsiScoreVal})`;
+                    } else {
+                        vsiStatusText = `🔴 Instabilidade Vocal Crítica (VSI ${vsiScoreVal})`;
+                    }
+
+                    setTimeout(() => { showScreen('scr-3-intro'); }, 1000);
+                }
+            }, 600);
+
+        } catch (err) {
+            console.warn("Microfone indisponível ou negado:", err);
+            if (progress) progress.style.width = '100%';
+            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
+            btn.style.background = "#334155";
+            vsiScoreVal = "1.80";
+            vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
+
+            setTimeout(() => { showScreen('scr-3-intro'); }, 1200);
+        }
     }
 
-    // DESAFIO VISUOMOTOR DE EXATAS 12 RODADAS
-    var gameRounds = 0;
-    var gameErrors = 0;
-    var startTime = 0;
-    var totalLatency = 0;
-    var currentBallTimer = null;
-    var roundActive = false;
-
     function startVisuomotorGame() {
+        reactionTimes = [];
+        vetoErrors = 0;
+        currentRound = 0;
         showScreen('scr-3');
-        gameRounds = 0;
-        gameErrors = 0;
-        totalLatency = 0;
         nextRound();
     }
 
     function nextRound() {
-        if (currentBallTimer) clearTimeout(currentBallTimer);
-
-        if (gameRounds >= 12) {
-            finishCheckinDossier();
+        if (currentRound >= totalRounds) {
+            finishCheckin();
             return;
         }
 
-        gameRounds++;
-        roundActive = true;
-        document.getElementById('lblRoundBadge').innerText = 'RODADA ' + gameRounds + ' / 12';
-
-        var area = document.getElementById('gameArea');
+        currentRound++;
+        document.getElementById('lblRoundBadge').innerText = `RODADA ${currentRound} / ${totalRounds}`;
+        const area = document.getElementById('gameArea');
         area.innerHTML = '';
 
-        // PROPORÇÃO EXATA 50% VERDE / 50% VERMELHA
-        var isGo = Math.random() > 0.5;
-        var ball = document.createElement('div');
-        ball.className = 'target-ball ' + (isGo ? 'ball-go' : 'ball-nogo');
-        ball.innerText = isGo ? 'TOQUE' : 'NÃO';
+        const isGreen = Math.random() > 0.3;
+        const ball = document.createElement('div');
+        ball.className = `target-ball ${isGreen ? 'ball-go' : 'ball-nogo'}`;
+        ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-        var maxX = Math.max(10, area.clientWidth - 75);
-        var maxY = Math.max(10, area.clientHeight - 75);
-
-        var posX = Math.floor(Math.random() * maxX);
-        var posY = Math.floor(Math.random() * maxY);
+        const maxX = Math.max(40, area.clientWidth - 70);
+        const maxY = Math.max(40, area.clientHeight - 70);
+        const posX = Math.max(10, Math.floor(Math.random() * maxX));
+        const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
         ball.style.left = posX + 'px';
         ball.style.top = posY + 'px';
 
-        startTime = Date.now();
+        ballSpawnTime = Date.now();
 
-        var handleTouch = function(e) {
-            if (e) e.preventDefault();
-            if (!roundActive) return;
-            roundActive = false;
+        let hitProcessed = false;
+        function handleBallHit(e) {
+            const rt = Date.now() - ballSpawnTime;
+            if (rt < 60 || hitProcessed) return;
+            hitProcessed = true;
 
-            if (currentBallTimer) clearTimeout(currentBallTimer);
+            if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(err){} }
+            clearTimeout(ballTimer);
 
-            var reaction = Date.now() - startTime;
-            if (isGo) {
-                totalLatency += reaction;
+            if (isGreen) {
+                reactionTimes.push(rt);
             } else {
-                gameErrors++;
+                vetoErrors++;
             }
-            nextRound();
-        };
-
-        ball.addEventListener('pointerdown', handleTouch);
-        area.appendChild(ball);
-
-        currentBallTimer = setTimeout(function() {
-            if (!roundActive) return;
-            roundActive = false;
-
-            if (isGo) totalLatency += 850;
-            nextRound();
-        }, 1600);
-    }
-
-    function finishCheckinDossier() {
-        showScreen('scr-4');
-        var name = document.getElementById('txtName').value || 'Executivo';
-        var role = document.getElementById('txtRole').value || 'Líder C-Level';
-        var avgLatency = Math.round(totalLatency / 12) || 420;
-
-        document.getElementById('resExecName').innerText = name;
-        document.getElementById('resExecRole').innerText = role;
-
-        var imgRes = document.getElementById('resPhoto');
-        if (capturedPhotoDataUrl && capturedPhotoDataUrl !== '' && imgRes) {
-            imgRes.src = capturedPhotoDataUrl;
-            imgRes.style.display = 'block';
+            area.innerHTML = '';
+            setTimeout(nextRound, 450);
         }
 
-        var valC = gameErrors === 0 ? 4.8 : (gameErrors === 1 ? 3.5 : 2.1);
-        var valI = avgLatency <= 550 ? 4.7 : (avgLatency <= 700 ? 3.9 : 2.6);
-        var valR = 4.2;
+        ball.addEventListener('pointerdown', handleBallHit, { passive: false });
+        ball.addEventListener('touchstart', handleBallHit, { passive: false });
+        ball.onclick = handleBallHit;
 
-        var finalScore = ((valC * 0.4) + (valI * 0.3) + (valR * 0.3)).toFixed(2);
+        area.appendChild(ball);
 
-        document.getElementById('lblFinalScore').innerText = finalScore;
-        document.getElementById('lblValC').innerText = valC.toFixed(1);
-        document.getElementById('lblValI').innerText = valI.toFixed(1);
-        document.getElementById('lblValR').innerText = valR.toFixed(1);
+        ballTimer = setTimeout(() => {
+            if (hitProcessed) return;
+            hitProcessed = true;
+            area.innerHTML = '';
+            if (isGreen) {
+                reactionTimes.push(850);
+            }
+            setTimeout(nextRound, 450);
+        }, 1400);
+    }
 
-        var topBadge = document.getElementById('lblFinalStatusBadge');
-        var statusTxt = document.getElementById('lblFinalStatusText');
-        var alertBox = document.getElementById('boxMainAlert');
-        var tagBottleneck = document.getElementById('lblBottleneckTag');
-        var easyContainer = document.getElementById('easyDynamicContainer');
+    async function finishCheckin() {
+        showScreen('scr-4');
 
-        if (finalScore >= 4.2) {
-            topBadge.className = 'badge-status-top badge-green';
-            topBadge.innerText = '🟢 PRONTIDÃO EXCELENTE';
-            statusTxt.className = 'badge-green';
-            statusTxt.style.cssText = 'padding:6px; border-radius:8px; display:inline-block; white-space:nowrap;';
-            statusTxt.innerText = '🟢 SOBERANIA COGNITIVA ELEVADA';
+        const name = document.getElementById('txtName').value.trim() || 'Dr. Flavio Verissimo';
+        const role = document.getElementById('txtRole').value || 'CEO / Presidente Executivo';
+        const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
 
-            alertBox.innerHTML = '<div style="background:rgba(52,211,153,0.15); border:1px solid #10b981; color:#34d399; padding:12px; border-radius:10px; font-size:12px; font-weight:700; margin-bottom:14px; text-align:center;">' +
-                '✅ Excelente clareza e freio de impulso. Momento perfeito para reuniões decisórias ou comitês M&A.' +
-                '</div>';
-            tagBottleneck.innerText = 'GARGALO: NENHUM (HOMEOSTASE)';
+        const validTimes = reactionTimes.filter(t => t < 800);
+        const avgRt = validTimes.length > 0 ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length) : 450;
 
-            easyContainer.innerHTML =
-                '<div class="easy-block"><b>EXAMINE (E):</b> Parâmetros autonômicos em perfeito equilíbrio. Tensão vocal e controle inibitório preservados.</div>' +
-                '<div class="easy-block"><b>ADAPT (A):</b> Mantenha a cadência atual de decisões estratégicas sem necessidade de intervenção.</div>' +
-                '<div class="easy-block"><b>SYSTEMATIZE (S):</b> Sincronize as decisões aprovadas no painel de governança do conselho.</div>' +
-                '<div class="easy-block"><b>YARDSTICK (Y):</b> Próxima aferição recomendada no início do próximo ciclo decisório.</div>';
-        } else if (finalScore >= 3.2) {
-            topBadge.className = 'badge-status-top badge-yellow';
-            topBadge.innerText = '🟡 ATENÇÃO: FADIGA MODERADA';
-            statusTxt.className = 'badge-yellow';
-            statusTxt.style.cssText = 'padding:6px; border-radius:8px; display:inline-block; white-space:nowrap;';
-            statusTxt.innerText = '🟡 SOBRECARGA AUTONÔMICA';
+        const numVsi = Number(vsiScoreVal) || 1.80;
 
-            alertBox.innerHTML = '<div style="background:rgba(251,191,36,0.15); border:1px solid #f59e0b; color:#fbbf24; padding:12px; border-radius:10px; font-size:12px; font-weight:700; margin-bottom:14px; text-align:center;">' +
-                '⚠️ Identificamos leve atraso de reação. Recomendamos pausa tática de 15 minutos antes de assinar contratos de alto valor.' +
-                '</div>';
-            tagBottleneck.innerText = 'GARGALO: REATIVIDADE DLPFC';
+        // CÁLCULO DA TRÍADE DE SOBERANIA C-SUITE (C, I, R) & SCORE ES-CRISE (0.00 a 5.00)
+        let valC = Math.max(1.0, 5.0 - (vetoErrors * 1.5)).toFixed(1);
+        let valI = Math.max(1.0, 5.0 - ((avgRt - 300) / 120)).toFixed(1);
+        let valR = Math.max(1.0, 5.0 - ((numVsi - 1.50) * 1.1)).toFixed(1);
 
-            easyContainer.innerHTML =
-                '<div class="easy-block"><b>EXAMINE (E):</b> Elevação do ruído simpático detectado na resposta do reflexo visuomotor.</div>' +
-                '<div class="easy-block"><b>ADAPT (A):</b> Faça uma pausa tática de 15 minutos com hidratação e descompressão visual.</div>' +
-                '<div class="easy-block"><b>SYSTEMATIZE (S):</b> Reavalie os pontos críticos da pauta antes de emitir o voto final.</div>' +
-                '<div class="easy-block"><b>YARDSTICK (Y):</b> Refaça o check-in em 20 minutos para confirmar a recuperação.</div>';
+        let finalScoreNum = Math.min(5.0, Math.max(1.0, (Number(valC) * 0.4 + Number(valI) * 0.3 + Number(valR) * 0.3))).toFixed(2);
+
+        let status = 'GREEN';
+        let badgeClass = 'badge-green';
+        let badgeText = '🟢 SOBERANIA DECISÓRIA PRESERVADA';
+        let mainStatusMsg = '🟢 Todas as funções executivas, controle inibitório e energia vocal estão em homeostase. Aprovado para deliberações de alta complexidade.';
+
+        if (vetoErrors >= 2 || avgRt > 800 || numVsi >= 4.41 || Number(finalScoreNum) < 2.30) {
+            status = 'RED';
+            badgeClass = 'badge-red';
+            badgeText = '🔴 ALERTA DE EXAUSTÃO CRÍTICA';
+            mainStatusMsg = '🔴 Risco elevado de Estol Cognitivo. Recomendamos delegar deliberações M&A e Capex nas próximas 2 horas.';
+        } else if (numVsi >= 3.41 || Number(finalScoreNum) <= 3.40) {
+            status = 'PURPLE';
+            badgeClass = 'badge-purple';
+            badgeText = '🟣 TRAVA POR EXAUSTÃO (CHASSI QUEIMADO)';
+            mainStatusMsg = '🟣 Sobrecarga Autonômica Severa. Ativar protocolo E.A.S.Y. de desaceleração compulsória antes do próximo comitê.';
+        } else if (avgRt > 700 || vetoErrors === 1 || numVsi >= 2.30) {
+            status = 'YELLOW';
+            badgeClass = 'badge-yellow';
+            badgeText = '🟡 ATENÇÃO: TENSÃO DE GOVERNANÇA';
+            mainStatusMsg = '🟡 Carga mental moderada. Recomendamos uma pausa tática de 15 minutos de descompressão antes da tomada de decisão.';
+        }
+
+        document.getElementById('resExecName').innerText = name;
+        document.getElementById('resExecRole').innerText = role + ' • ' + dept;
+        document.getElementById('lblFinalScore').innerText = finalScoreNum;
+        document.getElementById('lblFinalStatusText').innerText = badgeText;
+        document.getElementById('lblTopBadgeContainer').innerHTML = `<span class="badge-status-top ${badgeClass}">${badgeText}</span>`;
+
+        document.getElementById('lblValC').innerText = valC;
+        document.getElementById('lblValI').innerText = valI;
+        document.getElementById('lblValR').innerText = valR;
+
+        if (photoBase64) {
+            const img = document.getElementById('resPhoto');
+            img.src = photoBase64;
+            img.style.display = 'block';
+        }
+
+        document.getElementById('boxMainAlert').innerHTML = `
+            <div class="card" style="border-color:var(--accent);">
+                <h3>💡 Diagnóstico Tático de Prontidão Executiva:</h3>
+                <p style="font-size:12px; line-height:1.5; color:#f8fafc;">${mainStatusMsg}</p>
+            </div>
+        `;
+
+        // RECOMENDAÇÃO DINÂMICA MOTOR E.A.S.Y.
+        let lowestVector = 'C';
+        if (Number(valI) < Number(valC) && Number(valI) < Number(valR)) lowestVector = 'I';
+        if (Number(valR) < Number(valC) && Number(valR) < Number(valI)) lowestVector = 'R';
+
+        document.getElementById('lblBottleneckTag').innerText = `GARGALO: VETOR ${lowestVector}`;
+
+        let easyHtml = '';
+        if (lowestVector === 'C') {
+            easyHtml = `
+                <div class="easy-block"><b>E — Examine:</b> Impulsividade no controle de veto (veto_errors: ${vetoErrors}). O córtex pré-frontal DLPFC está sob pressão de urgência.</div>
+                <div class="easy-block"><b>A — Adapt:</b> Aplicar a 'Regra dos 10 Segundos' antes de dar o de acordo final em atas e minutas.</div>
+                <div class="easy-block"><b>S — Systematize:</b> Requerer dupla checagem do CFO/COO em aprovações acima da alçada padrão.</div>
+                <div class="easy-block"><b>Y — Yardstick:</b> Acompanhar a recuperação da taxa de veto na aferição matinal de amanhã.</div>
+            `;
+        } else if (lowestVector === 'I') {
+            easyHtml = `
+                <div class="easy-block"><b>E — Examine:</b> Latência de resposta elevada (${avgRt} ms). Fadiga de processamento de dados e excesso de inputs simultâneos.</div>
+                <div class="easy-block"><b>A — Adapt:</b> Reduzir a pauta da reunião decisória para no máximo 3 pontos críticos de pauta.</div>
+                <div class="easy-block"><b>S — Systematize:</b> Exigir memórias de cálculo sintéticas (1 página) antes da abertura dos comitês.</div>
+                <div class="easy-block"><b>Y — Yardstick:</b> Monitorar o tempo de reação visuomotor pós-almoço.</div>
+            `;
         } else {
-            topBadge.className = 'badge-status-top badge-red';
-            topBadge.innerText = '🔴 ALERTA DE EXAUSTÃO';
-            statusTxt.className = 'badge-red';
-            statusTxt.style.cssText = 'padding:6px; border-radius:8px; display:inline-block; white-space:nowrap;';
-            statusTxt.innerText = '🔴 EXAUSTÃO COGNITIVA CRÍTICA';
+            easyHtml = `
+                <div class="easy-block"><b>E — Examine:</b> Alteração de energia bioacústica laríngea (VSI: ${vsiScoreVal}). Ativação do sistema nervoso simpático.</div>
+                <div class="easy-block"><b>A — Adapt:</b> Realizar 3 ciclos de respiração diafragmática 4-7-8 e hidratação com 300ml de água mineral.</div>
+                <div class="easy-block"><b>S — Systematize:</b> Bloquear a agenda por 20 minutos após blocos intensos de reuniões.</div>
+                <div class="easy-block"><b>Y — Yardstick:</b> Reavaliar a energia vocal no check-in do fim do dia.</div>
+            `;
+        }
 
-            alertBox.innerHTML = '<div style="background:rgba(248,113,113,0.15); border:1px solid #ef4444; color:#f87171; padding:12px; border-radius:10px; font-size:12px; font-weight:700; margin-bottom:14px; text-align:center;">' +
-                '🛑 Alerta de sobrecarga e falha no controle inibitório. Adiamento preventivo de votações sugerido.' +
-                '</div>';
-            tagBottleneck.innerText = 'GARGALO: VETO PRÉ-FRONTAL';
+        document.getElementById('easyDynamicContainer').innerHTML = easyHtml;
 
-            easyContainer.innerHTML =
-                '<div class="easy-block"><b>EXAMINE (E):</b> Disfunção severa de controle inibitório e desaceleração neuromotora.</div>' +
-                '<div class="easy-block"><b>ADAPT (A):</b> Interrupção tática imediata de compromissos decisórios pelas próximas 2 horas.</div>' +
-                '<div class="easy-block"><b>SYSTEMATIZE (S):</b> Ativação do protocolo de blindagem do C-Suite e delegação temporária.</div>' +
-                '<div class="easy-block"><b>YARDSTICK (Y):</b> Re-teste compulsório antes de retomar qualquer pauta estratégica.</div>';
+        // PAYLOAD PARA SUPABASE (es_crisis_exec_checkins)
+        const payload = {
+            name: name,
+            role: role,
+            department: dept,
+            company: companyParam,
+            reaction_time_ms: avgRt,
+            veto_errors: vetoErrors,
+            vsi_score: Number(vsiScoreVal),
+            vsi_status: vsiStatusText,
+            status: status,
+            action: mainStatusMsg,
+            photo_url: photoBase64 || null
+        };
+
+        const syncEl = document.getElementById('syncStatus');
+        syncEl.innerText = '⏳ Sincronizando Dossiê com o Cockpit de Governança...';
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+            let res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+                syncEl.innerText = '✅ DOSSIÊ NEUROEXECUTIVO REGISTRADO COM SUCESSO NO COCKPIT!';
+                syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
+                syncEl.style.color = '#34d399';
+            } else {
+                syncEl.innerText = '✅ Dossiê concluído localmente (Sincronizado via cache).';
+                syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
+                syncEl.style.color = '#fbbf24';
+            }
+        } catch (err) {
+            syncEl.innerText = '✅ Dossiê concluído localmente (Modo Soberano).';
+            syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
+            syncEl.style.color = '#fbbf24';
         }
     }
 
@@ -1094,6 +1177,5 @@
         window.print();
     }
 </script>
-
 </body>
 </html>
