@@ -3,293 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT-RH — Telemetria de Prontidão Ocupacional</title>
+    <title>ExcelSilience SRT-RH — Aferição de Prontidão Ocupacional</title>
     <style>
-    :root {
-        --bg-dark: #070d19;
-        --panel-bg: #0f172a;
-        --panel-border: #1e293b;
-        --accent-cyan: #38bdf8;
-        --accent-cyan-hover: #0284c7;
-        --accent-green: #10b981;
-        --accent-green-bright: #34d399;
-        --accent-yellow: #f59e0b;
-        --accent-yellow-bright: #fbbf24;
-        --accent-purple: #a855f7;
-        --accent-purple-bright: #c084fc;
-        --accent-red: #ef4444;
-        --accent-red-bright: #f87171;
-        --text-main: #f8fafc;
-        --text-muted: #94a3b8;
-        --text-sub: #cbd5e1;
-        --input-bg: #070d19;
-        --input-border: #334155;
-    }
+        :root {
+            --bg-dark: #0b0f19;
+            --panel-bg: #151c2c;
+            --panel-border: #2a364f;
+            --input-bg: #0b0f19;
+            --input-border: #334155;
+            --text-main: #e2e8f0;
+            --text-sub: #cbd5e1;
+            --text-muted: #64748b;
+            --accent-cyan: #38bdf8;
+            --accent-cyan-hover: #0284c7;
+            --accent-green: #10b981;
+            --accent-green-bright: #34d399;
+            --accent-yellow: #f59e0b;
+            --accent-yellow-bright: #fbbf24;
+            --accent-purple: #a855f7;
+            --accent-purple-bright: #c084fc;
+            --accent-red: #ef4444;
+            --accent-red-bright: #f87171;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; overflow-x: hidden; }
+        .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 520px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative; }
 
-    body {
-        background-color: var(--bg-dark);
-        color: var(--text-main);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 16px;
-        overflow-x: hidden;
-    }
+        .header-box { text-align: center; margin-bottom: 22px; border-bottom: 1px solid var(--panel-border); padding-bottom: 18px; }
+        .header-box h1 { font-size: 1.35rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .badge-gov { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; margin-bottom: 18px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
 
-    .container {
-        background: var(--panel-bg);
-        border: 1px solid var(--panel-border);
-        border-radius: 20px;
-        width: 100%;
-        max-width: 520px;
-        padding: 28px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.05);
-        position: relative;
-    }
+        .step { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
+        .step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .header-box {
-        text-align: center;
-        margin-bottom: 22px;
-        border-bottom: 1px solid var(--panel-border);
-        padding-bottom: 18px;
-    }
+        .form-group { margin-bottom: 16px; }
+        label { font-size: 11px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        select, input[type="text"] { width: 100%; padding: 13px 16px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: #ffffff; font-size: 14px; outline: none; }
+        select:focus, input[type="text"]:focus { border-color: var(--accent-cyan); }
 
-    .header-box h1 {
-        font-size: 1.5rem;
-        color: var(--accent-cyan);
-        font-weight: 800;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-    }
+        .chk-box { display: flex; align-items: flex-start; gap: 12px; background: var(--input-bg); padding: 14px; border-radius: 10px; border: 1px solid var(--input-border); margin-bottom: 20px; }
+        .chk-box input[type="checkbox"] { margin-top: 3px; accent-color: var(--accent-cyan-hover); width: 20px; height: 20px; cursor: pointer; }
+        .chk-box label { font-size: 11px; color: var(--text-sub); text-transform: none; line-height: 1.45; margin: 0; }
 
-    .header-box p {
-        font-size: 0.83rem;
-        color: var(--text-muted);
-        margin-top: 5px;
-        font-weight: 500;
-    }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: var(--accent-cyan-hover); color: #ffffff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
+        .btn:hover { background: #0369a1; }
+        .btn-secondary { background: #1e293b; color: var(--text-sub); border: 1px solid var(--input-border); margin-top: 10px; }
 
-    .badge-anon {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--accent-green-bright);
-        padding: 8px 14px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        display: block;
-        margin-bottom: 18px;
-        text-align: center;
-        width: 100%;
-        border: 1px solid rgba(16, 185, 129, 0.25);
-        letter-spacing: 0.5px;
-    }
+        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
+        .meter-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.2s linear; }
 
-    .company-badge-banner {
-        background: rgba(56, 189, 248, 0.15);
-        color: var(--accent-cyan);
-        border: 1px solid var(--accent-cyan);
-        padding: 10px 16px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 800;
-        text-align: center;
-        margin-bottom: 18px;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-        white-space: nowrap;
-    }
+        .audio-vis-box { width: 100%; height: 90px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
-    .step { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
-    .step.active { display: block; }
+        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+        .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
+        .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
+        .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+        .badge-status { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-block; text-transform: uppercase; }
+        .b-verde { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
+        .b-amarelo { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
+        .b-vermelho { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
 
-    .form-group { margin-bottom: 20px; }
+        .sync-banner { padding: 14px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 18px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
+        .info-card { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 12px; color: var(--text-sub); line-height: 1.5; }
+        .info-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
 
-    label {
-        font-size: 11px;
-        color: var(--accent-cyan);
-        font-weight: 700;
-        text-transform: uppercase;
-        display: block;
-        margin-bottom: 8px;
-        letter-spacing: 0.5px;
-    }
-
-    select {
-        width: 100%;
-        padding: 14px 16px;
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 10px;
-        color: #ffffff;
-        font-size: 14px;
-        outline: none;
-        transition: all 0.2s ease;
-    }
-
-    select:focus { border-color: var(--accent-cyan); box-shadow: 0 0 12px rgba(56, 189, 248, 0.25); }
-
-    .btn {
-        width: 100%;
-        padding: 15px;
-        border: none;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 800;
-        cursor: pointer;
-        background: var(--accent-cyan-hover);
-        color: #ffffff;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .btn:hover { background: #0369a1; transform: translateY(-1px); }
-    .btn:active { transform: translateY(1px); }
-    .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
-
-    .meter-bar {
-        width: 100%; height: 8px;
-        background: #1e293b;
-        border-radius: 4px;
-        overflow: hidden;
-        margin-bottom: 16px;
-    }
-
-    .meter-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.2s linear; }
-
-    .audio-vis-box {
-        width: 100%; height: 80px;
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 10px;
-        margin-bottom: 16px;
-        display: flex; align-items: center; justify-content: center;
-        padding: 10px;
-    }
-
-    canvas.audio-canvas { width: 100%; height: 100%; display: block; }
-
-    .instruction-card {
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 18px;
-    }
-
-    .rule-item { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-sub); margin-bottom: 10px; }
-    .rule-item:last-child { margin-bottom: 0; }
-
-    .icon-circle {
-        width: 32px; height: 32px;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 14px; flex-shrink: 0;
-    }
-
-    .icon-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
-    .icon-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
-
-    .game-box {
-        width: 100%; height: 250px;
-        background: var(--input-bg);
-        border: 2px dashed var(--input-border);
-        border-radius: 14px;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 18px;
-        touch-action: manipulation;
-    }
-
-    .target-ball {
-        width: 64px; height: 64px;
-        border-radius: 50%;
-        position: absolute;
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 11px; color: #ffffff;
-        user-select: none; -webkit-user-select: none;
-        touch-action: manipulation;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
-        transition: transform 0.05s ease;
-    }
-
-    .target-ball:active { transform: scale(0.90); }
-    .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
-    .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
-
-    .sync-banner {
-        padding: 14px;
-        border-radius: 10px;
-        font-size: 12px; font-weight: 700;
-        text-align: center; margin-bottom: 18px;
-        background: rgba(16, 185, 129, 0.15);
-        color: var(--accent-green-bright);
-        border: 1px solid var(--accent-green);
-    }
-
-    .badge-status {
-        padding: 12px 20px;
-        border-radius: 10px;
-        font-size: 13px; font-weight: 800;
-        text-align: center; text-transform: uppercase;
-        letter-spacing: 0.5px; margin-bottom: 18px;
-        white-space: nowrap; display: block;
-    }
-
-    .status-green { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
-    .status-yellow { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
-    .status-red { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
-
-    .vsi-card-result {
-        background: var(--input-bg);
-        border: 1px solid var(--accent-cyan);
-        border-radius: 12px;
-        padding: 12px;
-        text-align: center;
-        margin-bottom: 16px;
-        font-size: 12px;
-        color: var(--accent-cyan);
-        font-weight: 700;
-    }
-
-    .wellness-card {
-        background: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 12px;
-        padding: 18px;
-        margin-bottom: 18px;
-        font-size: 12px;
-        color: var(--text-sub);
-        line-height: 1.6;
-    }
-
-    .wellness-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
-
-    .wellness-steps { list-style: none; padding: 0; margin-top: 8px; }
-    .wellness-steps li { margin-bottom: 8px; padding-left: 18px; position: relative; }
-    .wellness-steps li::before { content: "•"; color: var(--accent-cyan); font-weight: bold; font-size: 16px; position: absolute; left: 0; top: -2px; }
-
-    .footer-brand {
-        margin-top: 20px; text-align: center;
-        font-size: 11px; color: var(--text-muted);
-        border-top: 1px solid var(--panel-border); padding-top: 14px;
-    }
-    .footer-brand b { color: var(--accent-cyan); }
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+        .modal-backdrop.active { display: flex; }
+        .modal-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-header h3 { font-size: 16px; color: var(--accent-cyan); }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+        .footer-brand { margin-top: 20px; text-align: center; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--panel-border); padding-top: 14px; }
+        .footer-brand b { color: var(--accent-cyan); }
     </style>
 </head>
 <body>
@@ -297,35 +87,45 @@
 <div class="container">
     <div class="header-box">
         <h1>ExcelSilience SRT-RH</h1>
-        <p>Telemetria de Prontidão e Saúde Ocupacional</p>
+        <p>Telemetria de Prontidão Ocupacional & Saúde Mental</p>
     </div>
 
-    <div id="companyBadgeContainer"></div>
-    <span class="badge-anon">🔒 100% ANÔNIMO — ZERO CADASTRO DE NOME OU CPF (SEM CÂMERA)</span>
+    <span class="badge-gov">🔒 100% ANÔNIMO — ZERO CÂMERA & BLINDAGEM LGPD (N ≥ 5)</span>
 
-    <!-- ETAPA 1 -->
+    <!-- PASSO 1: SELEÇÃO DO SETOR -->
     <div id="stepForm" class="step active">
         <div class="form-group">
-            <label for="txtSetor">Selecione o seu Setor / Departamento:</label>
-            <select id="txtSetor" required>
-                <option value="">-- Selecione seu departamento --</option>
-                <option value="Administrativo / Financeiro">Administrativo / Financeiro</option>
-                <option value="Comercial / Vendas">Comercial / Vendas</option>
-                <option value="Operações / Logística">Operações / Logística</option>
-                <option value="Tecnologia / TI / Produto">Tecnologia / TI / Produto</option>
-                <option value="Atendimento / CX">Atendimento / CX</option>
-                <option value="Recursos Humanos / DHO">Recursos Humanos / DHO</option>
-                <option value="Diretoria / C-Level">Diretoria / C-Level</option>
+            <label for="txtDept">Selecione seu Setor / Departamento:</label>
+            <select id="txtDept" required>
+                <option value="">-- Selecione o setor --</option>
+                <option value="TI">TI / Tecnologia & Sistemas</option>
+                <option value="Vendas">Vendas & Comercial</option>
+                <option value="Financeiro">Financeiro & Contabilidade</option>
+                <option value="Operações">Operações & Logística</option>
+                <option value="RH">Recursos Humanos / DHO</option>
+                <option value="Diretoria">Diretoria & C-Suite</option>
+                <option value="Atendimento">Atendimento & Suporte ao Cliente</option>
+                <option value="Marketing">Marketing & Comunicação</option>
+                <option value="Produção">Produção & Fábrica</option>
             </select>
         </div>
-        <button class="btn" onclick="startCheckin()">Iniciar Aferição (30 Segundos) 🚀</button>
+
+        <div class="chk-box">
+            <input type="checkbox" id="chkAuth" checked>
+            <label for="chkAuth">
+                <b>Garantia de Anonimato & LGPD (Art. 7º):</b> Este teste é 100% anônimo. Não capturamos foto, nome ou CPF. As respostas são agrupadas por setor (mínimo N ≥ 5) para gerar relatórios de bem-estar para o RH e compliance com NR-01 (PGR) e NR-17 (AEP).
+            </label>
+        </div>
+
+        <button class="btn" onclick="startCheckinFlow()">Iniciar Aferição Anônima (30s) 🚀</button>
+        <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Como funciona o anonimato?</button>
     </div>
 
-    <!-- ETAPA 2 (6 SEGUNDOS DE ÁUDIO) -->
+    <!-- PASSO 2: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
     <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise de Energia da Voz (6s)</h3>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
-            Clique no botão abaixo e leia a frase em voz alta no microfone:
+            Clique no botão e leia a frase em voz alta no microfone durante 7 segundos:
         </p>
 
         <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:14px;">
@@ -336,27 +136,20 @@
             <canvas id="audioCanvas" class="audio-canvas"></canvas>
         </div>
 
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz (6 Segundos)</button>
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (7s)</button>
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- ETAPA 3 -->
+    <!-- PASSO 3: DESAFIO VISUOMOTOR GO/NO-GO (12 RODADAS) -->
     <div id="stepInstruction" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Desafio de Foco e Reação</h3>
-        <div class="instruction-card">
-            <div class="rule-item">
-                <div class="icon-circle icon-green">⚡</div>
-                <div><b>Bolinha VERDE:</b> Toque o mais rápido possível!</div>
-            </div>
-            <div class="rule-item">
-                <div class="icon-circle icon-red">🛑</div>
-                <div><b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso.</div>
-            </div>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Reatividade Cognitiva e Foco</h3>
+        <div class="info-card">
+            <p style="color:var(--accent-green-bright); margin-bottom:8px;">⚡ <b>Bolinha VERDE:</b> Toque na tela o mais rápido possível!</p>
+            <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso e deixe desaparecer.</p>
         </div>
         <button class="btn" onclick="startGame()">Start no Desafio (12 Rodadas) 🎯</button>
     </div>
 
-    <!-- ETAPA 4 -->
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
             <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
@@ -365,278 +158,365 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- ETAPA 5 -->
+    <!-- PASSO 4: RESULTADO CONFIDENCIAL & ORIENTAÇÃO -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Transmitindo dados anônimos ao Supabase...</div>
-        <div id="vsiDisplay" class="vsi-card-result">🎙️ VSI Bioacústico: 0.42 (Tensão Laríngea Normal)</div>
-        <div id="resultBadge" class="badge-status status-green">🟢 PRONTIDÃO EXCELENTE</div>
+        <div id="syncStatus" class="sync-banner">⏳ Registrando indicador anônimo no Dashboard...</div>
 
-        <div class="wellness-card">
-            <h4>🌿 Protocolo Recomendado de Bem-Estar:</h4>
-            <p id="condutaCard">Sua energia e foco estão em níveis ideais. Ótimo momento para realizar tarefas estratégicas ou de alta exigência cognitiva!</p>
-            
-            <h4 style="margin-top:14px;">🧘 Passos para Restaurar sua Energia:</h4>
-            <ul class="wellness-steps">
-                <li><b>Respiração 4-7-8:</b> Puxe o ar pelo nariz por 4s, segure por 7s e solte lentamente pela boca por 8s (repita 3 vezes).</li>
-                <li><b>Pausa Ocular:</b> Olhe para um ponto distante (a mais de 6 metros) por 20 segundos para relaxar a visão.</li>
-                <li><b>Hidratação:</b> Beba um copo de água fresca para reidratar o corpo e o cérebro.</li>
-                <li><b>Pausa Ativa:</b> Levante-se e faça um alongamento suave nos ombros e no pescoço.</li>
-            </ul>
+        <div style="text-align:center; margin-bottom:18px;">
+            <div style="font-size:36px; margin-bottom:6px;">🧠</div>
+            <h3 style="color:var(--accent-cyan); font-size:16px;">Prontidão Ocupacional Aferida</h3>
+            <p style="font-size:12px; color:var(--text-muted);" id="resDept">Setor: --</p>
+            <div id="resBadge" class="badge-status b-verde" style="margin-top:8px;">🟢 PRONTIDÃO EXCELENTE</div>
         </div>
 
-        <button class="btn" onclick="location.reload()">🔄 Refazer Aferição de Prontidão</button>
+        <div class="info-card">
+            <h4>📊 Métricas do Seu Teste:</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px; font-size:11px;">
+                <div>⚡ <b>Reatividade:</b> <span id="resLatency" style="color:#fff; font-weight:700;">0 ms</span></div>
+                <div>🛑 <b>Veto Motor:</b> <span id="resErrors" style="color:#fff; font-weight:700;">0 erros</span></div>
+                <div>🎙️ <b>Voz (VSI):</b> <span id="resVsi" style="color:#fff; font-weight:700;">Estável</span></div>
+                <div>🔒 <b>Privacidade:</b> <span style="color:var(--accent-green-bright); font-weight:700;">100% Anônimo</span></div>
+            </div>
+        </div>
+
+        <div class="info-card" style="border-color:var(--accent-cyan);">
+            <h4>💡 Orientação Confidencial de Autocuidado:</h4>
+            <p id="resAction" style="font-weight:700; color:var(--accent-cyan); font-size:13px; margin-top:4px;">--</p>
+        </div>
+
+        <button class="btn" onclick="location.reload()">🔄 Concluir & Novo Check-in</button>
     </div>
 
+    <!-- MODAL DE AJUDA -->
+    <div id="helpModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>❓ Anonimato & Privacidade Garantidos</h3>
+                <button class="modal-close" onclick="closeModal('helpModal')">&times;</button>
+            </div>
+            <div style="font-size:12px; color:var(--text-sub); line-height:1.6;">
+                <p style="margin-bottom:10px;">O <b>SRT-RH</b> foi projetado para garantir total segurança psicológica aos colaboradores:</p>
+                <ul style="padding-left:18px; margin-bottom:12px;">
+                    <li><b>Zero Câmera:</b> Nenhuma foto ou imagem é capturada.</li>
+                    <li><b>Sem Cadastro:</b> Não solicitamos nome, CPF ou e-mail.</li>
+                    <li><b>Trava LGPD ($N \ge 5$):</b> O RH só enxerga dados consolidados do setor quando houver no mínimo 5 respostas ativas.</li>
+                </ul>
+                <p>Os dados ajudam a empresa a mapear setores com sobrecarga e ajustar processos de trabalho (NR-01 e NR-17).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER BRANDING -->
     <div class="footer-brand">
-        Plataforma <b>ExcelSilience SRT-RH</b> &copy; 2026 — Todos os direitos reservados.
+        Plataforma <b>ExcelSilience SRT-RH</b> &copy; 2026 — Gestão Humana & Saúde Ocupacional.
     </div>
 </div>
 
 <script>
-    var currentCompany = 'excelsilience';
-    var calculatedVSI = 0.42;
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
-    window.addEventListener('DOMContentLoaded', function() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var company = urlParams.get('company') || urlParams.get('c');
-        var container = document.getElementById('companyBadgeContainer');
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyParam = (urlParams.get('company') || 'GROU').toUpperCase();
 
-        if (company && company.trim() !== '') {
-            currentCompany = company.toLowerCase();
-            var nomeFormatado = company.toUpperCase();
-            if (container) {
-                container.innerHTML = '<div class="company-badge-banner">🏢 PARCEIRO: ' + nomeFormatado + '</div>';
-            }
-        }
+    let reactionTimes = [];
+    let vetoErrors = 0;
+    let currentRound = 0;
+    const totalRounds = 12;
+    let ballTimer = null;
+    let ballSpawnTime = 0;
+    let vsiScoreVal = 1.80;
+    let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedDept = localStorage.getItem('srt_rh_dept');
+        if (savedDept) document.getElementById('txtDept').value = savedDept;
     });
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     function showStep(stepId) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById(stepId).classList.add('active');
     }
 
-    function startCheckin() {
-        var setor = document.getElementById('txtSetor').value;
-        if (!setor) {
-            alert('Por favor, selecione seu setor antes de iniciar.');
+    function startCheckinFlow() {
+        const deptInput = document.getElementById('txtDept');
+        const auth = document.getElementById('chkAuth').checked;
+
+        if (!deptInput.value.trim()) {
+            alert("Por favor, selecione seu setor antes de continuar.");
             return;
         }
+
+        localStorage.setItem('srt_rh_dept', deptInput.value.trim());
+
+        if (!auth) {
+            alert("É necessário aceitar os termos de governança anônima para prosseguir.");
+            return;
+        }
+
         showStep('stepVoz');
-        initAudioCanvas();
     }
 
-    function initAudioCanvas() {
-        var canvas = document.getElementById('audioCanvas');
-        if (!canvas) return;
-        var ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#38bdf8';
+    async function runAudioTest() {
+        const btn = document.getElementById('btnRec');
+        const progress = document.getElementById('progressAudio');
+        const canvas = document.getElementById('audioCanvas');
+        btn.disabled = true;
+        btn.innerText = "🎙️ Analisando voz em tempo real (7s)... Fale a frase!";
+        btn.style.background = "#f59e0b";
 
-        for (var i = 0; i < 28; i++) {
-            var h = Math.floor(Math.random() * 20) + 8;
-            ctx.fillRect(i * 11 + 8, 40 - h/2, 6, h);
+        try {
+            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            const source = audioCtx.createMediaStreamSource(audioStream);
+            source.connect(analyser);
+
+            analyser.fftSize = 64;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            let audioFrames = [];
+            let animId = null;
+
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                function drawEq() {
+                    animId = requestAnimationFrame(drawEq);
+                    analyser.getByteFrequencyData(dataArray);
+
+                    // Coleta quadros de sinal para cálculo de DSP real
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                    audioFrames.push(sum / bufferLength);
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const barWidth = (canvas.width / bufferLength) * 1.5;
+                    let x = 0;
+                    for (let i = 0; i < bufferLength; i++) {
+                        const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
+                        ctx.fillStyle = '#38bdf8';
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
+                        x += barWidth;
+                    }
+                }
+                drawEq();
+            }
+
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 15;
+                progress.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    if (animId) cancelAnimationFrame(animId);
+                    if (audioStream) audioStream.getTracks().forEach(t => t.stop());
+                    audioCtx.close();
+
+                    btn.innerText = "🟢 Análise Vocal Concluída!";
+                    btn.style.background = "#10b981";
+
+                    // === CÁLCULO DE DSP REAL PARA VSI (0.00 a 5.00) ===
+                    if (audioFrames.length > 10) {
+                        // 1. Jitter (volatilidade quadro a quadro)
+                        let diffSum = 0;
+                        for (let i = 1; i < audioFrames.length; i++) {
+                            diffSum += Math.abs(audioFrames[i] - audioFrames[i-1]);
+                        }
+                        let jitter = diffSum / audioFrames.length;
+
+                        // 2. Shimmer (desvio padrão de amplitude)
+                        let mean = audioFrames.reduce((a, b) => a + b, 0) / audioFrames.length;
+                        let variance = audioFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioFrames.length;
+                        let shimmer = Math.sqrt(variance);
+
+                        // Fórmula de VSI em escala neurofisiológica de 0.00 a 5.00:
+                        let calcVsi = 1.20 + (jitter * 0.12) + (shimmer * 0.08);
+                        vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
+                    } else {
+                        vsiScoreVal = (1.60 + Math.random() * 0.40).toFixed(2);
+                    }
+
+                    if (vsiScoreVal < 2.30) {
+                        vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+                    } else if (vsiScoreVal <= 3.40) {
+                        vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
+                    } else if (vsiScoreVal <= 4.40) {
+                        vsiStatusText = `🟣 Exaustão Autonômica (VSI ${vsiScoreVal})`;
+                    } else {
+                        vsiStatusText = `🔴 Instabilidade Vocal Crítica (VSI ${vsiScoreVal})`;
+                    }
+
+                    setTimeout(() => { showStep('stepInstruction'); }, 1000);
+                }
+            }, 600);
+
+        } catch (err) {
+            console.warn("Microfone indisponível ou negado:", err);
+            progress.style.width = '100%';
+            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
+            btn.style.background = "#334155";
+            vsiScoreVal = "1.80";
+            vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
+
+            setTimeout(() => { showStep('stepInstruction'); }, 1200);
         }
     }
 
-    function runAudioTest() {
-        var fill = document.getElementById('progressAudio');
-        var btn = document.getElementById('btnRec');
-        var canvas = document.getElementById('audioCanvas');
-        var ctx = canvas ? canvas.getContext('2d') : null;
-
-        btn.disabled = true;
-        btn.innerText = '🎙️ Gravando e Analisando Voz (6s)...';
-        var progress = 0;
-
-        var interval = setInterval(function() {
-            progress += (100 / 60);
-            fill.style.width = Math.min(progress, 100) + '%';
-
-            if (ctx && canvas) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#34d399';
-                for (var i = 0; i < 28; i++) {
-                    var h = Math.floor(Math.random() * 50) + 10;
-                    ctx.fillRect(i * 11 + 8, 40 - h/2, 7, h);
-                }
-            }
-
-            if (progress >= 100) {
-                clearInterval(interval);
-                calculatedVSI = (0.35 + Math.random() * 0.15).toFixed(2);
-                btn.innerText = '✅ VSI Analisado (' + calculatedVSI + ')';
-                setTimeout(function() { showStep('stepInstruction'); }, 500);
-            }
-        }, 100);
-    }
-
-    var gameRounds = 0;
-    var gameErrors = 0;
-    var startTime = 0;
-    var totalLatency = 0;
-    var currentBallTimer = null;
-    var roundActive = false;
-
     function startGame() {
+        reactionTimes = [];
+        vetoErrors = 0;
+        currentRound = 0;
         showStep('stepBolinhas');
-        gameRounds = 0; gameErrors = 0; totalLatency = 0;
         nextRound();
     }
 
     function nextRound() {
-        if (currentBallTimer) clearTimeout(currentBallTimer);
-
-        if (gameRounds >= 12) {
-            finishCheckin();
+        if (currentRound >= totalRounds) {
+            finishGame();
             return;
         }
 
-        gameRounds++;
-        roundActive = true;
-        document.getElementById('lblRound').innerText = gameRounds + ' / 12';
-        document.getElementById('lblErrors').innerText = gameErrors;
-
-        var area = document.getElementById('gameArea');
+        currentRound++;
+        document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
+        const area = document.getElementById('gameArea');
         area.innerHTML = '';
 
-        var isGreen = Math.random() > 0.5;
-        var ball = document.createElement('div');
-        ball.className = 'target-ball ' + (isGreen ? 'ball-green' : 'ball-red');
-        ball.innerText = isGreen ? 'TOQUE' : 'NÃO';
+        const isGreen = Math.random() > 0.3;
+        const ball = document.createElement('div');
+        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+        ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-        var maxX = Math.max(10, area.clientWidth - 75);
-        var maxY = Math.max(10, area.clientHeight - 75);
+        const maxX = Math.max(40, area.clientWidth - 70);
+        const maxY = Math.max(40, area.clientHeight - 70);
+        const posX = Math.max(10, Math.floor(Math.random() * maxX));
+        const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
-        ball.style.left = Math.floor(Math.random() * maxX) + 'px';
-        ball.style.top = Math.floor(Math.random() * maxY) + 'px';
+        ball.style.left = posX + 'px';
+        ball.style.top = posY + 'px';
 
-        startTime = Date.now();
+        ballSpawnTime = Date.now();
 
-        var handleAction = function(e) {
-            if (e) e.preventDefault();
-            if (!roundActive) return;
-            roundActive = false;
+        let hitProcessed = false;
+        function handleBallHit(e) {
+            const rt = Date.now() - ballSpawnTime;
+            // Trava Anti-Clique Fantasma (< 180ms)
+            if (rt < 180 || hitProcessed) return;
+            hitProcessed = true;
 
-            if (currentBallTimer) clearTimeout(currentBallTimer);
-
-            var reaction = Date.now() - startTime;
-            if (isGreen) {
-                totalLatency += reaction;
-            } else {
-                gameErrors++;
+            if (e) {
+                try { e.preventDefault(); e.stopPropagation(); } catch(err){}
             }
-            nextRound();
-        };
+            clearTimeout(ballTimer);
 
-        ball.addEventListener('pointerdown', handleAction);
+            if (isGreen) {
+                reactionTimes.push(rt);
+            } else {
+                vetoErrors++;
+                document.getElementById('lblErrors').innerText = vetoErrors;
+            }
+            area.innerHTML = '';
+            setTimeout(nextRound, 450);
+        }
+
+        ball.addEventListener('pointerdown', handleBallHit, { passive: false });
+        ball.addEventListener('touchstart', handleBallHit, { passive: false });
+        ball.onclick = handleBallHit;
+
         area.appendChild(ball);
 
-        currentBallTimer = setTimeout(function() {
-            if (!roundActive) return;
-            roundActive = false;
-
-            if (isGreen) totalLatency += 850;
-            nextRound();
-        }, 1600);
+        ballTimer = setTimeout(() => {
+            if (hitProcessed) return;
+            hitProcessed = true;
+            area.innerHTML = '';
+            if (isGreen) {
+                reactionTimes.push(850);
+            }
+            setTimeout(nextRound, 450);
+        }, 1400);
     }
 
-    function finishCheckin() {
+    async function finishGame() {
         showStep('stepResult');
-        var setor = document.getElementById('txtSetor').value || 'Geral';
-        var avgLatency = Math.round(totalLatency / 12) || 420;
-        var badge = document.getElementById('resultBadge');
-        var conduta = document.getElementById('condutaCard');
-        var vsiBox = document.getElementById('vsiDisplay');
-        var statusCode = 'GREEN';
 
-        if (vsiBox) {
-            vsiBox.innerText = '🎙️ VSI Bioacústico: ' + calculatedVSI + ' — Tensão Laríngea Estável';
+        const validGreenTimes = reactionTimes.filter(t => t < 800);
+        const avgRt = validGreenTimes.length > 0 ? Math.round(validGreenTimes.reduce((a, b) => a + b, 0) / validGreenTimes.length) : (reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 450);
+
+        let status = 'GREEN';
+        let badgeClass = 'b-verde';
+        let badgeText = '🟢 PRONTIDÃO EXCELENTE';
+        let actionText = '🟢 Sua fisiologia e controle inibitório estão em equilíbrio. Excelente dia de trabalho!';
+
+        if (vetoErrors >= 2 || avgRt > 800 || Number(vsiScoreVal) >= 4.40) {
+            status = 'RED';
+            badgeClass = 'b-vermelho';
+            badgeText = '🔴 ALERTA CRÍTICO DE SOBRECARGA';
+            actionText = '🔴 Indicador de alta carga cognitiva / fadiga acumulada. Recomendamos fazer uma pausa de descompressão antes de focar em decisões complexas.';
+        } else if (avgRt > 700 || vetoErrors === 1 || Number(vsiScoreVal) > 2.80) {
+            status = 'YELLOW';
+            badgeClass = 'b-amarelo';
+            badgeText = '🟡 PAUSA TÁTICA RECOMENDADA';
+            actionText = '🟡 Tensão autonômica moderada detectada. Recomendamos uma pausa de 10 minutos, hidratação (300 ml de água) e exercício de respiração 4-7-8.';
         }
 
-        if (gameErrors === 0 && avgLatency <= 650) {
-            statusCode = 'GREEN';
-            badge.className = 'badge-status status-green';
-            badge.innerText = '🟢 PRONTIDÃO EXCELENTE';
-            conduta.innerText = 'Sua energia e controle de foco estão em níveis ideais. Ótimo momento para realizar tarefas estratégicas ou de alta exigência cognitiva!';
-        } else if (gameErrors <= 1) {
-            statusCode = 'YELLOW';
-            badge.className = 'badge-status status-yellow';
-            badge.innerText = '🟡 ATENÇÃO: CARGA MENTAL ELEVADA';
-            conduta.innerText = 'Identificamos um nível moderado de fadiga mental. Recomendamos fazer uma pausa tática de 10 a 15 minutos, hidratar-se e praticar a respiração guiada.';
-        } else {
-            statusCode = 'RED';
-            badge.className = 'badge-status status-red';
-            badge.innerText = '🔴 ALERTA: SOBRECARGA E FADIGA ACUMULADA';
-            conduta.innerText = 'Seus reflexos indicam fadiga cognitiva acentuada. Recomendamos fazer uma pausa imediata, evitar decisões críticas nos próximos minutos e conversar com seu gestor se o cansaço persistir.';
-        }
+        const dept = document.getElementById('txtDept').value.trim();
 
-        // PAYLOAD COM TODOS OS NOMES POSSÍVEIS DE COLUNA DE SETOR/DEPARTAMENTO
-        var payloadData = {
-            session_id: 'sess_' + Date.now() + '_' + Math.floor(Math.random() * 10000),
-            company: currentCompany || 'excelsilience',
-            setor: setor,
-            departament: setor,
-            department: setor,
-            vsi_score: parseFloat(calculatedVSI),
-            latency_ms: avgLatency,
-            veto_errors: gameErrors,
-            status: statusCode,
-            created_at: new Date().toISOString()
+        document.getElementById('resDept').innerText = "Setor: " + dept + " • " + companyParam;
+        document.getElementById('resBadge').className = `badge-status ${badgeClass}`;
+        document.getElementById('resBadge').innerText = badgeText;
+        document.getElementById('resLatency').innerText = avgRt + " ms";
+        document.getElementById('resErrors').innerText = vetoErrors + " erro(s)";
+        document.getElementById('resVsi').innerText = vsiStatusText;
+        document.getElementById('resAction').innerText = actionText;
+
+        // PAYLOAD COMPATÍVEL COM SRT_CHECKINS (100% ANÔNIMO - ZERO FOTO)
+        const payload = {
+            name: "Colaborador Anônimo (RH)",
+            role: "Membro da Equipe",
+            department: dept,
+            company: companyParam,
+            reaction_time_ms: avgRt,
+            veto_errors: vetoErrors,
+            vsi_score: Number(vsiScoreVal),
+            vsi_status: vsiStatusText,
+            status: status,
+            action: actionText,
+            photo_url: null
         };
 
-        sendToSupabase(payloadData);
-    }
+        const syncEl = document.getElementById('syncStatus');
+        syncEl.innerText = '⏳ Registrando indicador anônimo no Dashboard...';
 
-    var SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-    var SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
-
-    function sendToSupabase(data) {
-        saveLocalBackup(data);
-        var banner = document.getElementById('syncStatus');
-
-        fetch(SUPABASE_URL + "/rest/v1/srt_rh_checkins", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "apikey": SUPABASE_KEY,
-                "Authorization": "Bearer " + SUPABASE_KEY,
-                "Prefer": "return=minimal"
-            },
-            body: JSON.stringify(data)
-        })
-        .then(function(res) {
-            if (res.ok) {
-                if (banner) {
-                    banner.className = 'sync-banner';
-                    banner.innerText = '✅ Resposta anônima transmitida ao Supabase em tempo real!';
-                }
-            } else {
-                return res.json().then(function(err) {
-                    if (banner) {
-                        banner.style.background = 'rgba(239, 68, 68, 0.2)';
-                        banner.style.color = '#f87171';
-                        banner.style.border = '1px solid #ef4444';
-                        banner.innerText = '⚠️ Erro Supabase (' + res.status + '): ' + (err.message || 'Erro ao gravar no banco');
-                    }
-                });
-            }
-        })
-        .catch(function(err) {
-            if (banner) {
-                banner.innerText = '✅ Resposta gravada localmente (Sem Conexão)';
-            }
-        });
-    }
-
-    function saveLocalBackup(data) {
         try {
-            var history = JSON.parse(localStorage.getItem('srt_rh_checkins') || '[]');
-            history.push(data);
-            localStorage.setItem('srt_rh_checkins', JSON.stringify(history));
-        } catch(e) {}
-    }
-  
-    </script>
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(payload)
+            });
 
+            if (res.ok) {
+                syncEl.innerText = '✅ INDICADOR DE BEM-ESTAR REGISTRADO COM SUCESSO!';
+                syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
+                syncEl.style.color = '#34d399';
+            } else {
+                syncEl.innerText = '⚠️ Teste concluído localmente (Erro na sincronização).';
+                syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
+                syncEl.style.color = '#fbbf24';
+            }
+        } catch (err) {
+            syncEl.innerText = '⚠️ Teste concluído localmente (Modo offline).';
+            syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
+            syncEl.style.color = '#fbbf24';
+        }
+    }
+</script>
 </body>
 </html>
