@@ -454,13 +454,20 @@
                 const isRH = (item._tableName === 'srt_rh_checkins');
                 const faceCheckStatus = item.face_match || (isRH ? "🔒 Isento de Foto (SRT-RH Anônimo)" : (photoUrl ? "🟢 Foto OK (Match 3D)" : "🔒 Aguardando Foto"));
 
-                // Status de Voz VSI
-                let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável</span>`;
+                // Status de Voz VSI (Escala Calibrada 0.00 a 5.00)
+                const vsiVal = item.vsi_score || item.vsi || item.vsi_val;
+                const vsiValNum = Number(vsiVal);
                 const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
-                if (vsiText.includes('amarelo') || vsiText.includes('atenção') || vsiText.includes('moderada')) {
-                    voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Moderada</span>`;
-                } else if (vsiText.includes('vermelho') || vsiText.includes('alta') || vsiText.includes('crítica') || vsiText.includes('roxo')) {
-                    voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica</span>`;
+
+                let vsiDisplayVal = (!isNaN(vsiValNum) && vsiValNum > 0) ? ` (VSI ${vsiValNum.toFixed(2)})` : '';
+                let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável${vsiDisplayVal}</span>`;
+
+                if (vsiText.includes('vermelho') || vsiText.includes('crítica') || vsiText.includes('critica') || (!isNaN(vsiValNum) && vsiValNum >= 4.41)) {
+                    voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Instabilidade Crítica${vsiDisplayVal}</span>`;
+                } else if (vsiText.includes('roxo') || vsiText.includes('exaustão') || vsiText.includes('exaustao') || (!isNaN(vsiValNum) && vsiValNum >= 3.41 && vsiValNum <= 4.40)) {
+                    voiceStatusHtml = `<span class="badge-voice" style="color:#c084fc;">🟣 Exaustão Autonômica${vsiDisplayVal}</span>`;
+                } else if (vsiText.includes('amarelo') || vsiText.includes('atenção') || vsiText.includes('atencao') || vsiText.includes('moderada') || vsiText.includes('modulada') || (!isNaN(vsiValNum) && vsiValNum >= 2.30 && vsiValNum <= 3.40)) {
+                    voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Modulada${vsiDisplayVal}</span>`;
                 }
 
                 // Categoria e Trava Operacional
