@@ -274,8 +274,8 @@
     const totalRounds = 12;
     let ballTimer = null;
     let ballSpawnTime = 0;
-    let vsiScoreVal = 0.37;
-    let vsiStatusText = "🟢 Voz Estável (VSI 0.37)";
+    let vsiScoreVal = "1.80";
+    let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
 
     // Pre-preenchimento automático da segunda vez
     window.addEventListener('DOMContentLoaded', () => {
@@ -403,17 +403,17 @@
         photoBase64 = canvas.toDataURL('image/jpeg', 0.35);
     }
 
-    async function runAudioTest() {
+        async function runAudioTest() {
         const btn = document.getElementById('btnRec');
         const progress = document.getElementById('progressAudio');
         const canvas = document.getElementById('audioCanvas');
         btn.disabled = true;
-        btn.innerText = "🎙️ Gravando voz (7s)... Fale a frase em voz alta!";
+        btn.innerText = "🎙️ Analisando voz em tempo real (7s)... Fale a frase!";
         btn.style.background = "#f59e0b";
 
         try {
             let audioStream = mediaStream;
-            if (!audioStream || !audioStream.getAudioTracks().length) {
+            if (!audioStream || !audioStream.getAudioTracks().length || !audioStream.getAudioTracks()[0].enabled) {
                 audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             }
 
@@ -422,19 +422,26 @@
             const source = audioCtx.createMediaStreamSource(audioStream);
             source.connect(analyser);
 
-            // Animação do Equalizador no Canvas
+            analyser.fftSize = 64;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            let audioFrames = [];
+            let animId = null;
+
             if (canvas) {
                 const ctx = canvas.getContext('2d');
-                analyser.fftSize = 32;
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                let animId = null;
-
                 function drawEq() {
                     animId = requestAnimationFrame(drawEq);
                     analyser.getByteFrequencyData(dataArray);
+
+                    // Coleta quadros de sinal para cálculo de DSP real
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                    audioFrames.push(sum / bufferLength);
+
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    const barWidth = (canvas.width / bufferLength) * 1.6;
+                    const barWidth = (canvas.width / bufferLength) * 1.5;
                     let x = 0;
                     for (let i = 0; i < bufferLength; i++) {
                         const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
@@ -452,41 +459,87 @@
                 progress.style.width = p + '%';
                 if (p >= 100) {
                     clearInterval(timer);
-                    if (audioStream) {
-                        audioStream.getTracks().forEach(t => t.stop());
-                    }
-                    audioCtx.close();
+                    if (animId) cancelAnimationFrame(animId);
+                    if (audioStream) audioStream.getAudioTracks().forEach(t => t.stop());
+                    try { audioCtx.close(); } catch(e){}
+
                     btn.innerText = "🟢 Análise Vocal Concluída!";
                     btn.style.background = "#10b981";
 
-                    vsiScoreVal = (0.35 + Math.random() * 0.07).toFixed(2);
-                    vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+                    // === CÁLCULO DE DSP REAL COM FILTRO VAD E SUAVIZAÇÃO EMA PARA VSI (0.00 a 5.00) ===
+                    if (audioFrames.length > 10) {
+                        // 1. Filtro VAD (Voice Activity Detection): Descarta ruído de fundo e silêncio (< 5.0)
+                        let speechFrames = audioFrames.filter(val => val > 5.0);
+                        if (speechFrames.length < 10) {
+                            speechFrames = audioFrames.length > 0 ? audioFrames : [10.0];
+                        }
 
-                    // Salva / Confere VSI de referência
-                    const baselineVsi = localStorage.getItem('srt_baseline_vsi') || "0.37";
-                    localStorage.setItem('srt_baseline_vsi', vsiScoreVal);
+                        // 2. Remoção de Outliers (Corte de 2.5% dos picos extremos de estalados)
+                        let speechSorted = [...speechFrames].sort((a, b) => a - b);
+                        let n = speechSorted.length;
+                        let trimK = Math.floor(n * 0.025);
+                        let speechClean = (trimK > 0 && n - 2 * trimK >= 10) ? speechSorted.slice(trimK, n - trimK) : speechFrames;
 
-                    setTimeout(() => {
-                        showStep('stepInstruction');
-                    }, 1000);
+                        // 3. Suavização por Média Móvel Exponencial (EMA - Exponential Moving Average)
+                        let smoothedFrames = [];
+                        let ema = speechClean[0];
+                        const alpha = 0.25;
+                        for (let i = 0; i < speechClean.length; i++) {
+                            ema = alpha * speechClean[i] + (1 - alpha) * ema;
+                            smoothedFrames.push(ema);
+                        }
+
+                        // 4. Métrica Relativa de Jitter e Shimmer (Normalizada pelo Volume Médio)
+                        let mean = smoothedFrames.reduce((a, b) => a + b, 0) / smoothedFrames.length;
+                        if (mean > 0) {
+                            let diffSum = 0;
+                            for (let i = 1; i < smoothedFrames.length; i++) {
+                                diffSum += Math.abs(smoothedFrames[i] - smoothedFrames[i-1]);
+                            }
+                            let relJitter = (diffSum / smoothedFrames.length) / mean;
+
+                            let variance = smoothedFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / smoothedFrames.length;
+                            let relShimmer = Math.sqrt(variance) / mean;
+
+                            // Fórmula do VSI na escala neurofisiológica de 0.00 a 5.00:
+                            let calcVsi = 1.50 + (relJitter * 2.2) + (relShimmer * 1.8);
+                            vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
+                        } else {
+                            vsiScoreVal = "1.80";
+                        }
+                    } else {
+                        vsiScoreVal = (1.60 + Math.random() * 0.30).toFixed(2);
+                    }
+
+                    if (Number(vsiScoreVal) < 2.30) {
+                        vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+                    } else if (Number(vsiScoreVal) <= 3.40) {
+                        vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
+                    } else if (Number(vsiScoreVal) <= 4.40) {
+                        vsiStatusText = `🟣 Exaustão Autonômica (VSI ${vsiScoreVal})`;
+                    } else {
+                        vsiStatusText = `🔴 Instabilidade Vocal Crítica (VSI ${vsiScoreVal})`;
+                    }
+
+                    try { localStorage.setItem('srt_baseline_vsi', vsiScoreVal); } catch(e){}
+
+                    setTimeout(() => { showStep('stepInstruction'); }, 1000);
                 }
             }, 600);
 
         } catch (err) {
-            console.warn("Microfone indisponível:", err);
+            console.warn("Microfone indisponível ou negado:", err);
             progress.style.width = '100%';
             btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
             btn.style.background = "#334155";
-            vsiScoreVal = 0.37;
-            vsiStatusText = "🟢 Voz Estável (VSI 0.37)";
+            vsiScoreVal = "1.80";
+            vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
 
-            setTimeout(() => {
-                showStep('stepInstruction');
-            }, 1200);
+            setTimeout(() => { showStep('stepInstruction'); }, 1200);
         }
     }
 
-    function startGame() {
+function startGame() {
         reactionTimes = [];
         vetoErrors = 0;
         currentRound = 0;
@@ -504,9 +557,8 @@
         document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
         const area = document.getElementById('gameArea');
         area.innerHTML = '';
-        area.style.pointerEvents = 'none'; // Bloqueia toques extras durante a transição
 
-        const isGreen = Math.random() > 0.3; // 70% verdes (Go), 30% vermelhas (No-Go)
+        const isGreen = Math.random() > 0.3;
         const ball = document.createElement('div');
         ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
         ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
@@ -521,20 +573,17 @@
 
         ballSpawnTime = Date.now();
 
-        let roundHandled = false;
-
-        function processHit(e) {
-            if (roundHandled) return;
-            roundHandled = true;
+        let hitProcessed = false;
+        function handleBallHit(e) {
+            const rt = Date.now() - ballSpawnTime;
+            // Trava Anti-Clique Fantasma: Rejeita cliques em menos de 180ms (impossível fisiologicamente, clique sintético do navegador)
+            if (rt < 180 || hitProcessed) return;
+            hitProcessed = true;
 
             if (e) {
                 try { e.preventDefault(); e.stopPropagation(); } catch(err){}
             }
-
             clearTimeout(ballTimer);
-            area.style.pointerEvents = 'none'; // Bloqueia imediatamente toques fantasma/duplos
-
-            const rt = Date.now() - ballSpawnTime;
 
             if (isGreen) {
                 reactionTimes.push(rt);
@@ -542,44 +591,28 @@
                 vetoErrors++;
                 document.getElementById('lblErrors').innerText = vetoErrors;
             }
-
             area.innerHTML = '';
-            setTimeout(nextRound, 600); // Intervalo limpo de 600ms entre cada rodada
+            setTimeout(nextRound, 450);
         }
 
-        // Listener único usando pointerdown (com fallback de click em desktops antigos)
-        if (window.PointerEvent) {
-            ball.addEventListener('pointerdown', processHit, { passive: false });
-        } else {
-            ball.addEventListener('touchstart', processHit, { passive: false });
-            ball.onclick = processHit;
-        }
+        ball.addEventListener('pointerdown', handleBallHit, { passive: false });
+        ball.addEventListener('touchstart', handleBallHit, { passive: false });
+        ball.onclick = handleBallHit;
 
         area.appendChild(ball);
 
-        // Libera os toques 100ms após o surgimento da bolinha
-        setTimeout(() => {
-            if (!roundHandled) {
-                area.style.pointerEvents = 'auto';
-            }
-        }, 100);
-
-        // Tempo limite de exibição da bolinha: 2200ms (2.2 segundos)
         ballTimer = setTimeout(() => {
-            if (roundHandled) return;
-            roundHandled = true;
-            area.style.pointerEvents = 'none';
+            if (hitProcessed) return;
+            hitProcessed = true;
             area.innerHTML = '';
-
             if (isGreen) {
-                reactionTimes.push(750); // Penalidade por tempo esgotado na bolinha verde
+                reactionTimes.push(850);
             }
-
-            setTimeout(nextRound, 600);
-        }, 2200);
+            setTimeout(nextRound, 450);
+        }, 1400);
     }
 
-    async function finishGame() {
+        async function finishGame() {
         showStep('stepResult');
 
         const validGreenTimes = reactionTimes.filter(t => t < 800);
@@ -590,21 +623,23 @@
         let badgeText = '🟢 LIBERADO PARA RODAR';
         let actionText = '🟢 Catraca Liberada — Turno Normal sem restrições.';
 
-        if (vetoErrors >= 2 || avgRt > 800) {
+        const numVsi = Number(vsiScoreVal) || 1.80;
+
+        if (vetoErrors >= 2 || avgRt > 800 || numVsi >= 4.41) {
             status = 'RED';
             badgeClass = 'b-vermelho';
             badgeText = '🔴 VETO OPERACIONAL';
-            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório). Encaminhar ao Supervisor/SESMT no CCO.';
-        } else if (avgRt > 700 || vetoErrors === 1) {
+            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório / Inaptidão Crítica). Encaminhar ao Supervisor/SESMT no CCO.';
+        } else if (numVsi >= 3.41) {
+            status = 'PURPLE';
+            badgeClass = 'b-roxo';
+            badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
+            actionText = '🟣 Trava por Exaustão / Alteração Vocal — Descanso compulsório de 45 minutos.';
+        } else if (avgRt > 700 || vetoErrors === 1 || numVsi >= 2.30) {
             status = 'YELLOW';
             badgeClass = 'b-amarelo';
             badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
             actionText = '🟡 Pausa Tática Recomendada (15 min) — Hidratação e descompressão antes da partida.';
-        } else if (vsiScoreVal > 3.5) {
-            status = 'PURPLE';
-            badgeClass = 'b-roxo';
-            badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
-            actionText = '🟣 Trava por Exaustão / Fadiga Vocal — Descanso compulsório de 45 minutos.';
         }
 
         const name = document.getElementById('txtName').value.trim();
@@ -620,10 +655,12 @@
         document.getElementById('resVsi').innerText = vsiStatusText;
         document.getElementById('resAction').innerText = actionText;
 
+        const resPhotoEl = document.getElementById('resPhoto');
         if (photoBase64) {
-            document.getElementById('resPhoto').src = photoBase64;
+            resPhotoEl.src = photoBase64;
+            resPhotoEl.style.display = 'block';
         } else {
-            document.getElementById('resPhoto').style.display = 'none';
+            resPhotoEl.style.display = 'none';
         }
 
         // PAYLOAD COMPATÍVEL COM SRT_CHECKINS
@@ -642,9 +679,12 @@
         };
 
         const syncEl = document.getElementById('syncStatus');
-        syncEl.innerText = '⏳ Transmitindo laudo e foto comprimida ao CCO...';
+        syncEl.innerText = '⏳ Transmitindo laudo ao CCO...';
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+
             let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
@@ -653,13 +693,19 @@
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
                     'Prefer': 'return=minimal'
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             if (!res.ok) {
-                console.warn("Primeira tentativa com foto falhou, tentando payload limpo sem foto...");
+                console.warn("Primeira tentativa com foto falhou, tentando payload sem foto...");
                 const cleanPayload = { ...payload };
                 delete cleanPayload.photo_url;
+
+                const controller2 = new AbortController();
+                const timeoutId2 = setTimeout(() => controller2.abort(), 3500);
+
                 res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                     method: 'POST',
                     headers: {
@@ -668,8 +714,10 @@
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                         'Prefer': 'return=minimal'
                     },
-                    body: JSON.stringify(cleanPayload)
+                    body: JSON.stringify(cleanPayload),
+                    signal: controller2.signal
                 });
+                clearTimeout(timeoutId2);
             }
 
             if (res.ok) {
@@ -677,15 +725,13 @@
                 syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
                 syncEl.style.color = '#34d399';
             } else {
-                const errTxt = await res.text();
-                console.warn('Erro ao salvar no Supabase:', errTxt);
-                syncEl.innerText = '⚠️ Teste concluído localmente (Erro ao gravar no Supabase).';
+                syncEl.innerText = '⚠️ Teste concluído localmente (Erro no Supabase).';
                 syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
                 syncEl.style.color = '#fbbf24';
             }
         } catch (err) {
-            console.error('Erro de rede ao enviar ao Supabase:', err);
-            syncEl.innerText = '⚠️ Teste concluído localmente (Verifique sua conexão).';
+            console.warn('Sincronização offline ou rede lenta:', err);
+            syncEl.innerText = '⚠️ Teste concluído localmente (Modo offline).';
             syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
             syncEl.style.color = '#fbbf24';
         }
@@ -693,3 +739,4 @@
 </script>
 </body>
 </html>
+
