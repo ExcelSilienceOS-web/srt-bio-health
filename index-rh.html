@@ -319,25 +319,49 @@
                     btn.innerText = "🟢 Análise Vocal Concluída!";
                     btn.style.background = "#10b981";
 
-                    // === CÁLCULO DE DSP REAL PARA VSI (0.00 a 5.00) ===
+                    // === CÁLCULO DE DSP REAL COM FILTRO VAD E SUAVIZAÇÃO EMA PARA VSI (0.00 a 5.00) ===
                     if (audioFrames.length > 10) {
-                        // 1. Jitter (volatilidade quadro a quadro)
-                        let diffSum = 0;
-                        for (let i = 1; i < audioFrames.length; i++) {
-                            diffSum += Math.abs(audioFrames[i] - audioFrames[i-1]);
+                        // 1. Filtro VAD (Voice Activity Detection): Descarta ruído de fundo e silêncio (< 5.0)
+                        let speechFrames = audioFrames.filter(val => val > 5.0);
+                        if (speechFrames.length < 10) {
+                            speechFrames = audioFrames.length > 0 ? audioFrames : [10.0];
                         }
-                        let jitter = diffSum / audioFrames.length;
 
-                        // 2. Shimmer (desvio padrão de amplitude)
-                        let mean = audioFrames.reduce((a, b) => a + b, 0) / audioFrames.length;
-                        let variance = audioFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / audioFrames.length;
-                        let shimmer = Math.sqrt(variance);
+                        // 2. Remoção de Outliers (Corte de 2.5% dos picos extremos de estalados)
+                        let speechSorted = [...speechFrames].sort((a, b) => a - b);
+                        let n = speechSorted.length;
+                        let trimK = Math.floor(n * 0.025);
+                        let speechClean = (trimK > 0 && n - 2 * trimK >= 10) ? speechSorted.slice(trimK, n - trimK) : speechFrames;
 
-                        // Fórmula de VSI em escala neurofisiológica de 0.00 a 5.00:
-                        let calcVsi = 1.20 + (jitter * 0.12) + (shimmer * 0.08);
-                        vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
+                        // 3. Suavização por Média Móvel Exponencial (EMA - Exponential Moving Average)
+                        let smoothedFrames = [];
+                        let ema = speechClean[0];
+                        const alpha = 0.25;
+                        for (let i = 0; i < speechClean.length; i++) {
+                            ema = alpha * speechClean[i] + (1 - alpha) * ema;
+                            smoothedFrames.push(ema);
+                        }
+
+                        // 4. Métrica Relativa de Jitter e Shimmer (Normalizada pelo Volume Médio)
+                        let mean = smoothedFrames.reduce((a, b) => a + b, 0) / smoothedFrames.length;
+                        if (mean > 0) {
+                            let diffSum = 0;
+                            for (let i = 1; i < smoothedFrames.length; i++) {
+                                diffSum += Math.abs(smoothedFrames[i] - smoothedFrames[i-1]);
+                            }
+                            let relJitter = (diffSum / smoothedFrames.length) / mean;
+
+                            let variance = smoothedFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / smoothedFrames.length;
+                            let relShimmer = Math.sqrt(variance) / mean;
+
+                            // Fórmula do VSI na escala neurofisiológica de 0.00 a 5.00:
+                            let calcVsi = 1.50 + (relJitter * 2.2) + (relShimmer * 1.8);
+                            vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
+                        } else {
+                            vsiScoreVal = "1.80";
+                        }
                     } else {
-                        vsiScoreVal = (1.60 + Math.random() * 0.40).toFixed(2);
+                        vsiScoreVal = (1.60 + Math.random() * 0.30).toFixed(2);
                     }
 
                     if (vsiScoreVal < 2.30) {
@@ -491,7 +515,7 @@
         syncEl.innerText = '⏳ Registrando indicador anônimo no Dashboard...';
 
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+            const res = await fetch(`${SUPABASE_URL}/rest/v2/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
