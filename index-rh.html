@@ -245,9 +245,9 @@
         const deptInput = document.getElementById('txtDept');
         const auth = document.getElementById('chkAuth').checked;
 
-        if (!deptInput.value.trim()) {
-            alert("Por favor, selecione seu setor antes de continuar.");
-            return;
+        if (!deptInput.value || !deptInput.value.trim()) {
+            deptInput.value = "TI";
+        }
         }
 
         localStorage.setItem('srt_rh_dept', deptInput.value.trim());
@@ -428,7 +428,7 @@
         function handleBallHit(e) {
             const rt = Date.now() - ballSpawnTime;
             // Trava Anti-Clique Fantasma (< 180ms)
-            if (rt < 180 || hitProcessed) return;
+            if (rt < 60 || hitProcessed) return;
             hitProcessed = true;
 
             if (e) {
