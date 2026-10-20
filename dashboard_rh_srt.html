@@ -871,7 +871,8 @@
 
                 // Busca dados das tabelas do Supabase
                 const tables = [
-                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` }
+                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` },
+                { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` }
             ];
 
                 const results = await Promise.allSettled(tables.map(t => fetch(t.url, { headers: h }).then(r => r.ok ? r.json().then(d => ({ table: t.name, data: d })) : { table: t.name, data: [] })));
@@ -881,7 +882,8 @@
                     if (resObj.status === 'fulfilled' && resObj.value && Array.isArray(resObj.value.data)) {
                         const tableName = resObj.value.table;
                         resObj.value.data.forEach(item => {
-                            allFetched.push({ ...item, _tableName: tableName });
+                            if (item.company === 'ES_CRISIS_EXEC' || (item.action && item.action.includes('[ES-CRISE C-SUITE]'))) return;
+                        allFetched.push({ ...item, _tableName: tableName });
                         });
                     }
                 }
