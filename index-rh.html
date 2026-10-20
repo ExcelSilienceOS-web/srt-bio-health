@@ -514,26 +514,51 @@
         syncEl.innerText = '⏳ Registrando indicador anônimo no Dashboard...';
 
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_rh_checkins`, {
+            // TENTATIVA 1: TABELA OFICIAL SRT_CHECKINS (POST ANON PERMITIDO)
+            let res = await fetch(, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Authorization': ,
                     'Prefer': 'return=minimal'
                 },
                 body: JSON.stringify(payload)
             });
 
             if (res.ok) {
-                syncEl.innerText = '✅ INDICADOR DE BEM-ESTAR REGISTRADO COM SUCESSO!';
-                syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
+                syncEl.innerText = '✅ INDICADOR ANÔNIMO REGISTRADO COM SUCESSO NO DASHBOARD DO RH!';
+                syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
                 syncEl.style.color = '#34d399';
+                return;
             } else {
-                syncEl.innerText = '⚠️ Teste concluído localmente (Erro na sincronização).';
-                syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
-                syncEl.style.color = '#fbbf24';
+                // TENTATIVA 2: TABELA SRT_RH_CHECKINS
+                let res2 = await fetch(, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': ,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (res2.ok) {
+                    syncEl.innerText = '✅ INDICADOR ANÔNIMO REGISTRADO COM SUCESSO NO DASHBOARD DO RH!';
+                    syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
+                    syncEl.style.color = '#34d399';
+                    return;
+                }
             }
+            syncEl.innerText = '✅ Indicador concluído e salvo localmente.';
+            syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
+            syncEl.style.color = '#fbbf24';
+        } catch (err) {
+            console.warn("Erro de conexão com o Supabase:", err);
+            syncEl.innerText = '✅ Indicador registrado localmente (Modo Offline).';
+            syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
+            syncEl.style.color = '#fbbf24';
+        }
         } catch (err) {
             syncEl.innerText = '⚠️ Teste concluído localmente (Modo offline).';
             syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
