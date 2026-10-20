@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>ExcelSilience SRT-RH — Aferição de Prontidão Ocupacional</title>
     <style>
         :root {
@@ -232,12 +229,8 @@
     let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
 
     window.addEventListener('DOMContentLoaded', () => {
-        try {
-            const savedDept = localStorage.getItem('srt_rh_dept');
-            if (savedDept && document.getElementById('txtDept')) {
-                document.getElementById('txtDept').value = savedDept;
-            }
-        } catch(e) { console.warn('LocalStorage inacessível:', e); }
+        const savedDept = localStorage.getItem('srt_rh_dept');
+        if (savedDept) document.getElementById('txtDept').value = savedDept;
     });
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -249,30 +242,21 @@
     }
 
     function startCheckinFlow() {
-        try {
-            const deptInput = document.getElementById('txtDept');
-            const auth = document.getElementById('chkAuth') ? document.getElementById('chkAuth').checked : true;
+        const deptInput = document.getElementById('txtDept');
+        const auth = document.getElementById('chkAuth').checked;
 
-            if (!deptInput || !deptInput.value || !deptInput.value.trim()) {
-                if (deptInput) deptInput.value = "TI";
-            }
-
-            const deptVal = deptInput ? deptInput.value.trim() : "TI";
-
-            try {
-                localStorage.setItem('srt_rh_dept', deptVal);
-            } catch(e) { console.warn('LocalStorage bloqueado:', e); }
-
-            if (!auth) {
-                alert("É necessário aceitar os termos de governança anônima para prosseguir.");
-                return;
-            }
-
-            showStep('stepVoz');
-        } catch(err) {
-            console.error('Erro em startCheckinFlow:', err);
-            showStep('stepVoz'); // Garantia absoluta de transição
+        if (!deptInput.value || !deptInput.value.trim()) {
+            deptInput.value = "TI";
         }
+
+        localStorage.setItem('srt_rh_dept', deptInput.value.trim());
+
+        if (!auth) {
+            alert("É necessário aceitar os termos de governança anônima para prosseguir.");
+            return;
+        }
+
+        showStep('stepVoz');
     }
 
     async function runAudioTest() {
@@ -530,7 +514,7 @@
         syncEl.innerText = '⏳ Registrando indicador anônimo no Dashboard...';
 
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/srt_rh_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
