@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES-Crise Executivo — Readiness Telemetry v6.1 Master</title>
+    <title>ES-Crise Executivo — Readiness Telemetry v6.0 Master</title>
     <style>
         :root {
             --bg: #030712;
@@ -420,9 +420,7 @@
         }
 
         .easy-block:last-child { margin-bottom: 0; }
-        .easy-block b { color: var(--accent); font-weight: 800; font-size: 13px; }
-        .easy-block ul { margin-top: 6px; margin-left: 18px; color: #cbd5e1; }
-        .easy-block li { margin-bottom: 4px; }
+        .easy-block b { color: var(--accent); font-weight: 800; }
 
         .sync-banner {
             padding: 12px;
@@ -467,7 +465,7 @@
             font-size: 11px;
             color: var(--muted);
             margin-bottom: 6px;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         .var-item b {
@@ -493,7 +491,7 @@
         <div class="header-brand">
             <div>
                 <div class="brand-title">EXCELSILIENCE ES-CRISE</div>
-                <div class="brand-subtitle">Readiness Telemetry v6.1 Master</div>
+                <div class="brand-subtitle">Readiness Telemetry v6.0 Master</div>
             </div>
             <div class="badge-v60">C-SUITE GOVERNANCE</div>
         </div>
@@ -695,19 +693,19 @@
 
             <div class="var-explanation-box">
                 <div class="var-explanation-title">📘 GUIA TÁTICO DAS VARIÁVEIS BIOMÉTRICAS</div>
-                <div class="var-item"><b>🧠 Autocontrole (C):</b> Mede a capacidade do Córtex Pré-Frontal Dorsolateral (DLPFC) de frear respostas impulsivas (veto nas bolinhas vermelhas NO-GO).</div>
-                <div class="var-item"><b>⚡ Clareza (I):</b> Avalia a velocidade de processamento neural e tempo de reação visuomotor (PVT). Latências normais são de 300ms a 480ms.</div>
-                <div class="var-item"><b>🎙️ Energia (R):</b> Mede a resiliência bioacústica e micro-tensão das cordas vocais (VSI) moduladas pelo Nervo Vago Laríngeo (NC X).</div>
-                <div class="var-item"><b>🫀 VFC / rMSSD:</b> Variabilidade da Frequência Cardíaca (tônus vagal). VFC > 40ms reflete tom parassimpático saudável e mente em estabilidade emocional; VFC < 30ms reflete hiperativação simpática.</div>
-                <div class="var-item"><b>🛡️ Regra do Elo Mais Fraco:</b> O score geral é travado pelo menor vetor individual, impedindo que uma média mascare um gargalo pontual.</div>
+                <div class="var-item"><b>🧠 Autocontrole (C):</b> Capacidade do Córtex Pré-Frontal Dorsolateral (DLPFC) de frear respostas impulsivas (veto nas bolinhas vermelhas NO-GO).</div>
+                <div class="var-item"><b>⚡ Clareza (I):</b> Agilidade visuomotora e velocidade de processamento neural (PVT). Latências normais são entre 300-480ms.</div>
+                <div class="var-item"><b>🎙️ Energia (R):</b> Resiliência bioacústica e micro-tensão vocal (VSI) moduladas pelo Nervo Vago Laríngeo (NC X).</div>
+                <div class="var-item"><b>🫀 VFC / rMSSD:</b> Variabilidade da Frequência Cardíaca (tônus vagal). VFC > 40ms reflete alta adaptabilidade e mente serena; VFC < 30ms reflete estresse simpático elevado.</div>
+                <div class="var-item"><b>🛡️ Regra do Elo Mais Fraco:</b> O score geral é limitado pelo menor vetor individual, garantindo que uma falha isolada não seja mascarada por uma média ponderada.</div>
             </div>
 
             <div id="boxMainAlert"></div>
 
             <div class="easy-box-master">
                 <h4>
-                    <span>🏛️ DOSSIÊ NEUROEXECUTIVO MOTOR E.A.S.Y. (GOVERNANÇA & BLINDAGEM DECISÓRIA)</span>
-                    <span id="lblBottleneckTag" style="font-size:10px; color:var(--accent);">STATUS: --</span>
+                    <span>🏛️ DOSSIÊ NEUROEXECUTIVO MOTOR E.A.S.Y. (GOVERNANÇA & RESTAURAÇÃO)</span>
+                    <span id="lblBottleneckTag" style="font-size:10px; color:var(--accent);">GARGALO: --</span>
                 </h4>
                 <div id="easyDynamicContainer"></div>
             </div>
@@ -1025,8 +1023,8 @@
         let valI = Number(Math.max(1.0, 5.0 - ((avgRt - 300) / 120)).toFixed(1));
         let valR = Number(Math.max(1.0, 5.0 - ((numVsi - 1.50) * 1.1)).toFixed(1));
 
-        // CÁLCULO DA VFC (rMSSD ms) - VARIABILIDADE DA FREQUÊNCIA CARDÍACA
-        let ctxPenalty = (selectedContext === 'PRE_MEETING') ? 4 : 0;
+        // CÁLCULO DA VFC (rMSSD ms)
+        let ctxPenalty = (selectedContext === 'PRE_MEETING') ? 2 : 0;
         let vfcRmssd = Math.round(Math.max(12, 80 - (numVsi * 9) - ((avgRt - 300) / 15) - (vetoErrors * 8) - ctxPenalty));
 
         // REGRA DO ELO MAIS FRACO
@@ -1044,17 +1042,17 @@
         let badgeText = '🟢 SOBERANIA DECISÓRIA PRESERVADA';
         let mainStatusMsg = '🟢 Sistema neurovegetativo em homeostase. VFC e agilidade visuomotora preservadas. Aprovado para deliberações estratégicas e reuniões de alto risco.';
 
-        if (vetoErrors >= 2 || avgRt > 800 || numVsi >= 4.41 || minVector < 2.0 || Number(finalScoreNum) < 2.30) {
+        if (vetoErrors >= 2 || avgRt > 780 || numVsi >= 4.41 || minVector < 2.0 || Number(finalScoreNum) < 2.30) {
             status = 'RED';
             badgeClass = 'badge-red';
             badgeText = '🔴 ALERTA DE EXAUSTÃO CRÍTICA';
             mainStatusMsg = '🔴 Risco elevado de Estol Cognitivo. Recomendamos congelar ou delegar deliberações M&A e Capex nas próximas 2 horas.';
-        } else if (numVsi >= 3.41 || (minVector < 2.30 && lowestVector === 'R')) {
+        } else if (numVsi >= 3.81 || (minVector < 2.20 && lowestVector === 'R')) {
             status = 'PURPLE';
             badgeClass = 'badge-purple';
             badgeText = '🟣 TRAVA POR EXAUSTÃO (CHASSI QUEIMADO)';
             mainStatusMsg = '🟣 Sobrecarga Autonômica Severa. Ativar protocolo E.A.S.Y. de desaceleração compulsória antes do próximo comitê.';
-        } else if (minVector < 3.20 || avgRt > 620 || vetoErrors === 1 || numVsi >= 2.80 || vfcRmssd < 32) {
+        } else if (minVector < 3.20 || avgRt > 620 || vetoErrors === 1 || numVsi >= 3.20 || vfcRmssd < 32) {
             status = 'YELLOW';
             badgeClass = 'badge-yellow';
             badgeText = '🟡 ATENÇÃO: TENSÃO DE GOVERNANÇA';
@@ -1064,23 +1062,12 @@
             } else if (lowestVector === 'C') {
                 mainStatusMsg = `🟡 Tensão no Controle de Veto: Impulsividade pontual no vetor C (Autocontrole = ${valC}). Recomenda-se dupla checagem em aprovações.`;
             } else {
-                mainStatusMsg = `🟡 Tensão Autonômica Modulada: Micro-tensão no vetor R (Energia = ${valR} / VFC = ${vfcRmssd} ms). Ativação simpática moderada.`;
-            }
-        } else {
-            // SE TUDO ESTIVER DENTRO DOS PARÂMETROS SAUDÁVEIS (EX: I=3.6, VFC=47)
-            status = 'GREEN';
-            badgeClass = 'badge-green';
-            if (selectedContext === 'PRE_MEETING') {
-                badgeText = '🟢 PRONTIDÃO PRÉ-REUNIÃO PLENA';
-                mainStatusMsg = `🟢 Prontidão Executiva Plena para a Reunião (${meetingTopic || 'Comitê Decisório'}): VFC em ${vfcRmssd} ms (Tônus Vagal Saudável), Vetor I=${valI} (${avgRt} ms). Foco calmo, estabilidade vocal e clareza analítica em nível soberano.`;
-            } else {
-                badgeText = '🟢 SOBERANIA DECISÓRIA PRESERVADA';
-                mainStatusMsg = `🟢 Excelente Prontidão Cognitiva: VFC em ${vfcRmssd} ms e Latência de ${avgRt} ms. Córtex pré-frontal e sistema nervoso autônomo em perfeita sincronia.`;
+                mainStatusMsg = `🟡 Tensão Autonômica Modulada: Modulação bioacústica no vetor R (Energia = ${valR} / VFC = ${vfcRmssd} ms). Recomenda-se pausa de descompressão.`;
             }
         }
 
         document.getElementById('resExecName').innerText = name;
-        document.getElementById('resExecRole').innerText = role + ' • ' + dept + (selectedContext === 'PRE_MEETING' ? ` [⚡ Pré-Reunião: ${meetingTopic || 'Pauta Decisória'}]` : '');
+        document.getElementById('resExecRole').innerText = role + ' • ' + dept + (selectedContext === 'PRE_MEETING' ? ` [⚡ Pré-Reunião: ${meetingTopic || 'Geral'}]` : '');
         document.getElementById('lblFinalScore').innerText = finalScoreNum;
         document.getElementById('lblFinalStatusText').innerText = badgeText;
         document.getElementById('lblTopBadgeContainer').innerHTML = `<span class="badge-status-top ${badgeClass}">${badgeText}</span>`;
@@ -1105,80 +1092,46 @@
 
         document.getElementById('lblBottleneckTag').innerText = `GARGALO: VETOR ${lowestVector} | VFC: ${vfcRmssd}ms`;
 
-        // PROTOCOLO DE GOVERNANÇA E.A.S.Y. APROFUNDADO E C-LEVEL
         let easyHtml = '';
-        if (selectedContext === 'PRE_MEETING') {
+        if (status === 'GREEN') {
             easyHtml = `
-                <div class="easy-block">
-                    <b>E — EXAMINE (Diagnóstico da Pauta & Estado Neurofisiológico):</b>
-                    <ul>
-                        <li><b>Pauta Analisada:</b> ${meetingTopic || 'Comitê Decisório de Alta Relevância'}.</li>
-                        <li><b>Tônus Vagal & VFC:</b> ${vfcRmssd} ms (Mente em estabilidade parassimpática) | <b>Latência:</b> ${avgRt} ms.</li>
-                        <li><b>Análise DLPFC:</b> O Córtex Pré-Frontal apresenta boa reserva glicêmica. Autocontrole em nível ${valC}/5.0.</li>
-                    </ul>
-                </div>
-                <div class="easy-block">
-                    <b>A — ADAPT (Protocolo Tático Pré-Comitê):</b>
-                    <ul>
-                        <li><b>Abertura de Reunião:</b> Definir claramente os papéis de decisão nos primeiros 3 minutos.</li>
-                        <li><b>Controle de Ansiedade de Pauta:</b> Fazer 2 minutos de respiração diafragmática 4-7-8 antes da palavra de abertura.</li>
-                        <li><b>Foco em Tópicos Chave:</b> Priorizar deliberações estruturadas e limitar digressões a no máximo 10 minutos.</li>
-                    </ul>
-                </div>
-                <div class="easy-block">
-                    <b>S — SYSTEMATIZE (Governança e Blindagem de Alçada):</b>
-                    <ul>
-                        <li><b>Regra de Alçada:</b> Submeter decisões de Capex/M&A com memórias de cálculo auditáveis pré-anexadas à ata.</li>
-                        <li><b>Veto Técnico:</b> Garantir que o CFO ou COO validem as premissas numéricas antes do 'De Acordo' final.</li>
-                    </ul>
-                </div>
-                <div class="easy-block">
-                    <b>Y — YARDSTICK (Aferição Pós-Comitê):</b>
-                    <ul>
-                        <li><b>Medição de Desgaste:</b> Realizar novo check-in de 30s imediatamente após a reunião para medir a drenagem de VFC.</li>
-                    </ul>
-                </div>
+                <div class="easy-block"><b>E — EXAMINE (Análise Neurofisiológica da Pauta):</b> Tônus vagal parassimpático excelente (VFC: ${vfcRmssd} ms / rMSSD). Reserva glicêmica pré-frontal plena e agilidade visuomotora preservada (${avgRt} ms). O cérebro apresenta condições ideais para conduzir deliberações da pauta (${meetingTopic || 'Comitê Executivo / Diretoria'}).</div>
+                <div class="easy-block"><b>A — ADAPT (Protocolo Tático de Condução):</b> Abrir a reunião com os tópicos de maior complexidade estratégica ou financeira nos primeiros 20 minutos, aproveitando a janela de agilidade visuomotora máxima.</div>
+                <div class="easy-block"><b>S — SYSTEMATIZE (Governança & Eficiência):</b> Limitar o comitê a no máximo 45 minutos e registrar deliberações de Capex/M&A em ata com responsáveis e prazos de execução nominal.</div>
+                <div class="easy-block"><b>Y — YARDSTICK (Métrica Pós-Comitê):</b> Realizar check-in de 30s pós-reunião para avaliar a taxa de consumo de capital biológico durante o debate.</div>
+            `;
+        } else if (lowestVector === 'C') {
+            easyHtml = `
+                <div class="easy-block"><b>E — EXAMINE (Análise do Impulso Pré-Frontal):</b> Impulsividade pontual no veto motor (veto_errors: ${vetoErrors}). O córtex pré-frontal DLPFC está sob pressão de urgência.</div>
+                <div class="easy-block"><b>A — ADAPT (Adaptação Tática):</b> Aplicar a 'Regra dos 10 Segundos' antes de assinar aprovações de contratos, atas ou minutas.</div>
+                <div class="easy-block"><b>S — SYSTEMATIZE (Blindagem de Alçada):</b> Requerer validação e dupla checagem do CFO/COO para deliberações acima do limite padrão.</div>
+                <div class="easy-block"><b>Y — YARDSTICK (Aferição Pós-Comitê):</b> Monitorar a taxa de recuperação do controle de veto no check-in do dia seguinte.</div>
+            `;
+        } else if (lowestVector === 'I') {
+            easyHtml = `
+                <div class="easy-block"><b>E — EXAMINE (Processamento Cognitivo Acumulado):</b> Desaceleração visuomotora (Vetor I: ${valI} / ${avgRt} ms / VFC: ${vfcRmssd} ms). Sinais de carga de trabalho acumulada ao longo do dia.</div>
+                <div class="easy-block"><b>A — ADAPT (Adaptação Tática):</b> Reduzir a pauta da reunião para no máximo 3 itens prioritários e pausar a cada 30 minutos.</div>
+                <div class="easy-block"><b>S — SYSTEMATIZE (Sistematização):</b> Exigir resumos executivos numéricos de 1 página antes da abertura da reunião.</div>
+                <div class="easy-block"><b>Y — YARDSTICK (Aferição Pós-Pausa):</b> Realizar pausa de 15 minutos com hidratação (300ml de água mineral) antes do próximo bloco decisório.</div>
             `;
         } else {
             easyHtml = `
-                <div class="easy-block">
-                    <b>E — EXAMINE (Diagnóstico de Prontidão da Jornada):</b>
-                    <ul>
-                        <li><b>Vetor Mínimo:</b> Vetor ${lowestVector} | <b>VFC Atual:</b> ${vfcRmssd} ms | <b>Tempo de Resposta:</b> ${avgRt} ms.</li>
-                        <li><b>Estado do Sistema Nervoso:</b> Autocontrole em ${valC}, Clareza em ${valI} e Energia Vocal em ${valR}.</li>
-                    </ul>
-                </div>
-                <div class="easy-block">
-                    <b>A — ADAPT (Ajuste Tático de Agenda):</b>
-                    <ul>
-                        <li><b>Gerenciamento de Energia:</b> Bloco de foco ininterrupto de 45 minutos seguido de 5 minutos de pausa ativa.</li>
-                        <li><b>Hidratação & Iluminação:</b> Ingestão de 300ml de água mineral para otimizar condutividade bioelétrica.</li>
-                    </ul>
-                </div>
-                <div class="easy-block">
-                    <b>S — SYSTEMATIZE (Protocolo Operacional Padrão):</b>
-                    <ul>
-                        <li><b>Matriz de Prioridade:</b> Filtrar e-mails e solicitações urgentes via diretoria executiva antes da execução.</li>
-                    </ul>
-                </div>
-                <div class="easy-block">
-                    <b>Y — YARDSTICK (Indicador de Acompanhamento):</b>
-                    <ul>
-                        <li><b>Comparativo Temporal:</b> Monitorar a variação do score em relação à média dos últimos 7 dias.</li>
-                    </ul>
-                </div>
+                <div class="easy-block"><b>E — EXAMINE (Modulação Bioacústica Vagal):</b> Alteração na micro-tensão das cordas vocais (VSI: ${vsiScoreVal} / VFC: ${vfcRmssd} ms). Ativação do sistema nervoso simpático.</div>
+                <div class="easy-block"><b>A — ADAPT (Adaptação Tática):</b> Praticar 3 ciclos de respiração diafragmática 4-7-8 antes do início da reunião.</div>
+                <div class="easy-block"><b>S — SYSTEMATIZE (Sistematização de Agenda):</b> Bloquear a agenda por 20 minutos após blocos intensos de reuniões.</div>
+                <div class="easy-block"><b>Y — YARDSTICK (Aferição Pós-Pausa):</b> Reavaliar a estabilidade vocal no próximo check-in de encerramento.</div>
             `;
         }
 
         document.getElementById('easyDynamicContainer').innerHTML = easyHtml;
 
-        // PAYLOAD ESTRITAMENTE HOMOLOGADO COM AS COLUNAS EXISTENTES NO SUPABASE
-        // A VFC É EMBUTIDA NO VSI_STATUS E NA ACTION PARA EVITAR REJEIÇÃO DA API HTTP 400
         const vsiStatusWithVfc = `${vsiStatusText} | VFC: ${vfcRmssd}ms`;
+
         const payload = {
             name: name,
             role: role,
             department: dept,
+            company: companyParam,
             reaction_time_ms: avgRt,
             veto_errors: vetoErrors,
             vsi_score: Number(vsiScoreVal),
@@ -1191,11 +1144,12 @@
         const syncEl = document.getElementById('syncStatus');
         syncEl.innerText = '⏳ Sincronizando Dossiê com o Cockpit de Governança...';
 
+        // ENVIO PRIMÁRIO PARA SRT_CHECKINS (TABELA PRINCIPAL HOMOLOGADA)
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1214,19 +1168,18 @@
                 syncEl.style.color = '#34d399';
                 return;
             } else {
-                const errTxt = await res.text();
-                console.error("Erro Supabase POST:", res.status, errTxt);
-                throw new Error("HTTP error: " + res.status);
+                console.warn("Envio primário para srt_checkins retornou status:", res.status);
             }
         } catch (err) {
-            console.warn("Tentativa 1 com foto falhou. Executando fallback sem foto...", err);
+            console.warn("Tentativa com foto falhou. Executando fallback sem foto...", err);
         }
 
+        // FALLBACK SEM FOTO PARA SRT_CHECKINS
         try {
             const lightPayload = { ...payload };
             delete lightPayload.photo_url;
 
-            let res2 = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+            let res2 = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
