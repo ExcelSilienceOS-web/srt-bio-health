@@ -358,7 +358,7 @@
 
     <div class="header">
         <div class="title-group">
-            <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA & MOTOR E.A.S.Y. v3.5</h1>
+            <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA C-SUITE v3.5</h1>
             <p>Painel Telemétrico de Prontidão C-Suite, Soberania Decisória & Governança Antifrágil</p>
         </div>
         <div class="live-indicator">
@@ -372,28 +372,28 @@
         <div class="exp-header">📘 MATRIZ DE TELEMETRIA BIOMÉTRICA & EXPLICAÇÃO DAS VARIÁVEIS</div>
         <div class="exp-grid">
             <div class="exp-card">
-                <b>🧠 Autocontrole (Vetor C - Compósito)</b>
-                <p>Mede a capacidade do Córtex Pré-Frontal (DLPFC) combinando inibição de impulso (veto nas bolinhas vermelhas em 800ms), ritmo atencional (PVT Jitter) e tom vocal.</p>
+                <b>🧠 Autocontrole (Vetor C)</b>
+                <p>Mede o controle inibitório pré-frontal (DLPFC), taxa de erro em bolinhas vermelhas e hesitação visuomotora (PVT Jitter).</p>
             </div>
             <div class="exp-card">
                 <b>⚡ Clareza (Vetor I)</b>
-                <p>Mede a velocidade de resposta visuomotora (PVT). Latências normais são entre 300-480ms. Valores >500ms apontam desaceleração por carga cognitiva acumulada.</p>
+                <p>Mede a velocidade de resposta visuomotora (PVT). Latências normais são entre 300-450ms. Valores >500ms apontam desaceleração cognitiva.</p>
             </div>
             <div class="exp-card">
                 <b>🎙️ Energia (Vetor R)</b>
-                <p>Avalia a micro-tensão das cordas vocais (VSI - Vocal Stress Index) controladas pelo Nervo Vago Laríngeo (NC X) durante 7s de fala.</p>
+                <p>Avalia a micro-tensão das cordas vocais (VSI) moduladas pelo Nervo Vago Laríngeo (NC X) em 7s de áudio.</p>
             </div>
             <div class="exp-card">
-                <b>🫀 VFC / rMSSD (Tônus Vagal)</b>
-                <p>Variabilidade da Frequência Cardíaca em milissegundos. VFC > 40ms reflete mente adaptável e serena. VFC < 30ms sinaliza estresse simpático elevado.</p>
+                <b>🫀 VFC Normalizada por Idade</b>
+                <p>Variabilidade da Frequência Cardíaca (tônus vagal). Ajustada atuarialmente para a faixa etária do executivo.</p>
             </div>
             <div class="exp-card">
                 <b>🛡️ Regra do Elo Mais Fraco</b>
-                <p>Princípio onde o menor vetor individual (C, I ou R) limita o score final, impedindo que uma média mascare um ponto cego crítico de prontidão.</p>
+                <p>O menor vetor individual (C, I ou R) limita o score final, impedindo que uma média mascare um ponto cego crítico de prontidão.</p>
             </div>
             <div class="exp-card">
                 <b>🏛️ Motor E.A.S.Y.</b>
-                <p>Framework de governança C-Level: <b>E</b>xamine (Exame da Pauta), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização de Alçada) e <b>Y</b>ardstick (Aferição Pós-Comitê).</p>
+                <p>Framework de governança prescritiva: <b>E</b>xamine (Exame), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização de Alçada) e <b>Y</b>ardstick (Métrica pós-pausa).</p>
             </div>
         </div>
     </div>
@@ -418,17 +418,21 @@
             <button class="btn-action" onclick="fetchAndRenderData()">🔄 Aplicar Filtro / Atualizar</button>
         </div>
 
-        <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
-            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Isolamento de Painel:</span>
-            <button class="btn-quick active" id="isoExec" onclick="setIsolationMode('EXEC_ONLY')">👑 Exclusivo C-Suite / ES-Crise</button>
-            <button class="btn-quick" id="isoAll" onclick="setIsolationMode('ALL')">🌐 Todas as Lideranças</button>
+        <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px; justify-content: space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Status de Trava:</span>
+                <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
+                <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
+                <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
+                <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">ROXO Roxo</button>
+                <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
+            </div>
 
-            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase; margin-left:16px;">Status de Trava:</span>
-            <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
-            <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
-            <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
-            <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Roxo</button>
-            <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:11px; color:#38bdf8; font-weight:800; text-transform:uppercase;">Filtragem:</span>
+                <button class="btn-quick active" id="btnScopeExec" onclick="setScope('EXEC_ONLY')">👑 Exclusivo C-Suite / ES-Crise</button>
+                <button class="btn-quick" id="btnScopeAll" onclick="setScope('ALL')">🌐 Todas as Lideranças</button>
+            </div>
         </div>
     </div>
 
@@ -447,7 +451,7 @@
             <div class="value val-amarelo" id="mAmarelo">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟣 Exaustão (Roxo)</div>
+            <div class="label">ROXO Exaustão (Roxo)</div>
             <div class="value val-roxo" id="mRoxo">0</div>
         </div>
         <div class="card-metric">
@@ -474,7 +478,7 @@
             <thead>
                 <tr>
                     <th>Horário / Data</th>
-                    <th>Executivo / Diretor C-Level (Foto & Nome)</th>
+                    <th>Executivo / Diretor C-Level (Foto, Nome & Idade)</th>
                     <th>Validação Facial</th>
                     <th>Business Unit / Diretoria</th>
                     <th>Conferência de Voz (VSI)</th>
@@ -496,7 +500,7 @@
 
         let allRecords = [];
         let selectedStatus = 'ALL';
-        let isolationMode = 'EXEC_ONLY';
+        let currentScope = 'EXEC_ONLY';
 
         function resolvePhoto(item) {
             let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.user_photo || item.snapshot || item.face_image || item.image;
@@ -551,7 +555,7 @@
             const defaultActions = {
                 'GREEN': '🟢 Operador Soberano — Prontidão Excelente',
                 'YELLOW': '🟡 Muleteiro Corp. — Atentar Vetor Intencionalidade',
-                'PURPLE': '🟣 Chassi Queimado — Trava por Exaustão (Restaurar Resiliência)',
+                'PURPLE': 'ROXO Chassi Queimado — Trava por Exaustão (Restaurar Resiliência)',
                 'RED': '🔴 Reativo Impulsivo — Veto Motor (Congelar Decisões de Risco)'
             };
 
@@ -572,16 +576,6 @@
             }
 
             return stdAction;
-        }
-
-        function setIsolationMode(mode) {
-            isolationMode = mode;
-            document.getElementById('isoExec').classList.remove('active');
-            document.getElementById('isoAll').classList.remove('active');
-            if (mode === 'EXEC_ONLY') document.getElementById('isoExec').classList.add('active');
-            else document.getElementById('isoAll').classList.add('active');
-
-            renderFilteredData();
         }
 
         function setPeriod(period) {
@@ -620,6 +614,20 @@
             if (status === 'YELLOW') document.getElementById('stAmarelo').classList.add('active');
             if (status === 'PURPLE') document.getElementById('stRoxo').classList.add('active');
             if (status === 'RED') document.getElementById('stVermelho').classList.add('active');
+
+            renderFilteredData();
+        }
+
+        function setScope(scope) {
+            currentScope = scope;
+            document.getElementById('btnScopeExec').classList.remove('active');
+            document.getElementById('btnScopeAll').classList.remove('active');
+
+            if (scope === 'EXEC_ONLY') {
+                document.getElementById('btnScopeExec').classList.add('active');
+            } else {
+                document.getElementById('btnScopeAll').classList.add('active');
+            }
 
             renderFilteredData();
         }
@@ -677,34 +685,43 @@
         }
 
         function isExecCheckin(item) {
-            if (item._tableName === 'srt_rh_checkins') return false;
-            if (item._tableName === 'es_crisis_exec_checkins') return true;
-
-            const role = (item.role || item.cargo || '').toString().toLowerCase();
-            const dept = (item.department || item.dept || item.setor || item.sector || '').toString().toLowerCase();
-            const name = (item.name || item.nome || item.exec_name || '').toString().toLowerCase();
-            const company = (item.company || '').toString().toUpperCase();
-            const action = (item.action || '').toString().toUpperCase();
-
-            if (company.includes('ES_CRISIS') || action.includes('[ES-CRISE') || action.includes('C-SUITE')) {
+            if (item._tableName === 'srt_rh_checkins') {
+                return false;
+            }
+            if (item._tableName === 'es_crisis_exec_checkins') {
                 return true;
             }
 
-            if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota')) {
+            const comp = (item.company || '').toString().toUpperCase();
+            if (comp === 'ES_CRISIS_EXEC') return true;
+
+            const act = (item.action || '').toString();
+            if (act.includes('[ES-CRISE C-SUITE]')) return true;
+
+            if (currentScope === 'EXEC_ONLY') {
+                const role = (item.role || item.cargo || '').toString().toLowerCase();
+                const dept = (item.department || item.dept || item.setor || item.sector || '').toString().toLowerCase();
+                const name = (item.name || item.nome || item.exec_name || '').toString().toLowerCase();
+
+                if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota')) {
+                    return false;
+                }
+
+                if (name === 'anônimo' || name === 'anonimo' || name === 'colaborador' || name === 'operador') {
+                    return false;
+                }
+
+                const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'c-suite'];
+                const hasExecRole = execKeywords.some(k => role.includes(k) || dept.includes(k));
+
+                if (hasExecRole) return true;
+
+                if (name.includes('flavio verissimo') || name.includes('dr. flavio')) return true;
+
                 return false;
             }
 
-            if (name === 'anônimo' || name === 'anonimo' || name === 'colaborador' || name === 'operador') {
-                return false;
-            }
-
-            if (isolationMode === 'EXEC_ONLY') {
-                const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'c-suite', 'flavio verissimo'];
-                const hasExecRole = execKeywords.some(k => role.includes(k) || dept.includes(k) || name.includes(k));
-                return hasExecRole;
-            } else {
-                return true;
-            }
+            return true;
         }
 
         function renderFilteredData() {
@@ -713,7 +730,6 @@
 
             let filtered = allRecords.filter(row => {
                 if (!isExecCheckin(row)) return false;
-
                 if (startVal || endVal) {
                     if (!row.created_at) return true;
                     const localDateObj = new Date(row.created_at);
@@ -750,7 +766,7 @@
                 if (!vfcVal) {
                     let vsiN = Number(r.vsi_score || r.vsi) || 1.80;
                     let latN = Number(r.reaction_time_ms || r.latency) || 450;
-                    vfcVal = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                    vfcVal = Math.round(Math.max(12, 82 - (vsiN * 9) - ((latN - 300) / 16)));
                 }
                 totalVfc += vfcVal;
             });
@@ -767,7 +783,7 @@
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado para os filtros selecionados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo C-Suite encontrado para os filtros selecionados.</td></tr>';
                 return;
             }
 
@@ -798,7 +814,7 @@
                     } else if (vsiVal <= 3.40) {
                         voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Modulada (${vsiVal.toFixed(2)})</span>`;
                     } else if (vsiVal <= 4.40) {
-                        voiceStatusHtml = `<span class="badge-voice" style="color:#c084fc;">🟣 Exaustão (${vsiVal.toFixed(2)})</span>`;
+                        voiceStatusHtml = `<span class="badge-voice" style="color:#c084fc;">ROXO Exaustão (${vsiVal.toFixed(2)})</span>`;
                     } else {
                         voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Instabilidade Crítica (${vsiVal.toFixed(2)})</span>`;
                     }
@@ -812,12 +828,12 @@
                 if (!itemVfc) {
                     let vsiN = Number(item.vsi_score || item.vsi) || 1.80;
                     let latN = Number(item.reaction_time_ms || item.latency) || 450;
-                    itemVfc = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                    itemVfc = Math.round(Math.max(12, 82 - (vsiN * 9) - ((latN - 300) / 16)));
                 }
 
                 let vfcColor = '#34d399';
-                if (itemVfc < 30) vfcColor = '#f87171';
-                else if (itemVfc < 38) vfcColor = '#fbbf24';
+                if (itemVfc < 25) vfcColor = '#f87171';
+                else if (itemVfc < 35) vfcColor = '#fbbf24';
 
                 const category = getStatusCategory(item);
                 let badgeClass = 'b-verde';
@@ -826,7 +842,7 @@
                 if (category === 'YELLOW') {
                     badgeClass = 'b-amarelo'; statusLabel = '🟡 AMARELO (PAUSA)';
                 } else if (category === 'PURPLE') {
-                    badgeClass = 'b-roxo'; statusLabel = '🟣 ROXO (EXAUSTÃO)';
+                    badgeClass = 'b-roxo'; statusLabel = 'ROXO ROXO (EXAUSTÃO)';
                 } else if (category === 'RED') {
                     badgeClass = 'b-vermelho'; statusLabel = '🔴 VERMELHO (VETO)';
                 }
