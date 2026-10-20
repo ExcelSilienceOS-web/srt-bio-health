@@ -119,29 +119,10 @@
             display: inline-block;
         }
 
-        .badge-green {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid var(--green);
-            color: var(--green);
-        }
-
-        .badge-yellow {
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid var(--yellow);
-            color: var(--yellow);
-        }
-
-        .badge-purple {
-            background: rgba(168, 85, 247, 0.2);
-            border: 1px solid var(--purple);
-            color: var(--purple);
-        }
-
-        .badge-red {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid var(--red);
-            color: var(--red);
-        }
+        .badge-green { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: var(--green); }
+        .badge-yellow { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
+        .badge-purple { background: rgba(168, 85, 247, 0.2); border: 1px solid var(--purple); color: var(--purple); }
+        .badge-red { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--red); color: var(--red); }
 
         .card {
             background: var(--card-inner);
@@ -159,10 +140,7 @@
             text-transform: uppercase;
         }
 
-        .form-group {
-            margin-bottom: 14px;
-        }
-
+        .form-group { margin-bottom: 14px; }
         .form-group label {
             display: block;
             font-size: 11px;
@@ -261,9 +239,7 @@
             transition: transform 0.1s, box-shadow 0.2s;
         }
 
-        .btn-btn:active {
-            transform: scale(0.98);
-        }
+        .btn-btn:active { transform: scale(0.98); }
 
         .btn-primary {
             background: linear-gradient(135deg, #0284c7, #0369a1);
@@ -302,10 +278,7 @@
 
         .hud-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             display: flex;
             flex-direction: column;
@@ -317,23 +290,19 @@
 
         .hud-frame-rect {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 170px;
-            height: 200px;
+            width: 170px; height: 200px;
             border: 2px dashed var(--accent);
             border-radius: 20px;
             box-shadow: 0 0 25px var(--accent-glow);
         }
 
         .hud-scanline {
-            width: 100%;
-            height: 3px;
+            width: 100%; height: 3px;
             background: var(--accent);
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             animation: scan 2.2s infinite linear;
         }
 
@@ -344,8 +313,7 @@
         }
 
         .progress-bar-container {
-            width: 100%;
-            height: 8px;
+            width: 100%; height: 8px;
             background: #1e293b;
             border-radius: 4px;
             overflow: hidden;
@@ -360,8 +328,7 @@
         }
 
         .audio-wave-box {
-            width: 100%;
-            height: 90px;
+            width: 100%; height: 90px;
             background: #070d19;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -372,15 +339,11 @@
             justify-content: center;
         }
 
-        canvas#canvasWave {
-            width: 100%;
-            height: 100%;
-        }
+        canvas#canvasWave { width: 100%; height: 100%; }
 
         .game-canvas-area {
             position: relative;
-            width: 100%;
-            height: 260px;
+            width: 100%; height: 260px;
             background: #070d19;
             border: 2px dashed var(--border);
             border-radius: 16px;
@@ -391,15 +354,10 @@
 
         .target-ball {
             position: absolute;
-            width: 64px;
-            height: 64px;
+            width: 64px; height: 64px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 800;
-            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; color: #fff;
             cursor: pointer;
             user-select: none;
             touch-action: manipulation;
@@ -407,19 +365,9 @@
             transition: transform 0.05s ease;
         }
 
-        .target-ball:active {
-            transform: scale(0.90);
-        }
-
-        .ball-go {
-            background: radial-gradient(circle, #34d399, #059669);
-            border: 2.5px solid #6ee7b7;
-        }
-
-        .ball-nogo {
-            background: radial-gradient(circle, #f87171, #dc2626);
-            border: 2.5px solid #fca5a5;
-        }
+        .target-ball:active { transform: scale(0.90); }
+        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2.5px solid #6ee7b7; }
+        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2.5px solid #fca5a5; }
 
         .dossier-grid {
             display: grid;
@@ -436,19 +384,8 @@
             padding: 12px 6px;
         }
 
-        .dossier-stat .lbl {
-            font-size: 9px;
-            color: var(--muted);
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .dossier-stat .val {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent);
-            margin-top: 2px;
-        }
+        .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
+        .dossier-stat .val { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 2px; }
 
         .heatmap-grid {
             display: grid;
@@ -503,14 +440,8 @@
             padding: 12px 14px;
         }
 
-        .easy-block:last-child {
-            margin-bottom: 0;
-        }
-
-        .easy-block b {
-            color: var(--accent);
-            font-weight: 800;
-        }
+        .easy-block:last-child { margin-bottom: 0; }
+        .easy-block b { color: var(--accent); font-weight: 800; }
 
         .sync-banner {
             padding: 12px;
@@ -675,7 +606,7 @@
         </div>
     </div>
 
-    <!-- TELA 3-INTRO: TARJA/INSTRUÇÃO ANTES DAS BOLINHAS -->
+    <!-- TELA 3-INTRO -->
     <div class="screen" id="scr-3-intro">
         <div class="header-brand">
             <div>
@@ -704,7 +635,7 @@
         </div>
     </div>
 
-    <!-- TELA 3: ARENA DAS BOLINHAS (12 RODADAS RIGOROSAS) -->
+    <!-- TELA 3: ARENA DAS BOLINHAS -->
     <div class="screen" id="scr-3">
         <div class="header-brand">
             <div>
@@ -722,7 +653,7 @@
         <div class="game-canvas-area" id="gameArea"></div>
     </div>
 
-    <!-- TELA 4: DOSSIÊ INDIVIDUAL & LAUDO NEUROEXECUTIVO -->
+    <!-- TELA 4: DOSSIÊ INDIVIDUAL -->
     <div class="screen" id="scr-4">
         <div id="syncStatus" class="sync-banner">⏳ Registrando laudo no Cockpit de Governança...</div>
 
@@ -1088,19 +1019,16 @@
         let valI = Number(Math.max(1.0, 5.0 - ((avgRt - 300) / 120)).toFixed(1));
         let valR = Number(Math.max(1.0, 5.0 - ((numVsi - 1.50) * 1.1)).toFixed(1));
 
-        // REGRA DO ELO MAIS FRACO (GARGALO / BOTTLENECK)
+        // REGRA DO ELO MAIS FRACO
         const minVector = Math.min(valC, valI, valR);
         let weightedAvg = (valC * 0.4 + valI * 0.3 + valR * 0.3);
 
-        // Se um dos vetores for crítico (ex: I = 2.5), o score é penalizado pelo gargalo
         let finalScoreNum = Math.min(weightedAvg, minVector + 0.8).toFixed(2);
 
-        // IDENTIFICAÇÃO DO VETOR DE GARGALO
         let lowestVector = 'C';
         if (valI < valC && valI <= valR) lowestVector = 'I';
         if (valR < valC && valR < valI) lowestVector = 'R';
 
-        // CLASSIFICAÇÃO RÍGIDA DE STATUS E TRAVAS
         let status = 'GREEN';
         let badgeClass = 'badge-green';
         let badgeText = '🟢 SOBERANIA DECISÓRIA PRESERVADA';
@@ -1122,9 +1050,13 @@
             badgeText = '🟡 ATENÇÃO: TENSÃO DE GOVERNANÇA';
             
             if (lowestVector === 'I') {
-                mainStatusMsg = `🟡 Tensão de Processamento Cognitivo: Latência elevada no vetor I (Clareza = ${valI}). O cérebro apresenta lentidão de resposta. Não recomendado para deliberações de alta complexidade ou sob pressão de tempo. Recomendamos pausa tática de 15 min.`;
+                if (valI >= 3.0) {
+                    mainStatusMsg = `🟡 Tensão de Processamento Cognitivo Moderada: Leve desaceleração no vetor I (Clareza = ${valI} / ${avgRt} ms). Recomenda-se simplificar a pauta da próxima reunião decisória.`;
+                } else {
+                    mainStatusMsg = `🟡 Tensão Elevada de Processamento: Latência acentuada no vetor I (Clareza = ${valI} / ${avgRt} ms). O cérebro apresenta lentidão. Não recomendado para deliberações sob forte pressão de tempo.`;
+                }
             } else if (lowestVector === 'C') {
-                mainStatusMsg = `🟡 Tensão no Controle de Veto: Erros de impulso no vetor C (Autocontrole = ${valC}). Córtex pré-frontal sob pressão de urgência. Recomenda-se dupla checagem antes de aprovações.`;
+                mainStatusMsg = `🟡 Tensão no Controle de Veto: Erros de impulso no vetor C (Autocontrole = ${valC}). Córtex pré-frontal sob pressão de urgência. Recomenda-se dupla checagem em aprovações.`;
             } else {
                 mainStatusMsg = `🟡 Tensão Autonômica Modulada: Alteração bioacústica no vetor R (Energia = ${valR}). Ativação simpática moderada. Recomenda-se pausa de descompressão.`;
             }
@@ -1164,12 +1096,21 @@
                 <div class="easy-block"><b>Y — Yardstick:</b> Acompanhar a recuperação da taxa de veto na aferição matinal de amanhã.</div>
             `;
         } else if (lowestVector === 'I') {
-            easyHtml = `
-                <div class="easy-block"><b>E — Examine:</b> Latência de resposta elevada (Vetor I: ${valI} / ${avgRt} ms). Fadiga de processamento de dados e excesso de inputs simultâneos.</div>
-                <div class="easy-block"><b>A — Adapt:</b> Reduzir a pauta da reunião decisória para no máximo 3 pontos críticos de pauta e adiar deliberações de alta complexidade.</div>
-                <div class="easy-block"><b>S — Systematize:</b> Exigir memórias de cálculo sintéticas (1 página) antes da abertura dos comitês.</div>
-                <div class="easy-block"><b>Y — Yardstick:</b> Monitorar o tempo de reação visuomotor pós-almoço e após pausa tática de 15 minutos.</div>
-            `;
+            if (valI >= 3.0) {
+                easyHtml = `
+                    <div class="easy-block"><b>E — Examine:</b> Desaceleração visuomotora leve (Vetor I: ${valI} / ${avgRt} ms). Acúmulo natural de carga de trabalho do dia.</div>
+                    <div class="easy-block"><b>A — Adapt:</b> Manter reuniões curtas (máximo 30 minutos) e focar em tópicos estruturados.</div>
+                    <div class="easy-block"><b>S — Systematize:</b> Utilizar resumos executivos de 1 página antes das reuniões.</div>
+                    <div class="easy-block"><b>Y — Yardstick:</b> Reavaliar o tempo de reação no próximo check-in do dia.</div>
+                `;
+            } else {
+                easyHtml = `
+                    <div class="easy-block"><b>E — Examine:</b> Latência de resposta elevada (Vetor I: ${valI} / ${avgRt} ms). Carga de processamento intensa e múltiplos inputs simultâneos.</div>
+                    <div class="easy-block"><b>A — Adapt:</b> Reduzir a pauta para no máximo 3 pontos críticos e adiar deliberações de alta complexidade.</div>
+                    <div class="easy-block"><b>S — Systematize:</b> Exigir memórias de cálculo sintéticas antes da abertura dos comitês.</div>
+                    <div class="easy-block"><b>Y — Yardstick:</b> Pausa tática de 15 minutos com hidratação antes do próximo bloco.</div>
+                `;
+            }
         } else {
             easyHtml = `
                 <div class="easy-block"><b>E — Examine:</b> Alteração de energia bioacústica laríngea (VSI: ${vsiScoreVal}). Ativação do sistema nervoso simpático.</div>
@@ -1181,12 +1122,11 @@
 
         document.getElementById('easyDynamicContainer').innerHTML = easyHtml;
 
-        // PAYLOAD PARA SUPABASE (es_crisis_exec_checkins)
+        // PAYLOAD LIMPO E ESTRITAMENTE HOMOLOGADO COM O BANCO DE DADOS
         const payload = {
             name: name,
             role: role,
             department: dept,
-            company: companyParam,
             reaction_time_ms: avgRt,
             veto_errors: vetoErrors,
             vsi_score: Number(vsiScoreVal),
@@ -1199,7 +1139,7 @@
         const syncEl = document.getElementById('syncStatus');
         syncEl.innerText = '⏳ Sincronizando Dossiê com o Cockpit de Governança...';
 
-        // 1ª TENTATIVA: ENVIO COMPLETO COM FOTO (TIMEOUT EXPANDIDO PARA 12s)
+        // TENTATIVA 1: ENVIO COMPLETO COM FOTO
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 12000);
@@ -1222,12 +1162,15 @@
                 syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
                 syncEl.style.color = '#34d399';
                 return;
+            } else {
+                const errTxt = await res.text();
+                throw new Error(`Resposta HTTP ${res.status}: ${errTxt}`);
             }
         } catch (err) {
-            console.warn("Tentativa 1 com foto falhou, executando fallback sem foto...", err);
+            console.warn("Tentativa 1 com foto falhou. Executando fallback sem foto...", err);
         }
 
-        // 2ª TENTATIVA: FALLBACK GARANTIDO SEM FOTO (EVITA TIMEOUT/PAYLOAD ERROR)
+        // TENTATIVA 2: FALLBACK SEM FOTO (GARANTIA DE REGISTRO)
         try {
             const lightPayload = { ...payload };
             delete lightPayload.photo_url;
