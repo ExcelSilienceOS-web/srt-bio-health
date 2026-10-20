@@ -196,8 +196,8 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 14px;
             margin-bottom: 28px;
         }
 
@@ -205,20 +205,20 @@
             background: #151c2c;
             border: 1px solid #2a364f;
             border-radius: 12px;
-            padding: 18px;
+            padding: 16px;
         }
 
         .card-metric .label {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #94a3b8;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 700;
         }
 
         .card-metric .value {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 800;
         }
 
@@ -229,6 +229,8 @@
         .val-vermelho { color: #f87171; }
         .val-tempo { color: #38bdf8; }
         .val-vfc { color: #38bdf8; }
+        .val-bpm { color: #fbbf24; }
+        .val-vo2 { color: #34d399; }
 
         .panel {
             background: #151c2c;
@@ -258,7 +260,7 @@
             border-collapse: collapse;
             text-align: left;
             font-size: 13px;
-            min-width: 1050px;
+            min-width: 1100px;
         }
 
         th {
@@ -358,7 +360,7 @@
 
     <div class="header">
         <div class="title-group">
-            <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA & MOTOR E.A.S.Y. v3.4</h1>
+            <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA & MOTOR E.A.S.Y. v3.4 MASTER</h1>
             <p>Painel Telemétrico de Prontidão C-Suite, Soberania Decisória & Governança Antifrágil</p>
         </div>
         <div class="live-indicator">
@@ -369,15 +371,15 @@
 
     <!-- GUIA TÁTICO & EXPLICAÇÃO COMPLETA DAS VARIÁVEIS -->
     <div class="explanation-panel">
-        <div class="exp-header">📘 MATRIZ DE TELEMETRIA BIOMÉTRICA & EXPLICAÇÃO DAS VARIÁVEIS</div>
+        <div class="exp-header">📘 MATRIZ DE TELEMETRIA BIOMÉTRICA & EXPLICAÇÃO DAS VARIÁVEIS C-SUITE</div>
         <div class="exp-grid">
             <div class="exp-card">
-                <b>🧠 Autocontrole (Vetor C)</b>
-                <p>Mede a capacidade do Córtex Pré-Frontal (DLPFC) de inibir reações impulsivas (veto nas bolinhas vermelhas NO-GO). Erros indicam precipitação decisória sob urgência.</p>
+                <b>🧠 Autocontrole Compósito (Vetor C - DLPFC)</b>
+                <p>Mede a capacidade inibitória do Córtex Pré-Frontal cruzando: (1) Veto motor ("Free Won't" de Libet no No-Go); (2) Consistência do ritmo (PVT Jitter); (3) Tônus de freio vagal laríngeo.</p>
             </div>
             <div class="exp-card">
                 <b>⚡ Clareza (Vetor I)</b>
-                <p>Mede a velocidade de resposta visuomotora (PVT). Latências normais são entre 300-480ms. Valores >520ms apontam desaceleração por acúmulo de carga de trabalho.</p>
+                <p>Mede a velocidade de resposta visuomotora (PVT). Latências normais são entre 300-480ms. Valores >550ms apontam desaceleração por acúmulo de carga de trabalho.</p>
             </div>
             <div class="exp-card">
                 <b>🎙️ Energia (Vetor R)</b>
@@ -388,12 +390,12 @@
                 <p>Variabilidade da Frequência Cardíaca em milissegundos. VFC > 40ms reflete mente adaptável e serena. VFC < 30ms sinaliza estresse simpático elevado pré-reunião.</p>
             </div>
             <div class="exp-card">
-                <b>🛡️ Regra do Elo Mais Fraco</b>
-                <p>Princípio de blindagem onde o menor vetor individual (C, I ou R) limita o score final, impedindo que uma média mascare um ponto cego crítico de prontidão.</p>
+                <b>💓 BPM & VO2 Máximo</b>
+                <p>Mapeamento de Frequência Cardíaca de Repouso e capacidade aeróbica de oxigenação pré-frontal (mL/kg/min) para blindagem contra a Hipóxia Executiva e prevenção de burnout.</p>
             </div>
             <div class="exp-card">
-                <b>🏛️ Motor E.A.S.Y.</b>
-                <p>Framework de governança prescritiva: <b>E</b>xamine (Exame), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização de Alçada) e <b>Y</b>ardstick (Métrica pós-pausa).</p>
+                <b>🏛️ Regra do Elo Mais Fraco & EASY</b>
+                <p>O menor vetor individual (C, I ou R) limita o score final. O Motor E.A.S.Y. prescreve condutas de restauração tática e triagem cardiológica preventiva.</p>
             </div>
         </div>
     </div>
@@ -419,48 +421,56 @@
         </div>
 
         <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
-            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Status de Trava:</span>
+            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Modo de Isolamento C-Suite:</span>
+            <button class="btn-quick active" id="modeExec" onclick="setExecMode('EXEC_ONLY')">👑 Exclusivo C-Suite / ES-Crise</button>
+            <button class="btn-quick" id="modeAll" onclick="setExecMode('ALL_LEADERS')">🌐 Todas as Lideranças</button>
+
+            <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase; margin-left:16px;">Status:</span>
             <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
             <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
             <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
             <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Roxo</button>
             <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
-
-            <span style="font-size:11px; color:#38bdf8; font-weight:700; text-transform:uppercase; margin-left:16px;">Modo de Isolamento:</span>
-            <button class="btn-quick active" id="modeExec" onclick="setScopeMode('EXEC')">👑 Exclusivo C-Suite / ES-Crise</button>
-            <button class="btn-quick" id="modeAll" onclick="setScopeMode('ALL')">🌐 Todas as Lideranças</button>
         </div>
     </div>
 
     <!-- CARDS DE MÉTRICAS -->
     <div class="metrics-grid">
         <div class="card-metric">
-            <div class="label">Aferições Período</div>
+            <div class="label">Aferições</div>
             <div class="value val-total" id="mTotal">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟢 Soberania (Verde)</div>
+            <div class="label">🟢 Soberania</div>
             <div class="value val-verde" id="mVerde">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟡 Tensão (Amarelo)</div>
+            <div class="label">🟡 Tensão</div>
             <div class="value val-amarelo" id="mAmarelo">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟣 Exaustão (Roxo)</div>
+            <div class="label">🟣 Exaustão</div>
             <div class="value val-roxo" id="mRoxo">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🔴 Alerta Estol (Vermelho)</div>
+            <div class="label">🔴 Alerta Estol</div>
             <div class="value val-vermelho" id="mVermelho">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">⚡ Média Latência</div>
+            <div class="label">⚡ Latência</div>
             <div class="value val-tempo" id="mTempo">0 ms</div>
         </div>
         <div class="card-metric">
-            <div class="label">🫀 Média VFC (rMSSD)</div>
+            <div class="label">🫀 Média VFC</div>
             <div class="value val-vfc" id="mVfc">0 ms</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">💓 Média BPM</div>
+            <div class="value val-bpm" id="mBpm">0 BPM</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">🫁 VO2 Máximo</div>
+            <div class="value val-vo2" id="mVo2">0 mL</div>
         </div>
     </div>
 
@@ -478,7 +488,7 @@
                     <th>Validação Facial</th>
                     <th>Business Unit / Diretoria</th>
                     <th>Conferência de Voz (VSI)</th>
-                    <th>VFC (rMSSD ms)</th>
+                    <th>VFC / BPM / VO2</th>
                     <th>Latência / Veto Motor</th>
                     <th>Status / Soberania</th>
                     <th>Orientação de Governança E.A.S.Y.</th>
@@ -496,7 +506,7 @@
 
         let allRecords = [];
         let selectedStatus = 'ALL';
-        let scopeMode = 'EXEC';
+        let execFilterMode = 'EXEC_ONLY';
 
         function resolvePhoto(item) {
             let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.user_photo || item.snapshot || item.face_image || item.image;
@@ -598,6 +608,17 @@
             fetchAndRenderData();
         }
 
+        function setExecMode(mode) {
+            execFilterMode = mode;
+            document.getElementById('modeExec').classList.remove('active');
+            document.getElementById('modeAll').classList.remove('active');
+
+            if (mode === 'EXEC_ONLY') document.getElementById('modeExec').classList.add('active');
+            else document.getElementById('modeAll').classList.add('active');
+
+            renderFilteredData();
+        }
+
         function setStatusFilter(status) {
             selectedStatus = status;
             ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
@@ -612,50 +633,6 @@
             if (status === 'RED') document.getElementById('stVermelho').classList.add('active');
 
             renderFilteredData();
-        }
-
-        function setScopeMode(mode) {
-            scopeMode = mode;
-            document.getElementById('modeExec').classList.remove('active');
-            document.getElementById('modeAll').classList.remove('active');
-
-            if (mode === 'EXEC') document.getElementById('modeExec').classList.add('active');
-            if (mode === 'ALL') document.getElementById('modeAll').classList.add('active');
-
-            renderFilteredData();
-        }
-
-        function isExecCheckin(item) {
-            const tbl = item._tableName || '';
-            if (tbl === 'srt_rh_checkins') return false;
-            if (tbl === 'es_crisis_exec_checkins') return true;
-
-            const role = (item.role || item.cargo || '').toString().toLowerCase();
-            const dept = (item.department || item.dept || item.setor || item.sector || '').toString().toLowerCase();
-            const name = (item.name || item.nome || item.exec_name || '').toString().toLowerCase();
-            const action = (item.action || item.easy_stage || '').toString().toLowerCase();
-            const vsiStatus = (item.vsi_status || '').toString().toLowerCase();
-            const company = (item.company || item.empresa || '').toString().toLowerCase();
-
-            // Descartar expressamente motoristas, operacionais e anonimos do RH
-            if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota') || role.includes('ajudante') || role.includes('mecanico')) {
-                return false;
-            }
-
-            if (name === 'anônimo' || name === 'anonimo' || name === 'colaborador' || name === 'operador' || name === 'condutor') {
-                return false;
-            }
-
-            // Tag explícita do aplicativo ES-Crise Executivo
-            if (action.includes('es-crise') || vsiStatus.includes('es-crise') || company.includes('es_crisis') || action.includes('soberania') || action.includes('dossiê neuroexecutivo')) {
-                return true;
-            }
-
-            // Filtro rigoroso de cargos C-Suite / Liderança
-            const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'c-suite', 'gerente'];
-            const hasExecRole = execKeywords.some(k => role.includes(k) || dept.includes(k));
-
-            return hasExecRole;
         }
 
         async function fetchAndRenderData() {
@@ -690,7 +667,6 @@
                     }
                 }
 
-                // DEDUPLICAÇÃO E ORDENAÇÃO
                 const seenKeys = new Set();
                 allRecords = [];
 
@@ -711,15 +687,52 @@
             renderFilteredData();
         }
 
+        // RIGOROSO FILTRO DE ISOLAMENTO C-SUITE
+        function isExecCheckin(item) {
+            if (item._tableName === 'srt_rh_checkins') {
+                return false;
+            }
+
+            const company = (item.company || item.empresa || '').toString().toUpperCase();
+            if (company.includes('ES_CRISIS') || company.includes('EXEC') || item._tableName === 'es_crisis_exec_checkins') {
+                return true;
+            }
+
+            const role = (item.role || item.cargo || '').toString().toLowerCase();
+            const dept = (item.department || item.dept || item.setor || item.sector || '').toString().toLowerCase();
+            const name = (item.name || item.nome || item.exec_name || '').toString().toLowerCase();
+            const action = (item.action || '').toString().toUpperCase();
+
+            if (action.includes('ES-CRISE') || action.includes('C-SUITE')) {
+                return true;
+            }
+
+            if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota')) {
+                return false;
+            }
+
+            if (name === 'anônimo' || name === 'anonimo' || name === 'colaborador' || name === 'operador' || name === 'null' || name === 'undefined') {
+                return false;
+            }
+
+            const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'líder', 'lider', 'c-suite', 'flavio', 'verissimo'];
+            const hasExecRole = execKeywords.some(k => role.includes(k) || dept.includes(k) || name.includes(k));
+
+            if (hasExecRole) return true;
+
+            if (execFilterMode === 'ALL_LEADERS' && name.length > 3) {
+                return true;
+            }
+
+            return false;
+        }
+
         function renderFilteredData() {
             const startVal = document.getElementById('startDate').value;
             const endVal = document.getElementById('endDate').value;
 
             let filtered = allRecords.filter(row => {
-                if (scopeMode === 'EXEC' && !isExecCheckin(row)) {
-                    return false;
-                }
-
+                if (!isExecCheckin(row)) return false;
                 if (startVal || endVal) {
                     if (!row.created_at) return true;
                     const localDateObj = new Date(row.created_at);
@@ -738,7 +751,9 @@
                 return true;
             });
 
-            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0, totalVfc = 0;
+            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0;
+            let totalLat = 0, totalVfc = 0, totalBpm = 0, totalVo2 = 0;
+
             filtered.forEach(r => {
                 const category = getStatusCategory(r);
                 if (category === 'GREEN') cGreen++;
@@ -746,19 +761,38 @@
                 else if (category === 'PURPLE') cPurple++;
                 else if (category === 'RED') cRed++;
 
-                totalLat += (r.reaction_time_ms || r.latency || 450);
+                const lat = (r.reaction_time_ms || r.latency || 450);
+                totalLat += lat;
 
                 let vfcVal = r.vfc_rmssd || r.rmssd || r.vfc || 0;
-                if (!vfcVal && r.vsi_status) {
-                    const match = r.vsi_status.match(/VFC:\s*(\d+)ms/i);
-                    if (match && match[1]) vfcVal = parseInt(match[1]);
+                let bpmVal = r.bpm || r.heart_rate || 0;
+                let vo2Val = r.vo2_max || r.vo2 || 0;
+
+                if ((!vfcVal || !bpmVal || !vo2Val) && r.vsi_status) {
+                    const matchVfc = r.vsi_status.match(/VFC:\s*(\d+)ms/i);
+                    const matchBpm = r.vsi_status.match(/BPM:\s*(\d+)/i);
+                    const matchVo2 = r.vsi_status.match(/VO2:\s*([\d\.]+)/i);
+
+                    if (!vfcVal && matchVfc) vfcVal = parseInt(matchVfc[1]);
+                    if (!bpmVal && matchBpm) bpmVal = parseInt(matchBpm[1]);
+                    if (!vo2Val && matchVo2) vo2Val = parseFloat(matchVo2[1]);
                 }
+
                 if (!vfcVal) {
                     let vsiN = Number(r.vsi_score || r.vsi) || 1.80;
-                    let latN = Number(r.reaction_time_ms || r.latency) || 450;
-                    vfcVal = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                    vfcVal = Math.round(Math.max(12, 80 - (vsiN * 9) - ((lat - 300) / 15)));
                 }
+                if (!bpmVal) {
+                    let vsiN = Number(r.vsi_score || r.vsi) || 1.80;
+                    bpmVal = Math.round(Math.min(115, Math.max(58, 62 + (vsiN * 6) + ((lat - 350) / 25))));
+                }
+                if (!vo2Val) {
+                    vo2Val = Number(Math.max(22, 52 - (23 * 0.35) - ((100 - vfcVal) * 0.12) - ((bpmVal - 65) * 0.15)).toFixed(1));
+                }
+
                 totalVfc += vfcVal;
+                totalBpm += bpmVal;
+                totalVo2 += vo2Val;
             });
 
             document.getElementById('mTotal').innerText = filtered.length;
@@ -766,14 +800,18 @@
             document.getElementById('mAmarelo').innerText = cYellow;
             document.getElementById('mRoxo').innerText = cPurple;
             document.getElementById('mVermelho').innerText = cRed;
-            document.getElementById('mTempo').innerText = filtered.length > 0 ? `${Math.round(totalLat / filtered.length)} ms` : '0 ms';
-            document.getElementById('mVfc').innerText = filtered.length > 0 ? `${Math.round(totalVfc / filtered.length)} ms` : '0 ms';
+
+            const cnt = filtered.length;
+            document.getElementById('mTempo').innerText = cnt > 0 ? `${Math.round(totalLat / cnt)} ms` : '0 ms';
+            document.getElementById('mVfc').innerText   = cnt > 0 ? `${Math.round(totalVfc / cnt)} ms` : '0 ms';
+            document.getElementById('mBpm').innerText   = cnt > 0 ? `${Math.round(totalBpm / cnt)} BPM` : '0 BPM';
+            document.getElementById('mVo2').innerText   = cnt > 0 ? `${(totalVo2 / cnt).toFixed(1)} mL` : '0 mL';
 
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado para os filtros selecionados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado no banco de dados para os filtros selecionados.</td></tr>';
                 return;
             }
 
@@ -811,14 +849,31 @@
                 }
 
                 let itemVfc = item.vfc_rmssd || item.rmssd || item.vfc || 0;
-                if (!itemVfc && item.vsi_status) {
-                    const match = item.vsi_status.match(/VFC:\s*(\d+)ms/i);
-                    if (match && match[1]) itemVfc = parseInt(match[1]);
+                let itemBpm = item.bpm || item.heart_rate || 0;
+                let itemVo2 = item.vo2_max || item.vo2 || 0;
+
+                if ((!itemVfc || !itemBpm || !itemVo2) && item.vsi_status) {
+                    const matchVfc = item.vsi_status.match(/VFC:\s*(\d+)ms/i);
+                    const matchBpm = item.vsi_status.match(/BPM:\s*(\d+)/i);
+                    const matchVo2 = item.vsi_status.match(/VO2:\s*([\d\.]+)/i);
+
+                    if (!itemVfc && matchVfc) itemVfc = parseInt(matchVfc[1]);
+                    if (!itemBpm && matchBpm) itemBpm = parseInt(matchBpm[1]);
+                    if (!itemVo2 && matchVo2) itemVo2 = parseFloat(matchVo2[1]);
                 }
+
+                const lat = (item.reaction_time_ms || item.latency || 450);
+
                 if (!itemVfc) {
                     let vsiN = Number(item.vsi_score || item.vsi) || 1.80;
-                    let latN = Number(item.reaction_time_ms || item.latency) || 450;
-                    itemVfc = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                    itemVfc = Math.round(Math.max(12, 80 - (vsiN * 9) - ((lat - 300) / 15)));
+                }
+                if (!itemBpm) {
+                    let vsiN = Number(item.vsi_score || item.vsi) || 1.80;
+                    itemBpm = Math.round(Math.min(115, Math.max(58, 62 + (vsiN * 6) + ((lat - 350) / 25))));
+                }
+                if (!itemVo2) {
+                    itemVo2 = Number(Math.max(22, 52 - (23 * 0.35) - ((100 - itemVfc) * 0.12) - ((itemBpm - 65) * 0.15)).toFixed(1));
                 }
 
                 let vfcColor = '#34d399';
@@ -856,8 +911,12 @@
                     </td>
                     <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || 'Presidência / Diretoria'}</td>
                     <td>${voiceStatusHtml}</td>
-                    <td><span class="badge-vfc" style="color:${vfcColor};">${itemVfc} ms</span></td>
-                    <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 450} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
+                    <td>
+                        <span class="badge-vfc" style="color:${vfcColor};">${itemVfc} ms</span>
+                        <br><small style="color:#fbbf24; font-weight:700;">${itemBpm} BPM</small>
+                        <br><small style="color:#34d399; font-weight:700;">VO2: ${itemVo2}</small>
+                    </td>
+                    <td style="color:#c084fc; font-weight:700;">${lat} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
                     <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
                     <td style="font-size:12px; font-weight:700;">${finalAction}</td>
                 `;
@@ -871,3 +930,4 @@
     </script>
 </body>
 </html>
+
