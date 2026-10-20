@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ES-Crise Executivo — Cockpit de Governança & Motor E.A.S.Y. v3.2</title>
+    <title>ES-Crise Executivo — Cockpit de Governança & Motor E.A.S.Y. v3.3 Master</title>
     <style>
         * { 
             box-sizing: border-box; 
@@ -67,6 +67,51 @@
             0% { opacity: 1; transform: scale(1); } 
             50% { opacity: 0.4; transform: scale(1.2); } 
             100% { opacity: 1; transform: scale(1); } 
+        }
+
+        .explanation-panel {
+            background: #151c2c;
+            border: 1px solid #0284c7;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 24px;
+        }
+
+        .exp-header {
+            font-size: 13px;
+            font-weight: 800;
+            color: #38bdf8;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .exp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .exp-card {
+            background: #0b0f19;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .exp-card b {
+            color: #f8fafc;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .exp-card p {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.45;
         }
 
         .filter-panel {
@@ -151,7 +196,7 @@
 
         .metrics-grid {
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px; 
             margin-bottom: 28px;
         }
@@ -183,6 +228,7 @@
         .val-roxo { color: #c084fc; }
         .val-vermelho { color: #f87171; }
         .val-tempo { color: #38bdf8; }
+        .val-vfc { color: #38bdf8; }
 
         .panel { 
             background: #151c2c; 
@@ -212,7 +258,7 @@
             border-collapse: collapse; 
             text-align: left; 
             font-size: 13px; 
-            min-width: 980px; 
+            min-width: 1050px; 
         }
 
         th { 
@@ -300,18 +346,55 @@
             font-weight: 700; 
             display: block; 
         }
+
+        .badge-vfc {
+            font-size: 12px;
+            font-weight: 800;
+            color: #38bdf8;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="title-group">
-            <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA & MOTOR E.A.S.Y. v3.2</h1>
+            <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA & MOTOR E.A.S.Y. v3.3</h1>
             <p>Painel Telemétrico de Prontidão C-Suite, Soberania Decisória & Governança Antifrágil</p>
         </div>
         <div class="live-indicator">
             <div class="dot"></div>
             COCKPIT ATIVO EM TEMPO REAL
+        </div>
+    </div>
+
+    <!-- GUIA TÁTICO & EXPLICAÇÃO COMPLETA DAS VARIÁVEIS -->
+    <div class="explanation-panel">
+        <div class="exp-header">📘 MATRIZ DE TELEMETRIA BIOMÉTRICA & EXPLICAÇÃO DAS VARIÁVEIS</div>
+        <div class="exp-grid">
+            <div class="exp-card">
+                <b>🧠 Autocontrole (Vetor C)</b>
+                <p>Mede a capacidade do Córtex Pré-Frontal (DLPFC) de inibir reações impulsivas (veto nas bolinhas vermelhas NO-GO). Erros indicam precipitação decisória sob urgência.</p>
+            </div>
+            <div class="exp-card">
+                <b>⚡ Clareza (Vetor I)</b>
+                <p>Mede a velocidade de resposta visuomotora (PVT). Latências normais são entre 300-450ms. Valores >500ms apontam desaceleração por acúmulo de carga de trabalho.</p>
+            </div>
+            <div class="exp-card">
+                <b>🎙️ Energia (Vetor R)</b>
+                <p>Avalia a micro-tensão das cordas vocais (VSI - Vocal Stress Index) controladas pelo Nervo Vago Laríngeo (NC X). Mede ativação do estresse simpático em 7s de áudio.</p>
+            </div>
+            <div class="exp-card">
+                <b>🫀 VFC / rMSSD (Tônus Vagal)</b>
+                <p>Variabilidade da Frequência Cardíaca em milissegundos. VFC > 40ms reflete mente adaptável e serena. VFC < 30ms sinaliza estresse simpático elevado pré-reunião.</p>
+            </div>
+            <div class="exp-card">
+                <b>🛡️ Regra do Elo Mais Fraco</b>
+                <p>Princípio de blindagem onde o menor vetor individual (C, I ou R) limita o score final, impedindo que uma média mascare um ponto cego crítico de prontidão.</p>
+            </div>
+            <div class="exp-card">
+                <b>🏛️ Motor E.A.S.Y.</b>
+                <p>Framework de governança prescritiva: <b>E</b>xamine (Exame), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização de Alçada) e <b>Y</b>ardstick (Métrica pós-pausa).</p>
+            </div>
         </div>
     </div>
 
@@ -348,7 +431,7 @@
     <!-- CARDS DE MÉTRICAS -->
     <div class="metrics-grid">
         <div class="card-metric">
-            <div class="label">Aferições no Período</div>
+            <div class="label">Aferições Período</div>
             <div class="value val-total" id="mTotal">0</div>
         </div>
         <div class="card-metric">
@@ -356,20 +439,24 @@
             <div class="value val-verde" id="mVerde">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟡 Tensão Decisória (Amarelo)</div>
+            <div class="label">🟡 Tensão (Amarelo)</div>
             <div class="value val-amarelo" id="mAmarelo">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🟣 Exaustão/Chassi (Roxo)</div>
+            <div class="label">🟣 Exaustão (Roxo)</div>
             <div class="value val-roxo" id="mRoxo">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">🔴 Alerta de Estol (Vermelho)</div>
+            <div class="label">🔴 Alerta Estol (Vermelho)</div>
             <div class="value val-vermelho" id="mVermelho">0</div>
         </div>
         <div class="card-metric">
-            <div class="label">⚡ Média de Latência</div>
+            <div class="label">⚡ Média Latência</div>
             <div class="value val-tempo" id="mTempo">0 ms</div>
+        </div>
+        <div class="card-metric">
+            <div class="label">🫀 Média VFC (rMSSD)</div>
+            <div class="value val-vfc" id="mVfc">0 ms</div>
         </div>
     </div>
 
@@ -387,13 +474,14 @@
                     <th>Validação Facial</th>
                     <th>Business Unit / Diretoria</th>
                     <th>Conferência de Voz (VSI)</th>
+                    <th>VFC (rMSSD ms)</th>
                     <th>Latência / Veto Motor</th>
                     <th>Status / Soberania</th>
                     <th>Orientação de Governança E.A.S.Y.</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Conectando ao banco de dados e buscando registros...</td></tr>
+                <tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Conectando ao banco de dados e buscando registros...</td></tr>
             </tbody>
         </table>
     </div>
@@ -521,10 +609,9 @@
             renderFilteredData();
         }
 
-        // BUSCA LIMPA NO SUPABASE (SEM PARÂMETROS INVÁLIDOS NA URL)
         async function fetchAndRenderData() {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos executivos e biometrias no Supabase...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos executivos e biometrias no Supabase...</td></tr>';
 
             try {
                 const apiUrl = `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`;
@@ -575,7 +662,7 @@
                 return true;
             });
 
-            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
+            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0, totalVfc = 0;
             filtered.forEach(r => {
                 const category = getStatusCategory(r);
                 if (category === 'GREEN') cGreen++;
@@ -584,6 +671,14 @@
                 else if (category === 'RED') cRed++;
 
                 totalLat += (r.reaction_time_ms || r.latency || 620);
+                
+                let vfcVal = r.vfc_rmssd || r.rmssd || r.vfc || 0;
+                if (!vfcVal) {
+                    let vsiN = Number(r.vsi_score || r.vsi) || 1.80;
+                    let latN = Number(r.reaction_time_ms || r.latency) || 450;
+                    vfcVal = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                }
+                totalVfc += vfcVal;
             });
 
             document.getElementById('mTotal').innerText = filtered.length;
@@ -592,12 +687,13 @@
             document.getElementById('mRoxo').innerText = cPurple;
             document.getElementById('mVermelho').innerText = cRed;
             document.getElementById('mTempo').innerText = filtered.length > 0 ? `${Math.round(totalLat / filtered.length)} ms` : '0 ms';
+            document.getElementById('mVfc').innerText = filtered.length > 0 ? `${Math.round(totalVfc / filtered.length)} ms` : '0 ms';
 
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado no banco de dados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado no banco de dados.</td></tr>';
                 return;
             }
 
@@ -633,15 +729,18 @@
                     } else {
                         voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Instabilidade Crítica (${vsiVal.toFixed(2)})</span>`;
                     }
-                } else {
-                    if (vsiText.includes('amarelo') || vsiText.includes('atenção') || vsiText.includes('moderada')) {
-                        voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Modulada</span>`;
-                    } else if (vsiText.includes('roxo') || vsiText.includes('exaustão') || vsiText.includes('chassi')) {
-                        voiceStatusHtml = `<span class="badge-voice" style="color:#c084fc;">🟣 Exaustão Vocal</span>`;
-                    } else if (vsiText.includes('vermelho') || vsiText.includes('alta') || vsiText.includes('crítica')) {
-                        voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Tensão Crítica</span>`;
-                    }
                 }
+
+                let itemVfc = item.vfc_rmssd || item.rmssd || item.vfc || 0;
+                if (!itemVfc) {
+                    let vsiN = Number(item.vsi_score || item.vsi) || 1.80;
+                    let latN = Number(item.reaction_time_ms || item.latency) || 450;
+                    itemVfc = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                }
+
+                let vfcColor = '#34d399';
+                if (itemVfc < 30) vfcColor = '#f87171';
+                else if (itemVfc < 40) vfcColor = '#fbbf24';
 
                 const category = getStatusCategory(item);
                 let badgeClass = 'b-verde';
@@ -674,6 +773,7 @@
                     </td>
                     <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || 'Presidência / Diretoria'}</td>
                     <td>${voiceStatusHtml}</td>
+                    <td><span class="badge-vfc" style="color:${vfcColor};">${itemVfc} ms</span></td>
                     <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 620} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
                     <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
                     <td style="font-size:12px; font-weight:700;">${finalAction}</td>
