@@ -377,7 +377,7 @@
             </div>
             <div class="exp-card">
                 <b>⚡ Clareza (Vetor I)</b>
-                <p>Mede a velocidade de resposta visuomotora (PVT). Latências normais são entre 300-480ms. Valores >500ms apontam desaceleração por acúmulo de carga de trabalho.</p>
+                <p>Mede a velocidade de resposta visuomotora (PVT). Latências normais são entre 300-480ms. Valores >520ms apontam desaceleração por acúmulo de carga de trabalho.</p>
             </div>
             <div class="exp-card">
                 <b>🎙️ Energia (Vetor R)</b>
@@ -393,7 +393,7 @@
             </div>
             <div class="exp-card">
                 <b>🏛️ Motor E.A.S.Y.</b>
-                <p>Framework de governança prescritiva: <b>E</b>xamine (Exame Neurofisiológico), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização de Alçada) e <b>Y</b>ardstick (Métrica pós-pausa).</p>
+                <p>Framework de governança prescritiva: <b>E</b>xamine (Exame), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização de Alçada) e <b>Y</b>ardstick (Métrica pós-pausa).</p>
             </div>
         </div>
     </div>
@@ -425,6 +425,10 @@
             <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
             <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Roxo</button>
             <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
+
+            <span style="font-size:11px; color:#38bdf8; font-weight:700; text-transform:uppercase; margin-left:16px;">Modo de Isolamento:</span>
+            <button class="btn-quick active" id="modeExec" onclick="setScopeMode('EXEC')">👑 Exclusivo C-Suite / ES-Crise</button>
+            <button class="btn-quick" id="modeAll" onclick="setScopeMode('ALL')">🌐 Todas as Lideranças</button>
         </div>
     </div>
 
@@ -492,6 +496,7 @@
 
         let allRecords = [];
         let selectedStatus = 'ALL';
+        let scopeMode = 'EXEC';
 
         function resolvePhoto(item) {
             let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.user_photo || item.snapshot || item.face_image || item.image;
@@ -609,7 +614,50 @@
             renderFilteredData();
         }
 
-        // BUSCA MULTI-TABELA PARALELA (SRT_CHECKINS + ES_CRISIS_EXEC_CHECKINS + SRT_RH_CHECKINS)
+        function setScopeMode(mode) {
+            scopeMode = mode;
+            document.getElementById('modeExec').classList.remove('active');
+            document.getElementById('modeAll').classList.remove('active');
+
+            if (mode === 'EXEC') document.getElementById('modeExec').classList.add('active');
+            if (mode === 'ALL') document.getElementById('modeAll').classList.add('active');
+
+            renderFilteredData();
+        }
+
+        function isExecCheckin(item) {
+            const tbl = item._tableName || '';
+            if (tbl === 'srt_rh_checkins') return false;
+            if (tbl === 'es_crisis_exec_checkins') return true;
+
+            const role = (item.role || item.cargo || '').toString().toLowerCase();
+            const dept = (item.department || item.dept || item.setor || item.sector || '').toString().toLowerCase();
+            const name = (item.name || item.nome || item.exec_name || '').toString().toLowerCase();
+            const action = (item.action || item.easy_stage || '').toString().toLowerCase();
+            const vsiStatus = (item.vsi_status || '').toString().toLowerCase();
+            const company = (item.company || item.empresa || '').toString().toLowerCase();
+
+            // Descartar expressamente motoristas, operacionais e anonimos do RH
+            if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota') || role.includes('ajudante') || role.includes('mecanico')) {
+                return false;
+            }
+
+            if (name === 'anônimo' || name === 'anonimo' || name === 'colaborador' || name === 'operador' || name === 'condutor') {
+                return false;
+            }
+
+            // Tag explícita do aplicativo ES-Crise Executivo
+            if (action.includes('es-crise') || vsiStatus.includes('es-crise') || company.includes('es_crisis') || action.includes('soberania') || action.includes('dossiê neuroexecutivo')) {
+                return true;
+            }
+
+            // Filtro rigoroso de cargos C-Suite / Liderança
+            const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'c-suite', 'gerente'];
+            const hasExecRole = execKeywords.some(k => role.includes(k) || dept.includes(k));
+
+            return hasExecRole;
+        }
+
         async function fetchAndRenderData() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos executivos no Supabase...</td></tr>';
@@ -620,9 +668,8 @@
             };
 
             const endpoints = [
-                { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` },
                 { name: 'es_crisis_exec_checkins', url: `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc` },
-                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` }
+                { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` }
             ];
 
             try {
@@ -669,6 +716,10 @@
             const endVal = document.getElementById('endDate').value;
 
             let filtered = allRecords.filter(row => {
+                if (scopeMode === 'EXEC' && !isExecCheckin(row)) {
+                    return false;
+                }
+
                 if (startVal || endVal) {
                     if (!row.created_at) return true;
                     const localDateObj = new Date(row.created_at);
@@ -722,7 +773,7 @@
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado no banco de dados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum laudo executivo encontrado para os filtros selecionados.</td></tr>';
                 return;
             }
 
