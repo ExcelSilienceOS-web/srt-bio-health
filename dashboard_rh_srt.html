@@ -600,7 +600,7 @@
             <div class="panel-header">
                 <div>
                     <div class="panel-title">Triagem de Prontidão Ocupacional & Sobrecarga Fisiológica Auditada</div>
-                    <div class="panel-subtitle">Painel Ocupacional Preventivo sob Diretrizes de Telemetria de Bem-Estar (Isenção ANVISA SaMD)</div>
+                    <div class="panel-subtitle">Painel Ocupacional Preventivo sob Diretrizes de People Analytics Anônimo (N ≥ 5) e Delta Setorial</div>
                 </div>
                 <span style="font-size:11px; color:var(--purple); font-weight:800;">🔐 Sigilo Médico CFM Preservado</span>
             </div>
@@ -609,7 +609,7 @@
                     <tr>
                         <th>Prontuário ID</th>
                         <th>Setor / Departamento</th>
-                        <th>VFC (rMSSD)</th>
+                        <th>Tensão Vocal (Score VSI)</th>
                         <th>Status Autonômico</th>
                         <th>Indicador de Risco Operacional</th>
                         <th>Conduta Preventiva Prescrita</th>
@@ -871,9 +871,9 @@
 
                 // Busca dados das tabelas do Supabase
                 const tables = [
-                    { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` },
-                    { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` }
-                ];
+                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` },
+                { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` }
+            ];
 
                 const results = await Promise.allSettled(tables.map(t => fetch(t.url, { headers: h }).then(r => r.ok ? r.json().then(d => ({ table: t.name, data: d })) : { table: t.name, data: [] })));
                 let allFetched = [];
@@ -973,6 +973,13 @@
         function filtrarDadosPorPeriodo() {
             const agora = new Date();
             filteredData = rawCheckinsData.filter(item => {
+                // Filtro Rígido de RH: Exclui estritamente motoristas/condutores de frota do Mobility
+                const nameStr = (item.name || item.driver_name || '').toString();
+                const roleStr = (item.role || item.cargo || '').toString();
+                if (roleStr.includes('Motorista') || roleStr.includes('Condutor') || item.photo_url || item.photo) {
+                    return false;
+                }
+
                 // Filtro Rígido de Empresa (Company)
                 if (currentCompany !== 'TODAS' && currentCompany !== 'ALL' && currentCompany !== '') {
                     const itemCompany = (item.company || '').toString().toUpperCase().trim();
@@ -1129,7 +1136,7 @@
 
             filteredData.slice(0, 15).forEach((d, idx) => {
                 const prtId = `PRT-${9000 + d.id}`;
-                const rmssdFmt = `${d.rmssd || 35} ms`;
+                const vsiFmt = `${(d.vsi_score || 1.80).toFixed(2)}`;
 
                 let statusAutonomico = `<span class="badge badge-verde">Homeostase Preservada</span>`;
                 let riscoOp = `Baixo`;
@@ -1153,7 +1160,7 @@
                     <tr>
                         <td><strong>${prtId}</strong></td>
                         <td>${d.sector}</td>
-                        <td>${rmssdFmt}</td>
+                        <td><strong style="color:var(--accent);">${vsiFmt}</strong></td>
                         <td>${statusAutonomico}</td>
                         <td><strong>${riscoOp}</strong></td>
                         <td>${conduta}</td>
