@@ -5,60 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ES-Crise Executivo — Cockpit de Governança & Motor E.A.S.Y. v3.0</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #0b0f19; color: #e2e8f0; padding: 24px; }
-
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        }
+        
+        body { 
+            background-color: #0b0f19; 
+            color: #e2e8f0; 
+            padding: 24px; 
+        }
+        
         .header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px;
-            flex-wrap: wrap; gap: 12px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 1px solid #1e293b; 
+            padding-bottom: 16px; 
+            margin-bottom: 24px;
+            flex-wrap: wrap; 
+            gap: 12px;
         }
-        .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
-        .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
 
-        .live-indicator {
-            display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;
-            font-size: 12px; font-weight: 700; color: #34d399;
+        .title-group h1 { 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: #38bdf8; 
+            letter-spacing: 0.5px; 
         }
-        .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+        .title-group p { 
+            font-size: 13px; 
+            color: #64748b; 
+            margin-top: 4px; 
+        }
+        
+        .live-indicator {
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3); 
+            padding: 6px 14px; 
+            border-radius: 20px;
+            font-size: 12px; 
+            font-weight: 700; 
+            color: #34d399;
+        }
+
+        .dot { 
+            width: 8px; 
+            height: 8px; 
+            background-color: #10b981; 
+            border-radius: 50%; 
+            animation: pulse 1.5s infinite; 
+        }
+
+        @keyframes pulse { 
+            0% { opacity: 1; transform: scale(1); } 
+            50% { opacity: 0.4; transform: scale(1.2); } 
+            100% { opacity: 1; transform: scale(1); } 
+        }
 
         /* PAINEL DE FILTROS DE DATA E STATUS */
         .filter-panel {
-            background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px;
-            margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;
+            background: #151c2c; 
+            border: 1px solid #2a364f; 
+            border-radius: 12px; 
+            padding: 18px;
+            margin-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 14px;
         }
-        .filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .filter-group { display: flex; align-items: center; gap: 8px; }
-        .filter-group label { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
 
-        input[type="date"] {
-            background: #0b0f19; border: 1px solid #334155; color: #f8fafc;
-            padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
+        .filter-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            flex-wrap: wrap; 
         }
-        input[type="date"]:focus { border-color: #38bdf8; }
+
+        .filter-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+
+        .filter-group label { 
+            font-size: 11px; 
+            font-weight: 700; 
+            color: #38bdf8; 
+            text-transform: uppercase; 
+        }
+        
+        input[type="date"] {
+            background: #0b0f19; 
+            border: 1px solid #334155; 
+            color: #f8fafc;
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            font-size: 13px; 
+            outline: none;
+        }
+
+        input[type="date"]:focus { 
+            border-color: #38bdf8; 
+        }
 
         .btn-quick {
-            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
-            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+            background: #1e293b; 
+            border: 1px solid #334155; 
+            color: #94a3b8;
+            padding: 8px 14px; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: 0.2s;
         }
-        .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; }
+
+        .btn-quick:hover, .btn-quick.active { 
+            background: #0284c7; 
+            color: #ffffff; 
+            border-color: #38bdf8; 
+        }
 
         .btn-action {
-            background: #10b981; border: none; color: #ffffff; padding: 8px 18px;
-            border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto;
+            background: #10b981; 
+            border: none; 
+            color: #ffffff; 
+            padding: 8px 18px;
+            border-radius: 6px; 
+            font-size: 13px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            margin-left: auto;
         }
-        .btn-action:hover { background: #059669; }
+
+        .btn-action:hover { 
+            background: #059669; 
+        }
 
         /* METRICS CARDS */
         .metrics-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 16px; margin-bottom: 28px;
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 16px; 
+            margin-bottom: 28px;
         }
-        .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; }
-        .card-metric .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 700; }
-        .card-metric .value { font-size: 26px; font-weight: 800; }
+
+        .card-metric { 
+            background: #151c2c; 
+            border: 1px solid #2a364f; 
+            border-radius: 12px; 
+            padding: 18px; 
+        }
+
+        .card-metric .label { 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            color: #94a3b8; 
+            margin-bottom: 8px; 
+            font-weight: 700; 
+        }
+
+        .card-metric .value { 
+            font-size: 26px; 
+            font-weight: 800; 
+        }
+
         .val-total { color: #f8fafc; }
         .val-verde { color: #34d399; }
         .val-amarelo { color: #fbbf24; }
@@ -67,45 +187,127 @@
         .val-tempo { color: #38bdf8; }
 
         /* TABELA */
-        .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; overflow-x: auto; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-        .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+        .panel { 
+            background: #151c2c; 
+            border: 1px solid #2a364f; 
+            border-radius: 12px; 
+            padding: 20px; 
+            overflow-x: auto; 
+        }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 980px; }
-        th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
-        td { padding: 12px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
-        tr:hover { background: rgba(255, 255, 255, 0.02); }
+        .panel-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px; 
+            flex-wrap: wrap; 
+            gap: 12px; 
+        }
+
+        .panel-title { 
+            font-size: 15px; 
+            font-weight: 700; 
+            color: #f1f5f9; 
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: left; 
+            font-size: 13px; 
+            min-width: 980px; 
+        }
+
+        th { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 12px 14px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            font-size: 11px; 
+            letter-spacing: 0.5px; 
+            border-bottom: 1px solid #334155; 
+        }
+
+        td { 
+            padding: 12px 14px; 
+            border-bottom: 1px solid #1e293b; 
+            color: #cbd5e1; 
+            vertical-align: middle; 
+        }
+
+        tr:hover { 
+            background: rgba(255, 255, 255, 0.02); 
+        }
 
         .user-photo {
-            width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
-            border: 2px solid #0284c7; background: #070d19; display: inline-block; vertical-align: middle;
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%; 
+            object-fit: cover;
+            border: 2px solid #0284c7; 
+            background: #070d19; 
+            display: inline-block; 
+            vertical-align: middle;
         }
 
         .user-avatar-fallback {
-            width: 44px; height: 44px; border-radius: 50%;
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%;
             background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: #ffffff; font-weight: 800; font-size: 18px;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid #38bdf8; text-transform: uppercase; flex-shrink: 0;
+            color: #ffffff; 
+            font-weight: 800; 
+            font-size: 18px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border: 2px solid #38bdf8; 
+            text-transform: uppercase; 
+            flex-shrink: 0;
         }
 
-        .photo-container { display: flex; align-items: center; gap: 12px; }
+        .photo-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
 
-        .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
+        .badge-status { 
+            padding: 5px 12px; 
+            border-radius: 6px; 
+            font-size: 11px; 
+            font-weight: 800; 
+            display: inline-block; 
+        }
+
         .b-verde { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
         .b-amarelo { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
         .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
         .b-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
 
         .badge-face {
-            font-size: 10px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.1);
-            padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block; margin-top: 2px;
+            font-size: 10px; 
+            font-weight: 700; 
+            color: #34d399; 
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            border: 1px solid rgba(16, 185, 129, 0.3); 
+            display: inline-block; 
+            margin-top: 2px;
         }
-        .badge-voice { font-size: 11px; font-weight: 700; display: block; }
+
+        .badge-voice { 
+            font-size: 11px; 
+            font-weight: 700; 
+            display: block; 
+        }
     </style>
 </head>
 <body>
 
+    <!-- CABEÇALHO DO COCKPIT -->
     <div class="header">
         <div class="title-group">
             <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA & MOTOR E.A.S.Y. v3.0</h1>
@@ -207,6 +409,7 @@
         let allRecords = [];
         let selectedStatus = 'ALL';
 
+        // RESOLUÇÃO DE FOTO COM TRATAMENTO BASE64 / HTTP
         function resolvePhoto(item) {
             let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.user_photo || item.snapshot || item.face_image || item.image;
             if (!raw || raw === 'null' || raw === 'undefined' || (typeof raw === 'string' && raw.trim() === '')) {
@@ -224,6 +427,7 @@
             return null;
         }
 
+        // RESOLUÇÃO FLEXÍVEL DE NOME DO EXECUTIVO
         function resolveName(item) {
             let possible = [
                 item.name, item.nome, item.full_name, item.exec_name, item.operator_name,
@@ -241,6 +445,7 @@
             return sess ? `Executivo C-Suite (#${sess})` : 'Líder Executivo';
         }
 
+        // MAPEAMENTO DOS 4 STATUS EXECUTIVOS
         function getStatusCategory(item) {
             let st = (item.status || item.profile_key || item.weakest_link || '').toString().toUpperCase();
 
@@ -256,17 +461,18 @@
             return 'GREEN';
         }
 
+        // AÇÃO E ORIENTAÇÃO DO MOTOR E.A.S.Y.
         function resolveAction(item, category) {
             const defaultActions = {
-                'GREEN': '🟢 🟢 Operador Soberano — Prontidão Excelente',
-                'YELLOW': '🟡 🟡 Muleteiro Corp. — Atentar Vetor Intencionalidade',
-                'PURPLE': '🟣 🟣 Chassi Queimado — Trava por Exaustão (Restaurar Resiliência)',
-                'RED': '🔴 🔴 Reativo Impulsivo — Veto Motor (Congelar Decisões de Risco)'
+                'GREEN': '🟢 Operador Soberano — Prontidão Excelente',
+                'YELLOW': '🟡 Muleteiro Corp. — Atentar Vetor Intencionalidade',
+                'PURPLE': '🟣 Chassi Queimado — Trava por Exaustão (Restaurar Resiliência)',
+                'RED': '🔴 Reativo Impulsivo — Veto Motor (Congelar Decisões de Risco)'
             };
 
             let stdAction = defaultActions[category] || defaultActions['GREEN'];
-
             let dbAction = item.action || item.easy_stage || '';
+
             if (dbAction && typeof dbAction === 'string') {
                 dbAction = dbAction.trim();
                 let dbUpper = dbAction.toUpperCase();
@@ -283,6 +489,7 @@
             return stdAction;
         }
 
+        // FILTRO RÁPIDO DE DATA
         function setPeriod(period) {
             document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
             const today = new Date();
@@ -307,6 +514,7 @@
             fetchAndRenderData();
         }
 
+        // FILTRO DE COR / STATUS
         function setStatusFilter(status) {
             selectedStatus = status;
             ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
@@ -323,6 +531,7 @@
             renderFilteredData();
         }
 
+        // BUSCA NO SUPABASE
         async function fetchAndRenderData() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos executivos e biometrias no Supabase...</td></tr>';
@@ -346,6 +555,7 @@
             renderFilteredData();
         }
 
+        // RENDERIZAÇÃO DA TABELA & CARDS
         function renderFilteredData() {
             const startVal = document.getElementById('startDate').value;
             const endVal = document.getElementById('endDate').value;
@@ -431,7 +641,7 @@
                     }
                 }
 
-                // Categoria e Trava Operacional
+                // CATEGORIA E TRAVA OPERACIONAL
                 const category = getStatusCategory(item);
                 let badgeClass = 'b-verde';
                 let statusLabel = '🟢 VERDE (APTO)';
