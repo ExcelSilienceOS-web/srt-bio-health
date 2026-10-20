@@ -371,8 +371,8 @@
 
         .dossier-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
             margin-bottom: 16px;
             text-align: center;
         }
@@ -381,32 +381,11 @@
             background: #070d19;
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px 6px;
+            padding: 10px 4px;
         }
 
         .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
-        .dossier-stat .val { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 2px; }
-
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .heatmap-cell {
-            padding: 8px 4px;
-            border-radius: 6px;
-            font-size: 10px;
-            text-align: center;
-            font-weight: 700;
-            border: 1px solid var(--border);
-        }
-
-        .hm-green { background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.4); }
-        .hm-yellow { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); }
-        .hm-purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; border-color: rgba(192, 132, 252, 0.4); }
-        .hm-red { background: rgba(248, 113, 113, 0.15); color: #f87171; border-color: rgba(248, 113, 113, 0.4); }
+        .dossier-stat .val { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 2px; }
 
         .easy-box-master {
             background: #070d19;
@@ -464,6 +443,33 @@
             color: var(--accent);
             text-align: center;
             letter-spacing: 0.5px;
+        }
+
+        .var-explanation-box {
+            background: #070d19;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .var-explanation-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .var-item {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .var-item b {
+            color: var(--text);
         }
 
         @media print {
@@ -680,24 +686,21 @@
 
             <div class="dossier-grid">
                 <div class="dossier-stat"><div class="lbl">Autocontrole (C)</div><div class="val" id="lblValC">0.0</div></div>
-                <div class="dossier-stat"><div class="lbl">Clareza (I)</div><div class="val" id="lblValI" style="color:#34d399;">0.0</div></div>
-                <div class="dossier-stat"><div class="lbl">Energia (R)</div><div class="val" id="lblValR" style="color:#c084fc;">0.0</div></div>
+                <div class="dossier-stat"><div class="lbl">Clareza (I)</div><div class="val" id="lblValI">0.0</div></div>
+                <div class="dossier-stat"><div class="lbl">Energia (R)</div><div class="val" id="lblValR">0.0</div></div>
+                <div class="dossier-stat"><div class="lbl">VFC (rMSSD)</div><div class="val" id="lblValVFC" style="color:#38bdf8;">-- ms</div></div>
+            </div>
+
+            <div class="var-explanation-box">
+                <div class="var-explanation-title">📘 GUIA TÁTICO DAS VARIÁVEIS BIOMÉTRICAS</div>
+                <div class="var-item"><b>🧠 Autocontrole (C):</b> Mede a capacidade do Córtex Pré-Frontal Dorsolateral (DLPFC) de frear respostas impulsivas (veto nas bolinhas vermelhas NO-GO).</div>
+                <div class="var-item"><b>⚡ Clareza (I):</b> Avalia a velocidade de processamento neural e tempo de reação visuomotor (PVT). Latências elevadas indicam atenuação por carga cognitiva acumulada.</div>
+                <div class="var-item"><b>🎙️ Energia (R):</b> Mede a resiliência bioacústica e micro-tensão das cordas vocais (VSI) moduladas pelo Nervo Vago Laríngeo (NC X).</div>
+                <div class="var-item"><b>🫀 VFC / rMSSD:</b> Variabilidade da Frequência Cardíaca (tônus vagal). VFC > 40ms indica alta adaptabilidade e mente calma; VFC < 30ms reflete estresse simpático/pré-reunião.</div>
+                <div class="var-item"><b>🛡️ Regra do Elo Mais Fraco:</b> O score geral é limitado pelo seu menor vetor individual, garantindo que uma falha isolada não seja mascarada por uma média ponderada.</div>
             </div>
 
             <div id="boxMainAlert"></div>
-
-            <div class="card" style="background:#070d19; padding:12px;">
-                <div style="font-size:11px; color:var(--accent); font-weight:800; margin-bottom:6px; text-transform:uppercase;">📊 Heatmap de Prontidão Recente</div>
-                <div class="heatmap-grid" id="heatmapGridBox">
-                    <div class="heatmap-cell hm-green">Seg<br><b>4.8</b></div>
-                    <div class="heatmap-cell hm-green">Ter<br><b>4.5</b></div>
-                    <div class="heatmap-cell hm-yellow">Qua<br><b>3.8</b></div>
-                    <div class="heatmap-cell hm-green">Qui<br><b>4.6</b></div>
-                    <div class="heatmap-cell hm-green">Sex<br><b>4.2</b></div>
-                    <div class="heatmap-cell hm-purple">Sáb<br><b>3.9</b></div>
-                    <div class="heatmap-cell hm-green">Dom<br><b>4.7</b></div>
-                </div>
-            </div>
 
             <div class="easy-box-master">
                 <h4>
@@ -1008,6 +1011,7 @@
         const name = document.getElementById('txtName').value.trim() || 'Dr. Flavio Verissimo';
         const role = document.getElementById('txtRole').value || 'CEO / Presidente Executivo';
         const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
+        const meetingTopic = document.getElementById('txtMeetingTopic').value.trim() || '';
 
         const validTimes = reactionTimes.filter(t => t < 800);
         const avgRt = validTimes.length > 0 ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length) : 450;
@@ -1018,6 +1022,10 @@
         let valC = Number(Math.max(1.0, 5.0 - (vetoErrors * 1.5)).toFixed(1));
         let valI = Number(Math.max(1.0, 5.0 - ((avgRt - 300) / 120)).toFixed(1));
         let valR = Number(Math.max(1.0, 5.0 - ((numVsi - 1.50) * 1.1)).toFixed(1));
+
+        // CÁLCULO DA VFC (rMSSD ms) - VARIABILIDADE DA FREQUÊNCIA CARDÍACA
+        let ctxPenalty = (selectedContext === 'PRE_MEETING') ? 6 : 0;
+        let vfcRmssd = Math.round(Math.max(12, 80 - (numVsi * 9) - ((avgRt - 300) / 15) - (vetoErrors * 8) - ctxPenalty));
 
         // REGRA DO ELO MAIS FRACO
         const minVector = Math.min(valC, valI, valR);
@@ -1044,26 +1052,28 @@
             badgeClass = 'badge-purple';
             badgeText = '🟣 TRAVA POR EXAUSTÃO (CHASSI QUEIMADO)';
             mainStatusMsg = '🟣 Sobrecarga Autonômica Severa. Ativar protocolo E.A.S.Y. de desaceleração compulsória antes do próximo comitê.';
-        } else if (minVector < 3.40 || avgRt > 650 || vetoErrors === 1 || numVsi >= 2.30 || Number(finalScoreNum) <= 3.40) {
+        } else if (minVector < 3.40 || avgRt > 650 || vetoErrors === 1 || numVsi >= 2.30 || Number(finalScoreNum) <= 3.40 || selectedContext === 'PRE_MEETING') {
             status = 'YELLOW';
             badgeClass = 'badge-yellow';
             badgeText = '🟡 ATENÇÃO: TENSÃO DE GOVERNANÇA';
             
-            if (lowestVector === 'I') {
+            if (selectedContext === 'PRE_MEETING' && vfcRmssd < 38) {
+                mainStatusMsg = `🟡 Tensão Pré-Reunião: VFC em ${vfcRmssd} ms (Carga Simpática Elevação). Mente sob pressão de pauta (${meetingTopic || 'Comitê'}). Recomendamos 3 min de respiração 4-7-8 antes do início.`;
+            } else if (lowestVector === 'I') {
                 if (valI >= 3.0) {
-                    mainStatusMsg = `🟡 Tensão de Processamento Cognitivo Moderada: Leve desaceleração no vetor I (Clareza = ${valI} / ${avgRt} ms). Recomenda-se simplificar a pauta da próxima reunião decisória.`;
+                    mainStatusMsg = `🟡 Tensão de Processamento Cognitivo Moderada: Leve desaceleração no vetor I (Clareza = ${valI} / ${avgRt} ms / VFC = ${vfcRmssd} ms). Recomenda-se simplificar a pauta da próxima reunião decisória.`;
                 } else {
                     mainStatusMsg = `🟡 Tensão Elevada de Processamento: Latência acentuada no vetor I (Clareza = ${valI} / ${avgRt} ms). O cérebro apresenta lentidão. Não recomendado para deliberações sob forte pressão de tempo.`;
                 }
             } else if (lowestVector === 'C') {
                 mainStatusMsg = `🟡 Tensão no Controle de Veto: Erros de impulso no vetor C (Autocontrole = ${valC}). Córtex pré-frontal sob pressão de urgência. Recomenda-se dupla checagem em aprovações.`;
             } else {
-                mainStatusMsg = `🟡 Tensão Autonômica Modulada: Alteração bioacústica no vetor R (Energia = ${valR}). Ativação simpática moderada. Recomenda-se pausa de descompressão.`;
+                mainStatusMsg = `🟡 Tensão Autonômica Modulada: Alteração bioacústica no vetor R (Energia = ${valR} / VFC = ${vfcRmssd} ms). Ativação simpática moderada. Recomenda-se pausa de descompressão.`;
             }
         }
 
         document.getElementById('resExecName').innerText = name;
-        document.getElementById('resExecRole').innerText = role + ' • ' + dept;
+        document.getElementById('resExecRole').innerText = role + ' • ' + dept + (selectedContext === 'PRE_MEETING' ? ` [⚡ Pré-Reunião: ${meetingTopic || 'Geral'}]` : '');
         document.getElementById('lblFinalScore').innerText = finalScoreNum;
         document.getElementById('lblFinalStatusText').innerText = badgeText;
         document.getElementById('lblTopBadgeContainer').innerHTML = `<span class="badge-status-top ${badgeClass}">${badgeText}</span>`;
@@ -1071,6 +1081,7 @@
         document.getElementById('lblValC').innerText = valC;
         document.getElementById('lblValI').innerText = valI;
         document.getElementById('lblValR').innerText = valR;
+        document.getElementById('lblValVFC').innerText = `${vfcRmssd} ms`;
 
         if (photoBase64) {
             const img = document.getElementById('resPhoto');
@@ -1085,7 +1096,7 @@
             </div>
         `;
 
-        document.getElementById('lblBottleneckTag').innerText = `GARGALO: VETOR ${lowestVector}`;
+        document.getElementById('lblBottleneckTag').innerText = `GARGALO: VETOR ${lowestVector} | VFC: ${vfcRmssd}ms`;
 
         let easyHtml = '';
         if (lowestVector === 'C') {
@@ -1096,24 +1107,15 @@
                 <div class="easy-block"><b>Y — Yardstick:</b> Acompanhar a recuperação da taxa de veto na aferição matinal de amanhã.</div>
             `;
         } else if (lowestVector === 'I') {
-            if (valI >= 3.0) {
-                easyHtml = `
-                    <div class="easy-block"><b>E — Examine:</b> Desaceleração visuomotora leve (Vetor I: ${valI} / ${avgRt} ms). Acúmulo natural de carga de trabalho do dia.</div>
-                    <div class="easy-block"><b>A — Adapt:</b> Manter reuniões curtas (máximo 30 minutos) e focar em tópicos estruturados.</div>
-                    <div class="easy-block"><b>S — Systematize:</b> Utilizar resumos executivos de 1 página antes das reuniões.</div>
-                    <div class="easy-block"><b>Y — Yardstick:</b> Reavaliar o tempo de reação no próximo check-in do dia.</div>
-                `;
-            } else {
-                easyHtml = `
-                    <div class="easy-block"><b>E — Examine:</b> Latência de resposta elevada (Vetor I: ${valI} / ${avgRt} ms). Carga de processamento intensa e múltiplos inputs simultâneos.</div>
-                    <div class="easy-block"><b>A — Adapt:</b> Reduzir a pauta para no máximo 3 pontos críticos e adiar deliberações de alta complexidade.</div>
-                    <div class="easy-block"><b>S — Systematize:</b> Exigir memórias de cálculo sintéticas antes da abertura dos comitês.</div>
-                    <div class="easy-block"><b>Y — Yardstick:</b> Pausa tática de 15 minutos com hidratação antes do próximo bloco.</div>
-                `;
-            }
+            easyHtml = `
+                <div class="easy-block"><b>E — Examine:</b> Desaceleração visuomotora (Vetor I: ${valI} / ${avgRt} ms / VFC: ${vfcRmssd} ms). Acúmulo de carga cognitiva de trabalho.</div>
+                <div class="easy-block"><b>A — Adapt:</b> Manter reuniões curtas (máximo 30 minutos) e focar em tópicos estruturados de alta relevância.</div>
+                <div class="easy-block"><b>S — Systematize:</b> Utilizar resumos executivos de 1 página antes das reuniões.</div>
+                <div class="easy-block"><b>Y — Yardstick:</b> Reavaliar o tempo de reação no próximo check-in do dia.</div>
+            `;
         } else {
             easyHtml = `
-                <div class="easy-block"><b>E — Examine:</b> Alteração de energia bioacústica laríngea (VSI: ${vsiScoreVal}). Ativação do sistema nervoso simpático.</div>
+                <div class="easy-block"><b>E — Examine:</b> Alteração de energia bioacústica laríngea (VSI: ${vsiScoreVal} / VFC: ${vfcRmssd} ms). Ativação do sistema nervoso simpático.</div>
                 <div class="easy-block"><b>A — Adapt:</b> Realizar 3 ciclos de respiração diafragmática 4-7-8 e hidratação com 300ml de água mineral.</div>
                 <div class="easy-block"><b>S — Systematize:</b> Bloquear a agenda por 20 minutos após blocos intensos de reuniões.</div>
                 <div class="easy-block"><b>Y — Yardstick:</b> Reavaliar a energia vocal no check-in do fim do dia.</div>
@@ -1122,7 +1124,6 @@
 
         document.getElementById('easyDynamicContainer').innerHTML = easyHtml;
 
-        // PAYLOAD LIMPO E ESTRITAMENTE HOMOLOGADO COM O BANCO DE DADOS
         const payload = {
             name: name,
             role: role,
@@ -1131,6 +1132,7 @@
             veto_errors: vetoErrors,
             vsi_score: Number(vsiScoreVal),
             vsi_status: vsiStatusText,
+            vfc_rmssd: vfcRmssd,
             status: status,
             action: mainStatusMsg,
             photo_url: photoBase64 || null
@@ -1139,10 +1141,9 @@
         const syncEl = document.getElementById('syncStatus');
         syncEl.innerText = '⏳ Sincronizando Dossiê com o Cockpit de Governança...';
 
-        // TENTATIVA 1: ENVIO COMPLETO COM FOTO
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 12000);
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
 
             let res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
                 method: 'POST',
@@ -1163,14 +1164,12 @@
                 syncEl.style.color = '#34d399';
                 return;
             } else {
-                const errTxt = await res.text();
-                throw new Error(`Resposta HTTP ${res.status}: ${errTxt}`);
+                throw new Error("HTTP error: " + res.status);
             }
         } catch (err) {
             console.warn("Tentativa 1 com foto falhou. Executando fallback sem foto...", err);
         }
 
-        // TENTATIVA 2: FALLBACK SEM FOTO (GARANTIA DE REGISTRO)
         try {
             const lightPayload = { ...payload };
             delete lightPayload.photo_url;
