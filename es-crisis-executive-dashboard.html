@@ -393,7 +393,7 @@
             </div>
             <div class="exp-card">
                 <b>🏛️ Motor E.A.S.Y.</b>
-                <p>Framework de governança prescritiva: <b>E</b>xamine (Diagnóstico), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização) e <b>Y</b>ardstick (Aferição Pós-Comitê).</p>
+                <p>Framework de governança prescritiva: <b>E</b>xamine (Exame Neurofisiológico), <b>A</b>dapt (Adaptação Tática), <b>S</b>ystematize (Sistematização de Alçada) e <b>Y</b>ardstick (Métrica pós-pausa).</p>
             </div>
         </div>
     </div>
@@ -527,22 +527,6 @@
             return sess ? `Executivo C-Suite (#${sess})` : 'Líder Executivo';
         }
 
-        function extractVfc(item) {
-            if (item.vfc_rmssd) return Number(item.vfc_rmssd);
-            if (item.rmssd) return Number(item.rmssd);
-
-            // Tenta extrair da string vsi_status (ex: "🟢 Voz Estável (VSI 1.80) | VFC: 47ms")
-            let statusStr = (item.vsi_status || '') + ' ' + (item.action || '');
-            let match = statusStr.match(/VFC:?\s*(\d+)/i);
-            if (match) return Number(match[1]);
-
-            // Fallback biofísico
-            let vsiN = Number(item.vsi_score || item.vsi) || 1.80;
-            let latN = Number(item.reaction_time_ms || item.latency) || 450;
-            let vetoN = Number(item.veto_errors) || 0;
-            return Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15) - (vetoN * 8)));
-        }
-
         function getStatusCategory(item) {
             let st = (item.status || item.profile_key || item.weakest_link || '').toString().toUpperCase();
 
@@ -625,28 +609,53 @@
             renderFilteredData();
         }
 
+        // BUSCA MULTI-TABELA PARALELA (SRT_CHECKINS + ES_CRISIS_EXEC_CHECKINS + SRT_RH_CHECKINS)
         async function fetchAndRenderData() {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos executivos e biometrias no Supabase...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos executivos no Supabase...</td></tr>';
+
+            const headers = {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            };
+
+            const endpoints = [
+                { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` },
+                { name: 'es_crisis_exec_checkins', url: `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc` },
+                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` }
+            ];
 
             try {
-                const apiUrl = `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?select=*&order=created_at.desc`;
-                let res = await fetch(apiUrl, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    },
-                    cache: 'no-store'
+                const results = await Promise.allSettled(
+                    endpoints.map(ep => fetch(ep.url, { headers, cache: 'no-store' })
+                        .then(r => r.ok ? r.json().then(d => ({ table: ep.name, data: d })) : { table: ep.name, data: [] })
+                        .catch(() => ({ table: ep.name, data: [] }))
+                    )
+                );
+
+                let allFetched = [];
+                for (const resObj of results) {
+                    if (resObj.status === 'fulfilled' && resObj.value && Array.isArray(resObj.value.data)) {
+                        const tableName = resObj.value.table;
+                        resObj.value.data.forEach(item => {
+                            allFetched.push({ ...item, _tableName: tableName });
+                        });
+                    }
+                }
+
+                // DEDUPLICAÇÃO E ORDENAÇÃO
+                const seenKeys = new Set();
+                allRecords = [];
+
+                allFetched.forEach((item, idx) => {
+                    const uniqueKey = `${item._tableName}_${item.id || idx}_${item.created_at}_${item.reaction_time_ms || item.latency}`;
+                    if (seenKeys.has(uniqueKey)) return;
+                    seenKeys.add(uniqueKey);
+                    allRecords.push(item);
                 });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    allRecords = data || [];
-                } else {
-                    const errText = await res.text();
-                    console.error('Erro de requisição Supabase:', res.status, errText);
-                    allRecords = [];
-                }
+                allRecords.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
             } catch (err) {
                 console.warn('Erro ao conectar com o Supabase:', err);
                 allRecords = [];
@@ -686,8 +695,19 @@
                 else if (category === 'PURPLE') cPurple++;
                 else if (category === 'RED') cRed++;
 
-                totalLat += (r.reaction_time_ms || r.latency || 620);
-                totalVfc += extractVfc(r);
+                totalLat += (r.reaction_time_ms || r.latency || 450);
+
+                let vfcVal = r.vfc_rmssd || r.rmssd || r.vfc || 0;
+                if (!vfcVal && r.vsi_status) {
+                    const match = r.vsi_status.match(/VFC:\s*(\d+)ms/i);
+                    if (match && match[1]) vfcVal = parseInt(match[1]);
+                }
+                if (!vfcVal) {
+                    let vsiN = Number(r.vsi_score || r.vsi) || 1.80;
+                    let latN = Number(r.reaction_time_ms || r.latency) || 450;
+                    vfcVal = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                }
+                totalVfc += vfcVal;
             });
 
             document.getElementById('mTotal').innerText = filtered.length;
@@ -739,10 +759,20 @@
                     }
                 }
 
-                let itemVfc = extractVfc(item);
+                let itemVfc = item.vfc_rmssd || item.rmssd || item.vfc || 0;
+                if (!itemVfc && item.vsi_status) {
+                    const match = item.vsi_status.match(/VFC:\s*(\d+)ms/i);
+                    if (match && match[1]) itemVfc = parseInt(match[1]);
+                }
+                if (!itemVfc) {
+                    let vsiN = Number(item.vsi_score || item.vsi) || 1.80;
+                    let latN = Number(item.reaction_time_ms || item.latency) || 450;
+                    itemVfc = Math.round(Math.max(12, 80 - (vsiN * 9) - ((latN - 300) / 15)));
+                }
+
                 let vfcColor = '#34d399';
                 if (itemVfc < 30) vfcColor = '#f87171';
-                else if (itemVfc < 40) vfcColor = '#fbbf24';
+                else if (itemVfc < 38) vfcColor = '#fbbf24';
 
                 const category = getStatusCategory(item);
                 let badgeClass = 'b-verde';
@@ -776,7 +806,7 @@
                     <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || 'Presidência / Diretoria'}</td>
                     <td>${voiceStatusHtml}</td>
                     <td><span class="badge-vfc" style="color:${vfcColor};">${itemVfc} ms</span></td>
-                    <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 620} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
+                    <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 450} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
                     <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
                     <td style="font-size:12px; font-weight:700;">${finalAction}</td>
                 `;
