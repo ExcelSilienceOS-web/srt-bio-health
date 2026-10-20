@@ -871,8 +871,7 @@
 
                 // Busca dados das tabelas do Supabase
                 const tables = [
-                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` },
-                { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` }
+                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` }
             ];
 
                 const results = await Promise.allSettled(tables.map(t => fetch(t.url, { headers: h }).then(r => r.ok ? r.json().then(d => ({ table: t.name, data: d })) : { table: t.name, data: [] })));
