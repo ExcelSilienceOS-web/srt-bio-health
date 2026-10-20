@@ -1083,33 +1083,51 @@
 
         const numVsi = Number(vsiScoreVal) || 1.80;
 
-        // CÁLCULO DA TRÍADE DE SOBERANIA C-SUITE (C, I, R) & SCORE ES-CRISE (0.00 a 5.00)
-        let valC = Math.max(1.0, 5.0 - (vetoErrors * 1.5)).toFixed(1);
-        let valI = Math.max(1.0, 5.0 - ((avgRt - 300) / 120)).toFixed(1);
-        let valR = Math.max(1.0, 5.0 - ((numVsi - 1.50) * 1.1)).toFixed(1);
+        // CÁLCULO DA TRÍADE DE SOBERANIA C-SUITE (C, I, R)
+        let valC = Number(Math.max(1.0, 5.0 - (vetoErrors * 1.5)).toFixed(1));
+        let valI = Number(Math.max(1.0, 5.0 - ((avgRt - 300) / 120)).toFixed(1));
+        let valR = Number(Math.max(1.0, 5.0 - ((numVsi - 1.50) * 1.1)).toFixed(1));
 
-        let finalScoreNum = Math.min(5.0, Math.max(1.0, (Number(valC) * 0.4 + Number(valI) * 0.3 + Number(valR) * 0.3))).toFixed(2);
+        // REGRA DO ELO MAIS FRACO (GARGALO / BOTTLENECK)
+        const minVector = Math.min(valC, valI, valR);
+        let weightedAvg = (valC * 0.4 + valI * 0.3 + valR * 0.3);
 
+        // Se um dos vetores for crítico (ex: I = 2.5), o score é penalizado pelo gargalo
+        let finalScoreNum = Math.min(weightedAvg, minVector + 0.8).toFixed(2);
+
+        // IDENTIFICAÇÃO DO VETOR DE GARGALO
+        let lowestVector = 'C';
+        if (valI < valC && valI <= valR) lowestVector = 'I';
+        if (valR < valC && valR < valI) lowestVector = 'R';
+
+        // CLASSIFICAÇÃO RÍGIDA DE STATUS E TRAVAS
         let status = 'GREEN';
         let badgeClass = 'badge-green';
         let badgeText = '🟢 SOBERANIA DECISÓRIA PRESERVADA';
         let mainStatusMsg = '🟢 Todas as funções executivas, controle inibitório e energia vocal estão em homeostase. Aprovado para deliberações de alta complexidade.';
 
-        if (vetoErrors >= 2 || avgRt > 800 || numVsi >= 4.41 || Number(finalScoreNum) < 2.30) {
+        if (vetoErrors >= 2 || avgRt > 800 || numVsi >= 4.41 || minVector < 2.0 || Number(finalScoreNum) < 2.30) {
             status = 'RED';
             badgeClass = 'badge-red';
             badgeText = '🔴 ALERTA DE EXAUSTÃO CRÍTICA';
             mainStatusMsg = '🔴 Risco elevado de Estol Cognitivo. Recomendamos delegar deliberações M&A e Capex nas próximas 2 horas.';
-        } else if (numVsi >= 3.41 || Number(finalScoreNum) <= 3.40) {
+        } else if (numVsi >= 3.41 || (minVector < 2.30 && lowestVector === 'R')) {
             status = 'PURPLE';
             badgeClass = 'badge-purple';
             badgeText = '🟣 TRAVA POR EXAUSTÃO (CHASSI QUEIMADO)';
             mainStatusMsg = '🟣 Sobrecarga Autonômica Severa. Ativar protocolo E.A.S.Y. de desaceleração compulsória antes do próximo comitê.';
-        } else if (avgRt > 700 || vetoErrors === 1 || numVsi >= 2.30) {
+        } else if (minVector < 3.40 || avgRt > 650 || vetoErrors === 1 || numVsi >= 2.30 || Number(finalScoreNum) <= 3.40) {
             status = 'YELLOW';
             badgeClass = 'badge-yellow';
             badgeText = '🟡 ATENÇÃO: TENSÃO DE GOVERNANÇA';
-            mainStatusMsg = '🟡 Carga mental moderada. Recomendamos uma pausa tática de 15 minutos de descompressão antes da tomada de decisão.';
+            
+            if (lowestVector === 'I') {
+                mainStatusMsg = `🟡 Tensão de Processamento Cognitivo: Latência elevada no vetor I (Clareza = ${valI}). O cérebro apresenta lentidão de resposta. Não recomendado para deliberações de alta complexidade ou sob pressão de tempo. Recomendamos pausa tática de 15 min.`;
+            } else if (lowestVector === 'C') {
+                mainStatusMsg = `🟡 Tensão no Controle de Veto: Erros de impulso no vetor C (Autocontrole = ${valC}). Córtex pré-frontal sob pressão de urgência. Recomenda-se dupla checagem antes de aprovações.`;
+            } else {
+                mainStatusMsg = `🟡 Tensão Autonômica Modulada: Alteração bioacústica no vetor R (Energia = ${valR}). Ativação simpática moderada. Recomenda-se pausa de descompressão.`;
+            }
         }
 
         document.getElementById('resExecName').innerText = name;
@@ -1135,11 +1153,6 @@
             </div>
         `;
 
-        // RECOMENDAÇÃO DINÂMICA MOTOR E.A.S.Y.
-        let lowestVector = 'C';
-        if (Number(valI) < Number(valC) && Number(valI) < Number(valR)) lowestVector = 'I';
-        if (Number(valR) < Number(valC) && Number(valR) < Number(valI)) lowestVector = 'R';
-
         document.getElementById('lblBottleneckTag').innerText = `GARGALO: VETOR ${lowestVector}`;
 
         let easyHtml = '';
@@ -1152,10 +1165,10 @@
             `;
         } else if (lowestVector === 'I') {
             easyHtml = `
-                <div class="easy-block"><b>E — Examine:</b> Latência de resposta elevada (${avgRt} ms). Fadiga de processamento de dados e excesso de inputs simultâneos.</div>
-                <div class="easy-block"><b>A — Adapt:</b> Reduzir a pauta da reunião decisória para no máximo 3 pontos críticos de pauta.</div>
+                <div class="easy-block"><b>E — Examine:</b> Latência de resposta elevada (Vetor I: ${valI} / ${avgRt} ms). Fadiga de processamento de dados e excesso de inputs simultâneos.</div>
+                <div class="easy-block"><b>A — Adapt:</b> Reduzir a pauta da reunião decisória para no máximo 3 pontos críticos de pauta e adiar deliberações de alta complexidade.</div>
                 <div class="easy-block"><b>S — Systematize:</b> Exigir memórias de cálculo sintéticas (1 página) antes da abertura dos comitês.</div>
-                <div class="easy-block"><b>Y — Yardstick:</b> Monitorar o tempo de reação visuomotor pós-almoço.</div>
+                <div class="easy-block"><b>Y — Yardstick:</b> Monitorar o tempo de reação visuomotor pós-almoço e após pausa tática de 15 minutos.</div>
             `;
         } else {
             easyHtml = `
