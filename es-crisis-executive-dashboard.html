@@ -69,7 +69,6 @@
             100% { opacity: 1; transform: scale(1); } 
         }
 
-        /* PAINEL DE FILTROS DE DATA E STATUS */
         .filter-panel {
             background: #151c2c; 
             border: 1px solid #2a364f; 
@@ -150,7 +149,6 @@
             background: #059669; 
         }
 
-        /* METRICS CARDS */
         .metrics-grid {
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -186,7 +184,6 @@
         .val-vermelho { color: #f87171; }
         .val-tempo { color: #38bdf8; }
 
-        /* TABELA */
         .panel { 
             background: #151c2c; 
             border: 1px solid #2a364f; 
@@ -307,7 +304,6 @@
 </head>
 <body>
 
-    <!-- CABEÇALHO DO COCKPIT -->
     <div class="header">
         <div class="title-group">
             <h1>EXCELSILIENCE ES-CRISE — COCKPIT DE GOVERNANÇA & MOTOR E.A.S.Y. v3.0</h1>
@@ -409,7 +405,6 @@
         let allRecords = [];
         let selectedStatus = 'ALL';
 
-        // RESOLUÇÃO DE FOTO COM TRATAMENTO BASE64 / HTTP
         function resolvePhoto(item) {
             let raw = item.photo_url || item.photo || item.photo_base64 || item.foto || item.image_url || item.avatar_url || item.user_photo || item.snapshot || item.face_image || item.image;
             if (!raw || raw === 'null' || raw === 'undefined' || (typeof raw === 'string' && raw.trim() === '')) {
@@ -427,7 +422,6 @@
             return null;
         }
 
-        // RESOLUÇÃO FLEXÍVEL DE NOME DO EXECUTIVO
         function resolveName(item) {
             let possible = [
                 item.name, item.nome, item.full_name, item.exec_name, item.operator_name,
@@ -445,7 +439,6 @@
             return sess ? `Executivo C-Suite (#${sess})` : 'Líder Executivo';
         }
 
-        // MAPEAMENTO DOS 4 STATUS EXECUTIVOS
         function getStatusCategory(item) {
             let st = (item.status || item.profile_key || item.weakest_link || '').toString().toUpperCase();
 
@@ -461,7 +454,6 @@
             return 'GREEN';
         }
 
-        // AÇÃO E ORIENTAÇÃO DO MOTOR E.A.S.Y.
         function resolveAction(item, category) {
             const defaultActions = {
                 'GREEN': '🟢 Operador Soberano — Prontidão Excelente',
@@ -489,23 +481,22 @@
             return stdAction;
         }
 
-        // FILTRO RÁPIDO DE DATA
         function setPeriod(period) {
             document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
             const today = new Date();
 
             if (period === 'today') {
-                const dateStr = today.toISOString().split('T')[0];
+                const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
                 document.getElementById('startDate').value = dateStr;
                 document.getElementById('endDate').value = dateStr;
             } else if (period === '7days') {
                 const past = new Date(); past.setDate(today.getDate() - 7);
-                document.getElementById('startDate').value = past.toISOString().split('T')[0];
-                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+                document.getElementById('startDate').value = past.getFullYear() + '-' + String(past.getMonth() + 1).padStart(2, '0') + '-' + String(past.getDate()).padStart(2, '0');
+                document.getElementById('endDate').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             } else if (period === '30days') {
                 const past = new Date(); past.setDate(today.getDate() - 30);
-                document.getElementById('startDate').value = past.toISOString().split('T')[0];
-                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+                document.getElementById('startDate').value = past.getFullYear() + '-' + String(past.getMonth() + 1).padStart(2, '0') + '-' + String(past.getDate()).padStart(2, '0');
+                document.getElementById('endDate').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             } else if (period === 'all') {
                 document.getElementById('startDate').value = '';
                 document.getElementById('endDate').value = '';
@@ -514,7 +505,6 @@
             fetchAndRenderData();
         }
 
-        // FILTRO DE COR / STATUS
         function setStatusFilter(status) {
             selectedStatus = status;
             ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
@@ -531,7 +521,6 @@
             renderFilteredData();
         }
 
-        // BUSCA NO SUPABASE
         async function fetchAndRenderData() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#38bdf8;">🔄 Buscando laudos executivos e biometrias no Supabase...</td></tr>';
@@ -555,15 +544,22 @@
             renderFilteredData();
         }
 
-        // RENDERIZAÇÃO DA TABELA & CARDS
         function renderFilteredData() {
             const startVal = document.getElementById('startDate').value;
             const endVal = document.getElementById('endDate').value;
 
             let filtered = allRecords.filter(row => {
-                const rowDate = row.created_at ? row.created_at.split('T')[0] : '';
-                if (startVal && rowDate < startVal) return false;
-                if (endVal && rowDate > endVal) return false;
+                if (startVal || endVal) {
+                    if (!row.created_at) return true;
+                    // NORMALIZA TIMESTAMP UTC PARA DATA LOCAL DO NAVEGADOR
+                    const localDateObj = new Date(row.created_at);
+                    const rowDateLocal = localDateObj.getFullYear() + '-' + 
+                        String(localDateObj.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(localDateObj.getDate()).padStart(2, '0');
+
+                    if (startVal && rowDateLocal < startVal) return false;
+                    if (endVal && rowDateLocal > endVal) return false;
+                }
 
                 if (selectedStatus !== 'ALL') {
                     const category = getStatusCategory(row);
