@@ -514,13 +514,12 @@
         syncEl.innerText = '⏳ Registrando indicador anônimo no Dashboard...';
 
         try {
-            // TENTATIVA 1: TABELA OFICIAL SRT_CHECKINS (POST ANON PERMITIDO)
-            let res = await fetch(, {
+            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_KEY,
-                    'Authorization': ,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
                     'Prefer': 'return=minimal'
                 },
                 body: JSON.stringify(payload)
@@ -532,13 +531,12 @@
                 syncEl.style.color = '#34d399';
                 return;
             } else {
-                // TENTATIVA 2: TABELA SRT_RH_CHECKINS
-                let res2 = await fetch(, {
+                let res2 = await fetch(`${SUPABASE_URL}/rest/v1/srt_rh_checkins`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'apikey': SUPABASE_KEY,
-                        'Authorization': ,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
                         'Prefer': 'return=minimal'
                     },
                     body: JSON.stringify(payload)
@@ -559,12 +557,8 @@
             syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
             syncEl.style.color = '#fbbf24';
         }
-        } catch (err) {
-            syncEl.innerText = '⚠️ Teste concluído localmente (Modo offline).';
-            syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
-            syncEl.style.color = '#fbbf24';
-        }
     }
-</script>
+
+    </script>
 </body>
 </html>
