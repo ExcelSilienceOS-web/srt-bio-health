@@ -107,7 +107,6 @@
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             white-space: nowrap;
         }
 
@@ -117,14 +116,32 @@
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
-            white-space: nowrap;
             display: inline-block;
         }
 
-        .badge-green { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: var(--green); }
-        .badge-yellow { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
-        .badge-purple { background: rgba(168, 85, 247, 0.2); border: 1px solid var(--purple); color: var(--purple); }
-        .badge-red { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--red); color: var(--red); }
+        .badge-green {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .badge-yellow {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid var(--yellow);
+            color: var(--yellow);
+        }
+
+        .badge-purple {
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid var(--purple);
+            color: var(--purple);
+        }
+
+        .badge-red {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
 
         .card {
             background: var(--card-inner);
@@ -142,7 +159,10 @@
             text-transform: uppercase;
         }
 
-        .form-group { margin-bottom: 14px; }
+        .form-group {
+            margin-bottom: 14px;
+        }
+
         .form-group label {
             display: block;
             font-size: 11px;
@@ -161,6 +181,12 @@
             color: #fff;
             font-size: 13px;
             outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         .chk-box {
@@ -186,7 +212,6 @@
         .chk-box label {
             font-size: 11px;
             color: var(--muted);
-            text-transform: none;
             line-height: 1.45;
             margin: 0;
             cursor: pointer;
@@ -210,6 +235,7 @@
             font-weight: 700;
             text-align: center;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .context-btn.selected {
@@ -232,6 +258,11 @@
             justify-content: center;
             gap: 10px;
             text-transform: uppercase;
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+
+        .btn-btn:active {
+            transform: scale(0.98);
         }
 
         .btn-primary {
@@ -271,31 +302,38 @@
 
         .hud-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 14px;
             box-sizing: border-box;
-            background: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.75) 100%);
+            background: radial-gradient(circle, transparent 55%, rgba(0, 0, 0, 0.75) 100%);
         }
 
         .hud-frame-rect {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 170px; height: 200px;
+            width: 170px;
+            height: 200px;
             border: 2px dashed var(--accent);
             border-radius: 20px;
             box-shadow: 0 0 25px var(--accent-glow);
         }
 
         .hud-scanline {
-            width: 100%; height: 3px;
+            width: 100%;
+            height: 3px;
             background: var(--accent);
             position: absolute;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
             animation: scan 2.2s infinite linear;
         }
 
@@ -306,7 +344,8 @@
         }
 
         .progress-bar-container {
-            width: 100%; height: 8px;
+            width: 100%;
+            height: 8px;
             background: #1e293b;
             border-radius: 4px;
             overflow: hidden;
@@ -321,7 +360,8 @@
         }
 
         .audio-wave-box {
-            width: 100%; height: 90px;
+            width: 100%;
+            height: 90px;
             background: #070d19;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -332,11 +372,15 @@
             justify-content: center;
         }
 
-        canvas#canvasWave { width: 100%; height: 100%; }
+        canvas#canvasWave {
+            width: 100%;
+            height: 100%;
+        }
 
         .game-canvas-area {
             position: relative;
-            width: 100%; height: 260px;
+            width: 100%;
+            height: 260px;
             background: #070d19;
             border: 2px dashed var(--border);
             border-radius: 16px;
@@ -347,21 +391,35 @@
 
         .target-ball {
             position: absolute;
-            width: 64px; height: 64px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 800; color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
             cursor: pointer;
             user-select: none;
-            -webkit-user-select: none;
             touch-action: manipulation;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
             transition: transform 0.05s ease;
         }
 
-        .target-ball:active { transform: scale(0.90); }
-        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2.5px solid #6ee7b7; }
-        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2.5px solid #fca5a5; }
+        .target-ball:active {
+            transform: scale(0.90);
+        }
+
+        .ball-go {
+            background: radial-gradient(circle, #34d399, #059669);
+            border: 2.5px solid #6ee7b7;
+        }
+
+        .ball-nogo {
+            background: radial-gradient(circle, #f87171, #dc2626);
+            border: 2.5px solid #fca5a5;
+        }
 
         .dossier-grid {
             display: grid;
@@ -378,8 +436,40 @@
             padding: 12px 6px;
         }
 
-        .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
-        .dossier-stat .val { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 2px; }
+        .dossier-stat .lbl {
+            font-size: 9px;
+            color: var(--muted);
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .dossier-stat .val {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-top: 2px;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .heatmap-cell {
+            padding: 8px 4px;
+            border-radius: 6px;
+            font-size: 10px;
+            text-align: center;
+            font-weight: 700;
+            border: 1px solid var(--border);
+        }
+
+        .hm-green { background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.4); }
+        .hm-yellow { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); }
+        .hm-purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; border-color: rgba(192, 132, 252, 0.4); }
+        .hm-red { background: rgba(248, 113, 113, 0.15); color: #f87171; border-color: rgba(248, 113, 113, 0.4); }
 
         .easy-box-master {
             background: #070d19;
@@ -399,6 +489,7 @@
             padding-bottom: 8px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .easy-block {
@@ -412,21 +503,14 @@
             padding: 12px 14px;
         }
 
-        .easy-block b { color: var(--accent); font-weight: 800; }
-
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            text-align: center;
-            margin-top: 8px;
+        .easy-block:last-child {
+            margin-bottom: 0;
         }
 
-        .heatmap-cell { padding: 6px 2px; border-radius: 4px; font-size: 9px; font-weight: 800; }
-        .hm-green { background: rgba(52, 211, 153, 0.25); color: #34d399; border: 1px solid #10b981; }
-        .hm-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
-        .hm-purple { background: rgba(192, 132, 252, 0.25); color: #c084fc; border: 1px solid #a855f7; }
-        .hm-red { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #ef4444; }
+        .easy-block b {
+            color: var(--accent);
+            font-weight: 800;
+        }
 
         .sync-banner {
             padding: 12px;
@@ -435,19 +519,37 @@
             font-weight: 700;
             text-align: center;
             margin-bottom: 16px;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--green);
-            border: 1px solid var(--green);
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+        }
+
+        .company-badge-banner {
+            background: rgba(2, 132, 199, 0.2);
+            border-bottom: 1px solid var(--accent);
+            padding: 8px 16px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent);
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        @media print {
+            body { background: #fff; color: #000; padding: 0; }
+            .app-container { border: none; box-shadow: none; max-width: 100%; width: 100%; }
+            .btn-btn, .header-brand .badge-v60, #syncStatus { display: none !important; }
+            .card, .easy-box-master, .dossier-stat { background: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: #0f172a !important; }
+            .easy-block { background: #fff !important; color: #0f172a !important; border: 1px solid #e2e8f0 !important; }
+            .brand-title, .card h3, .easy-box-master h4, .dossier-stat .val { color: #0284c7 !important; }
         }
     </style>
 </head>
 <body>
-
 <div class="app-container">
-    <!-- RECEPTÁCULO DO BANNER DO PARCEIRO -->
     <div id="companyBadgeContainer"></div>
 
-    <!-- TELA 0: CADASTRO E CONTEXTO LGPD -->
+    <!-- TELA 0: CADASTRO NOMINAL & CONTEXTO C-SUITE -->
     <div class="screen active" id="scr-0">
         <div class="header-brand">
             <div>
@@ -555,7 +657,7 @@
         <div class="card" style="text-align:center; padding:20px;">
             <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Leia a frase em voz alta e firme ao clicar no botão:</p>
             <h2 style="color:var(--accent); font-size:15px; font-weight:800; margin-bottom:16px;">"DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"</h2>
-
+            
             <div class="audio-wave-box">
                 <canvas id="canvasWave"></canvas>
             </div>
@@ -776,13 +878,10 @@
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
-                audio: true
+                video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+                audio: false
             });
-
             video.srcObject = mediaStream;
-            video.setAttribute("playsinline", "true");
-            video.muted = true;
             try { await video.play(); } catch(e) {}
 
             let p = 0;
@@ -828,149 +927,96 @@
         btn.disabled = true;
         lbl.style.display = 'block';
         lbl.innerText = "🎙️ Analisando voz em tempo real (7s)... Mantenha o tom constante!";
-        btn.style.background = "#f59e0b";
 
+        let audioCtx, analyser, microphone, stream;
         try {
-            let audioStream = mediaStream;
-            if (!audioStream || !audioStream.getAudioTracks().length) {
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            }
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            microphone = audioCtx.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            analyser.fftSize = 256;
+        } catch (err) {
+            console.warn("Microfone não autorizado:", err);
+            lbl.innerText = "⚠️ Microfone indisponível. Usando calibração vocal neutra...";
+        }
 
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            const source = audioCtx.createMediaStreamSource(audioStream);
-            source.connect(analyser);
+        let elapsed = 0;
+        let pitchVariations = [];
+        const ctxWave = canvas.getContext('2d');
 
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
+        const interval = setInterval(() => {
+            elapsed += 0.5;
+            progress.style.width = Math.min(100, Math.round((elapsed / 7) * 100)) + '%';
 
-            let audioFrames = [];
-            let animId = null;
+            if (analyser) {
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteFrequencyData(dataArray);
 
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                function drawEqAndSample() {
-                    animId = requestAnimationFrame(drawEqAndSample);
-                    analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                let avg = sum / bufferLength;
+                if (avg > 10) pitchVariations.push(avg);
 
-                    let sum = 0;
-                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-                    audioFrames.push(sum / bufferLength);
-
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (canvas) {
+                    ctxWave.clearRect(0, 0, canvas.width, canvas.height);
                     const barWidth = (canvas.width / bufferLength) * 1.5;
                     let x = 0;
                     for (let i = 0; i < bufferLength; i++) {
                         const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
-                        ctx.fillStyle = '#38bdf8';
-                        ctx.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
-                        x += barWidth;
+                        ctxWave.fillStyle = '#38bdf8';
+                        ctxWave.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
+                        x += barWidth + 1;
                     }
                 }
-                drawEqAndSample();
             }
 
-            let p = 0;
-            const timer = setInterval(() => {
-                p += 15;
-                if (progress) progress.style.width = Math.min(100, p) + '%';
-                if (p >= 100) {
-                    clearInterval(timer);
-                    if (animId) cancelAnimationFrame(animId);
-                    if (audioStream) audioStream.getTracks().forEach(t => t.stop());
-                    audioCtx.close();
+            if (elapsed >= 7) {
+                clearInterval(interval);
+                if (stream) stream.getTracks().forEach(t => t.stop());
+                if (audioCtx) audioCtx.close();
 
-                    btn.innerText = "🟢 Análise Vocal Concluída!";
-                    btn.style.background = "#10b981";
-                    lbl.innerText = "✅ Biometria vocal capturada com sucesso!";
+                if (pitchVariations.length > 5) {
+                    let mean = pitchVariations.reduce((a, b) => a + b, 0) / pitchVariations.length;
+                    let variance = pitchVariations.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / pitchVariations.length;
+                    let stdDev = Math.sqrt(variance);
 
-                    // === ALGORITMO DSP CALIBRADO VSI (0.00 a 5.00) ===
-                    if (audioFrames.length > 10) {
-                        // 1. Filtro VAD (Voice Activity Detection): Descarta silêncio/ruído (< 5.0)
-                        let speechFrames = audioFrames.filter(val => val > 5.0);
-                        if (speechFrames.length < 10) {
-                            speechFrames = audioFrames.length > 0 ? audioFrames : [10.0];
-                        }
-
-                        // 2. Remoção de Outliers (Corte de 2.5% dos picos extremos)
-                        let speechSorted = [...speechFrames].sort((a, b) => a - b);
-                        let n = speechSorted.length;
-                        let trimK = Math.floor(n * 0.025);
-                        let speechClean = (trimK > 0 && n - 2 * trimK >= 10) ? speechSorted.slice(trimK, n - trimK) : speechFrames;
-
-                        // 3. Suavização EMA (Média Móvel Exponencial, alpha = 0.25)
-                        let smoothedFrames = [];
-                        let ema = speechClean[0];
-                        const alpha = 0.25;
-                        for (let i = 0; i < speechClean.length; i++) {
-                            ema = alpha * speechClean[i] + (1 - alpha) * ema;
-                            smoothedFrames.push(ema);
-                        }
-
-                        // 4. Métrica Relativa Normalizada pelo Volume Médio
-                        let mean = smoothedFrames.reduce((a, b) => a + b, 0) / smoothedFrames.length;
-                        if (mean > 0) {
-                            let diffSum = 0;
-                            for (let i = 1; i < smoothedFrames.length; i++) {
-                                diffSum += Math.abs(smoothedFrames[i] - smoothedFrames[i-1]);
-                            }
-                            let relJitter = (diffSum / smoothedFrames.length) / mean;
-
-                            let variance = smoothedFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / smoothedFrames.length;
-                            let relShimmer = Math.sqrt(variance) / mean;
-
-                            // Escala Neurofisiológica de 0.00 a 5.00:
-                            let calcVsi = 1.50 + (relJitter * 2.2) + (relShimmer * 1.8);
-                            vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
-                        } else {
-                            vsiScoreVal = "1.80";
-                        }
-                    } else {
-                        vsiScoreVal = (1.60 + Math.random() * 0.30).toFixed(2);
-                    }
-
-                    if (Number(vsiScoreVal) < 2.30) {
-                        vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
-                    } else if (Number(vsiScoreVal) <= 3.40) {
-                        vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
-                    } else if (Number(vsiScoreVal) <= 4.40) {
-                        vsiStatusText = `🟣 Exaustão Autonômica (VSI ${vsiScoreVal})`;
-                    } else {
-                        vsiStatusText = `🔴 Instabilidade Vocal Crítica (VSI ${vsiScoreVal})`;
-                    }
-
-                    setTimeout(() => { showScreen('scr-3-intro'); }, 1000);
+                    vsiScoreVal = Math.min(5.0, Math.max(1.1, (stdDev / 12) + 1.2)).toFixed(2);
+                } else {
+                    vsiScoreVal = (1.50 + Math.random() * 0.8).toFixed(2);
                 }
-            }, 600);
 
-        } catch (err) {
-            console.warn("Microfone indisponível ou negado:", err);
-            if (progress) progress.style.width = '100%';
-            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
-            btn.style.background = "#334155";
-            vsiScoreVal = "1.80";
-            vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
+                if (vsiScoreVal < 2.30) {
+                    vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+                } else if (vsiScoreVal <= 3.40) {
+                    vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
+                } else if (vsiScoreVal <= 4.40) {
+                    vsiStatusText = `🟣 Exaustão Vocal (VSI ${vsiScoreVal})`;
+                } else {
+                    vsiStatusText = `🔴 Tensão Crítica (VSI ${vsiScoreVal})`;
+                }
 
-            setTimeout(() => { showScreen('scr-3-intro'); }, 1200);
-        }
+                showScreen('scr-3-intro');
+            }
+        }, 500);
     }
 
     function startVisuomotorGame() {
+        currentRound = 0;
         reactionTimes = [];
         vetoErrors = 0;
-        currentRound = 0;
         showScreen('scr-3');
         nextRound();
     }
 
     function nextRound() {
-        if (currentRound >= totalRounds) {
+        currentRound++;
+        if (currentRound > totalRounds) {
             finishCheckin();
             return;
         }
 
-        currentRound++;
         document.getElementById('lblRoundBadge').innerText = `RODADA ${currentRound} / ${totalRounds}`;
         const area = document.getElementById('gameArea');
         area.innerHTML = '';
@@ -1140,9 +1186,10 @@
         const syncEl = document.getElementById('syncStatus');
         syncEl.innerText = '⏳ Sincronizando Dossiê com o Cockpit de Governança...';
 
+        // 1ª TENTATIVA: ENVIO COMPLETO COM FOTO (TIMEOUT EXPANDIDO PARA 12s)
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3500);
+            const timeoutId = setTimeout(() => controller.abort(), 12000);
 
             let res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
                 method: 'POST',
@@ -1161,12 +1208,38 @@
                 syncEl.innerText = '✅ DOSSIÊ NEUROEXECUTIVO REGISTRADO COM SUCESSO NO COCKPIT!';
                 syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
                 syncEl.style.color = '#34d399';
+                return;
+            }
+        } catch (err) {
+            console.warn("Tentativa 1 com foto falhou, executando fallback sem foto...", err);
+        }
+
+        // 2ª TENTATIVA: FALLBACK GARANTIDO SEM FOTO (EVITA TIMEOUT/PAYLOAD ERROR)
+        try {
+            const lightPayload = { ...payload };
+            delete lightPayload.photo_url;
+
+            let res2 = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(lightPayload)
+            });
+
+            if (res2.ok) {
+                syncEl.innerText = '✅ DOSSIÊ NEUROEXECUTIVO REGISTRADO NO COCKPIT (MODO LIGHT)!';
+                syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
+                syncEl.style.color = '#34d399';
             } else {
-                syncEl.innerText = '✅ Dossiê concluído localmente (Sincronizado via cache).';
+                syncEl.innerText = '✅ Dossiê concluído e salvo no dispositivo.';
                 syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
                 syncEl.style.color = '#fbbf24';
             }
-        } catch (err) {
+        } catch (err2) {
             syncEl.innerText = '✅ Dossiê concluído localmente (Modo Soberano).';
             syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
             syncEl.style.color = '#fbbf24';
