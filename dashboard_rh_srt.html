@@ -890,36 +890,50 @@
                 }
 
                 if (allFetched.length > 0) {
-                    const seenKeys = new Set();
                     rawCheckinsData = [];
+                    // Ordena por data decrescente para priorizar os mais recentes
+                    allFetched.sort((a, b) => new Date(b.created_at || Date.now()) - new Date(a.created_at || Date.now()));
 
                     allFetched.forEach((item, idx) => {
-                        const keyDept = (item.department || item.sector || item.setor || item.dept || '').toString().toUpperCase().trim();
-                        const keyDt = (item.created_at || '').toString().substring(0, 19);
-                        const keyRt = item.latency_ms || item.reaction_time_ms || item.latency || 0;
-                        const keyVsi = Number(item.vsi_score || item.vsi || 0).toFixed(2);
-                        const uniqueKey = `${keyDept}_${keyDt}_${keyRt}_${keyVsi}`;
-                        if (seenKeys.has(uniqueKey)) return;
-                        seenKeys.add(uniqueKey);
-
-                        let rawEmp = item.company || item.empresa || item.company_id || item.organization;
-                        let emp = (rawEmp && rawEmp.toString().trim() !== 'null' && rawEmp.toString().trim() !== '' && rawEmp.toString().trim() !== 'undefined') ? rawEmp.toString().toUpperCase().trim() : 'EXCELSILIENCE';
+                        // 1. Filtros de Módulo e Exclusão (Ignora C-Suite e Motoristas de Frota)
+                        if (item._tableName === 'es_crisis_backup_checkins' && item.module_type !== 'SRT_RH') return;
 
                         let rawRole = (item.role || item.cargo || '').toString().toLowerCase();
                         let isMobilityDriver = rawRole.includes('motorista') || rawRole.includes('condutor') || rawRole.includes('cnh') || rawRole.includes('operador de empilhadeira');
-
-                        // SEPARAÇÃO RIGOROSA: No Dashboard de RH, ignoramos check-ins de motoristas de frota (Mobility)
-                        // A não ser que seja um check-in explícito do RH ou teste de departamento (ex: TI, RH, DHO)
-                        if (item._tableName === 'es_crisis_backup_checkins' && item.module_type !== 'SRT_RH') return;
-                        if (item._tableName === 'srt_checkins' && isMobilityDriver) {
-                            // É um check-in exclusivo de frota/motorista (Mobility) -> não mistura no RH
-                            return;
-                        }
+                        if (item._tableName === 'srt_checkins' && isMobilityDriver) return;
 
                         let sec = item.sector || item.department || item.setor || item.ghe || item.dept || 'TI';
-                        let lat = item.latency_ms || item.reaction_time_ms || item.latency || item.reaction_time || 450;
-                        let errs = item.veto_errors !== undefined ? item.veto_errors : (item.errors || 0);
-                        let vsiVal = item.vsi_score || item.vsi || item.vsi_val || 0.37;
+                        let normSector = normalizarNomeSetor(sec);
+                        let lat = Number(item.latency_ms || item.reaction_time_ms || item.latency || item.reaction_time || 450);
+                        let errs = Number(item.veto_errors !== undefined ? item.veto_errors : (item.errors || 0));
+                        let vsiVal = Number(item.vsi_score || item.vsi || item.vsi_val || 0.37);
+                        let rawDt = item.created_at || new Date().toISOString();
+                        let dtObj = new Date(rawDt);
+                        if (isNaN(dtObj.getTime())) dtObj = new Date();
+
+                        // 2. Trava de Deduplicação em Janela de Tempo (120 segundos / 2 minutos)
+                        // Descarta registros idênticos gravados em tabelas espelho com timestamp próximo
+                        let isDuplicate = false;
+                        const itemTime = dtObj.getTime();
+
+                        for (let i = 0; i < rawCheckinsData.length; i++) {
+                            const exist = rawCheckinsData[i];
+                            const existTime = new Date(exist.created_at).getTime();
+                            if (exist.sector === normSector &&
+                                Math.abs(exist.latency_ms - lat) < 1.0 &&
+                                Math.abs(exist.vsi_score - vsiVal) < 0.05 &&
+                                exist.veto_errors === errs) {
+                                if (Math.abs(itemTime - existTime) < 120000) {
+                                    isDuplicate = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (isDuplicate) return;
+
+                        let rawEmp = item.company || item.empresa || item.company_id || item.organization;
+                        let emp = (rawEmp && rawEmp.toString().trim() !== 'null' && rawEmp.toString().trim() !== '' && rawEmp.toString().trim() !== 'undefined') ? rawEmp.toString().toUpperCase().trim() : 'EXCELSILIENCE';
                         let rmssdVal = item.rmssd || item.vfc || item.hrv_rmssd || item.hrv || 42;
                         let st = (item.status || 'GREEN').toString().toUpperCase();
 
@@ -928,11 +942,6 @@
                         else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO')) st = 'YELLOW';
                         else st = 'GREEN';
 
-                        let rawDt = item.created_at || new Date().toISOString();
-                        let dtObj = new Date(rawDt);
-                        if (isNaN(dtObj.getTime())) dtObj = new Date();
-
-                        let normSector = normalizarNomeSetor(sec);
                         if (!setoresCadastrados.includes(normSector)) {
                             setoresCadastrados.push(normSector);
                         }
