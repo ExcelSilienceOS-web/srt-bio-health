@@ -370,14 +370,11 @@
                     const role = (item.role || item.cargo || '').toString().toLowerCase();
                     const name = (item.name || item.nome || '').toString().toLowerCase();
 
-                    // DESCARTE RÍGIDO: Exclui qualquer registro do ES-Crise Executivo ou do SRT-RH
-                    if (company === 'ES_CRISIS_EXEC' || company === 'SRT_RH' || action.includes('ES-CRISE') || action.includes('C-SUITE') || action.includes('[SRT-RH]') || action.includes('SOBERANIA')) {
+                    // DESCARTE RÍGIDO DE OUTROS MÓDULOS: Exclui estritamente registros do ES-Crise Executivo ou do SRT-RH
+                    if (company === 'ES_CRISIS_EXEC' || action.includes('ES-CRISE') || action.includes('C-SUITE') || item.module_type === 'ES_CRISIS_EXEC' || item._tableName === 'es_crisis_exec_checkins') {
                         return false;
                     }
-                    if (name.includes('flavio') || name.includes('verissimo') || name.includes('dr.') || name.includes('colaborador anônimo') || name.includes('anônimo') || name.includes('anonimo')) {
-                        return false;
-                    }
-                    if (role.includes('ceo') || role.includes('cfo') || role.includes('coo') || role.includes('presidente') || role.includes('diretor') || role.includes('presidência')) {
+                    if (company === 'SRT_RH' || action.includes('[SRT-RH]') || name === 'colaborador anônimo (rh)' || name === 'colaborador anônimo' || item.module_type === 'SRT_RH' || item._tableName === 'srt_rh_checkins') {
                         return false;
                     }
 
