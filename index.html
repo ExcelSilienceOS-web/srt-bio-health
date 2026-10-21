@@ -263,7 +263,7 @@
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
     const urlParams = new URLSearchParams(window.location.search);
-    const companyParam = (urlParams.get('company') || 'Frotas Corporativas').toUpperCase();
+    const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
 
     let mediaStream = null;
     let storedAudioStream = null;
@@ -276,6 +276,7 @@
     let ballSpawnTime = 0;
     let vsiScoreVal = "1.80";
     let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
+    let checkinSubmitted = false;
 
     // Pre-preenchimento automático da segunda vez
     window.addEventListener('DOMContentLoaded', () => {
@@ -613,6 +614,8 @@ function startGame() {
     }
 
         async function finishGame() {
+        if (checkinSubmitted) return;
+        checkinSubmitted = true;
         showStep('stepResult');
 
         const validGreenTimes = reactionTimes.filter(t => t < 800);
@@ -678,7 +681,42 @@ function startGame() {
             photo_url: photoBase64 || null
         };
 
+
+    async function sendBackupCopy(moduleType, payloadData) {
+        try {
+            const backupPayload = {
+                module_type: moduleType,
+                name: payloadData.name || null,
+                role: payloadData.role || null,
+                department: payloadData.department || payloadData.dept || null,
+                company: payloadData.company || null,
+                reaction_time_ms: payloadData.reaction_time_ms || payloadData.latency_ms || null,
+                veto_errors: payloadData.veto_errors !== undefined ? payloadData.veto_errors : null,
+                vsi_score: payloadData.vsi_score || null,
+                vsi_status: payloadData.vsi_status || null,
+                status: payloadData.status || null,
+                action: payloadData.action || null,
+                photo_url: payloadData.photo_url || null,
+                raw_payload: payloadData
+            };
+            fetch(`${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(backupPayload)
+            }).catch(e => console.warn("Espelho de Segurança (Backup) aviso:", e));
+        } catch(e) {
+            console.warn("Espelho de Segurança falha:", e);
+        }
+    }
+
         const syncEl = document.getElementById('syncStatus');
+        sendBackupCopy('SRT_MOBILITY', payload);
+
         syncEl.innerText = '⏳ Transmitindo laudo ao CCO...';
 
         try {
@@ -739,4 +777,5 @@ function startGame() {
 </script>
 </body>
 </html>
+
 
