@@ -792,7 +792,7 @@
                 if (btnInd) btnInd.style.display = 'inline-block';
             }
 
-            document.getElementById('companyBadgeLabel').innerText = (currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany) ? 'GROU' : currentCompany;
+            document.getElementById('companyBadgeLabel').innerText = (currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany) ? 'EXCELSILIENCE' : currentCompany;
             initSetoresEGenerators();
             fetchSupabaseData(); // Carrega automaticamente os dados reais do Supabase na inicialização
         });
@@ -894,12 +894,16 @@
                     rawCheckinsData = [];
 
                     allFetched.forEach((item, idx) => {
-                        const uniqueKey = `${item._tableName}_${item.id || idx}_${item.created_at}_${item.latency_ms || item.reaction_time_ms}`;
+                        const keyDept = (item.department || item.sector || item.setor || item.dept || '').toString().toUpperCase().trim();
+                        const keyDt = (item.created_at || '').toString().substring(0, 19);
+                        const keyRt = item.latency_ms || item.reaction_time_ms || item.latency || 0;
+                        const keyVsi = Number(item.vsi_score || item.vsi || 0).toFixed(2);
+                        const uniqueKey = `${keyDept}_${keyDt}_${keyRt}_${keyVsi}`;
                         if (seenKeys.has(uniqueKey)) return;
                         seenKeys.add(uniqueKey);
 
                         let rawEmp = item.company || item.empresa || item.company_id || item.organization;
-                        let emp = (rawEmp && rawEmp.toString().trim() !== 'null' && rawEmp.toString().trim() !== '' && rawEmp.toString().trim() !== 'undefined') ? rawEmp.toString().toUpperCase().trim() : 'GROU';
+                        let emp = (rawEmp && rawEmp.toString().trim() !== 'null' && rawEmp.toString().trim() !== '' && rawEmp.toString().trim() !== 'undefined') ? rawEmp.toString().toUpperCase().trim() : 'EXCELSILIENCE';
 
                         let rawRole = (item.role || item.cargo || '').toString().toLowerCase();
                         let isMobilityDriver = rawRole.includes('motorista') || rawRole.includes('condutor') || rawRole.includes('cnh') || rawRole.includes('operador de empilhadeira');
@@ -989,8 +993,8 @@
                     const targetCompany = currentCompany.toUpperCase().trim();
 
                     // Se o filtro for GROU, aceita registros com GROU ou corporativos vinculados
-                    if (targetCompany === 'GROU') {
-                        if (!itemCompany.includes('GROU') && itemCompany !== 'CORPORATIVO ANÔNIMO (RH)' && itemCompany !== '') {
+                    if (targetCompany === 'EXCELSILIENCE' || targetCompany === 'GROU') {
+                        if (!itemCompany.includes('EXCELSILIENCE') && !itemCompany.includes('GROU') && itemCompany !== 'CORPORATIVO ANÔNIMO (RH)' && itemCompany !== 'SRT_RH' && itemCompany !== '') {
                             return false;
                         }
                     } else {
