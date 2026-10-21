@@ -220,6 +220,7 @@
     const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
 
     let checkinSubmitted = false;
+    let isRoundProcessing = false;
     let reactionTimes = [];
     let vetoErrors = 0;
     let currentRound = 0;
@@ -391,31 +392,40 @@
     }
 
     function startGame() {
+        checkinSubmitted = false;
+        isRoundProcessing = false;
         reactionTimes = [];
         vetoErrors = 0;
         currentRound = 0;
+        if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
         showStep('stepBolinhas');
         nextRound();
     }
 
     function nextRound() {
+        if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+
         if (currentRound >= totalRounds) {
             finishGame();
             return;
         }
 
         currentRound++;
-        document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
+        isRoundProcessing = false;
+        const lblRound = document.getElementById('lblRound');
+        if (lblRound) lblRound.innerText = currentRound + " / " + totalRounds;
+
         const area = document.getElementById('gameArea');
+        if (!area) return;
         area.innerHTML = '';
 
         const isGreen = Math.random() > 0.3;
         const ball = document.createElement('div');
-        ball.className = `target-ball ${isGreen ? 'ball-green' : 'ball-red'}`;
+        ball.className = "target-ball " + (isGreen ? "ball-green" : "ball-red");
         ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-        const maxX = Math.max(40, area.clientWidth - 70);
-        const maxY = Math.max(40, area.clientHeight - 70);
+        const maxX = Math.max(40, (area.clientWidth || 300) - 70);
+        const maxY = Math.max(40, (area.clientHeight || 200) - 70);
         const posX = Math.max(10, Math.floor(Math.random() * maxX));
         const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
@@ -424,26 +434,28 @@
 
         ballSpawnTime = Date.now();
 
-        let hitProcessed = false;
         function handleBallHit(e) {
-            const rt = Date.now() - ballSpawnTime;
-            // Trava Anti-Clique Fantasma (< 180ms)
-            if (rt < 60 || hitProcessed) return;
-            hitProcessed = true;
-
             if (e) {
                 try { e.preventDefault(); e.stopPropagation(); } catch(err){}
             }
-            clearTimeout(ballTimer);
+            if (isRoundProcessing) return;
+            isRoundProcessing = true;
+
+            if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+
+            const rt = Date.now() - ballSpawnTime;
+            const finalRt = Math.max(100, rt);
 
             if (isGreen) {
-                reactionTimes.push(rt);
+                reactionTimes.push(finalRt);
             } else {
                 vetoErrors++;
-                document.getElementById('lblErrors').innerText = vetoErrors;
+                const lblErr = document.getElementById('lblErrors');
+                if (lblErr) lblErr.innerText = vetoErrors;
             }
+
             area.innerHTML = '';
-            setTimeout(nextRound, 450);
+            setTimeout(nextRound, 300);
         }
 
         ball.addEventListener('pointerdown', handleBallHit, { passive: false });
@@ -453,14 +465,14 @@
         area.appendChild(ball);
 
         ballTimer = setTimeout(() => {
-            if (hitProcessed) return;
-            hitProcessed = true;
+            if (isRoundProcessing) return;
+            isRoundProcessing = true;
             area.innerHTML = '';
             if (isGreen) {
                 reactionTimes.push(850);
             }
-            setTimeout(nextRound, 450);
-        }, 1400);
+            setTimeout(nextRound, 300);
+        }, 1100);
     }
 
     async function finishGame() {
