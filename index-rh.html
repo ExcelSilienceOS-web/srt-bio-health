@@ -217,8 +217,9 @@
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 
     const urlParams = new URLSearchParams(window.location.search);
-    const companyParam = (urlParams.get('company') || 'GROU').toUpperCase();
+    const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
 
+    let checkinSubmitted = false;
     let reactionTimes = [];
     let vetoErrors = 0;
     let currentRound = 0;
@@ -463,6 +464,8 @@
     }
 
     async function finishGame() {
+        if (checkinSubmitted) return;
+        checkinSubmitted = true;
         showStep('stepResult');
 
         const validGreenTimes = reactionTimes.filter(t => t < 800);
