@@ -365,6 +365,22 @@
                 allRecords = allFetched.filter(item => {
                     if (item._tableName === 'es_crisis_backup_checkins' && item.module_type && item.module_type !== 'SRT_MOBILITY') return false;
 
+                    const company = (item.company || '').toString().toUpperCase();
+                    const action = (item.action || '').toString().toUpperCase();
+                    const role = (item.role || item.cargo || '').toString().toLowerCase();
+                    const name = (item.name || item.nome || '').toString().toLowerCase();
+
+                    // DESCARTE RÍGIDO: Exclui qualquer registro do ES-Crise Executivo ou do SRT-RH
+                    if (company === 'ES_CRISIS_EXEC' || company === 'SRT_RH' || action.includes('ES-CRISE') || action.includes('C-SUITE') || action.includes('[SRT-RH]') || action.includes('SOBERANIA')) {
+                        return false;
+                    }
+                    if (name.includes('flavio') || name.includes('verissimo') || name.includes('dr.') || name.includes('colaborador anônimo') || name.includes('anônimo') || name.includes('anonimo')) {
+                        return false;
+                    }
+                    if (role.includes('ceo') || role.includes('cfo') || role.includes('coo') || role.includes('presidente') || role.includes('diretor') || role.includes('presidência')) {
+                        return false;
+                    }
+
                     const rawDriver = (item.name || item.driver_name || item.nome || '').toString().toUpperCase().trim();
                     const rawPlate = (item.plate || item.placa || item.vehicle_plate || '').toString().toUpperCase().trim();
                     const dtMs = new Date(item.created_at || Date.now()).getTime();
