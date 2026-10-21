@@ -703,8 +703,8 @@
             const name = (item.name || item.nome || '').toString().toLowerCase();
             const dept = (item.department || item.dept || item.setor || '').toString().toLowerCase();
 
-            // Descarte explícito de pesquisas e check-ins anônimos do RH ou de motoristas de frota
-            if (company === 'SRT_RH' || action.includes('[SRT-RH]') || name === 'colaborador anônimo' || name === 'anônimo' || name === 'anonimo') {
+            // DESCARTE RÍGIDO: Exclui qualquer registro do SRT-RH ou de Frotas/Motoristas
+            if (company === 'SRT_RH' || action.includes('[SRT-RH]') || name.includes('colaborador') || name.includes('anônimo') || name.includes('anonimo') || role === 'membro da equipe') {
                 return false;
             }
             if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota')) {
@@ -716,14 +716,21 @@
                 return true;
             }
 
-            // Cargos e Departamentos de Liderança/C-Suite
-            const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'líder', 'lider', 'c-suite', 'gerente'];
-            if (execKeywords.some(k => role.includes(k) || dept.includes(k))) {
+            if (item._tableName === 'es_crisis_backup_checkins' && item.module_type === 'ES_CRISIS_EXEC') {
                 return true;
             }
 
             // Registros nominais da liderança (ex: Dr. Flavio Verissimo)
             if (name.includes('flavio') || name.includes('verissimo') || name.includes('dr.')) {
+                return true;
+            }
+
+            // Cargos e Departamentos de Liderança/C-Suite (Somente se NÃO for anônimo)
+            const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'c-suite'];
+            if (execKeywords.some(k => role.includes(k) || dept.includes(k))) {
+                if (name.includes('colaborador') || name.includes('anônimo') || name.includes('anonimo')) {
+                    return false;
+                }
                 return true;
             }
 
