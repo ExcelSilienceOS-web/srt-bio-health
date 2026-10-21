@@ -1158,11 +1158,50 @@
 
         document.getElementById('lblBottleneckTag').innerText = `GARGALO: VETOR ${lowestVector} | VFC: ${vfcRmssd}ms`;
 
+        let eMsg = `VFC registrada em <b>${vfcRmssd} ms</b> para a faixa etária de <b>${userAge} anos</b> (Corte Verde >= ${ageVfcThresholdGreen} ms). `;
+        if (isVfcGreen) {
+            eMsg += `Reserva autonômica em excelente nível atuarial. Gargalo principal no vetor <b>${lowestVector}</b>.`;
+        } else if (isVfcYellow) {
+            eMsg += `Reserva autonômica com sobrecarga moderada. Tensão concentrada no vetor <b>${lowestVector}</b>.`;
+        } else {
+            eMsg += `Reserva autonômica em nível crítico de exaustão (< ${ageVfcThresholdYellow} ms). Disfunção no vetor <b>${lowestVector}</b>.`;
+        }
+
+        let aMsg = '';
+        if (status === 'GREEN') {
+            aMsg = `Conduzir pautas estratégicas de alta densidade analítica e deliberações de M&A e Capex nos primeiros 20 a 30 minutos de reunião, aproveitando a homeostase decisória.`;
+        } else if (status === 'YELLOW') {
+            if (lowestVector === 'I') {
+                aMsg = `Tensão no vetor I (Clareza/Processamento): Reduzir a densidade da pauta. Focar em apenas 1 decisão principal e delegar análises operacionais à equipe.`;
+            } else if (lowestVector === 'C') {
+                aMsg = `Tensão no vetor C (Autocontrole/Veto): Risco de impulsividade ou atrito. Fazer pausa de 5 minutos antes do voto final e requerer dupla checagem.`;
+            } else {
+                aMsg = `Tensão no vetor R (Energia Vocal/Simpática): Fazer pausa tática de 10-15 minutos com hidratação (300ml de água) antes de iniciar a sessão decisória.`;
+            }
+        } else if (status === 'PURPLE') {
+            aMsg = `Sobrecarga Severa / Exaustão: Ativar protocolo de desaceleração compulsória. Pausa de 45 minutos. Reagendar comitês de alta densidade para o turno seguinte.`;
+        } else { // RED
+            aMsg = `<b>ESTOL COGNITIVO IMINENTE:</b> CONGELAR ou DELEGAR deliberações de Capex, M&A e reestruturação pelas próximas 2 a 4 horas. Não assinar atos de governança neste estado.`;
+        }
+
+        let sMsg = '';
+        if (status === 'GREEN') {
+            sMsg = `Alçada de deliberação autônoma mantida. Duração máxima do comitê recomendada: 60 minutos.`;
+        } else if (status === 'YELLOW') {
+            sMsg = `Alçada condicionada: Exigir co-assinatura/validação conjunta do CFO ou COO em aprovações de contratos e limitar o comitê a 30-45 minutos.`;
+        } else if (status === 'PURPLE') {
+            sMsg = `Alçada sob restrição temporária: Limitar reuniões a 20 minutos com foco único em alinhamento de emergência, transferindo voto final para o conselho.`;
+        } else { // RED
+            sMsg = `<b>TRAVA DE ALÇADA ATIVADA:</b> Desativação temporária da alçada individual de aprovação. Toda deliberação exige validação colegiada presencial do Conselho.`;
+        }
+
+        let yMsg = `Realizar nova aferição telemétrica de 30s após o comitê/reunião para mensurar a taxa de consumo da reserva de VFC e validar a recuperação autonômica.`;
+
         let easyHtml = `
-            <div class="easy-block"><b>E — EXAMINE (Análise da Reserva de VFC por Idade):</b> VFC registrada em <b>${vfcRmssd} ms</b> para a faixa etária de <b>${userAge} anos</b>. ${isVfcGreen ? 'A reserva autonômica está em excelente nível atuarial.' : 'A reserva autonômica apresenta leve fadiga.'}</div>
-            <div class="easy-block"><b>A — ADAPT (Condução Tática do Comitê):</b> Conduzir pautas de alta densidade analítica nos primeiros 20 minutos de reunião, aproveitando o momento de clareza cognitiva.</div>
-            <div class="easy-block"><b>S — SYSTEMATIZE (Governança & Alçada):</b> Manter o limite de 45 minutos para reuniões decisórias e requerer validação conjunta do CFO em decisões de Capex.</div>
-            <div class="easy-block"><b>Y — YARDSTICK (Métrica Pós-Comitê):</b> Realizar a aferição de 30s após o comitê para verificar a taxa de desgaste da reserva de VFC.</div>
+            <div class="easy-block"><b>E — EXAMINE (Diagnóstico Biométrico):</b> ${eMsg}</div>
+            <div class="easy-block"><b>A — ADAPT (Diretriz Tática no Comitê):</b> ${aMsg}</div>
+            <div class="easy-block"><b>S — SYSTEMATIZE (Governança & Alçada):</b> ${sMsg}</div>
+            <div class="easy-block"><b>Y — YARDSTICK (Métrica Pós-Comitê):</b> ${yMsg}</div>
         `;
 
         document.getElementById('easyDynamicContainer').innerHTML = easyHtml;
