@@ -668,9 +668,19 @@
                 allRecords = [];
 
                 allFetched.forEach((item, idx) => {
-                    const uniqueKey = `${item._tableName}_${item.id || idx}_${item.created_at}_${item.reaction_time_ms || item.latency}`;
+                    if (item._tableName === 'es_crisis_backup_checkins' && item.module_type && item.module_type !== 'ES_CRISIS_EXEC') return;
+
+                    const rawName = (item.name || item.nome || '').toString().toUpperCase().trim();
+                    const rawDept = (item.department || item.dept || item.setor || '').toString().toUpperCase().trim();
+                    const dtMs = new Date(item.created_at || Date.now()).getTime();
+                    const timeWindow = Math.floor(dtMs / 120000); // 2-minute window
+                    const rt = item.reaction_time_ms || item.latency_ms || item.latency || 0;
+                    const vsi = Number(item.vsi_score || item.vsi || 0).toFixed(2);
+
+                    const uniqueKey = `${rawName}_${rawDept}_${timeWindow}_${rt}_${vsi}`;
                     if (seenKeys.has(uniqueKey)) return;
                     seenKeys.add(uniqueKey);
+
                     allRecords.push(item);
                 });
 
@@ -685,43 +695,39 @@
         }
 
         function isExecCheckin(item) {
-            if (item._tableName === 'srt_rh_checkins') {
+            if (item._tableName === 'es_crisis_exec_checkins') return true;
+
+            const company = (item.company || '').toString().toUpperCase();
+            const action = (item.action || '').toString().toUpperCase();
+            const role = (item.role || item.cargo || '').toString().toLowerCase();
+            const name = (item.name || item.nome || '').toString().toLowerCase();
+            const dept = (item.department || item.dept || item.setor || '').toString().toLowerCase();
+
+            // Descarte explícito de pesquisas e check-ins anônimos do RH ou de motoristas de frota
+            if (company === 'SRT_RH' || action.includes('[SRT-RH]') || name === 'colaborador anônimo' || name === 'anônimo' || name === 'anonimo') {
                 return false;
             }
-            if (item._tableName === 'es_crisis_exec_checkins') {
+            if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota')) {
+                return false;
+            }
+
+            // Critérios de Inclusão Executiva C-Suite / ES-Crise
+            if (company === 'ES_CRISIS_EXEC' || action.includes('ES-CRISE') || action.includes('SOBERANIA') || action.includes('C-SUITE') || action.includes('ESTOL COGNITIVO') || action.includes('TENSÃO DE GOVERNANÇA')) {
                 return true;
             }
 
-            const comp = (item.company || '').toString().toUpperCase();
-            if (comp === 'ES_CRISIS_EXEC') return true;
-
-            const act = (item.action || '').toString();
-            if (act.includes('[ES-CRISE C-SUITE]')) return true;
-
-            if (currentScope === 'EXEC_ONLY') {
-                const role = (item.role || item.cargo || '').toString().toLowerCase();
-                const dept = (item.department || item.dept || item.setor || item.sector || '').toString().toLowerCase();
-                const name = (item.name || item.nome || item.exec_name || '').toString().toLowerCase();
-
-                if (role.includes('motorista') || role.includes('condutor') || role.includes('entregador') || role.includes('operador de frota')) {
-                    return false;
-                }
-
-                if (name === 'anônimo' || name === 'anonimo' || name === 'colaborador' || name === 'operador') {
-                    return false;
-                }
-
-                const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'c-suite'];
-                const hasExecRole = execKeywords.some(k => role.includes(k) || dept.includes(k));
-
-                if (hasExecRole) return true;
-
-                if (name.includes('flavio verissimo') || name.includes('dr. flavio')) return true;
-
-                return false;
+            // Cargos e Departamentos de Liderança/C-Suite
+            const execKeywords = ['ceo', 'cfo', 'coo', 'chro', 'cmo', 'cto', 'vp', 'presidente', 'diretor', 'diretoria', 'executivo', 'conselho', 'presidência', 'presidencia', 'líder', 'lider', 'c-suite', 'gerente'];
+            if (execKeywords.some(k => role.includes(k) || dept.includes(k))) {
+                return true;
             }
 
-            return true;
+            // Registros nominais da liderança (ex: Dr. Flavio Verissimo)
+            if (name.includes('flavio') || name.includes('verissimo') || name.includes('dr.')) {
+                return true;
+            }
+
+            return false;
         }
 
         function renderFilteredData() {
