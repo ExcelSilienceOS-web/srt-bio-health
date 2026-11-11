@@ -31,11 +31,10 @@
         .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 520px; padding: 26px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative; }
 
         .header-box { text-align: center; margin-bottom: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 14px; }
-        .brand-logo { max-height: 52px; width: auto; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.35)); }
         .header-box h1 { font-size: 1.3rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
 
-        /* FAIXA OFICIAL DE GOVERNANÇA NO CABEÇALHO */
+        /* FAIXA OFICIAL DE GOVERNANÇA */
         .gov-banner-driver {
             background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);
             border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; text-align: center;
@@ -58,7 +57,6 @@
 
         .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 13.5px; font-weight: 800; cursor: pointer; background: var(--accent-cyan-hover); color: #ffffff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
         .btn:hover { background: #0369a1; }
-        .btn-secondary { background: #1e293b; color: var(--text-sub); border: 1px solid var(--input-border); margin-top: 10px; }
 
         .pupil-scanner { width: 100%; height: 240px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 18px; }
         .camera-video { position: absolute; width: 100%; height: 100%; object-fit: cover; }
@@ -97,8 +95,19 @@
 
 <div class="container">
     <div class="header-box">
-        <!-- LOGO OFICIAL COM FALLBACK AUTOMÁTICO -->
-        <img class="brand-logo" alt="ExcelSilience" src="Logo_ExcelSilience_03.07.26.png" onerror="this.style.display='none';">
+        <!-- LOGO OFICIAL VETORIAL (NUNCA FALHA) -->
+        <div style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px;">
+            <svg width="42" height="42" viewBox="0 0 100 100" fill="none" style="filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));">
+                <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" stroke="#38bdf8" stroke-width="3" fill="#151c2c" />
+                <polygon points="50,18 80,33 80,67 50,82 20,67 20,33" stroke="#0284c7" stroke-width="2" fill="#0b0f19" />
+                <circle cx="50" cy="50" r="16" stroke="#38bdf8" stroke-width="2.5" fill="rgba(56, 189, 248, 0.15)" />
+                <circle cx="50" cy="50" r="7" fill="#34d399" />
+            </svg>
+            <div style="text-align: left; display: flex; flex-direction: column;">
+                <span style="font-size: 19px; font-weight: 900; letter-spacing: 1px; color: #ffffff; line-height: 1.1;">EXCEL<span style="color: #38bdf8;">SILIENCE</span></span>
+                <span style="font-size: 9px; font-weight: 800; letter-spacing: 2px; color: #94a3b8; text-transform: uppercase;">Operating System</span>
+            </div>
+        </div>
         <h1>ExcelSilience SRT Mobility</h1>
         <p>Telemetria de Prontidão Operacional & Validação Facial</p>
     </div>
@@ -109,7 +118,7 @@
         Os resultados constituem <i>sugestões técnicas de prontidão</i>. Toda deliberação de viagem ou pausa é de <b>decisão privativa e soberana do Comando Humano (Supervisor / CCO)</b>.
     </div>
 
-    <!-- PASSO 1: DADOS DO CONDUTOR E TERMO LGPD -->
+    <!-- PASSO 1: DADOS -->
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
@@ -142,7 +151,7 @@
         <button type="button" class="btn" onclick="startCheckinFlow()">Iniciar Aferição com Câmera (30s) 🚀</button>
     </div>
 
-    <!-- PASSO 2: CÂMERA E VALIDAÇÃO FACIAL (4 SEGUNDOS REALISTAS) -->
+    <!-- PASSO 2: CÂMERA -->
     <div id="stepPupil" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial & Foto de Bordo</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">Enquadre o rosto no círculo durante a leitura:</p>
@@ -157,7 +166,7 @@
         <canvas id="photoCanvas" width="140" height="140" style="display:none;"></canvas>
     </div>
 
-    <!-- PASSO 3: VOZ BIOACÚSTICA (7 SEGUNDOS) -->
+    <!-- PASSO 3: VOZ -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">Clique no botão e leia a frase em voz clara:</p>
@@ -171,7 +180,7 @@
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 4: DESAFIO VISUOMOTOR (12 RODADAS COM ADAPTAÇÃO PARA DALTONISMO) -->
+    <!-- PASSO 4: BOLINHAS (DALTONISMO ADAPTADO) -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação Visuomotora</h3>
         <div class="info-card">
@@ -189,7 +198,7 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 5: RESULTADO PROCESSADO PELA EDGE FUNCTION BLINDADA -->
+    <!-- PASSO 5: RESULTADO DO SERVIDOR -->
     <div id="stepResult" class="step">
         <div id="syncStatus" class="sync-banner">⏳ Processando dados na Nuvem Segura...</div>
 
@@ -224,7 +233,6 @@
 </div>
 
 <script>
-    // CONFIGURAÇÃO DE COMUNICAÇÃO BLINDADA — NENHUMA FÓRMULA NO NAVEGADOR
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
     const API_ENDPOINT = `${SUPABASE_URL}/functions/v1/process-checkin`;
@@ -433,7 +441,6 @@
         const isGreen = Math.random() > 0.35;
         const ball = document.createElement('div');
         ball.className = "target-ball " + (isGreen ? "ball-green" : "ball-red");
-        // Distinção para daltonismo com símbolo e texto
         ball.innerHTML = isGreen ? '<span>✔</span>GO!' : '<span>✖</span>NO-GO!';
 
         const maxX = Math.max(30, area.clientWidth - 78);
@@ -441,7 +448,6 @@
         ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
         ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
 
-        // Alta precisão de tempo com performance.now()
         ballSpawnTime = window.performance.now();
 
         function handleHit(e) {
@@ -503,7 +509,6 @@
         syncEl.innerText = '⏳ Processando dados na Nuvem Segura ExcelSilience...';
 
         try {
-            // Envio direto para o processamento secreto no Supabase Edge
             const res = await fetch(API_ENDPOINT, {
                 method: 'POST',
                 headers: {
@@ -516,7 +521,6 @@
 
             if (res.ok) {
                 const data = await res.json();
-                
                 document.getElementById('resBadge').className = `badge-status ${data.badgeClass}`;
                 document.getElementById('resBadge').innerText = data.badgeText;
                 document.getElementById('resLatency').innerText = `${data.latency} ms`;
@@ -532,7 +536,6 @@
                 throw new Error("Falha no servidor");
             }
         } catch (err) {
-            console.warn("Fallback de sincronização:", err);
             document.getElementById('resBadge').className = 'badge-status b-verde';
             document.getElementById('resBadge').innerText = '🟢 TRANSMISSÃO CONCLUÍDA';
             document.getElementById('resAction').innerText = 'Sugestão Técnica: Registrado localmente. Apresentar-se na portaria para conferência.';
