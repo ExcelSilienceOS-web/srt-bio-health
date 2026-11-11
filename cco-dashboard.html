@@ -328,47 +328,42 @@
         renderFilteredData();
     }
 
-    async function fetchAndRenderData() {
-        const tables = [
-            { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` },
-            { name: 'es_crisis_backup_checkins', url: `${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins?select=*&order=created_at.desc` }
-        ];
-
+ async function fetchAndRenderData() {
+        // Busca EXCLUSIVAMENTE os testes de Bordo / Frotas do SRT Mobility
+        const url = `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`;
         const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
 
         try {
-            const results = await Promise.allSettled(tables.map(t =>
-                fetch(t.url, { headers })
-                    .then(r => r.ok ? r.json().then(d => ({ table: t.name, data: d })) : { table: t.name, data: [] })
-                    .catch(() => ({ table: t.name, data: [] }))
-            ));
+            const res = await fetch(url, { headers });
+            if (res.ok) {
+                const data = await res.json();
+                
+                // Filtro Rígido de Isolamento: elimina 100% qualquer resquício de ES-Crise ou RH
+                allRecords = (Array.isArray(data) ? data : []).filter(item => {
+                    const comp = (item.company || '').toString().toUpperCase();
+                    const act = (item.action || '').toString().toUpperCase();
+                    const mod = (item.module_type || '').toString().toUpperCase();
+                    const name = (item.name || item.driver_name || item.nome || '').toString().toLowerCase();
 
-            let allFetched = [];
-            results.forEach(res => {
-                if (res.status === 'fulfilled' && res.value && Array.isArray(res.value.data)) {
-                    res.value.data.forEach(item => {
-                        allFetched.push({ ...item, _tableName: res.value.table });
-                    });
-                }
-            });
+                    // 1. BLOQUEIO TOTAL DO ES-CRISE
+                    if (comp.includes('ES_CRISIS') || act.includes('ES-CRISE') || mod.includes('ES_CRISIS') || act.includes('C-SUITE')) {
+                        return false;
+                    }
 
-            // Ordena estritamente do mais recente para o mais antigo por created_at
-            allFetched.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                    // 2. BLOQUEIO DE TESTES ANÔNIMOS DE RH
+                    if (comp.includes('SRT_RH') || act.includes('[SRT-RH]') || name.includes('anônimo') || name.includes('anonimo')) {
+                        return false;
+                    }
 
-            // Filtro direto: foca nos dados de frotas e exclui apenas registros puramente anônimos de RH
-            allRecords = allFetched.filter(item => {
-                const nameStr = (item.name || item.driver_name || item.nome || '').toString().toLowerCase();
-                const roleStr = (item.role || item.cargo || '').toString().toLowerCase();
-
-                if (nameStr.includes('anônimo') || nameStr.includes('anonimo') || roleStr.includes('membro da equipe') || item._tableName === 'srt_rh_checkins') {
-                    return false;
-                }
-                return true;
-            });
-
+                    return true;
+                });
+            }
         } catch (err) {
             console.warn('Erro ao conectar com o Supabase:', err);
         }
+
+        renderFilteredData();
+    }
 
         renderFilteredData();
     }
