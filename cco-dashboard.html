@@ -531,15 +531,16 @@ if (vsiText.includes('vermelho') || vsiText.includes('crítica') || (!isNaN(vsiV
             });
         }
 
-        window.onload = () => {
-            fetchAndRenderData();
-            // Auto-Refresh a cada 10 segundos
-            if (!autoRefreshTimer) {
-                autoRefreshTimer = setInterval(() => {
-                    fetchAndRenderData();
-                }, 10000);
-            }
-        };
+         window.onload = () => {
+        // Força o Dashboard a abrir em "Todo o Histórico", listando tudo na hora sem travar em data
+        setPeriod('all');
+        
+        if (!autoRefreshTimer) {
+            autoRefreshTimer = setInterval(() => {
+                fetchAndRenderData();
+            }, 10000);
+        }
+    };
     </script>
 </body>
 </html>
