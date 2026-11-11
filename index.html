@@ -644,33 +644,30 @@ function startGame() {
         // Contagem de lapsos atencionais severos (>= 700ms) indicando micro-sono e fadiga crítica
         const attentionLapses = reactionTimes.filter(t => t >= 700).length;
         const numVsi = Number(vsiScoreVal) || 1.80;
-
-        let status = 'GREEN';
+   let status = 'GREEN';
         let badgeClass = 'b-verde';
         let badgeText = '🟢 LIBERADO PARA RODAR';
         let actionText = '🟢 Catraca Liberada — Turno Normal sem restrições.';
 
-        // === MATRIZ DE SEGURANÇA OPERACIONAL (PADRÃO SSMA SUPERGASBRAS) ===
-        
-        // 1. SINAL VERMELHO (Veto Operacional Imediato):
-        // Falha no controle inibitório (1 erro de No-Go), lentidão severa (>620ms) ou VSI vocal crítico (>= 3.80)
-        if (vetoErrors >= 1 || avgRt > 620 || numVsi >= 3.80) {
+        const numVsi = Number(vsiScoreVal) || 1.80;
+        const attentionLapses = reactionTimes.filter(t => t >= 750).length;
+
+        // 1. VERMELHO: 1 erro na bolinha vermelha, reflexo > 720ms ou voz crítica >= 3.80
+        if (vetoErrors >= 1 || avgRt > 720 || numVsi >= 3.80) {
             status = 'RED';
             badgeClass = 'b-vermelho';
             badgeText = '🔴 VETO OPERACIONAL';
-            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório / Desaceleração Neuromotora Crítica). Encaminhar ao Supervisor/SESMT no CCO.';
+            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório / Lentidão Crítica). Encaminhar ao Supervisor/SESMT no CCO.';
         }
-        // 2. SINAL ROXO (Pausa Compulsória de 45 Minutos):
-        // Privação de sono / fadiga extrema demonstrada por 2+ lapsos atencionais, reflexo arrastado (>530ms) ou exaustão vocal (>= 3.00)
-        else if (attentionLapses >= 2 || avgRt > 530 || numVsi >= 3.00) {
+        // 2. ROXO: 2 lapsos graves (>=750ms), reflexo arrastado > 620ms ou voz exausta >= 3.00
+        else if (attentionLapses >= 2 || avgRt > 620 || numVsi >= 3.00) {
             status = 'PURPLE';
             badgeClass = 'b-roxo';
             badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
             actionText = '🟣 Trava por Exaustão / Privação de Sono — Descanso compulsório de 45 minutos no aplicativo.';
         }
-        // 3. SINAL AMARELO (Pausa Tática de 15 Minutos):
-        // Sobrecarga autonômica, estresse ou 1 lapso isolado de atenção
-        else if (avgRt > 460 || attentionLapses === 1 || numVsi >= 2.20) {
+        // 3. AMARELO: Média entre 561ms e 620ms, 1 lapso isolado ou tensão vocal leve >= 2.30
+        else if (avgRt > 560 || attentionLapses === 1 || numVsi >= 2.30) {
             status = 'YELLOW';
             badgeClass = 'b-amarelo';
             badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
