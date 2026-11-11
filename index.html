@@ -30,11 +30,18 @@
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; overflow-x: hidden; }
         .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 520px; padding: 26px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative; }
 
-        .header-box { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px; }
+        .header-box { text-align: center; margin-bottom: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 14px; }
         .brand-logo { max-height: 52px; width: auto; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.35)); }
         .header-box h1 { font-size: 1.3rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-        .badge-gov { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 7px 12px; border-radius: 20px; font-size: 10.5px; font-weight: 700; display: block; margin-bottom: 16px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
+
+        /* FAIXA OFICIAL DE GOVERNANÇA NO CABEÇALHO */
+        .gov-banner-driver {
+            background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; text-align: center;
+            font-size: 11px; color: var(--text-sub); line-height: 1.45;
+        }
+        .gov-banner-driver b { color: var(--accent-cyan); text-transform: uppercase; display: block; margin-bottom: 2px; }
 
         .step { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
         .step.active { display: block; }
@@ -90,14 +97,19 @@
 
 <div class="container">
     <div class="header-box">
-        <img class="brand-logo" alt="ExcelSilience" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAgAGQDAREAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP//Z">
+        <!-- LOGO OFICIAL COM FALLBACK AUTOMÁTICO -->
+        <img class="brand-logo" alt="ExcelSilience" src="Logo_ExcelSilience_03.07.26.png" onerror="this.style.display='none';">
         <h1>ExcelSilience SRT Mobility</h1>
         <p>Telemetria de Prontidão Operacional & Validação Facial</p>
     </div>
 
-    <span class="badge-gov">🏛️ AFERIÇÃO OBRIGATÓRIA DE BORDO — FROTAS & PORTARIA</span>
+    <!-- FAIXA OFICIAL DE GOVERNANÇA DO COMANDO -->
+    <div class="gov-banner-driver">
+        <b>🏛️ Aferição Preventiva de Bordo</b>
+        Os resultados constituem <i>sugestões técnicas de prontidão</i>. Toda deliberação de viagem ou pausa é de <b>decisão privativa e soberana do Comando Humano (Supervisor / CCO)</b>.
+    </div>
 
-    <!-- PASSO 1: DADOS -->
+    <!-- PASSO 1: DADOS DO CONDUTOR E TERMO LGPD -->
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
@@ -130,7 +142,7 @@
         <button type="button" class="btn" onclick="startCheckinFlow()">Iniciar Aferição com Câmera (30s) 🚀</button>
     </div>
 
-    <!-- PASSO 2: CÂMERA (4s) -->
+    <!-- PASSO 2: CÂMERA E VALIDAÇÃO FACIAL (4 SEGUNDOS REALISTAS) -->
     <div id="stepPupil" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial & Foto de Bordo</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">Enquadre o rosto no círculo durante a leitura:</p>
@@ -145,7 +157,7 @@
         <canvas id="photoCanvas" width="140" height="140" style="display:none;"></canvas>
     </div>
 
-    <!-- PASSO 3: VOZ (7s) -->
+    <!-- PASSO 3: VOZ BIOACÚSTICA (7 SEGUNDOS) -->
     <div id="stepVoz" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">Clique no botão e leia a frase em voz clara:</p>
@@ -159,7 +171,7 @@
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 4: BOLINHAS (12 RODADAS COM ADAPTAÇÃO PARA DALTONISMO) -->
+    <!-- PASSO 4: DESAFIO VISUOMOTOR (12 RODADAS COM ADAPTAÇÃO PARA DALTONISMO) -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação Visuomotora</h3>
         <div class="info-card">
@@ -177,7 +189,7 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 5: RESULTADO DO SERVIDOR -->
+    <!-- PASSO 5: RESULTADO PROCESSADO PELA EDGE FUNCTION BLINDADA -->
     <div id="stepResult" class="step">
         <div id="syncStatus" class="sync-banner">⏳ Processando dados na Nuvem Segura...</div>
 
@@ -212,7 +224,7 @@
 </div>
 
 <script>
-    // Configurações de API — O Front-end NÃO possui nenhuma fórmula!
+    // CONFIGURAÇÃO DE COMUNICAÇÃO BLINDADA — NENHUMA FÓRMULA NO NAVEGADOR
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
     const API_ENDPOINT = `${SUPABASE_URL}/functions/v1/process-checkin`;
@@ -421,6 +433,7 @@
         const isGreen = Math.random() > 0.35;
         const ball = document.createElement('div');
         ball.className = "target-ball " + (isGreen ? "ball-green" : "ball-red");
+        // Distinção para daltonismo com símbolo e texto
         ball.innerHTML = isGreen ? '<span>✔</span>GO!' : '<span>✖</span>NO-GO!';
 
         const maxX = Math.max(30, area.clientWidth - 78);
@@ -428,6 +441,7 @@
         ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
         ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
 
+        // Alta precisão de tempo com performance.now()
         ballSpawnTime = window.performance.now();
 
         function handleHit(e) {
@@ -489,7 +503,7 @@
         syncEl.innerText = '⏳ Processando dados na Nuvem Segura ExcelSilience...';
 
         try {
-            // Chamada direta para a Edge Function Blindada
+            // Envio direto para o processamento secreto no Supabase Edge
             const res = await fetch(API_ENDPOINT, {
                 method: 'POST',
                 headers: {
@@ -503,7 +517,6 @@
             if (res.ok) {
                 const data = await res.json();
                 
-                // Exibe o veredito blindado retornado pelo servidor
                 document.getElementById('resBadge').className = `badge-status ${data.badgeClass}`;
                 document.getElementById('resBadge').innerText = data.badgeText;
                 document.getElementById('resLatency').innerText = `${data.latency} ms`;
@@ -519,8 +532,7 @@
                 throw new Error("Falha no servidor");
             }
         } catch (err) {
-            // Fallback seguro de emergência em caso de perda de conexão
-            console.warn("Fallback offline:", err);
+            console.warn("Fallback de sincronização:", err);
             document.getElementById('resBadge').className = 'badge-status b-verde';
             document.getElementById('resBadge').innerText = '🟢 TRANSMISSÃO CONCLUÍDA';
             document.getElementById('resAction').innerText = 'Sugestão Técnica: Registrado localmente. Apresentar-se na portaria para conferência.';
