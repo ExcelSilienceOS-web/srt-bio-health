@@ -397,11 +397,13 @@
             renderFilteredData();
         }
 
-        function renderFilteredData() {
-            const startVal = document.getElementById('startDate').value;
-            const endVal = document.getElementById('endDate').value;
+       function renderFilteredData() {
+        const startVal = document.getElementById('startDate').value;
+        const endVal = document.getElementById('endDate').value;
 
-            let filtered = allRecords.filter(row => {
+        let filtered = allRecords.filter(row => {
+            // Só aplica o filtro de data se o usuário realmente escolheu uma data. Se estiver vazio, MOSTRA TUDO!
+            if (startVal || endVal) {
                 let rowDate = '';
                 if (row.created_at) {
                     const dObj = new Date(row.created_at);
@@ -416,26 +418,27 @@
                 }
                 if (startVal && rowDate < startVal) return false;
                 if (endVal && rowDate > endVal) return false;
+            }
 
-                // FILTRO RÍGIDO CCO MOBILITY: Exclui estritamente qualquer teste anônimo de RH
-                const nameStr = (row.name || row.driver_name || row.nome || '').toString();
-                const roleStr = (row.role || row.cargo || '').toString();
-                if (nameStr.includes('Anônimo') || nameStr.includes('Anonimo') || roleStr.includes('Membro da Equipe') || row._tableName === 'srt_rh_checkins') {
-                    return false;
-                }
+            // Exclui estritamente registros anônimos de RH para manter o foco em Frotas
+            const nameStr = (row.name || row.driver_name || row.nome || '').toString();
+            const roleStr = (row.role || row.cargo || '').toString();
+            if (nameStr.includes('Anônimo') || nameStr.includes('Anonimo') || roleStr.includes('Membro da Equipe') || row._tableName === 'srt_rh_checkins') {
+                return false;
+            }
 
-                if (selectedStatus !== 'ALL') {
-                    const category = getStatusCategory(row);
-                    if (selectedStatus !== category) return false;
-                }
-                return true;
-            });
+            if (selectedStatus !== 'ALL') {
+                const category = getStatusCategory(row);
+                if (selectedStatus !== category) return false;
+            }
+            return true;
+        });
 
-            // Re-ordena filtered do mais recente para o mais antigo
-            filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        // Re-ordena do mais recente para o mais antigo
+        filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
-            // Atualização de Cards de Métricas
-            let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
+        // Atualização de Cards de Métricas
+        let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
             filtered.forEach(r => {
                 const category = getStatusCategory(r);
                 if (category === 'GREEN') cGreen++;
@@ -531,10 +534,9 @@ if (vsiText.includes('vermelho') || vsiText.includes('crítica') || (!isNaN(vsiV
             });
         }
 
-         window.onload = () => {
-        // Força o Dashboard a abrir em "Todo o Histórico", listando tudo na hora sem travar em data
+          window.onload = () => {
+        // Abre imediatamente em "Todo o Histórico" para listar todos os testes
         setPeriod('all');
-        
         if (!autoRefreshTimer) {
             autoRefreshTimer = setInterval(() => {
                 fetchAndRenderData();
