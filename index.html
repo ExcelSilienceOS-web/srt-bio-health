@@ -552,6 +552,9 @@ function startGame() {
         nextRound();
     }
 
+ // === CONSTANTE DE ESTÍMULO CALIBRADA (PADRÃO PVT INTERNACIONAL) ===
+    const STIMULUS_TIMEOUT_MS = 720; // 720ms: janela máxima para reação e veto pré-frontal
+
     function nextRound() {
         if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
 
@@ -564,18 +567,19 @@ function startGame() {
         isRoundProcessing = false;
         const lblRound = document.getElementById('lblRound');
         if (lblRound) lblRound.innerText = currentRound + " / " + totalRounds;
-
+        
         const area = document.getElementById('gameArea');
         if (!area) return;
         area.innerHTML = '';
 
-        const isGreen = Math.random() > 0.3;
+        // Distribuição: ~35% de bolinhas vermelhas (desafios reais de Veto Motor nas 12 rodadas)
+        const isGreen = Math.random() > 0.35;
         const ball = document.createElement('div');
         ball.className = "target-ball " + (isGreen ? "ball-green" : "ball-red");
         ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
 
-        const maxX = Math.max(40, (area.clientWidth || 300) - 70);
-        const maxY = Math.max(40, (area.clientHeight || 200) - 70);
+        const maxX = Math.max(30, (area.clientWidth || 300) - 75);
+        const maxY = Math.max(30, (area.clientHeight || 200) - 75);
         const posX = Math.max(10, Math.floor(Math.random() * maxX));
         const posY = Math.max(10, Math.floor(Math.random() * maxY));
 
@@ -594,7 +598,7 @@ function startGame() {
             if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
 
             const rt = Date.now() - ballSpawnTime;
-            const finalRt = Math.max(100, rt);
+            const finalRt = Math.max(120, rt);
 
             if (isGreen) {
                 reactionTimes.push(finalRt);
@@ -605,7 +609,7 @@ function startGame() {
             }
 
             area.innerHTML = '';
-            setTimeout(nextRound, 300);
+            setTimeout(nextRound, 260);
         }
 
         ball.addEventListener('pointerdown', handleBallHit, { passive: false });
@@ -614,15 +618,17 @@ function startGame() {
 
         area.appendChild(ball);
 
+        // Janela de Estímulo Calibrada em 720ms (Padrão rigoroso contra álcool e lentidão motora):
         ballTimer = setTimeout(() => {
             if (isRoundProcessing) return;
             isRoundProcessing = true;
             area.innerHTML = '';
             if (isGreen) {
-                reactionTimes.push(850);
+                // Penalidade por não reagir a tempo diante de estímulo verde (lapso psicomotor)
+                reactionTimes.push(820);
             }
-            setTimeout(nextRound, 300);
-        }, 1100);
+            setTimeout(nextRound, 260);
+        }, STIMULUS_TIMEOUT_MS);
     }
 
     async function finishGame() {
@@ -630,27 +636,41 @@ function startGame() {
         checkinSubmitted = true;
         showStep('stepResult');
 
-        const validGreenTimes = reactionTimes.filter(t => t < 800);
-        const avgRt = validGreenTimes.length > 0 ? Math.round(validGreenTimes.reduce((a, b) => a + b, 0) / validGreenTimes.length) : (reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 450);
+        // CALIBRAÇÃO MATEMÁTICA REAL (SEM DESCARTAR ATRASOS):
+        const avgRt = reactionTimes.length > 0 
+            ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) 
+            : 550;
+
+        // Contagem de lapsos atencionais severos (>= 700ms) indicando micro-sono e fadiga crítica
+        const attentionLapses = reactionTimes.filter(t => t >= 700).length;
+        const numVsi = Number(vsiScoreVal) || 1.80;
 
         let status = 'GREEN';
         let badgeClass = 'b-verde';
         let badgeText = '🟢 LIBERADO PARA RODAR';
         let actionText = '🟢 Catraca Liberada — Turno Normal sem restrições.';
 
-        const numVsi = Number(vsiScoreVal) || 1.80;
-
-        if (vetoErrors >= 2 || avgRt > 800 || numVsi >= 4.41) {
+        // === MATRIZ DE SEGURANÇA OPERACIONAL (PADRÃO SSMA SUPERGASBRAS) ===
+        
+        // 1. SINAL VERMELHO (Veto Operacional Imediato):
+        // Falha no controle inibitório (1 erro de No-Go), lentidão severa (>620ms) ou VSI vocal crítico (>= 3.80)
+        if (vetoErrors >= 1 || avgRt > 620 || numVsi >= 3.80) {
             status = 'RED';
             badgeClass = 'b-vermelho';
             badgeText = '🔴 VETO OPERACIONAL';
-            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório / Inaptidão Crítica). Encaminhar ao Supervisor/SESMT no CCO.';
-        } else if (numVsi >= 3.41) {
+            actionText = '🔴 BLOQUEIO TEMPORÁRIO (Disfunção de Controle Inibitório / Desaceleração Neuromotora Crítica). Encaminhar ao Supervisor/SESMT no CCO.';
+        }
+        // 2. SINAL ROXO (Pausa Compulsória de 45 Minutos):
+        // Privação de sono / fadiga extrema demonstrada por 2+ lapsos atencionais, reflexo arrastado (>530ms) ou exaustão vocal (>= 3.00)
+        else if (attentionLapses >= 2 || avgRt > 530 || numVsi >= 3.00) {
             status = 'PURPLE';
             badgeClass = 'b-roxo';
             badgeText = '🟣 PAUSA COMPULSÓRIA (45 MIN)';
-            actionText = '🟣 Trava por Exaustão / Alteração Vocal — Descanso compulsório de 45 minutos.';
-        } else if (avgRt > 700 || vetoErrors === 1 || numVsi >= 2.30) {
+            actionText = '🟣 Trava por Exaustão / Privação de Sono — Descanso compulsório de 45 minutos no aplicativo.';
+        }
+        // 3. SINAL AMARELO (Pausa Tática de 15 Minutos):
+        // Sobrecarga autonômica, estresse ou 1 lapso isolado de atenção
+        else if (avgRt > 460 || attentionLapses === 1 || numVsi >= 2.20) {
             status = 'YELLOW';
             badgeClass = 'b-amarelo';
             badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
@@ -678,7 +698,6 @@ function startGame() {
             resPhotoEl.style.display = 'none';
         }
 
-        // PAYLOAD COMPATÍVEL COM SRT_CHECKINS
         const payload = {
             name: name,
             role: role,
@@ -693,42 +712,7 @@ function startGame() {
             photo_url: photoBase64 || null
         };
 
-
-    async function sendBackupCopy(moduleType, payloadData) {
-        try {
-            const backupPayload = {
-                module_type: moduleType,
-                name: payloadData.name || null,
-                role: payloadData.role || null,
-                department: payloadData.department || payloadData.dept || null,
-                company: payloadData.company || null,
-                reaction_time_ms: payloadData.reaction_time_ms || payloadData.latency_ms || null,
-                veto_errors: payloadData.veto_errors !== undefined ? payloadData.veto_errors : null,
-                vsi_score: payloadData.vsi_score || null,
-                vsi_status: payloadData.vsi_status || null,
-                status: payloadData.status || null,
-                action: payloadData.action || null,
-                photo_url: payloadData.photo_url || null,
-                raw_payload: payloadData
-            };
-            fetch(`${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(backupPayload)
-            }).catch(e => console.warn("Espelho de Segurança (Backup) aviso:", e));
-        } catch(e) {
-            console.warn("Espelho de Segurança falha:", e);
-        }
-    }
-
         const syncEl = document.getElementById('syncStatus');
-        sendBackupCopy('SRT_MOBILITY', payload);
-
         syncEl.innerText = '⏳ Transmitindo laudo ao CCO...';
 
         try {
@@ -749,14 +733,10 @@ function startGame() {
             clearTimeout(timeoutId);
 
             if (!res.ok) {
-                console.warn("Primeira tentativa com foto falhou, tentando payload sem foto...");
+                // Fallback sem foto caso a rede móvel oscile
                 const cleanPayload = { ...payload };
                 delete cleanPayload.photo_url;
-
-                const controller2 = new AbortController();
-                const timeoutId2 = setTimeout(() => controller2.abort(), 3500);
-
-                res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -764,10 +744,8 @@ function startGame() {
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                         'Prefer': 'return=minimal'
                     },
-                    body: JSON.stringify(cleanPayload),
-                    signal: controller2.signal
+                    body: JSON.stringify(cleanPayload)
                 });
-                clearTimeout(timeoutId2);
             }
 
             if (res.ok) {
@@ -786,6 +764,7 @@ function startGame() {
             syncEl.style.color = '#fbbf24';
         }
     }
+
 </script>
 </body>
 </html>
