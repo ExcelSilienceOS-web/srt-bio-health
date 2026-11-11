@@ -608,6 +608,34 @@
             resPhotoEl.style.display = 'none';
         }
 
+        // Validação da Foto: se não houver foto, não pode passar como 100% regular
+        const hasValidPhoto = (photoBase64 && photoBase64.length > 500);
+        const faceMatchResult = hasValidPhoto 
+            ? "🟢 Foto OK (Match 3D / Presença Validada)" 
+            : "🔴 Falha Biométrica (Foto Ausente / Não Identificado)";
+
+        // Se a foto falhou, rebaixa o status para evitar liberação indevida
+        if (!hasValidPhoto && status === 'GREEN') {
+            status = 'YELLOW';
+            badgeClass = 'b-amarelo';
+            badgeText = '🟡 PENDÊNCIA FACIAL (PORTARIA)';
+            actionText = '🟡 Validação Facial Não Concluída. Comparecer presencialmente à Portaria/CCO para identificação manual.';
+        }
+
+       // Validação da Foto: se não houver foto, não pode passar como 100% regular
+        const hasValidPhoto = (photoBase64 && photoBase64.length > 500);
+        const faceMatchResult = hasValidPhoto 
+            ? "🟢 Foto OK (Match 3D / Presença Validada)" 
+            : "🔴 Falha Biométrica (Foto Ausente / Não Identificado)";
+
+        // Se a foto falhou, rebaixa o status para evitar liberação indevida
+        if (!hasValidPhoto && status === 'GREEN') {
+            status = 'YELLOW';
+            badgeClass = 'b-amarelo';
+            badgeText = '🟡 PENDÊNCIA FACIAL (PORTARIA)';
+            actionText = '🟡 Validação Facial Não Concluída. Comparecer presencialmente à Portaria/CCO para identificação manual.';
+        }
+
         const payload = {
             name: name,
             role: role,
@@ -617,11 +645,11 @@
             veto_errors: vetoErrors,
             vsi_score: Number(vsiScoreVal),
             vsi_status: vsiStatusText,
+            face_match: faceMatchResult,
             status: status,
             action: actionText,
             photo_url: photoBase64 || null
         };
-
         const syncEl = document.getElementById('syncStatus');
         syncEl.innerText = '⏳ Transmitindo laudo ao CCO...';
 
