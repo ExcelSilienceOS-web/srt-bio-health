@@ -109,7 +109,7 @@
 <div class="header">
     <div class="title-group">
         <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
-        <p>Painel Telemétrico de Prontidão, Validação Facial & Biometria Vocal — NR-01, NR-17 & eSocial</p>
+        <p>Painel Telemétrico de Prontidão, Validação Facial & Biometria Vocal — Frotas e Portaria</p>
     </div>
     <div class="live-indicator">
         <div class="dot"></div>
@@ -122,16 +122,16 @@
     <div class="filter-row">
         <div class="filter-group">
             <label for="startDate">Data Início:</label>
-            <input type="date" id="startDate" onchange="fetchAndRenderData()">
+            <input type="date" id="startDate" onchange="renderFilteredData()">
         </div>
         <div class="filter-group">
             <label for="endDate">Data Fim:</label>
-            <input type="date" id="endDate" onchange="fetchAndRenderData()">
+            <input type="date" id="endDate" onchange="renderFilteredData()">
         </div>
 
-        <button class="btn-quick" onclick="setPeriod('today')">Hoje</button>
-        <button class="btn-quick" onclick="setPeriod('7days')">Últimos 7 Dias</button>
-        <button class="btn-quick" onclick="setPeriod('30days')">Últimos 30 Dias</button>
+        <button class="btn-quick" id="btnToday" onclick="setPeriod('today')">Hoje</button>
+        <button class="btn-quick" id="btn7Days" onclick="setPeriod('7days')">Últimos 7 Dias</button>
+        <button class="btn-quick" id="btn30Days" onclick="setPeriod('30days')">Últimos 30 Dias</button>
         <button class="btn-quick active" id="btnAll" onclick="setPeriod('all')">🌐 Todo o Histórico</button>
 
         <button class="btn-action" onclick="fetchAndRenderData()">🔄 Atualizar Agora</button>
@@ -231,7 +231,6 @@
     }
 
     function resolveName(item) {
-        let isRH = (item._tableName === 'srt_rh_checkins');
         let possible = [
             item.driver_name, item.condutor_nome, item.condutor, item.nome, item.name,
             item.full_name, item.operator_name, item.exec_name, item.operador, item.user, item.usuario, item.user_name
@@ -244,7 +243,6 @@
                 }
             }
         }
-        if (isRH) return 'Operador Anônimo (RH)';
         let sess = item.session_count || item.session_id || item.id || '';
         return sess ? `Condutor (#${sess})` : 'Condutor Profissional';
     }
@@ -288,28 +286,34 @@
     }
 
     function setPeriod(period) {
-        document.querySelectorAll('.filter-row .btn-quick').forEach(b => b.classList.remove('active'));
+        ['btnToday', 'btn7Days', 'btn30Days', 'btnAll'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+        });
+
         const today = new Date();
 
         if (period === 'today') {
-            const dateStr = today.toISOString().split('T');
+            const dateStr = today.toISOString().split('T')[0];
             document.getElementById('startDate').value = dateStr;
             document.getElementById('endDate').value = dateStr;
+            const b = document.getElementById('btnToday'); if (b) b.classList.add('active');
         } else if (period === '7days') {
             const past = new Date(); past.setDate(today.getDate() - 7);
-            document.getElementById('startDate').value = past.toISOString().split('T');
-            document.getElementById('endDate').value = today.toISOString().split('T');
+            document.getElementById('startDate').value = past.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            const b = document.getElementById('btn7Days'); if (b) b.classList.add('active');
         } else if (period === '30days') {
             const past = new Date(); past.setDate(today.getDate() - 30);
-            document.getElementById('startDate').value = past.toISOString().split('T');
-            document.getElementById('endDate').value = today.toISOString().split('T');
+            document.getElementById('startDate').value = past.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            const b = document.getElementById('btn30Days'); if (b) b.classList.add('active');
         } else if (period === 'all') {
             document.getElementById('startDate').value = '';
             document.getElementById('endDate').value = '';
-            const btnAll = document.getElementById('btnAll');
-            if (btnAll) btnAll.classList.add('active');
+            const b = document.getElementById('btnAll'); if (b) b.classList.add('active');
         }
-        fetchAndRenderData();
+        renderFilteredData();
     }
 
     function setStatusFilter(status) {
@@ -328,42 +332,44 @@
         renderFilteredData();
     }
 
- async function fetchAndRenderData() {
-        // Busca EXCLUSIVAMENTE os testes de Bordo / Frotas do SRT Mobility
-        const url = `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc`;
+    async function fetchAndRenderData() {
+        const url = `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc&limit=150`;
         const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
 
         try {
-            const res = await fetch(url, { headers });
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+            const res = await fetch(url, { headers, signal: controller.signal });
+            clearTimeout(timeoutId);
+
             if (res.ok) {
                 const data = await res.json();
                 
-                // Filtro Rígido de Isolamento: elimina 100% qualquer resquício de ES-Crise ou RH
+                // Filtra apenas testes legítimos de frotas/motoristas e expulsa ES-Crise / RH
                 allRecords = (Array.isArray(data) ? data : []).filter(item => {
                     const comp = (item.company || '').toString().toUpperCase();
                     const act = (item.action || '').toString().toUpperCase();
                     const mod = (item.module_type || '').toString().toUpperCase();
                     const name = (item.name || item.driver_name || item.nome || '').toString().toLowerCase();
 
-                    // 1. BLOQUEIO TOTAL DO ES-CRISE
+                    // Bloqueio rigoroso de ES-Crise
                     if (comp.includes('ES_CRISIS') || act.includes('ES-CRISE') || mod.includes('ES_CRISIS') || act.includes('C-SUITE')) {
                         return false;
                     }
-
-                    // 2. BLOQUEIO DE TESTES ANÔNIMOS DE RH
+                    // Bloqueio de RH Anônimo
                     if (comp.includes('SRT_RH') || act.includes('[SRT-RH]') || name.includes('anônimo') || name.includes('anonimo')) {
                         return false;
                     }
 
                     return true;
                 });
+            } else {
+                console.warn('Erro retornado pelo Supabase:', res.status, res.statusText);
             }
         } catch (err) {
-            console.warn('Erro ao conectar com o Supabase:', err);
+            console.warn('Falha na busca dos checkins:', err);
         }
-
-        renderFilteredData();
-    }
 
         renderFilteredData();
     }
@@ -383,7 +389,7 @@
                         const d = String(dObj.getDate()).padStart(2, '0');
                         rowDate = `${y}-${m}-${d}`;
                     } else {
-                        rowDate = (row.created_at || '').split('T');
+                        rowDate = (row.created_at || '').split('T')[0];
                     }
                 }
                 if (startVal && rowDate < startVal) return false;
@@ -397,9 +403,10 @@
             return true;
         });
 
+        // Ordena do mais recente para o mais antigo
         filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
-        // Atualização de Métricas
+        // Atualização dos Cards de Métricas
         let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
         filtered.forEach(r => {
             const category = getStatusCategory(r);
@@ -422,7 +429,7 @@
         tbody.innerHTML = '';
 
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro encontrado para o período/filtro selecionado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px; color:#94a3b8; font-weight:600;">Nenhum registro encontrado no CCO para os filtros selecionados. Realize um teste no aplicativo ou clique em "Todo o Histórico".</td></tr>';
             return;
         }
 
@@ -442,10 +449,9 @@
                 photoHtml = `<div class="user-avatar-fallback">${initial}</div>`;
             }
 
-            const isRH = (item._tableName === 'srt_rh_checkins');
-            const faceCheckStatus = item.face_match || (isRH ? "🔒 Isento de Foto (SRT-RH Anônimo)" : (photoUrl ? "🟢 Foto OK (Match 3D)" : "🔒 Aguardando Foto"));
+            const faceCheckStatus = item.face_match || (photoUrl ? "🟢 Foto OK (Match 3D)" : "🔒 Foto Ausente");
 
-            // Status de Voz VSI (com sintaxe corrigida e blindada)
+            // Bioacústica da Voz VSI (Sintaxe 100% blindada)
             const vsiVal = item.vsi_score || item.vsi || item.vsi_val;
             const vsiValNum = Number(vsiVal);
             const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
@@ -461,7 +467,7 @@
                 voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Modulada${vsiDisplayVal}</span>`;
             }
 
-            // Categoria e Trava Operacional
+            // Status Operacional e Encaminhamento
             const category = getStatusCategory(item);
             let badgeClass = 'b-verde';
             let statusLabel = '🟢 VERDE (APTO)';
@@ -484,14 +490,14 @@
                         ${photoHtml}
                         <div>
                             <b style="color:#38bdf8;">${displayName}</b>
-                            <br><small style="color:#94a3b8;">${item.role || item.cargo || (isRH ? 'Colaborador RH' : 'Condutor Profissional')}</small>
+                            <br><small style="color:#94a3b8;">${item.role || item.cargo || 'Condutor Profissional'}</small>
                         </div>
                     </div>
                 </td>
                 <td>
                     <span class="badge-face">${faceCheckStatus}</span>
                 </td>
-                <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || item.ghe || 'Frotas / Operações'}</td>
+                <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || 'Frotas / Operações'}</td>
                 <td>${voiceStatusHtml}</td>
                 <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 520} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
                 <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
@@ -501,8 +507,11 @@
         });
     }
 
+    // Inicialização direta e automática em Todo o Histórico
     window.onload = () => {
         setPeriod('all');
+        fetchAndRenderData();
+
         if (!autoRefreshTimer) {
             autoRefreshTimer = setInterval(() => {
                 fetchAndRenderData();
