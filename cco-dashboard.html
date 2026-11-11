@@ -10,7 +10,7 @@
         
         .header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px;
+            border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 16px;
             flex-wrap: wrap; gap: 14px;
         }
         .brand-group { display: flex; align-items: center; gap: 16px; }
@@ -25,6 +25,13 @@
         }
         .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* FAIXA DE GOVERNANÇA DO COMANDO */
+        .gov-banner {
+            background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 10px; padding: 12px 18px; margin-bottom: 22px;
+            display: flex; align-items: center; gap: 12px; font-size: 12px; color: #38bdf8; line-height: 1.5;
+        }
 
         /* PAINEL DE FILTROS */
         .filter-panel {
@@ -110,7 +117,7 @@
 
 <div class="header">
     <div class="brand-group">
-        <img class="cco-logo" alt="ExcelSilience" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAgAGQDAREAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP//Z">
+        <img class="cco-logo" alt="ExcelSilience" src="Logo_ExcelSilience_03.07.26.png" onerror="this.style.display='none';">
         <div class="title-group">
             <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
             <p>Painel Telemétrico de Prontidão, Validação Facial & Biometria Vocal — Frotas e Portaria</p>
@@ -120,6 +127,12 @@
         <div class="dot"></div>
         <span id="liveText">TEMPO REAL (AUTO-REFRESH 10s)</span>
     </div>
+</div>
+
+<!-- A FRASE OFICIAL NO CABEÇALHO -->
+<div class="gov-banner">
+    <span style="font-size: 18px;">🏛️</span>
+    <span><b>DIRETRIZ DE GOVERNANÇA OPERACIONAL:</b> O sistema emite estritamente <i>sugestões técnicas de prontidão</i>. Toda e qualquer ação de liberação, pausa ou retenção é de <b>decisão privativa e soberana do Comando Humano (Supervisor / CCO)</b>.</span>
 </div>
 
 <!-- SELETOR DE DATAS E FILTROS -->
@@ -356,11 +369,9 @@
                     const mod = (item.module_type || '').toString().toUpperCase();
                     const name = (item.name || item.driver_name || item.nome || '').toString().toLowerCase();
 
-                    // Bloqueio rigoroso de ES-Crise (Diretoria)
                     if (comp.includes('ES_CRISIS') || act.includes('ES-CRISE') || mod.includes('ES_CRISIS') || act.includes('C-SUITE')) {
                         return false;
                     }
-                    // Bloqueio de RH Anônimo
                     if (comp.includes('SRT_RH') || act.includes('[SRT-RH]') || name.includes('anônimo') || name.includes('anonimo')) {
                         return false;
                     }
@@ -454,7 +465,6 @@
 
             const faceCheckStatus = item.face_match || (photoUrl ? "🟢 Foto OK (CCO)" : "🟡 Foto Ausente (Portaria)");
 
-            // VSI vocal
             const vsiVal = item.vsi_score || item.vsi || item.vsi_val;
             const vsiValNum = Number(vsiVal);
             const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
