@@ -296,28 +296,37 @@
         if (el) el.classList.add('active');
     }
 
-    async function startCheckinFlow() {
+     function startCheckinFlow() {
         const nameInput = document.getElementById('txtName');
         const roleInput = document.getElementById('txtRole');
         const deptInput = document.getElementById('txtDept');
-        const auth = document.getElementById('chkAuth').checked;
+        const chk = document.getElementById('chkAuth');
+        const auth = chk ? chk.checked : true;
 
         if (!nameInput.value.trim()) { nameInput.value = "Flavio Verissimo"; }
         if (!roleInput.value) { roleInput.value = "Motorista de Carga Pesada (CNH C/E)"; }
         if (!deptInput.value.trim()) { deptInput.value = "Frota 01"; }
 
-        // Memoriza no aparelho
-        localStorage.setItem('srt_driver_name', nameInput.value.trim());
-        localStorage.setItem('srt_driver_role', roleInput.value);
-        localStorage.setItem('srt_driver_dept', deptInput.value.trim());
+        try {
+            localStorage.setItem('srt_driver_name', nameInput.value.trim());
+            localStorage.setItem('srt_driver_role', roleInput.value);
+            localStorage.setItem('srt_driver_dept', deptInput.value.trim());
+        } catch(e){}
 
         if (!auth) {
             alert("É necessário aceitar a Autorização de Governança & LGPD para prosseguir.");
             return;
         }
 
-        showStep('stepPupil');
-        startCamera();
+        // Força a troca imediata de tela (destrava a primeira página na hora)
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const stepPupil = document.getElementById('stepPupil');
+        if (stepPupil) stepPupil.classList.add('active');
+
+        // Dispara a câmera com proteção de tempo para não congelar
+        setTimeout(() => {
+            try { startCamera(); } catch(err) { console.warn(err); }
+        }, 50);
     }
 
     async function startCamera() {
