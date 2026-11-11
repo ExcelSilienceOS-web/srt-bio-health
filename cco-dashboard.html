@@ -11,9 +11,11 @@
         .header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px;
-            flex-wrap: wrap; gap: 12px;
+            flex-wrap: wrap; gap: 14px;
         }
-        .title-group h1 { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
+        .brand-group { display: flex; align-items: center; gap: 16px; }
+        .cco-logo { max-height: 54px; width: auto; object-fit: contain; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); }
+        .title-group h1 { font-size: 21px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
         .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
 
         .live-indicator {
@@ -107,9 +109,12 @@
 <body>
 
 <div class="header">
-    <div class="title-group">
-        <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
-        <p>Painel Telemétrico de Prontidão, Validação Facial & Biometria Vocal — Frotas e Portaria</p>
+    <div class="brand-group">
+        <img class="cco-logo" alt="ExcelSilience" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAgAGQDAREAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP//Z">
+        <div class="title-group">
+            <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
+            <p>Painel Telemétrico de Prontidão, Validação Facial & Biometria Vocal — Frotas e Portaria</p>
+        </div>
     </div>
     <div class="live-indicator">
         <div class="dot"></div>
@@ -138,7 +143,7 @@
     </div>
 
     <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
-        <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Status de Trava:</span>
+        <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Status Sugerido:</span>
         <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
         <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
         <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
@@ -166,7 +171,7 @@
         <div class="value val-roxo" id="mRoxo">0</div>
     </div>
     <div class="card-metric">
-        <div class="label">🔴 Inaptos / Veto (Vermelho)</div>
+        <div class="label">🔴 Encaminhamento (Vermelho)</div>
         <div class="value val-vermelho" id="mVermelho">0</div>
     </div>
     <div class="card-metric">
@@ -178,7 +183,7 @@
 <!-- TABELA COMPLETA CCO -->
 <div class="panel">
     <div class="panel-header">
-        <div class="panel-title">Fila de Registro de Prontidão e Biometria em Tempo Real</div>
+        <div class="panel-title">Fila de Registro de Prontidão em Tempo Real (Decisão Privativa do Comando Humano)</div>
     </div>
 
     <table>
@@ -190,8 +195,8 @@
                 <th>Setor / Departamento</th>
                 <th>Conferência de Voz (VSI)</th>
                 <th>Latência / Veto Motor</th>
-                <th>Status / Trava</th>
-                <th>Encaminhamento Operacional</th>
+                <th>Status Sugerido</th>
+                <th>Encaminhamento Técnico Sugerido (Decisão do Comando)</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -267,25 +272,18 @@
 
     function resolveAction(item, category) {
         const defaultActions = {
-            'GREEN': '🟢 Catraca Liberada — Turno Normal',
-            'YELLOW': '🟡 Pausa Tática (15 min) — Descompressão / Hidratação',
-            'PURPLE': '🟣 Pausa Compulsória (45 min) — Trava por Exaustão / Sono',
-            'RED': '🔴 VETO OPERACIONAL — Bloqueio CCO / Encaminhado ao SESMT'
+            'GREEN': 'Sugestão Técnica: Liberação recomendada para viagem/turno normal. Decisão final do Comando.',
+            'YELLOW': 'Sugestão Técnica: Pausa Tática de 15 min recomendada para hidratação e descompressão. Ação privativa do Comando.',
+            'PURPLE': 'Sugestão Técnica: Pausa Compulsória de 45 min no pátio por Exaustão/Sono. Decisão do Comando.',
+            'RED': 'Sugestão Técnica: NÃO INICIAR VIAGEM. Encaminhar ao Supervisor no CCO para deliberação presencial do Comando.'
         };
 
         let stdAction = defaultActions[category] || defaultActions['GREEN'];
         if (!item) return stdAction;
 
         let dbAction = item.action || item.easy_stage || '';
-        if (dbAction && typeof dbAction === 'string') {
-            dbAction = dbAction.trim();
-            let dbUpper = dbAction.toUpperCase();
-            if (category !== 'GREEN' && (dbUpper.includes('LIBERADA') || dbUpper.includes('TURNO NORMAL') || dbUpper.includes('APTO'))) {
-                return stdAction;
-            }
-            if (dbAction.length > 5 && !dbUpper.includes('CATRACA LIBERADA')) {
-                return dbAction;
-            }
+        if (dbAction && typeof dbAction === 'string' && dbAction.trim().length > 5) {
+            return dbAction.trim();
         }
         return stdAction;
     }
@@ -358,7 +356,7 @@
                     const mod = (item.module_type || '').toString().toUpperCase();
                     const name = (item.name || item.driver_name || item.nome || '').toString().toLowerCase();
 
-                    // Bloqueio rigoroso de ES-Crise
+                    // Bloqueio rigoroso de ES-Crise (Diretoria)
                     if (comp.includes('ES_CRISIS') || act.includes('ES-CRISE') || mod.includes('ES_CRISIS') || act.includes('C-SUITE')) {
                         return false;
                     }
@@ -412,7 +410,6 @@
 
         filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
-        // Atualização dos Cards de Métricas
         let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
         filtered.forEach(r => {
             const category = getStatusCategory(r);
@@ -455,9 +452,9 @@
                 photoHtml = `<div class="user-avatar-fallback">${initial}</div>`;
             }
 
-            const faceCheckStatus = item.face_match || (photoUrl ? "🟢 Foto OK (Match 3D)" : "🔒 Foto Ausente");
+            const faceCheckStatus = item.face_match || (photoUrl ? "🟢 Foto OK (CCO)" : "🟡 Foto Ausente (Portaria)");
 
-            // Bioacústica da Voz VSI
+            // VSI vocal
             const vsiVal = item.vsi_score || item.vsi || item.vsi_val;
             const vsiValNum = Number(vsiVal);
             const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
@@ -465,7 +462,9 @@
             let vsiDisplayVal = (!isNaN(vsiValNum) && vsiValNum > 0) ? ` (VSI ${vsiValNum.toFixed(2)})` : '';
             let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável${vsiDisplayVal}</span>`;
 
-            if (vsiText.includes('vermelho') || vsiText.includes('crítica') || (!isNaN(vsiValNum) && vsiValNum >= 3.80)) {
+            if (vsiText.includes('insuficiente') || vsiValNum === 0) {
+                voiceStatusHtml = `<span class="badge-voice" style="color:#94a3b8;">⚪ Áudio Insuficiente</span>`;
+            } else if (vsiText.includes('vermelho') || vsiText.includes('crítica') || (!isNaN(vsiValNum) && vsiValNum >= 3.80)) {
                 voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Instabilidade Crítica${vsiDisplayVal}</span>`;
             } else if (vsiText.includes('roxo') || vsiText.includes('exaustão') || (!isNaN(vsiValNum) && vsiValNum >= 3.00 && vsiValNum < 3.80)) {
                 voiceStatusHtml = `<span class="badge-voice" style="color:#c084fc;">🟣 Exaustão Autonômica${vsiDisplayVal}</span>`;
@@ -473,17 +472,16 @@
                 voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Modulada${vsiDisplayVal}</span>`;
             }
 
-            // Status Operacional e Encaminhamento
             const category = getStatusCategory(item);
             let badgeClass = 'b-verde';
-            let statusLabel = '🟢 VERDE (APTO)';
+            let statusLabel = '🟢 LIBERADO';
 
             if (category === 'YELLOW') {
-                badgeClass = 'b-amarelo'; statusLabel = '🟡 AMARELO (PAUSA)';
+                badgeClass = 'b-amarelo'; statusLabel = '🟡 PAUSA TÁTICA';
             } else if (category === 'PURPLE') {
-                badgeClass = 'b-roxo'; statusLabel = '🟣 ROXO (EXAUSTÃO)';
+                badgeClass = 'b-roxo'; statusLabel = '🟣 EXAUSTÃO';
             } else if (category === 'RED') {
-                badgeClass = 'b-vermelho'; statusLabel = '🔴 VERMELHO (VETO)';
+                badgeClass = 'b-vermelho'; statusLabel = '🔴 ENCAMINHAMENTO';
             }
 
             const finalAction = resolveAction(item, category);
@@ -500,20 +498,17 @@
                         </div>
                     </div>
                 </td>
-                <td>
-                    <span class="badge-face">${faceCheckStatus}</span>
-                </td>
+                <td><span class="badge-face">${faceCheckStatus}</span></td>
                 <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || 'Frotas / Operações'}</td>
                 <td>${voiceStatusHtml}</td>
                 <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 520} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
                 <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
-                <td style="font-size:12px; font-weight:700;">${finalAction}</td>
+                <td style="font-size:12px; font-weight:600; line-height:1.4;">${finalAction}</td>
             `;
             tbody.appendChild(tr);
         });
     }
 
-    // Inicialização direta em Todo o Histórico
     window.onload = () => {
         setPeriod('all');
         fetchAndRenderData();
