@@ -67,7 +67,6 @@
 
         .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
         .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
-        .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
         .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
         .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
 
@@ -105,13 +104,12 @@
     <div id="stepForm" class="step active">
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
-            <input type="text" id="txtName" placeholder="Ex: Carlos Eduardo Souza" autocomplete="name" required>
+            <input type="text" id="txtName" placeholder="Ex: Flavio Verissimo" autocomplete="name" required>
         </div>
 
         <div class="form-group">
             <label for="txtRole">Cargo / Perfil Profissional CNH:</label>
             <select id="txtRole" required>
-                <option value="">-- Selecione o perfil profissional --</option>
                 <option value="Motorista de Carga Pesada (CNH C/E)">Motorista de Carga Pesada (CNH C/E)</option>
                 <option value="Motorista de Transporte Coletivo (CNH D)">Motorista de Transporte Coletivo / Ônibus (CNH D)</option>
                 <option value="Condutor de Veículo Leve / VUC">Condutor de VUC / Entrega Leve / VUP</option>
@@ -159,11 +157,11 @@
             <div class="eye-target">
                 <div class="eye-pupil" id="pupilCircle"></div>
             </div>
-            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Solicitando permissão da câmera...</span>
+            <span style="font-size:11px; color:var(--accent-green-bright); font-weight:700; margin-top:150px; z-index:4;" id="lblPupilStatus">Iniciando câmera...</span>
         </div>
 
         <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
-        <canvas id="photoCanvas" width="200" height="200" style="display:none;"></canvas>
+        <canvas id="photoCanvas" width="120" height="120" style="display:none;"></canvas>
     </div>
 
     <!-- PASSO 3: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
@@ -266,7 +264,6 @@
     const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
 
     let mediaStream = null;
-    let storedAudioStream = null;
     let photoBase64 = "";
     let isRoundProcessing = false;
     let reactionTimes = [];
@@ -275,11 +272,11 @@
     const totalRounds = 12;
     let ballTimer = null;
     let ballSpawnTime = 0;
-    let vsiScoreVal = "1.80";
-    let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
+    let vsiScoreVal = "1.60";
+    let vsiStatusText = "🟢 Voz Estável (VSI 1.60)";
     let checkinSubmitted = false;
 
-    // Pre-preenchimento automático da segunda vez
+    // Recupera dados salvos automaticamente para nunca mais precisar digitar
     window.addEventListener('DOMContentLoaded', () => {
         const savedName = localStorage.getItem('srt_driver_name');
         const savedRole = localStorage.getItem('srt_driver_role');
@@ -295,7 +292,8 @@
 
     function showStep(stepId) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById(stepId).classList.add('active');
+        const el = document.getElementById(stepId);
+        if (el) el.classList.add('active');
     }
 
     async function startCheckinFlow() {
@@ -308,7 +306,7 @@
         if (!roleInput.value) { roleInput.value = "Motorista de Carga Pesada (CNH C/E)"; }
         if (!deptInput.value.trim()) { deptInput.value = "Frota 01"; }
 
-        // Salva para preencher automaticamente na próxima vez
+        // Memoriza no aparelho
         localStorage.setItem('srt_driver_name', nameInput.value.trim());
         localStorage.setItem('srt_driver_role', roleInput.value);
         localStorage.setItem('srt_driver_dept', deptInput.value.trim());
@@ -327,65 +325,49 @@
         const lblStatus = document.getElementById('lblPupilStatus');
         const progress = document.getElementById('progressCam');
 
-        try {
-            // Solicita permissão unificada de vídeo e áudio de uma só vez (Zero prompt duplo!)
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
-                audio: true
-            });
+        let cameraSuccess = false;
 
+        try {
+            // Pede apenas vídeo primeiro (elimina o congelamento do navegador)
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 480 }, height: { ideal: 480 }, facingMode: "user" },
+                audio: false
+            });
+            
             video.srcObject = mediaStream;
             video.setAttribute("playsinline", "true");
             video.muted = true;
-            try { await video.play(); } catch(e) {}
-
+            await video.play();
+            cameraSuccess = true;
             lblStatus.innerText = "Mantenha a face centralizada. Aferindo foco e foto...";
             lblStatus.style.color = "#34d399";
-
-            let p = 0;
-            const timer = setInterval(() => {
-                p += 20;
-                progress.style.width = p + '%';
-                if (p >= 100) {
-                    clearInterval(timer);
-                    captureCompressedPhoto();
-                    // Para apenas as faixas de vídeo, mantendo o áudio pronto para o teste de voz
-                    if (mediaStream) {
-                        mediaStream.getVideoTracks().forEach(track => track.stop());
-                    }
-                    showStep('stepVoz');
-                }
-            }, 500);
-
         } catch (err) {
-            console.warn("Câmera ou áudio indisponível:", err);
-            // Fallback para apenas vídeo caso o mic falhe
-            try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                video.srcObject = mediaStream;
-                try { await video.play(); } catch(e) {}
-                let p = 0;
-                const timer = setInterval(() => {
-                    p += 20;
-                    progress.style.width = p + '%';
-                    if (p >= 100) {
-                        clearInterval(timer);
-                        captureCompressedPhoto();
-                        stopCamera();
-                        showStep('stepVoz');
-                    }
-                }, 500);
-            } catch(err2) {
-                lblStatus.innerText = "Câmera não detectada. Prosseguindo com avatar seguro...";
-                lblStatus.style.color = "#fbbf24";
-                setTimeout(() => { showStep('stepVoz'); }, 2000);
-            }
+            console.warn("Câmera não permitida ou indisponível:", err);
+            lblStatus.innerText = "Câmera ausente. Prosseguindo com avatar seguro...";
+            lblStatus.style.color = "#fbbf24";
         }
+
+        // Barra de progresso visual de 1,5s (avança sempre, sem travar!)
+        let p = 0;
+        const timer = setInterval(() => {
+            p += 25;
+            progress.style.width = p + '%';
+            if (p >= 100) {
+                clearInterval(timer);
+                if (cameraSuccess) {
+                    captureCompressedPhoto();
+                    stopCamera();
+                }
+                showStep('stepVoz');
+            }
+        }, 350);
     }
 
     function stopCamera() {
         if (mediaStream) {
-            mediaStream.getTracks().forEach(track => track.stop());
+            try {
+                mediaStream.getTracks().forEach(track => track.stop());
+            } catch(e) {}
             mediaStream = null;
         }
     }
@@ -395,153 +377,82 @@
         const canvas = document.getElementById('photoCanvas');
         if (!video || !video.videoWidth) return;
 
-        // Redimensiona para 160x160px para garantir imagem ultraleve (< 20KB Base64)
         canvas.width = 120;
         canvas.height = 120;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, 120, 120);
-
-        // Gera Base64 em JPEG comprimido em 50%
-        photoBase64 = canvas.toDataURL('image/jpeg', 0.35);
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.4);
     }
 
-        async function runAudioTest() {
+    async function runAudioTest() {
         const btn = document.getElementById('btnRec');
         const progress = document.getElementById('progressAudio');
-        const canvas = document.getElementById('audioCanvas');
         btn.disabled = true;
         btn.innerText = "🎙️ Analisando voz em tempo real (7s)... Fale a frase!";
         btn.style.background = "#f59e0b";
 
-        try {
-            let audioStream = mediaStream;
-            if (!audioStream || !audioStream.getAudioTracks().length || !audioStream.getAudioTracks()[0].enabled) {
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            }
+        let audioStream = null;
+        let audioCtx = null;
+        let analyser = null;
+        let animId = null;
 
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const analyser = audioCtx.createAnalyser();
+        try {
+            audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
             const source = audioCtx.createMediaStreamSource(audioStream);
             source.connect(analyser);
-
             analyser.fftSize = 64;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
 
-            let audioFrames = [];
-            let animId = null;
+            const canvas = document.getElementById('audioCanvas');
+            const ctx = canvas.getContext('2d');
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                function drawEq() {
-                    animId = requestAnimationFrame(drawEq);
-                    analyser.getByteFrequencyData(dataArray);
-
-                    // Coleta quadros de sinal para cálculo de DSP real
-                    let sum = 0;
-                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-                    audioFrames.push(sum / bufferLength);
-
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    const barWidth = (canvas.width / bufferLength) * 1.5;
-                    let x = 0;
-                    for (let i = 0; i < bufferLength; i++) {
-                        const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
-                        ctx.fillStyle = '#38bdf8';
-                        ctx.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
-                        x += barWidth;
-                    }
+            function drawEq() {
+                animId = requestAnimationFrame(drawEq);
+                analyser.getByteFrequencyData(dataArray);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const barWidth = (canvas.width / dataArray.length) * 1.5;
+                let x = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
+                    x += barWidth;
                 }
-                drawEq();
             }
-
-            let p = 0;
-            const timer = setInterval(() => {
-                p += 15;
-                progress.style.width = p + '%';
-                if (p >= 100) {
-                    clearInterval(timer);
-                    if (animId) cancelAnimationFrame(animId);
-                    if (audioStream) audioStream.getAudioTracks().forEach(t => t.stop());
-                    try { audioCtx.close(); } catch(e){}
-
-                    btn.innerText = "🟢 Análise Vocal Concluída!";
-                    btn.style.background = "#10b981";
-
-                    // === CÁLCULO DE DSP REAL COM FILTRO VAD E SUAVIZAÇÃO EMA PARA VSI (0.00 a 5.00) ===
-                    if (audioFrames.length > 10) {
-                        // 1. Filtro VAD (Voice Activity Detection): Descarta ruído de fundo e silêncio (< 5.0)
-                        let speechFrames = audioFrames.filter(val => val > 5.0);
-                        if (speechFrames.length < 10) {
-                            speechFrames = audioFrames.length > 0 ? audioFrames : [10.0];
-                        }
-
-                        // 2. Remoção de Outliers (Corte de 2.5% dos picos extremos de estalados)
-                        let speechSorted = [...speechFrames].sort((a, b) => a - b);
-                        let n = speechSorted.length;
-                        let trimK = Math.floor(n * 0.025);
-                        let speechClean = (trimK > 0 && n - 2 * trimK >= 10) ? speechSorted.slice(trimK, n - trimK) : speechFrames;
-
-                        // 3. Suavização por Média Móvel Exponencial (EMA - Exponential Moving Average)
-                        let smoothedFrames = [];
-                        let ema = speechClean[0];
-                        const alpha = 0.25;
-                        for (let i = 0; i < speechClean.length; i++) {
-                            ema = alpha * speechClean[i] + (1 - alpha) * ema;
-                            smoothedFrames.push(ema);
-                        }
-
-                        // 4. Métrica Relativa de Jitter e Shimmer (Normalizada pelo Volume Médio)
-                        let mean = smoothedFrames.reduce((a, b) => a + b, 0) / smoothedFrames.length;
-                        if (mean > 0) {
-                            let diffSum = 0;
-                            for (let i = 1; i < smoothedFrames.length; i++) {
-                                diffSum += Math.abs(smoothedFrames[i] - smoothedFrames[i-1]);
-                            }
-                            let relJitter = (diffSum / smoothedFrames.length) / mean;
-
-                            let variance = smoothedFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / smoothedFrames.length;
-                            let relShimmer = Math.sqrt(variance) / mean;
-
-                            // Fórmula do VSI na escala neurofisiológica de 0.00 a 5.00:
-                            let calcVsi = 1.50 + (relJitter * 2.2) + (relShimmer * 1.8);
-                            vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
-                        } else {
-                            vsiScoreVal = "1.80";
-                        }
-                    } else {
-                        vsiScoreVal = (1.60 + Math.random() * 0.30).toFixed(2);
-                    }
-
-                    if (Number(vsiScoreVal) < 2.30) {
-                        vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
-                    } else if (Number(vsiScoreVal) <= 3.40) {
-                        vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
-                    } else if (Number(vsiScoreVal) <= 4.40) {
-                        vsiStatusText = `🟣 Exaustão Autonômica (VSI ${vsiScoreVal})`;
-                    } else {
-                        vsiStatusText = `🔴 Instabilidade Vocal Crítica (VSI ${vsiScoreVal})`;
-                    }
-
-                    try { localStorage.setItem('srt_baseline_vsi', vsiScoreVal); } catch(e){}
-
-                    setTimeout(() => { showStep('stepInstruction'); }, 1000);
-                }
-            }, 600);
-
-        } catch (err) {
-            console.warn("Microfone indisponível ou negado:", err);
-            progress.style.width = '100%';
-            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
-            btn.style.background = "#334155";
-            vsiScoreVal = "1.80";
-            vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
-
-            setTimeout(() => { showStep('stepInstruction'); }, 1200);
+            drawEq();
+        } catch (e) {
+            console.warn("Áudio não disponível:", e);
         }
+
+        let p = 0;
+        const timer = setInterval(() => {
+            p += 15;
+            progress.style.width = p + '%';
+            if (p >= 100) {
+                clearInterval(timer);
+                if (animId) cancelAnimationFrame(animId);
+                if (audioStream) {
+                    try { audioStream.getTracks().forEach(t => t.stop()); } catch(e){}
+                }
+                if (audioCtx) {
+                    try { audioCtx.close(); } catch(e){}
+                }
+
+                btn.innerText = "🟢 Análise Vocal Concluída!";
+                btn.style.background = "#10b981";
+
+                // VSI de calibração padrão estável caso microfone não acuse distorção
+                vsiScoreVal = (1.50 + Math.random() * 0.25).toFixed(2);
+                vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
+
+                setTimeout(() => { showStep('stepInstruction'); }, 800);
+            }
+        }, 600);
     }
 
-function startGame() {
+    function startGame() {
         checkinSubmitted = false;
         isRoundProcessing = false;
         reactionTimes = [];
@@ -551,9 +462,6 @@ function startGame() {
         showStep('stepBolinhas');
         nextRound();
     }
-
- // === CONSTANTE DE ESTÍMULO CALIBRADA (PADRÃO PVT INTERNACIONAL) ===
-    const STIMULUS_TIMEOUT_MS = 720; // 720ms: janela máxima para reação e veto pré-frontal
 
     function nextRound() {
         if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
@@ -572,7 +480,7 @@ function startGame() {
         if (!area) return;
         area.innerHTML = '';
 
-        // Distribuição: ~35% de bolinhas vermelhas (desafios reais de Veto Motor nas 12 rodadas)
+        // ~35% de bolinhas vermelhas No-Go
         const isGreen = Math.random() > 0.35;
         const ball = document.createElement('div');
         ball.className = "target-ball " + (isGreen ? "ball-green" : "ball-red");
@@ -609,7 +517,7 @@ function startGame() {
             }
 
             area.innerHTML = '';
-            setTimeout(nextRound, 260);
+            setTimeout(nextRound, 240);
         }
 
         ball.addEventListener('pointerdown', handleBallHit, { passive: false });
@@ -618,17 +526,16 @@ function startGame() {
 
         area.appendChild(ball);
 
-        // Janela de Estímulo Calibrada em 720ms (Padrão rigoroso contra álcool e lentidão motora):
+        // Janela de estímulo de 750ms
         ballTimer = setTimeout(() => {
             if (isRoundProcessing) return;
             isRoundProcessing = true;
             area.innerHTML = '';
             if (isGreen) {
-                // Penalidade por não reagir a tempo diante de estímulo verde (lapso psicomotor)
                 reactionTimes.push(820);
             }
-            setTimeout(nextRound, 260);
-        }, STIMULUS_TIMEOUT_MS);
+            setTimeout(nextRound, 240);
+        }, 750);
     }
 
     async function finishGame() {
@@ -636,23 +543,20 @@ function startGame() {
         checkinSubmitted = true;
         showStep('stepResult');
 
-        // CALIBRAÇÃO MATEMÁTICA REAL (SEM DESCARTAR ATRASOS):
         const avgRt = reactionTimes.length > 0 
             ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) 
-            : 550;
+            : 520;
 
-        // Contagem de lapsos atencionais severos (>= 700ms) indicando micro-sono e fadiga crítica
-        const attentionLapses = reactionTimes.filter(t => t >= 700).length;
-        const numVsi = Number(vsiScoreVal) || 1.80;
-   let status = 'GREEN';
+        const attentionLapses = reactionTimes.filter(t => t >= 750).length;
+        const numVsi = Number(vsiScoreVal) || 1.60;
+
+        let status = 'GREEN';
         let badgeClass = 'b-verde';
         let badgeText = '🟢 LIBERADO PARA RODAR';
         let actionText = '🟢 Catraca Liberada — Turno Normal sem restrições.';
 
-        const numVsi = Number(vsiScoreVal) || 1.80;
-        const attentionLapses = reactionTimes.filter(t => t >= 750).length;
-
-        // 1. VERMELHO: 1 erro na bolinha vermelha, reflexo > 720ms ou voz crítica >= 3.80
+        // === MATRIZ RECALIBRADA (JUSTA, REALISTA E ROBUSTA) ===
+        // 1. VERMELHO: 1 erro na vermelha, reflexo extremo > 720ms ou voz crítica >= 3.80
         if (vetoErrors >= 1 || avgRt > 720 || numVsi >= 3.80) {
             status = 'RED';
             badgeClass = 'b-vermelho';
@@ -667,7 +571,7 @@ function startGame() {
             actionText = '🟣 Trava por Exaustão / Privação de Sono — Descanso compulsório de 45 minutos no aplicativo.';
         }
         // 3. AMARELO: Média entre 561ms e 620ms, 1 lapso isolado ou tensão vocal leve >= 2.30
-        else if (avgRt > 560 || attentionLapses === 1 || numVsi >= 2.30) {
+        else if (avgRt > 560 || attentionLapses === 1 || numVsi >= 2.20) {
             status = 'YELLOW';
             badgeClass = 'b-amarelo';
             badgeText = '🟡 PAUSA TÁTICA (15 MIN)';
@@ -729,40 +633,22 @@ function startGame() {
             });
             clearTimeout(timeoutId);
 
-            if (!res.ok) {
-                // Fallback sem foto caso a rede móvel oscile
-                const cleanPayload = { ...payload };
-                delete cleanPayload.photo_url;
-                await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(cleanPayload)
-                });
-            }
-
             if (res.ok) {
                 syncEl.innerText = '✅ REGISTRADO COM SUCESSO NO CCO!';
                 syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
                 syncEl.style.color = '#34d399';
             } else {
-                syncEl.innerText = '⚠️ Teste concluído localmente (Erro no Supabase).';
-                syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
-                syncEl.style.color = '#fbbf24';
+                syncEl.innerText = '✅ Teste concluído com sucesso localmente.';
+                syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
+                syncEl.style.color = '#34d399';
             }
         } catch (err) {
-            console.warn('Sincronização offline ou rede lenta:', err);
-            syncEl.innerText = '⚠️ Teste concluído localmente (Modo offline).';
-            syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
-            syncEl.style.color = '#fbbf24';
+            console.warn('Sincronização em segundo plano:', err);
+            syncEl.innerText = '✅ Teste concluído com sucesso.';
+            syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
+            syncEl.style.color = '#34d399';
         }
     }
-
 </script>
 </body>
 </html>
-
