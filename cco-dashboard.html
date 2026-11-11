@@ -13,8 +13,7 @@
             border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 16px;
             flex-wrap: wrap; gap: 14px;
         }
-        .brand-group { display: flex; align-items: center; gap: 16px; }
-        .cco-logo { max-height: 54px; width: auto; object-fit: contain; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); }
+        .brand-group { display: flex; align-items: center; gap: 14px; }
         .title-group h1 { font-size: 21px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
         .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
 
@@ -26,7 +25,7 @@
         .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* FAIXA DE GOVERNANÇA DO COMANDO */
+        /* FAIXA OFICIAL DE GOVERNANÇA */
         .gov-banner {
             background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);
             border-radius: 10px; padding: 12px 18px; margin-bottom: 22px;
@@ -117,7 +116,19 @@
 
 <div class="header">
     <div class="brand-group">
-        <img class="cco-logo" alt="ExcelSilience" src="Logo_ExcelSilience_03.07.26.png" onerror="this.style.display='none';">
+        <!-- LOGO OFICIAL VETORIAL (NUNCA FALHA) -->
+        <div style="display: inline-flex; align-items: center; justify-content: center; gap: 10px;">
+            <svg width="44" height="44" viewBox="0 0 100 100" fill="none" style="filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));">
+                <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" stroke="#38bdf8" stroke-width="3" fill="#151c2c" />
+                <polygon points="50,18 80,33 80,67 50,82 20,67 20,33" stroke="#0284c7" stroke-width="2" fill="#0b0f19" />
+                <circle cx="50" cy="50" r="16" stroke="#38bdf8" stroke-width="2.5" fill="rgba(56, 189, 248, 0.15)" />
+                <circle cx="50" cy="50" r="7" fill="#34d399" />
+            </svg>
+            <div style="text-align: left; display: flex; flex-direction: column;">
+                <span style="font-size: 19px; font-weight: 900; letter-spacing: 1px; color: #ffffff; line-height: 1.1;">EXCEL<span style="color: #38bdf8;">SILIENCE</span></span>
+                <span style="font-size: 9px; font-weight: 800; letter-spacing: 2px; color: #94a3b8; text-transform: uppercase;">Operating System</span>
+            </div>
+        </div>
         <div class="title-group">
             <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
             <p>Painel Telemétrico de Prontidão, Validação Facial & Biometria Vocal — Frotas e Portaria</p>
@@ -238,12 +249,8 @@
             if (typeof raw === 'string') {
                 raw = raw.trim();
                 if (raw === '') continue;
-                if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:image/')) {
-                    return raw;
-                }
-                if (raw.length > 50) {
-                    return `data:image/jpeg;base64,${raw}`;
-                }
+                if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:image/')) return raw;
+                if (raw.length > 50) return `data:image/jpeg;base64,${raw}`;
             }
         }
         return null;
@@ -271,15 +278,9 @@
         if (!item) return 'GREEN';
         let st = (item.status || item.profile_key || item.weakest_link || '').toString().toUpperCase();
 
-        if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO') || st.includes('EXAUSTÃO') || st.includes('BURNED_CHASSIS')) {
-            return 'PURPLE';
-        }
-        if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('IMPULSIVE_REACTOR') || st.includes('VETO')) {
-            return 'RED';
-        }
-        if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO') || st.includes('PACK_MULE')) {
-            return 'YELLOW';
-        }
+        if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO') || st.includes('EXAUSTÃO') || st.includes('BURNED_CHASSIS')) return 'PURPLE';
+        if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('IMPULSIVE_REACTOR') || st.includes('VETO')) return 'RED';
+        if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO') || st.includes('PACK_MULE')) return 'YELLOW';
         return 'GREEN';
     }
 
@@ -295,9 +296,7 @@
         if (!item) return stdAction;
 
         let dbAction = item.action || item.easy_stage || '';
-        if (dbAction && typeof dbAction === 'string' && dbAction.trim().length > 5) {
-            return dbAction.trim();
-        }
+        if (dbAction && typeof dbAction === 'string' && dbAction.trim().length > 5) return dbAction.trim();
         return stdAction;
     }
 
@@ -361,7 +360,6 @@
 
             if (res.ok) {
                 const data = await res.json();
-                
                 allRecords = (Array.isArray(data) ? data : []).filter(item => {
                     if (!item) return false;
                     const comp = (item.company || '').toString().toUpperCase();
@@ -369,17 +367,11 @@
                     const mod = (item.module_type || '').toString().toUpperCase();
                     const name = (item.name || item.driver_name || item.nome || '').toString().toLowerCase();
 
-                    if (comp.includes('ES_CRISIS') || act.includes('ES-CRISE') || mod.includes('ES_CRISIS') || act.includes('C-SUITE')) {
-                        return false;
-                    }
-                    if (comp.includes('SRT_RH') || act.includes('[SRT-RH]') || name.includes('anônimo') || name.includes('anonimo')) {
-                        return false;
-                    }
+                    if (comp.includes('ES_CRISIS') || act.includes('ES-CRISE') || mod.includes('ES_CRISIS') || act.includes('C-SUITE')) return false;
+                    if (comp.includes('SRT_RH') || act.includes('[SRT-RH]') || name.includes('anônimo') || name.includes('anonimo')) return false;
 
                     return true;
                 });
-            } else {
-                console.warn('Erro retornado pelo Supabase:', res.status, res.statusText);
             }
         } catch (err) {
             console.warn('Falha na busca dos checkins:', err);
