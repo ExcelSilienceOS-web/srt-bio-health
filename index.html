@@ -328,13 +328,20 @@
     }
 
     // === SCANNER FACIAL COM TEMPO REALISTA DE 3,5 SEGUNDOS ===
-    async function startCamera() {
+ async function startCamera() {
         const video = document.getElementById('webcamVideo');
         const lblStatus = document.getElementById('lblPupilStatus');
         const progress = document.getElementById('progressCam');
 
-        let cameraSuccess = false;
+        if (progress) progress.style.width = '0%';
+        if (lblStatus) {
+            lblStatus.innerText = "Iniciando câmera...";
+            lblStatus.style.color = "#38bdf8";
+        }
 
+        let cameraActive = false;
+
+        // 1. Conecta o vídeo na tela primeiro
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({
                 video: { width: { ideal: 480 }, height: { ideal: 480 }, facingMode: "user" },
@@ -345,57 +352,60 @@
                 video.setAttribute("playsinline", "true");
                 video.muted = true;
                 await video.play();
-                cameraSuccess = true;
+                cameraActive = true;
             }
         } catch (err) {
-            console.warn("Câmera ausente:", err);
+            console.warn("Câmera indisponível:", err);
             if (lblStatus) {
-                lblStatus.innerText = "Câmera não detectada. Prosseguindo...";
+                lblStatus.innerText = "Câmera ausente. Prosseguindo...";
                 lblStatus.style.color = "#fbbf24";
             }
         }
 
-        // Barra de progresso de 3,5 segundos (ritmo profissional de telemetria)
-        let progressVal = 0;
-        const totalDurationMs = 3500;
-        const stepIntervalMs = 100;
-        const increment = (stepIntervalMs / totalDurationMs) * 100;
+        // 2. Temporizador único e blindado: 4.000 milissegundos (4 segundos reais)
+        let elapsedMs = 0;
+        const totalScanTimeMs = 4000;
+        const tickMs = 100;
 
-        const scanTimer = setInterval(() => {
-            progressVal += increment;
-            if (progress) progress.style.width = Math.min(100, progressVal) + '%';
+        const scanInterval = setInterval(() => {
+            elapsedMs += tickMs;
+            const pct = Math.min(100, Math.round((elapsedMs / totalScanTimeMs) * 100));
 
-            // Mensagens dinâmicas de telemetria conforme a barra carrega
-            if (lblStatus && cameraSuccess) {
-                if (progressVal < 35) {
-                    lblStatus.innerText = "🔍 Centralizando face no alvo óptico...";
+            if (progress) progress.style.width = pct + '%';
+
+            if (lblStatus && cameraActive) {
+                if (pct < 35) {
+                    lblStatus.innerText = "🔍 Centralize o rosto no círculo...";
                     lblStatus.style.color = "#38bdf8";
-                } else if (progressVal < 75) {
-                    lblStatus.innerText = "👁️ Aferindo foco visual e reatividade...";
+                } else if (pct < 75) {
+                    lblStatus.innerText = "👁️ Aferindo foco e microexpressões...";
                     lblStatus.style.color = "#38bdf8";
-                } else if (progressVal < 98) {
-                    lblStatus.innerText = "📸 Registrando foto biométrica oficial...";
+                } else if (pct < 98) {
+                    lblStatus.innerText = "📸 Registrando biometria facial...";
                     lblStatus.style.color = "#34d399";
                 }
             }
 
-            if (progressVal >= 100) {
-                clearInterval(scanTimer);
-                if (cameraSuccess) {
+            // Só fecha a tela e avança quando completar os 4 segundos inteiros!
+            if (elapsedMs >= totalScanTimeMs) {
+                clearInterval(scanInterval);
+
+                if (cameraActive) {
                     captureCompressedPhoto();
                     stopCamera();
                 }
+
                 if (lblStatus) {
-                    lblStatus.innerText = "✅ Validação Facial Concluída com Sucesso!";
+                    lblStatus.innerText = "✅ Validação Facial Concluída!";
                     lblStatus.style.color = "#34d399";
                 }
 
-                // Pausa elegante de 600ms antes de abrir o teste de voz
+                // Pausa de 800ms para você ver o aviso verde antes de abrir a voz
                 setTimeout(() => {
                     showStep('stepVoz');
-                }, 600);
+                }, 800);
             }
-        }, stepIntervalMs);
+        }, tickMs);
     }
 
     function stopCamera() {
