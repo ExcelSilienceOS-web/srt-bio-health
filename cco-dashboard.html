@@ -79,7 +79,7 @@
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
         .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
 
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 980px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 1050px; }
         th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
         td { padding: 12px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
         tr:hover { background: rgba(255, 255, 255, 0.02); }
@@ -105,11 +105,24 @@
         .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
         .b-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
 
+        .badge-type {
+            font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; display: inline-block; text-transform: uppercase;
+        }
+        .type-partida { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+        .type-rota { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
         .badge-face {
             font-size: 10px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.1);
             padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block; margin-top: 2px;
         }
         .badge-voice { font-size: 11px; font-weight: 700; display: block; }
+
+        .btn-dispatch {
+            background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8;
+            padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;
+            cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
+        }
+        .btn-dispatch:hover { background: #0284c7; color: #ffffff; }
     </style>
 </head>
 <body>
@@ -214,6 +227,7 @@
         <thead>
             <tr>
                 <th>Horário / Data</th>
+                <th>Tipo de Aferição</th>
                 <th>Condutor / Operador (Foto & Nome)</th>
                 <th>Validação Facial</th>
                 <th>Setor / Departamento</th>
@@ -224,7 +238,7 @@
             </tr>
         </thead>
         <tbody id="tableBody">
-            <tr><td colspan="8" style="text-align:center; padding:20px; color:#94a3b8;">Conectando ao banco de dados e buscando registros...</td></tr>
+            <tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Conectando ao banco de dados e buscando registros...</td></tr>
         </tbody>
     </table>
 </div>
@@ -300,6 +314,13 @@
         return stdAction;
     }
 
+    function dispatchRouteLink(driverName) {
+        const baseUrl = window.location.href.replace('dashboard.html', 'index.html');
+        const routeLink = `${baseUrl}?type=rota`;
+        const text = encodeURIComponent(`Olá, ${driverName}! A Torre CCO solicita o seu Check-in de Retorno de Rota (Regra de 60 minutos): ${routeLink}`);
+        window.open(`[suspicious link removed]{text}`, '_blank');
+    }
+
     function setPeriod(period) {
         ['btnToday', 'btn7Days', 'btn30Days', 'btnAll'].forEach(id => {
             const el = document.getElementById(id);
@@ -309,19 +330,19 @@
         const today = new Date();
 
         if (period === 'today') {
-            const dateStr = today.toISOString().split('T')[0];
+            const dateStr = today.toISOString().split('T');
             document.getElementById('startDate').value = dateStr;
             document.getElementById('endDate').value = dateStr;
             const b = document.getElementById('btnToday'); if (b) b.classList.add('active');
         } else if (period === '7days') {
             const past = new Date(); past.setDate(today.getDate() - 7);
-            document.getElementById('startDate').value = past.toISOString().split('T')[0];
-            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = past.toISOString().split('T');
+            document.getElementById('endDate').value = today.toISOString().split('T');
             const b = document.getElementById('btn7Days'); if (b) b.classList.add('active');
         } else if (period === '30days') {
             const past = new Date(); past.setDate(today.getDate() - 30);
-            document.getElementById('startDate').value = past.toISOString().split('T')[0];
-            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = past.toISOString().split('T');
+            document.getElementById('endDate').value = today.toISOString().split('T');
             const b = document.getElementById('btn30Days'); if (b) b.classList.add('active');
         } else if (period === 'all') {
             document.getElementById('startDate').value = '';
@@ -397,7 +418,7 @@
                         const d = String(dObj.getDate()).padStart(2, '0');
                         rowDate = `${y}-${m}-${d}`;
                     } else {
-                        rowDate = (row.created_at || '').split('T')[0];
+                        rowDate = (row.created_at || '').split('T');
                     }
                 }
                 if (startVal && rowDate < startVal) return false;
@@ -435,7 +456,7 @@
         tbody.innerHTML = '';
 
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px; color:#94a3b8; font-weight:600;">Nenhum registro encontrado no CCO para os filtros selecionados. Realize um teste no aplicativo ou clique em "Todo o Histórico".</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:24px; color:#94a3b8; font-weight:600;">Nenhum registro encontrado no CCO para os filtros selecionados. Realize um teste no aplicativo ou clique em "Todo o Histórico".</td></tr>';
             return;
         }
 
@@ -457,6 +478,14 @@
 
             const faceCheckStatus = item.face_match || (photoUrl ? "🟢 Foto OK (CCO)" : "🟡 Foto Ausente (Portaria)");
 
+            // Identificação de Modalidade de Check-in (Partida vs Rota)
+            const modType = (item.module_type || '').toString().toUpperCase();
+            let checkinBadge = `<span class="badge-type type-partida">🟢 Check-in 1 (Partida)</span>`;
+            if (modType.includes('ROTA') || modType.includes('60MIN')) {
+                checkinBadge = `<span class="badge-type type-rota">⏱️ Check-in 2 (Rota 60m)</span>`;
+            }
+
+            // VSI vocal
             const vsiVal = item.vsi_score || item.vsi || item.vsi_val;
             const vsiValNum = Number(vsiVal);
             const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
@@ -491,6 +520,10 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight:700; color:#f8fafc; font-size:12px;">${formattedDate}</td>
+                <td>
+                    ${checkinBadge}
+                    <button class="btn-dispatch" onclick="dispatchRouteLink('${displayName}')">📲 Disparar Link Rota</button>
+                </td>
                 <td>
                     <div class="photo-container">
                         ${photoHtml}
