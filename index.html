@@ -46,10 +46,26 @@
         .step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 14px; }
         label { font-size: 11px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
         select, input[type="text"] { width: 100%; padding: 12px 14px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: #ffffff; font-size: 14px; outline: none; }
         select:focus, input[type="text"]:focus { border-color: var(--accent-cyan); }
+
+        /* SELETOR DE MODALIDADE DE CHECK-IN */
+        .checkin-selector {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
+        }
+        .checkin-option {
+            background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px;
+            padding: 12px 10px; cursor: pointer; text-align: center; transition: 0.2s;
+        }
+        .checkin-option:hover { border-color: var(--accent-cyan); }
+        .checkin-option.selected {
+            background: rgba(56, 189, 248, 0.15); border-color: var(--accent-cyan);
+            color: #ffffff; font-weight: 800; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+        .checkin-option b { display: block; font-size: 12px; margin-bottom: 2px; }
+        .checkin-option span { font-size: 10px; color: var(--text-muted); }
 
         .chk-box { display: flex; align-items: flex-start; gap: 12px; background: var(--input-bg); padding: 14px; border-radius: 10px; border: 1px solid var(--input-border); margin-bottom: 18px; }
         .chk-box input[type="checkbox"] { margin-top: 3px; accent-color: var(--accent-cyan-hover); width: 20px; height: 20px; cursor: pointer; }
@@ -118,8 +134,20 @@
         Os resultados constituem <i>sugestões técnicas de prontidão</i>. Toda deliberação de viagem ou pausa é de <b>decisão privativa e soberana do Comando Humano (Supervisor / CCO)</b>.
     </div>
 
-    <!-- PASSO 1: DADOS -->
+    <!-- PASSO 1: DADOS E MODALIDADE DE CHECK-IN -->
     <div id="stepForm" class="step active">
+        <label>Momento da Aferição Operacional:</label>
+        <div class="checkin-selector">
+            <div id="optPartida" class="checkin-option selected" onclick="selectCheckinType('CHECKIN_1_PARTIDA')">
+                <b>🟢 Check-in 1</b>
+                <span>Saída / Portaria Inicial</span>
+            </div>
+            <div id="optRota" class="checkin-option" onclick="selectCheckinType('CHECKIN_2_ROTA_60MIN')">
+                <b>⏱️ Check-in 2</b>
+                <span>Retorno de Rota (&gt;60 min)</span>
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="txtName">Nome Completo do Condutor / Motorista:</label>
             <input type="text" id="txtName" placeholder="Ex: Flavio Verissimo" autocomplete="name" required>
@@ -198,7 +226,7 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 5: RESULTADO DO SERVIDOR -->
+    <!-- PASSO 5: RESULTADO PROCESSADO PELA EDGE FUNCTION -->
     <div id="stepResult" class="step">
         <div id="syncStatus" class="sync-banner">⏳ Processando dados na Nuvem Segura...</div>
 
@@ -240,6 +268,9 @@
     const urlParams = new URLSearchParams(window.location.search);
     const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
 
+    // Detecção automática se o condutor veio via link de rota
+    let currentCheckinType = urlParams.get('type') === 'rota' ? 'CHECKIN_2_ROTA_60MIN' : 'CHECKIN_1_PARTIDA';
+
     let mediaStream = null;
     let photoBase64 = "";
     let isRoundProcessing = false;
@@ -250,6 +281,25 @@
     let ballTimer = null;
     let ballSpawnTime = 0;
     let collectedAudioFrames = [];
+
+    function selectCheckinType(type) {
+        currentCheckinType = type;
+        const optPartida = document.getElementById('optPartida');
+        const optRota = document.getElementById('optRota');
+
+        if (type === 'CHECKIN_1_PARTIDA') {
+            optPartida.classList.add('selected');
+            optRota.classList.remove('selected');
+        } else {
+            optRota.classList.add('selected');
+            optPartida.classList.remove('selected');
+        }
+    }
+
+    // Inicialização da interface
+    window.addEventListener('DOMContentLoaded', () => {
+        selectCheckinType(currentCheckinType);
+    });
 
     function showStep(id) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -499,6 +549,7 @@
             role: role,
             department: dept,
             company: companyParam,
+            module_type: currentCheckinType, // Envio auditável do tipo de check-in
             reaction_times: reactionTimes,
             veto_errors: vetoErrors,
             audio_frames: collectedAudioFrames,
@@ -529,7 +580,8 @@
                 document.getElementById('resFace').innerText = data.faceMatch;
                 document.getElementById('resAction').innerText = data.action;
 
-                syncEl.innerText = '✅ REGISTRADO COM SUCESSO NO CCO!';
+                const checkinLabel = currentCheckinType === 'CHECKIN_2_ROTA_60MIN' ? 'CHECK-IN 2 (ROTA 60 MIN)' : 'CHECK-IN 1 (PARTIDA)';
+                syncEl.innerText = `✅ REGISTRADO NO CCO COMO ${checkinLabel}!`;
                 syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
                 syncEl.style.color = '#34d399';
             } else {
