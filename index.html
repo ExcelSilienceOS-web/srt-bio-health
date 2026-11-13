@@ -34,7 +34,6 @@
         .header-box h1 { font-size: 1.3rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
 
-        /* FAIXA OFICIAL DE GOVERNANÇA */
         .gov-banner-driver {
             background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);
             border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; text-align: center;
@@ -51,7 +50,6 @@
         select, input[type="text"] { width: 100%; padding: 12px 14px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: #ffffff; font-size: 14px; outline: none; }
         select:focus, input[type="text"]:focus { border-color: var(--accent-cyan); }
 
-        /* SELETOR DE MODALIDADE DE CHECK-IN */
         .checkin-selector {
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
         }
@@ -87,8 +85,8 @@
         .audio-vis-box { width: 100%; height: 80px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
         canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
-        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; }
-        .target-ball { width: 68px; height: 68px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); text-align: center; }
+        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .target-ball { width: 68px; height: 68px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); text-align: center; }
         .target-ball span { font-size: 16px; line-height: 1; }
         .ball-green { background: #059669; border: 3px solid var(--accent-green-bright); }
         .ball-red { background: #dc2626; border: 3px solid var(--accent-red-bright); }
@@ -111,7 +109,6 @@
 
 <div class="container">
     <div class="header-box">
-        <!-- LOGO OFICIAL VETORIAL (NUNCA FALHA) -->
         <div style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px;">
             <svg width="42" height="42" viewBox="0 0 100 100" fill="none" style="filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));">
                 <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" stroke="#38bdf8" stroke-width="3" fill="#151c2c" />
@@ -125,10 +122,9 @@
             </div>
         </div>
         <h1>ExcelSilience SRT Mobility</h1>
-        <p>Telemetria de Prontidão Operacional & Validação Facial</p>
+        <p>Telemetria de Prontidão Operacional &amp; Validação Facial</p>
     </div>
 
-    <!-- FAIXA OFICIAL DE GOVERNANÇA DO COMANDO -->
     <div class="gov-banner-driver">
         <b>🏛️ Aferição Preventiva de Bordo</b>
         Os resultados constituem <i>sugestões técnicas de prontidão</i>. Toda deliberação de viagem ou pausa é de <b>decisão privativa e soberana do Comando Humano (Supervisor / CCO)</b>.
@@ -172,7 +168,7 @@
         <div class="chk-box">
             <input type="checkbox" id="chkAuth" checked>
             <label for="chkAuth">
-                <b>Governança & LGPD (Art. 11, II, 'e'):</b> Autorizo a captura de foto de presença e a aferição não-invasiva da minha prontidão operacional para orientação do CCO antes da jornada, visando a proteção da minha vida e do trânsito.
+                <b>Governança &amp; LGPD (Art. 11, II, 'e'):</b> Autorizo a captura de foto de presença e a aferição não-invasiva da minha prontidão operacional para orientação do CCO antes da jornada, visando a proteção da minha vida e do trânsito.
             </label>
         </div>
 
@@ -181,7 +177,7 @@
 
     <!-- PASSO 2: CÂMERA -->
     <div id="stepPupil" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial & Foto de Bordo</h3>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📸 Validação Facial &amp; Foto de Bordo</h3>
         <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">Enquadre o rosto no círculo durante a leitura:</p>
 
         <div class="pupil-scanner">
@@ -226,19 +222,19 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 5: RESULTADO PROCESSADO PELA EDGE FUNCTION -->
+    <!-- PASSO 5: RESULTADO -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Processando dados na Nuvem Segura...</div>
+        <div id="syncStatus" class="sync-banner">⏳ Transmitindo parâmetros para o CCO...</div>
 
         <div style="text-align:center; margin-bottom:18px;">
-            <img id="resPhoto" src="" style="width:84px; height:84px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:inline-block; margin-bottom:8px; background:#1e293b;">
+            <img id="resPhoto" src="" style="width:84px; height:84px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-cyan); display:none; margin:0 auto 8px auto; background:#1e293b;">
             <h3 style="color:var(--accent-cyan); font-size:16px;" id="resName">--</h3>
             <p style="font-size:12px; color:var(--text-muted);" id="resRole">--</p>
             <div id="resBadge" class="badge-status b-verde" style="margin-top:8px;">🟢 PROCESSANDO...</div>
         </div>
 
         <div class="info-card">
-            <h4>📊 Parâmetros Aferidos pelo Servidor:</h4>
+            <h4>📊 Parâmetros Telemétricos Aferidos:</h4>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px; font-size:11px;">
                 <div>⚡ <b>Latência:</b> <span id="resLatency" style="color:#fff; font-weight:700;">-- ms</span></div>
                 <div>🛑 <b>Erros de Veto:</b> <span id="resErrors" style="color:#fff; font-weight:700;">--</span></div>
@@ -249,10 +245,10 @@
 
         <div class="info-card" style="border-color:var(--accent-cyan);">
             <h4>📋 Encaminhamento Técnico Sugerido (Decisão do Comando):</h4>
-            <p id="resAction" style="font-weight:700; color:var(--accent-cyan); font-size:13px; margin-top:4px;">Aguardando retorno do servidor...</p>
+            <p id="resAction" style="font-weight:700; color:var(--accent-cyan); font-size:13px; margin-top:4px;">--</p>
         </div>
 
-        <button class="btn" onclick="location.reload()">🔄 Finalizar & Liberar Aplicativo</button>
+        <button class="btn" onclick="location.reload()">🔄 Finalizar &amp; Liberar Aplicativo</button>
     </div>
 
     <div class="footer-brand">
@@ -263,30 +259,31 @@
 <script>
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
-    const API_ENDPOINT = `${SUPABASE_URL}/functions/v1/process-checkin`;
+    const EDGE_ENDPOINT = `${SUPABASE_URL}/functions/v1/process-checkin`;
 
     const urlParams = new URLSearchParams(window.location.search);
     const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
 
-    // Detecção automática se o condutor veio via link de rota
     let currentCheckinType = urlParams.get('type') === 'rota' ? 'CHECKIN_2_ROTA_60MIN' : 'CHECKIN_1_PARTIDA';
-
     let mediaStream = null;
     let photoBase64 = "";
     let isRoundProcessing = false;
     let reactionTimes = [];
+    let greenLapses = 0;
     let vetoErrors = 0;
     let currentRound = 0;
     const totalRounds = 12;
     let ballTimer = null;
     let ballSpawnTime = 0;
     let collectedAudioFrames = [];
+    let vsiScoreNum = 0;
+    let vsiStatusText = "⚪ Áudio Insuficiente (0.00)";
+    let checkinSubmitted = false;
 
     function selectCheckinType(type) {
         currentCheckinType = type;
         const optPartida = document.getElementById('optPartida');
         const optRota = document.getElementById('optRota');
-
         if (type === 'CHECKIN_1_PARTIDA') {
             optPartida.classList.add('selected');
             optRota.classList.remove('selected');
@@ -296,9 +293,16 @@
         }
     }
 
-    // Inicialização da interface
     window.addEventListener('DOMContentLoaded', () => {
         selectCheckinType(currentCheckinType);
+        try {
+            const savedName = localStorage.getItem('srt_driver_name');
+            const savedRole = localStorage.getItem('srt_driver_role');
+            const savedDept = localStorage.getItem('srt_driver_dept');
+            if (savedName) document.getElementById('txtName').value = savedName;
+            if (savedRole) document.getElementById('txtRole').value = savedRole;
+            if (savedDept) document.getElementById('txtDept').value = savedDept;
+        } catch (e) {}
     });
 
     function showStep(id) {
@@ -316,6 +320,12 @@
         if (!nameInput.value.trim()) nameInput.value = "Flavio Verissimo";
         if (!roleInput.value) roleInput.value = "Motorista de Carga Pesada (CNH C/E)";
         if (!deptInput.value.trim()) deptInput.value = "Frota 01";
+
+        try {
+            localStorage.setItem('srt_driver_name', nameInput.value.trim());
+            localStorage.setItem('srt_driver_role', roleInput.value);
+            localStorage.setItem('srt_driver_dept', deptInput.value.trim());
+        } catch (e) {}
 
         if (chk && !chk.checked) {
             alert("É necessário aceitar a Autorização de Governança & LGPD.");
@@ -346,13 +356,13 @@
             }
         } catch (err) {
             if (lblStatus) {
-                lblStatus.innerText = "Câmera ausente. Prosseguindo...";
+                lblStatus.innerText = "Câmera ausente. Prosseguindo sem foto...";
                 lblStatus.style.color = "#fbbf24";
             }
         }
 
         let elapsedMs = 0;
-        const totalScanMs = 4000;
+        const totalScanMs = 3500;
         const scanInterval = setInterval(() => {
             elapsedMs += 100;
             const pct = Math.min(100, Math.round((elapsedMs / totalScanMs) * 100));
@@ -361,7 +371,7 @@
             if (lblStatus && cameraActive) {
                 if (pct < 40) lblStatus.innerText = "🔍 Centralize o rosto...";
                 else if (pct < 80) lblStatus.innerText = "👁️ Aferindo foco e enquadramento...";
-                else lblStatus.innerText = "📸 Registrando biometria facial...";
+                else lblStatus.innerText = "📸 Registrando foto de presença...";
             }
 
             if (elapsedMs >= totalScanMs) {
@@ -371,17 +381,17 @@
                     stopCamera();
                 }
                 if (lblStatus) {
-                    lblStatus.innerText = "✅ Validação Facial Concluída!";
-                    lblStatus.style.color = "#34d399";
+                    lblStatus.innerText = cameraActive ? "✅ Validação Facial Concluída!" : "⚠️ Modo sem câmera";
+                    lblStatus.style.color = cameraActive ? "#34d399" : "#fbbf24";
                 }
-                setTimeout(() => { showStep('stepVoz'); }, 800);
+                setTimeout(() => { showStep('stepVoz'); }, 700);
             }
         }, 100);
     }
 
     function stopCamera() {
         if (mediaStream) {
-            try { mediaStream.getTracks().forEach(t => t.stop()); } catch(e){}
+            try { mediaStream.getTracks().forEach(t => t.stop()); } catch (e) {}
             mediaStream = null;
         }
     }
@@ -390,11 +400,55 @@
         const video = document.getElementById('webcamVideo');
         const canvas = document.getElementById('photoCanvas');
         if (!video || !video.videoWidth) return;
-        canvas.width = 140;
-        canvas.height = 140;
+        canvas.width = 120;
+        canvas.height = 120;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, 140, 140);
-        photoBase64 = canvas.toDataURL('image/jpeg', 0.40);
+        ctx.drawImage(video, 0, 0, 120, 120);
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.35);
+    }
+
+    function computeRealVsi(frames) {
+        if (!frames || frames.length < 10) {
+            return { score: 0, label: "⚪ Áudio Insuficiente (0.00)" };
+        }
+        const speechFrames = frames.filter(val => val > 5.0);
+        if (speechFrames.length < 8) {
+            return { score: 0, label: "⚪ Áudio Insuficiente (0.00)" };
+        }
+        const sorted = [...speechFrames].sort((a, b) => a - b);
+        const n = sorted.length;
+        const trimK = Math.floor(n * 0.025);
+        const clean = (trimK > 0 && n - 2 * trimK >= 8) ? sorted.slice(trimK, n - trimK) : speechFrames;
+
+        const smoothed = [];
+        let ema = clean[0];
+        const alpha = 0.25;
+        for (let i = 0; i < clean.length; i++) {
+            ema = alpha * clean[i] + (1 - alpha) * ema;
+            smoothed.push(ema);
+        }
+
+        const mean = smoothed.reduce((a, b) => a + b, 0) / smoothed.length;
+        if (mean <= 0) {
+            return { score: 0, label: "⚪ Áudio Insuficiente (0.00)" };
+        }
+
+        let diffSum = 0;
+        for (let i = 1; i < smoothed.length; i++) {
+            diffSum += Math.abs(smoothed[i] - smoothed[i - 1]);
+        }
+        const relJitter = (diffSum / smoothed.length) / mean;
+        const variance = smoothed.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / smoothed.length;
+        const relShimmer = Math.sqrt(variance) / mean;
+
+        const rawVsi = 1.50 + (relJitter * 2.2) + (relShimmer * 1.8);
+        const score = Number(Math.min(5.00, Math.max(1.00, rawVsi)).toFixed(2));
+        const sStr = score.toFixed(2);
+
+        if (score < 2.20) return { score, label: `🟢 Voz Estável (VSI ${sStr})` };
+        if (score < 3.00) return { score, label: `🟡 Tensão Modulada (VSI ${sStr})` };
+        if (score < 3.80) return { score, label: `🟣 Exaustão Autonômica (VSI ${sStr})` };
+        return { score, label: `🔴 Instabilidade Crítica (VSI ${sStr})` };
     }
 
     async function runAudioTest() {
@@ -402,7 +456,7 @@
         const progress = document.getElementById('progressAudio');
         const canvas = document.getElementById('audioCanvas');
         btn.disabled = true;
-        btn.innerText = "🎙️ Gravando áudio bruto (7s)...";
+        btn.innerText = "🎙️ Analisando voz (7s)... Fale a frase!";
         btn.style.background = "#f59e0b";
 
         let audioStream = null;
@@ -427,7 +481,6 @@
             function draw() {
                 animId = requestAnimationFrame(draw);
                 analyser.getByteFrequencyData(dataArray);
-
                 let sum = 0;
                 for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
                 collectedAudioFrames.push(sum / dataArray.length);
@@ -444,33 +497,43 @@
             }
             draw();
         } catch (e) {
-            console.warn("Falha no microfone:", e);
+            console.warn("Microfone indisponível:", e);
         }
 
         let p = 0;
         const timer = setInterval(() => {
             p += 15;
-            progress.style.width = p + '%';
+            if (progress) progress.style.width = Math.min(100, p) + '%';
             if (p >= 100) {
                 clearInterval(timer);
                 if (animId) cancelAnimationFrame(animId);
                 if (audioStream) {
-                    try { audioStream.getTracks().forEach(t => t.stop()); } catch(e){}
+                    try { audioStream.getTracks().forEach(t => t.stop()); } catch (e) {}
                 }
                 if (audioCtx) {
-                    try { audioCtx.close(); } catch(e){}
+                    try { audioCtx.close(); } catch (e) {}
                 }
-                btn.innerText = "🟢 Gravação Concluída!";
-                btn.style.background = "#10b981";
-                setTimeout(() => { showStep('stepInstruction'); }, 800);
+
+                const vsiRes = computeRealVsi(collectedAudioFrames);
+                vsiScoreNum = vsiRes.score;
+                vsiStatusText = vsiRes.label;
+
+                btn.innerText = vsiScoreNum > 0 ? "🟢 Análise Vocal Concluída!" : "⚪ Áudio Insuficiente (Prosseguindo)";
+                btn.style.background = vsiScoreNum > 0 ? "#10b981" : "#475569";
+                setTimeout(() => { showStep('stepInstruction'); }, 700);
             }
         }, 600);
     }
 
     function startGame() {
+        checkinSubmitted = false;
+        isRoundProcessing = false;
         reactionTimes = [];
+        greenLapses = 0;
         vetoErrors = 0;
         currentRound = 0;
+        document.getElementById('lblErrors').innerText = '0';
+        if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
         showStep('stepBolinhas');
         nextRound();
     }
@@ -493,22 +556,24 @@
         ball.className = "target-ball " + (isGreen ? "ball-green" : "ball-red");
         ball.innerHTML = isGreen ? '<span>✔</span>GO!' : '<span>✖</span>NO-GO!';
 
-        const maxX = Math.max(30, area.clientWidth - 78);
-        const maxY = Math.max(30, area.clientHeight - 78);
+        const maxX = Math.max(30, (area.clientWidth || 300) - 78);
+        const maxY = Math.max(30, (area.clientHeight || 200) - 78);
         ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
         ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
 
         ballSpawnTime = window.performance.now();
 
         function handleHit(e) {
-            if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(err){} }
+            if (e) { try { e.preventDefault(); e.stopPropagation(); } catch (err) {} }
             if (isRoundProcessing) return;
             isRoundProcessing = true;
             if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
 
             const rt = Math.round(window.performance.now() - ballSpawnTime);
             if (isGreen) {
-                reactionTimes.push(Math.max(100, rt));
+                const clampedRt = Math.max(100, rt);
+                reactionTimes.push(clampedRt);
+                if (clampedRt >= 750) greenLapses++;
             } else {
                 vetoErrors++;
                 document.getElementById('lblErrors').innerText = vetoErrors;
@@ -518,6 +583,7 @@
         }
 
         ball.addEventListener('pointerdown', handleHit, { passive: false });
+        ball.addEventListener('touchstart', handleHit, { passive: false });
         ball.onclick = handleHit;
         area.appendChild(ball);
 
@@ -525,12 +591,96 @@
             if (isRoundProcessing) return;
             isRoundProcessing = true;
             area.innerHTML = '';
-            if (isGreen) reactionTimes.push(820);
+            if (isGreen) {
+                reactionTimes.push(950);
+                greenLapses++;
+            }
             setTimeout(nextRound, 260);
-        }, 750);
+        }, 950);
+    }
+
+    function evaluateLocalReadiness() {
+        const avgRt = reactionTimes.length > 0
+            ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
+            : 520;
+
+        let status = 'GREEN';
+        let badgeClass = 'b-verde';
+        let badgeText = '🟢 PRONTIDÃO PRESERVADA';
+        let actionText = 'Sugestão Técnica: Liberação recomendada para viagem/turno normal. Decisão final do Comando Humano.';
+
+        if (vetoErrors >= 2 || avgRt > 800 || vsiScoreNum >= 3.80) {
+            status = 'RED';
+            badgeClass = 'b-vermelho';
+            badgeText = '🔴 DISFUNÇÃO NEUROMOTORA CRÍTICA';
+            actionText = 'Sugestão Técnica: NÃO INICIAR VIAGEM. Encaminhar presencialmente ao Supervisor no CCO para deliberação soberana do Comando.';
+        } else if (greenLapses >= 2 || avgRt > 700 || vsiScoreNum >= 3.00) {
+            status = 'PURPLE';
+            badgeClass = 'b-roxo';
+            badgeText = '🟣 EXAUSTÃO SEVERA / SONO';
+            actionText = 'Sugestão Técnica: Pausa Compulsória de 45 min no pátio para repouso. Decisão final do Comando Humano.';
+        } else if (avgRt > 600 || vetoErrors === 1 || vsiScoreNum >= 2.20) {
+            status = 'YELLOW';
+            badgeClass = 'b-amarelo';
+            badgeText = '🟡 SOBRECARGA TÁTICA';
+            actionText = 'Sugestão Técnica: Pausa Tática de 15 min recomendada para hidratação e descompressão. Ação privativa do Comando.';
+        }
+
+        const faceMatch = photoBase64 ? '🟢 Foto OK (CCO)' : '🟡 Foto Ausente (Portaria)';
+        return { avgRt, status, badgeClass, badgeText, actionText, faceMatch };
+    }
+
+    function applyResultToScreen(resObj) {
+        document.getElementById('resBadge').className = `badge-status ${resObj.badgeClass}`;
+        document.getElementById('resBadge').innerText = resObj.badgeText;
+        document.getElementById('resLatency').innerText = `${resObj.latency} ms`;
+        document.getElementById('resErrors').innerText = resObj.vetoErrors;
+        document.getElementById('resVsi').innerText = resObj.vsiStatus;
+        document.getElementById('resFace').innerText = resObj.faceMatch;
+        document.getElementById('resFace').style.color = photoBase64 ? 'var(--accent-green-bright)' : 'var(--accent-yellow-bright)';
+        document.getElementById('resAction').innerText = resObj.action;
+    }
+
+    async function sendBackupMirror(payloadData) {
+        try {
+            const backupPayload = {
+                module_type: currentCheckinType,
+                name: payloadData.name || null,
+                role: payloadData.role || null,
+                department: payloadData.department || null,
+                company: payloadData.company || null,
+                reaction_time_ms: payloadData.reaction_time_ms || null,
+                veto_errors: payloadData.veto_errors !== undefined ? payloadData.veto_errors : 0,
+                vsi_score: payloadData.vsi_score !== undefined ? payloadData.vsi_score : 0,
+                vsi_status: payloadData.vsi_status || null,
+                status: payloadData.status || null,
+                action: payloadData.action || null,
+                photo_url: payloadData.photo_url || null,
+                raw_payload: {
+                    ...payloadData,
+                    module_type: currentCheckinType,
+                    green_lapses: greenLapses,
+                    face_match: payloadData.face_match || null
+                }
+            };
+            await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(backupPayload)
+            });
+        } catch (e) {
+            console.warn("Espelho backup aviso:", e);
+        }
     }
 
     async function finishGame() {
+        if (checkinSubmitted) return;
+        checkinSubmitted = true;
         showStep('stepResult');
 
         const name = document.getElementById('txtName').value.trim();
@@ -539,59 +689,140 @@
 
         document.getElementById('resName').innerText = name;
         document.getElementById('resRole').innerText = `${role} • ${dept}`;
+        const resPhotoEl = document.getElementById('resPhoto');
         if (photoBase64) {
-            document.getElementById('resPhoto').src = photoBase64;
-            document.getElementById('resPhoto').style.display = 'inline-block';
+            resPhotoEl.src = photoBase64;
+            resPhotoEl.style.display = 'block';
+        } else {
+            resPhotoEl.style.display = 'none';
         }
 
-        const payload = {
+        // 1. Calcula e exibe IMEDIATAMENTE os parâmetros reais aferidos no celular
+        const localEval = evaluateLocalReadiness();
+        applyResultToScreen({
+            latency: localEval.avgRt,
+            vetoErrors: vetoErrors,
+            vsiStatus: vsiStatusText,
+            faceMatch: localEval.faceMatch,
+            badgeClass: localEval.badgeClass,
+            badgeText: localEval.badgeText,
+            action: localEval.actionText
+        });
+
+        const tagModulo = currentCheckinType === 'CHECKIN_2_ROTA_60MIN' ? '[Check-in 2 - Rota 60m]' : '[Check-in 1 - Partida]';
+        const restPayload = {
             name: name,
             role: role,
             department: dept,
             company: companyParam,
-            module_type: currentCheckinType, // Envio auditável do tipo de check-in
-            reaction_times: reactionTimes,
+            reaction_time_ms: localEval.avgRt,
             veto_errors: vetoErrors,
+            vsi_score: vsiScoreNum,
+            vsi_status: vsiStatusText,
+            status: localEval.status,
+            action: `${tagModulo} ${localEval.actionText}`,
+            photo_url: photoBase64 || null
+        };
+
+        const edgePayload = {
+            ...restPayload,
+            module_type: currentCheckinType,
+            reaction_times: reactionTimes,
             audio_frames: collectedAudioFrames,
             photo_base64: photoBase64
         };
 
         const syncEl = document.getElementById('syncStatus');
-        syncEl.innerText = '⏳ Processando dados na Nuvem Segura ExcelSilience...';
+        syncEl.innerText = '⏳ Transmitindo parâmetros ao CCO...';
 
+        // Grava espelho de segurança em paralelo
+        sendBackupMirror({ ...restPayload, face_match: localEval.faceMatch });
+
+        let syncedToServer = false;
+
+        // 2. Tenta Edge Function primeiro
         try {
-            const res = await fetch(API_ENDPOINT, {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3500);
+            const res = await fetch(EDGE_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_KEY,
                     'Authorization': `Bearer ${SUPABASE_KEY}`
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(edgePayload),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             if (res.ok) {
                 const data = await res.json();
-                document.getElementById('resBadge').className = `badge-status ${data.badgeClass}`;
-                document.getElementById('resBadge').innerText = data.badgeText;
-                document.getElementById('resLatency').innerText = `${data.latency} ms`;
-                document.getElementById('resErrors').innerText = data.vetoErrors;
-                document.getElementById('resVsi').innerText = data.vsiStatus;
-                document.getElementById('resFace').innerText = data.faceMatch;
-                document.getElementById('resAction').innerText = data.action;
-
-                const checkinLabel = currentCheckinType === 'CHECKIN_2_ROTA_60MIN' ? 'CHECK-IN 2 (ROTA 60 MIN)' : 'CHECK-IN 1 (PARTIDA)';
-                syncEl.innerText = `✅ REGISTRADO NO CCO COMO ${checkinLabel}!`;
-                syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
-                syncEl.style.color = '#34d399';
-            } else {
-                throw new Error("Falha no servidor");
+                applyResultToScreen({
+                    latency: data.latency ?? data.reaction_time_ms ?? localEval.avgRt,
+                    vetoErrors: data.vetoErrors ?? data.veto_errors ?? vetoErrors,
+                    vsiStatus: data.vsiStatus ?? data.vsi_status ?? vsiStatusText,
+                    faceMatch: data.faceMatch ?? data.face_match ?? localEval.faceMatch,
+                    badgeClass: data.badgeClass ?? localEval.badgeClass,
+                    badgeText: data.badgeText ?? localEval.badgeText,
+                    action: data.action ?? `${tagModulo} ${localEval.actionText}`
+                });
+                syncedToServer = true;
             }
         } catch (err) {
-            document.getElementById('resBadge').className = 'badge-status b-verde';
-            document.getElementById('resBadge').innerText = '🟢 TRANSMISSÃO CONCLUÍDA';
-            document.getElementById('resAction').innerText = 'Sugestão Técnica: Registrado localmente. Apresentar-se na portaria para conferência.';
-            syncEl.innerText = '✅ Teste finalizado e transmitido.';
+            console.warn("Edge Function indisponível, acionando gravação direta no banco:", err);
+        }
+
+        // 3. Fallback automático direto para a tabela srt_checkins (se Edge Function falhou)
+        if (!syncedToServer) {
+            try {
+                const controller2 = new AbortController();
+                const timeoutId2 = setTimeout(() => controller2.abort(), 4500);
+                let resDb = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(restPayload),
+                    signal: controller2.signal
+                });
+                clearTimeout(timeoutId2);
+
+                if (!resDb.ok) {
+                    const cleanPayload = { ...restPayload };
+                    delete cleanPayload.photo_url;
+                    resDb = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(cleanPayload)
+                    });
+                }
+
+                if (resDb.ok) syncedToServer = true;
+            } catch (errDb) {
+                console.warn("Falha no envio direto:", errDb);
+            }
+        }
+
+        const checkinLabel = currentCheckinType === 'CHECKIN_2_ROTA_60MIN' ? 'CHECK-IN 2 (ROTA 60 MIN)' : 'CHECK-IN 1 (PARTIDA)';
+        if (syncedToServer) {
+            syncEl.innerText = `✅ REGISTRADO NO CCO (${checkinLabel})!`;
+            syncEl.style.background = 'rgba(16, 185, 129, 0.2)';
+            syncEl.style.color = '#34d399';
+            syncEl.style.borderColor = '#10b981';
+        } else {
+            syncEl.innerText = '⚠️ Parâmetros exibidos localmente (Verifique a conexão de rede).';
+            syncEl.style.background = 'rgba(245, 158, 11, 0.2)';
+            syncEl.style.color = '#fbbf24';
+            syncEl.style.borderColor = '#f59e0b';
         }
     }
 </script>
