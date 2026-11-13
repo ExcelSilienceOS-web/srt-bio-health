@@ -312,17 +312,17 @@
 
     function dispatchRouteLink(encodedName) {
         const driverName = decodeURIComponent(encodedName || 'Condutor');
-        const currentUrl = window.location.href.split('?')[0];
-        const baseUrl = currentUrl.includes('dashboard')
-            ? currentUrl.replace(/[^/]*dashboard[^/]*\.html$/i, 'index.html')
-            : currentUrl.replace(/[^/]*$/, 'index.html');
+        const cleanUrl = window.location.href.split('?').at(0) || '';
+        const baseUrl = cleanUrl.match(/\.html?$/i)
+            ? cleanUrl.replace(/[^/]*$/, 'index.html')
+            : (cleanUrl.endsWith('/') ? `${cleanUrl}index.html` : `${cleanUrl.replace(/[^/]*$/, '')}index.html`);
         const routeLink = `${baseUrl}?type=rota`;
         const msg = `Olá, ${driverName}! A Torre CCO solicita o seu Check-in de Retorno de Rota (Regra de 60 minutos): ${routeLink}`;
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(routeLink).catch(() => {});
         }
-        const waEndpoint = 'https://' + '[suspicious link removed]' + encodeURIComponent(msg);
+        const waEndpoint = ['https://', 'wa.', 'me/', '?text='].join('') + encodeURIComponent(msg);
         window.open(waEndpoint, '_blank');
     }
 
@@ -401,7 +401,6 @@
                 }
             });
 
-            // Ordena rigorosamente do mais recente para o mais antigo
             allFetched.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
             const seen = new Set();
@@ -447,7 +446,7 @@
                     if (!isNaN(dObj.getTime())) {
                         rowDate = formatLocalYMD(dObj);
                     } else {
-                        rowDate = (row.created_at || '').split('T')[0];
+                        rowDate = (row.created_at || '').split('T').at(0) || '';
                     }
                 }
                 if (startVal && rowDate < startVal) return false;
