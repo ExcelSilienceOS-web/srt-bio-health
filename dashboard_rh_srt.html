@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT-RH — Cockpit de People Analytics & SST</title>
-    <!-- Chart.js para Gráfico Temporal -->
+    <title>ExcelSilience SRT-RH — Hub de Gestão Psicossocial, People Analytics & Motor E.A.S.Y.</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
         :root {
             --bg: #0b0f19;
@@ -16,7 +13,7 @@
             --card-inner: #0d1527;
             --border: #2a364f;
             --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.3);
+            --accent-glow: rgba(56, 189, 248, 0.25);
             --text: #e2e8f0;
             --muted: #94a3b8;
             --green: #34d399;
@@ -26,194 +23,76 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        /* HEADER PRINCIPAL */
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 16px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 18px;
+            flex-wrap: wrap; gap: 14px;
         }
-
-        .title-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .title-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .company-badge {
-            background: rgba(56, 189, 248, 0.15);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            background: rgba(56, 189, 248, 0.14); color: var(--accent);
+            border: 1px solid var(--accent); padding: 6px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
         }
+        .title-group h1 { font-size: 19px; font-weight: 800; color: #fff; letter-spacing: 0.4px; }
+        .title-group p { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 600; }
 
-        .title-group h1 {
-            font-size: 20px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: 0.5px;
-        }
-
-        .title-group p {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 2px;
-            font-weight: 600;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .period-selector {
-            display: flex;
-            background: #0d1527;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 3px;
-            gap: 3px;
+            display: flex; background: var(--card-inner); border: 1px solid var(--border);
+            border-radius: 8px; padding: 3px; gap: 3px;
         }
-
         .period-btn {
-            background: transparent;
-            border: none;
-            color: var(--muted);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
+            background: transparent; border: none; color: var(--muted);
+            padding: 6px 11px; border-radius: 6px; font-size: 11px; font-weight: 800;
+            cursor: pointer; transition: 0.2s; text-transform: uppercase;
         }
-
-        .period-btn.active {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
+        .period-btn.active { background: var(--accent); color: #000; }
 
         .btn {
-            background: var(--card-inner);
-            color: #fff;
-            border: 1px solid var(--border);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            background: var(--card-inner); color: #fff; border: 1px solid var(--border);
+            padding: 8px 13px; border-radius: 8px; font-size: 11px; font-weight: 800;
+            cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
         }
+        .btn:hover:not(:disabled) { background: #1e293b; border-color: var(--accent); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-green { background: #059669; border-color: #10b981; }
+        .btn-green:hover:not(:disabled) { background: #10b981; }
+        .btn-accent { background: #0284c7; border-color: var(--accent); }
+        .btn-accent:hover:not(:disabled) { background: #0369a1; }
+        .btn-purple { background: #7e22ce; border-color: #a855f7; }
+        .btn-purple:hover:not(:disabled) { background: #9333ea; }
+        .btn-amber { background: #b45309; border-color: #f59e0b; }
+        .btn-red { background: #b91c1c; border-color: #ef4444; }
 
-        .btn:hover { background: #2d3d5a; border-color: var(--accent); }
-        .btn-green { background: #059669; color: #fff; border: none; }
-        .btn-green:hover { background: #10b981; }
-        .btn-accent { background: #0284c7; color: #fff; border-color: var(--accent); }
-        .btn-accent:hover { background: #0369a1; }
-        .btn-purple { background: #7e22ce; color: #fff; border: none; }
-        .btn-purple:hover { background: #9333ea; }
-
-        /* NAV TABS */
         .nav-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
+            display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;
+            border-bottom: 1px solid var(--border); padding-bottom: 10px;
         }
-
         .tab-btn {
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            background: var(--card); border: 1px solid var(--border); color: var(--muted);
+            padding: 9px 13px; border-radius: 10px; font-size: 11px; font-weight: 800;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
         }
-
         .tab-btn:hover { color: #fff; border-color: var(--accent); }
+        .tab-btn.active { background: #0284c7; color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
 
-        .tab-btn.active {
-            background: #0284c7;
-            color: #fff;
-            border-color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        /* TAB CONTENT SECTIONS */
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        /* CARDS GRID */
         .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 14px;
-            margin-bottom: 24px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px; margin-bottom: 20px;
         }
-
         .card-metric {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            text-align: center;
-            position: relative;
+            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+            padding: 15px; text-align: center;
         }
-
-        .card-metric .lbl {
-            font-size: 10px;
-            text-transform: uppercase;
-            color: var(--muted);
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-
-        .card-metric .val {
-            font-size: 26px;
-            font-weight: 800;
-        }
-
-        .card-metric .subtext {
-            font-size: 10px;
-            color: var(--muted);
-            margin-top: 4px;
-            font-weight: 600;
-        }
+        .card-metric .lbl { font-size: 10px; text-transform: uppercase; color: var(--muted); font-weight: 800; margin-bottom: 6px; }
+        .card-metric .val { font-size: 24px; font-weight: 800; }
+        .card-metric .subtext { font-size: 10px; color: var(--muted); margin-top: 4px; font-weight: 600; }
 
         .val-total { color: var(--accent); }
         .val-verde { color: var(--green); }
@@ -221,1198 +100,1955 @@
         .val-vermelho { color: var(--red); }
         .val-purple { color: var(--purple); }
 
-        /* PAINÉIS */
         .panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 18px; margin-bottom: 20px; overflow-x: auto;
         }
-
         .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
         }
+        .panel-title { font-size: 14px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .panel-subtitle { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; }
 
-        .panel-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .grid-two { display: grid; grid-template-columns: 1.45fr 1fr; gap: 18px; margin-bottom: 20px; }
+        .grid-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+        @media (max-width: 980px) { .grid-two, .grid-eq { grid-template-columns: 1fr; } }
 
-        .panel-subtitle {
-            font-size: 11px;
-            color: var(--muted);
-            font-weight: 600;
-        }
-
-        /* TABELAS */
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
-        th { padding: 10px; color: var(--accent); font-size: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: #0d1527; font-weight: 800; }
-        td { padding: 12px 10px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
+        th { padding: 10px; color: var(--accent); font-size: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--card-inner); font-weight: 800; }
+        td { padding: 11px 10px; border-bottom: 1px solid var(--border); color: #cbd5e1; vertical-align: middle; }
         tr:hover td { background: rgba(255,255,255,0.02); }
 
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 800;
-            display: inline-block;
+        .badge { padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; white-space: nowrap; }
+        .badge-verde { background: rgba(52, 211, 153, 0.14); color: var(--green); border: 1px solid var(--green); }
+        .badge-amarelo { background: rgba(251, 191, 36, 0.14); color: var(--yellow); border: 1px solid var(--yellow); }
+        .badge-roxo { background: rgba(192, 132, 252, 0.14); color: var(--purple); border: 1px solid var(--purple); }
+        .badge-vermelho { background: rgba(248, 113, 113, 0.14); color: var(--red); border: 1px solid var(--red); }
+        .badge-neutro { background: rgba(148, 163, 184, 0.12); color: var(--muted); border: 1px solid var(--border); }
+        .badge-cyan { background: rgba(56, 189, 248, 0.14); color: var(--accent); border: 1px solid var(--accent); }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 12px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+        .select-box, .input-box, textarea {
+            width: 100%; background: var(--card-inner); border: 1px solid var(--border);
+            color: #fff; padding: 9px 11px; border-radius: 8px; font-size: 12px; outline: none;
+        }
+        .select-box:focus, .input-box:focus, textarea:focus { border-color: var(--accent); }
+        textarea { resize: vertical; min-height: 76px; line-height: 1.45; }
+
+        .notice-box {
+            background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 10px; padding: 12px 14px; font-size: 11px; color: #cbd5e1; line-height: 1.5; margin-bottom: 14px;
+        }
+        .warn-box {
+            background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 10px; padding: 12px 14px; font-size: 11px; color: #fde68a; line-height: 1.5; margin-bottom: 14px;
         }
 
-        .badge-verde { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid var(--green); }
-        .badge-amarelo { background: rgba(251, 191, 36, 0.15); color: var(--yellow); border: 1px solid var(--yellow); }
-        .badge-roxo { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid var(--purple); }
-        .badge-vermelho { background: rgba(248, 113, 113, 0.15); color: var(--red); border: 1px solid var(--red); }
-
-        .grid-two {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-bottom: 24px;
+        .easy-card {
+            background: var(--card-inner); border: 1px solid var(--border); border-radius: 12px;
+            padding: 14px; margin-bottom: 10px;
         }
-
-        @media (max-width: 960px) {
-            .grid-two { grid-template-columns: 1fr; }
-        }
-
-        .select-box, .input-box {
-            background: #0d1527;
-            border: 1px solid var(--border);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            outline: none;
-        }
-
-        /* HEATMAP STYLES */
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: 1.5fr repeat(6, 1fr);
-            gap: 8px;
-            overflow-x: auto;
-        }
-        .heatmap-header-cell {
-            background: #0d1527;
-            border: 1px solid var(--border);
-            padding: 10px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--accent);
-            text-align: center;
-            text-transform: uppercase;
-        }
-        .heatmap-sector-title {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 800;
-            color: #fff;
-            display: flex;
-            align-items: center;
-        }
-        .heatmap-cell {
-            padding: 10px 6px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 11px;
-            font-weight: 800;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .cell-green { background: rgba(52, 211, 153, 0.2); border: 1px solid var(--green); color: var(--green); }
-        .cell-yellow { background: rgba(251, 191, 36, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
-        .cell-purple { background: rgba(192, 132, 252, 0.2); border: 1px solid var(--purple); color: var(--purple); }
-        .cell-red { background: rgba(248, 113, 113, 0.2); border: 1px solid var(--red); color: var(--red); }
-        .cell-empty { background: rgba(148, 163, 184, 0.1); border: 1px dashed var(--border); color: var(--muted); font-size: 10px; }
+        .easy-card h4 { font-size: 12px; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; }
+        .easy-card p { font-size: 12px; line-height: 1.55; color: #e2e8f0; white-space: pre-wrap; }
 
         .report-preview-box {
-            background: #090d16;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 18px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            color: #38bdf8;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            margin: 16px 0;
-            max-height: 420px;
-            overflow-y: auto;
+            background: #090d16; border: 1px solid var(--border); border-radius: 10px;
+            padding: 18px; font-family: 'Courier New', Courier, monospace; font-size: 11px;
+            color: #e2e8f0; line-height: 1.6; white-space: pre-wrap; margin: 12px 0;
+            max-height: 460px; overflow-y: auto;
         }
 
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .empty-row-text {
-            text-align: center;
-            padding: 30px;
-            color: var(--muted);
-            font-weight: 600;
-        }
-
+        .empty-row-text { text-align: center; padding: 26px; color: var(--muted); font-weight: 600; font-size: 12px; }
         .dept-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: #0d1527;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 6px;
-            font-size: 11px;
-            font-weight: 700;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px; background: var(--card-inner); border: 1px solid var(--border);
+            border-radius: 8px; margin-bottom: 6px; font-size: 12px; font-weight: 700;
         }
 
-        /* REGRA ISOLADA DE IMPRESSÃO LIMPA EM A4 SEM VAZAMENTO DA UI */
+        .heatmap-grid { display: grid; grid-template-columns: 1.5fr repeat(5, 1fr); gap: 8px; min-width: 620px; }
+        .heatmap-header-cell {
+            background: var(--card-inner); border: 1px solid var(--border); padding: 9px 6px;
+            border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--accent); text-align: center; text-transform: uppercase;
+        }
+        .heatmap-sector-title {
+            background: var(--card-inner); border: 1px solid var(--border); padding: 10px;
+            border-radius: 6px; font-size: 11px; font-weight: 800; color: #fff; display: flex; align-items: center;
+        }
+        .heatmap-cell {
+            padding: 10px 6px; border-radius: 6px; text-align: center; font-size: 11px; font-weight: 800;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .cell-green { background: rgba(52, 211, 153, 0.18); border: 1px solid var(--green); color: var(--green); }
+        .cell-yellow { background: rgba(251, 191, 36, 0.18); border: 1px solid var(--yellow); color: var(--yellow); }
+        .cell-purple { background: rgba(192, 132, 252, 0.18); border: 1px solid var(--purple); color: var(--purple); }
+        .cell-red { background: rgba(248, 113, 113, 0.18); border: 1px solid var(--red); color: var(--red); }
+        .cell-empty { background: rgba(148, 163, 184, 0.08); border: 1px dashed var(--border); color: var(--muted); font-size: 10px; }
+
         @media print {
-            body {
-                background: #ffffff !important;
-                color: #000000 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
-            .header, .nav-tabs, .period-selector, .filter-bar, .no-print, button, .btn, .cards-grid {
-                display: none !important;
-            }
-
-            .tab-content {
-                display: none !important;
-            }
-
-            #tab-laudos.tab-content.active {
-                display: block !important;
-            }
-
-            .panel {
-                border: none !important;
-                background: #ffffff !important;
-                color: #000000 !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
-            .grid-two {
-                display: block !important;
-            }
-
-            .grid-two > div:first-child {
-                display: none !important;
-            }
-
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .no-print, .header, .nav-tabs, .cards-grid, button, .btn { display: none !important; }
+            .tab-content { display: none !important; }
+            #tab-relatorios.tab-content.active { display: block !important; }
+            .panel { border: none !important; background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .grid-two { display: block !important; }
+            .grid-two > div:first-child { display: none !important; }
             .report-preview-box {
-                background: #ffffff !important;
-                color: #000000 !important;
-                border: 2px solid #000000 !important;
-                font-family: 'Courier New', Courier, monospace !important;
-                font-size: 11pt !important;
-                line-height: 1.5 !important;
-                white-space: pre-wrap !important;
-                max-height: none !important;
-                overflow: visible !important;
-                padding: 20px !important;
+                background: #fff !important; color: #000 !important; border: 1px solid #000 !important;
+                max-height: none !important; overflow: visible !important; font-size: 10.5pt !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER PRINCIPAL -->
     <div class="header no-print">
         <div class="title-group">
-            <span class="company-badge" id="companyBadgeLabel">SELECTA</span>
+            <span class="company-badge" id="companyBadgeLabel">EXCELSILIENCE</span>
             <div>
-                <h1>EXCELSILIENCE SRT-RH — COCKPIT DE PEOPLE ANALYTICS & SST</h1>
-                <p>Telemetria de Prontidão Biométrica, Matriz de Contágio C-Level & Compliance (NR-01, NR-17 e eSocial)</p>
+                <h1>EXCELSILIENCE SRT-RH — HUB DE GESTÃO PSICOSSOCIAL & PEOPLE ANALYTICS</h1>
+                <p>Telemetria Anônima (N ≥ 5), Comparativo 8h vs. 17h, Ouvidoria NR-05, Motor E.A.S.Y. (IA), Planos 5W2H & Impacto Financeiro</p>
             </div>
         </div>
-
         <div class="header-actions">
             <div class="period-selector">
-                <button class="period-btn" id="pBtnDay" onclick="setPeriod('DAY')">☀️ Dia</button>
-                <button class="period-btn active" id="pBtnWeek" onclick="setPeriod('WEEK')">📅 Semana</button>
-                <button class="period-btn" id="pBtnMonth" onclick="setPeriod('MONTH')">📊 Mês</button>
+                <button class="period-btn" id="pBtnDay" onclick="setPeriod('DAY')">☀️ 24h</button>
+                <button class="period-btn" id="pBtnWeek" onclick="setPeriod('WEEK')">📅 7 Dias</button>
+                <button class="period-btn active" id="pBtnMonth" onclick="setPeriod('MONTH')">📊 30 Dias</button>
             </div>
-
-            <button class="btn btn-green" onclick="abrirCentralLaudos('NR01')">📄 Laudo NR-01 (PGR)</button>
-            <button class="btn btn-accent" onclick="abrirCentralLaudos('NR17')">📋 Laudo NR-17 (AEP)</button>
-            <button class="btn btn-purple" onclick="abrirCentralLaudos('eSocial')">📊 eSocial (S-2240)</button>
-            <button class="btn" style="background:#0284c7; color:#fff;" onclick="fetchSupabaseData()">🔄 Atualizar Dados</button>
-            <button class="btn" style="background:#f59e0b; color:#000;" onclick="toggleDemoData()">⚡ Alternar Dados Demo</button>
+            <button class="btn btn-purple" onclick="goTab('motor-easy')">🧠 Motor E.A.S.Y. (IA)</button>
+            <button class="btn btn-green" onclick="goTab('relatorios')">📄 Relatórios Cruzados</button>
+            <button class="btn btn-accent" onclick="loadAllHubData()">🔄 Atualizar Tudo</button>
+            <button class="btn btn-amber" id="btnDemoSim" onclick="toggleLocalSimulation()">⚡ Simulação Demo Local</button>
         </div>
     </div>
 
-    <!-- NAVEGAÇÃO DE ABAS -->
     <div class="nav-tabs no-print">
-        <button class="tab-btn active" onclick="switchTab('visao-geral', this)">📊 1. Visão People Analytics & RH</button>
-        <button class="tab-btn" id="tabBtnIndividual" style="display: none;" onclick="switchTab('checkins-historico', this)">👤 2. Check-ins Individuais & Histórico</button>
-        <button class="tab-btn" onclick="switchTab('saude-ocupacional', this)">🩺 3. Saúde Ocupacional (Clinical Cockpit CFM)</button>
-        <button class="tab-btn" onclick="switchTab('mapa-calor', this)">🔥 4. Mapa de Calor & Acompanhamento Temporal</button>
-        <button class="tab-btn" onclick="switchTab('matriz-contagio', this)">👑 5. Matriz de Contágio C-Level (v5.7 Grou)</button>
-        <button class="tab-btn" onclick="switchTab('laudos', this)">📄 6. Central de Laudos & Compliance</button>
-        <button class="tab-btn" onclick="switchTab('gerenciador-setores', this)">⚙️ 7. Gerenciador de Setores & Links</button>
+        <button class="tab-btn active" data-tab="visao-geral" onclick="switchTab('visao-geral', this)">📊 1. Visão Setorial & 8h→17h</button>
+        <button class="tab-btn" id="tabBtnDemoIndividual" style="display:none;" data-tab="demo-individual" onclick="switchTab('demo-individual', this)">🧪 2. Teste Demo Individual (PIN)</button>
+        <button class="tab-btn" data-tab="tendencia-calor" onclick="switchTab('tendencia-calor', this)">📈 3. Tendência Temporal & Carga (N ≥ 5)</button>
+        <button class="tab-btn" data-tab="motor-easy" onclick="switchTab('motor-easy', this)">🧠 4. Hub Legal + Motor E.A.S.Y. (IA) + 5W2H</button>
+        <button class="tab-btn" data-tab="ouvidoria" onclick="switchTab('ouvidoria', this)">🛡️ 5. Ouvidoria NR-05 (Comitê)</button>
+        <button class="tab-btn" data-tab="impacto-roi" onclick="switchTab('impacto-roi', this)">💰 6. Histórico, Produtividade & ROI</button>
+        <button class="tab-btn" data-tab="relatorios" onclick="switchTab('relatorios', this)">📄 7. Relatórios Cruzados & Validação</button>
+        <button class="tab-btn" data-tab="contagio-clevel" onclick="switchTab('contagio-clevel', this)">👑 8. Matriz Contágio & 360°</button>
+        <button class="tab-btn" data-tab="config-setores" onclick="switchTab('config-setores', this)">⚙️ 9. Setores, Benefícios & Links</button>
     </div>
 
-    <!-- CARDS DE MÉTRICAS EXECUTIVAS -->
     <div class="cards-grid no-print">
         <div class="card-metric">
-            <div class="lbl">Vidas Monitoradas</div>
+            <div class="lbl">Check-ins no Período</div>
             <div class="val val-total" id="metricTotalCheckins">0</div>
-            <div class="subtext">Check-ins na janela de análise</div>
+            <div class="subtext">Apenas contagens agregadas</div>
         </div>
         <div class="card-metric">
-            <div class="lbl">Homeostase (Apto)</div>
+            <div class="lbl">🟢 Prontidão Preservada</div>
             <div class="val val-verde" id="metricVerde">0</div>
-            <div class="subtext">Sinal Verde (Prontidão Ideal)</div>
+            <div class="subtext">Em setores com quórum N ≥ 5</div>
         </div>
         <div class="card-metric">
-            <div class="lbl">Sobrecarga (Atenção)</div>
+            <div class="lbl">🟡 Sobrecarga / Atenção</div>
             <div class="val val-amarelo" id="metricAmarelo">0</div>
-            <div class="subtext">Sinal Amarelo (Pausa 15m)</div>
+            <div class="subtext">Em setores com quórum N ≥ 5</div>
         </div>
         <div class="card-metric">
-            <div class="lbl">Fadiga / Sono</div>
+            <div class="lbl">🟣 Fadiga / Exaustão</div>
             <div class="val val-purple" id="metricRoxo">0</div>
-            <div class="subtext">Sinal Roxo (Pausa 45m)</div>
+            <div class="subtext">Em setores com quórum N ≥ 5</div>
         </div>
         <div class="card-metric">
-            <div class="lbl">Alertas Críticos</div>
+            <div class="lbl">🔴 Alerta Crítico</div>
             <div class="val val-vermelho" id="metricVermelho">0</div>
-            <div class="subtext">Sinal Vermelho (Risco Severo)</div>
+            <div class="subtext">Em setores com quórum N ≥ 5</div>
+        </div>
+        <div class="card-metric">
+            <div class="lbl">💰 Economia Apurada</div>
+            <div class="val val-verde" id="metricEconomiaTop">R$ 0</div>
+            <div class="subtext" id="metricRoiSubTop">Aguardando fechamento mensal</div>
         </div>
     </div>
 
-    <!-- ABA 1: VISÃO PEOPLE ANALYTICS & RH -->
+    <!-- ABA 1: VISÃO SETORIAL, DELTA 8H->17H & FATORES NR-1 -->
     <div id="tab-visao-geral" class="tab-content active">
-        <div class="grid-two">
+        <div class="notice-box">
+            <b>🔒 Blindagem de Anonimato & Medição do Desgaste no Trabalho:</b> O servidor bloqueia leitura individual e libera dados do setor somente com <b>N ≥ 5</b>. O comparativo <b>Entrada (8h) vs. Saída (17h)</b> identifica se o desgaste foi gerado durante a jornada de trabalho ou se já chegou de fatores externos pré-jornada, cruzado com os <b>4 Fatores Organizacionais da NR-1</b>.
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Mapeamento Setorial & Fatores Organizacionais NR-1 (Trava N ≥ 5)</div>
+                    <div class="panel-subtitle">Consolidado por setor sem exposição de horário exato ou identidade</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setor / GHE</th>
+                        <th>Participações</th>
+                        <th>Taxa de Alerta</th>
+                        <th>Latência / VSI Válido</th>
+                        <th>Fatores NR-1 (1–5: Dem / Aut / Cla / Sup)</th>
+                        <th>Status Setorial</th>
+                    </tr>
+                </thead>
+                <tbody id="tblRhSectorsBody">
+                    <tr><td colspan="6" class="empty-row-text">Carregando setores agregados do Supabase...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Comparativo Intra-Jornada: Entrada (8h) vs. Saída (17h)</div>
+                    <div class="panel-subtitle">Diferencia desgaste gerado na rotina de trabalho de carga pré-jornada (quórum N ≥ 5 em cada janela)</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setor / Turno</th>
+                        <th>Amostra (8h / 17h)</th>
+                        <th>Alerta 8h → 17h</th>
+                        <th>Delta Alerta</th>
+                        <th>Delta Latência / VSI</th>
+                        <th>Classificação da Origem da Carga</th>
+                    </tr>
+                </thead>
+                <tbody id="tblDelta8h17hBody">
+                    <tr><td colspan="6" class="empty-row-text">Aguardando amostras nas janelas 8h e 17h...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA 2: MODO TESTE / DEMO INDIVIDUAL PROTEGIDO POR PIN (?master=true) -->
+    <div id="tab-demo-individual" class="tab-content">
+        <div class="warn-box">
+            <b>🧪 Ambiente Restrito de Demonstração ao Vivo:</b> Esta aba consulta exclusivamente registros marcados com <code>is_demo_test = true</code> (feitos via <code>index-rh.html?demo=true</code>) mediante PIN autorizado. Dados reais de colaboradores em produção nunca ficam visíveis individualmente aqui.
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Desbloquear Testes Individuais de Demonstração</div>
+                    <div class="panel-subtitle">Digite o PIN de demonstração para exibir os últimos check-ins de teste na apresentação</div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="password" class="input-box" id="inpDemoPin" placeholder="PIN Demo (ex: DEMO2026)" style="width:200px;">
+                    <button class="btn btn-accent" onclick="loadDemoIndividualCheckins()">🔓 Buscar Testes Demo</button>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID / Data</th>
+                        <th>Tag Sessão</th>
+                        <th>Setor / Janela</th>
+                        <th>Latência (ms)</th>
+                        <th>Erros / Lapsos</th>
+                        <th>Voz (VSI)</th>
+                        <th>Status</th>
+                        <th>Devolutiva Gerada</th>
+                    </tr>
+                </thead>
+                <tbody id="tblDemoIndividualBody">
+                    <tr><td colspan="8" class="empty-row-text">Informe o PIN acima e clique em "Buscar Testes Demo" para exibir os registros de teste.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA 3: TENDÊNCIA TEMPORAL & CARGA SETORIAL (N >= 5) -->
+    <div id="tab-tendencia-calor" class="tab-content">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">🔥 Painel Matricial de Carga Setorial (N ≥ 5)</div>
+                    <div class="panel-subtitle">Indicadores agregados por setor: Prontidão, Desgaste 17h e Fatores Organizacionais NR-1</div>
+                </div>
+            </div>
+            <div class="heatmap-grid" id="heatmapGridContainer">
+                <div class="heatmap-header-cell">Setor</div>
+                <div class="heatmap-header-cell">Prontidão Geral</div>
+                <div class="heatmap-header-cell">Carga 17h</div>
+                <div class="heatmap-header-cell">Demandas / Autonomia</div>
+                <div class="heatmap-header-cell">Clareza / Suporte</div>
+                <div class="heatmap-header-cell">Atenção Preventiva</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">📈 Evolução Diária de Latência & Taxa de Alertas (Somente dias com N ≥ 5)</div>
+                    <div class="panel-subtitle">Calculada no servidor pela função <code>get_rh_daily_trend</code></div>
+                </div>
+                <select class="select-box" id="selChartSector" style="width:220px;" onchange="loadDailyTrendChart()">
+                    <option value="ALL">🏢 Todos os Setores</option>
+                </select>
+            </div>
+            <div style="height:290px; position:relative;">
+                <canvas id="trendChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 4: HUB DOCUMENTAL + MOTOR E.A.S.Y. (GEMINI + LIVRO) + PLANOS 5W2H -->
+    <div id="tab-motor-easy" class="tab-content">
+        <div class="grid-eq">
             <div class="panel">
                 <div class="panel-header">
                     <div>
-                        <div class="panel-title">Mapeamento de Carga de Estresse por Setor (GHE — Trava N ≥ 5)</div>
-                        <div class="panel-subtitle">Auditoria de Riscos Psicossociais em Tempo Real</div>
+                        <div class="panel-title">📁 Hub de Documentos SST (NR-17, NR-01, NR-07)</div>
+                        <div class="panel-subtitle">Cadastre os resumos de AEP/AET, PGR e PCMSO Analítico para o Motor E.A.S.Y. cruzar</div>
                     </div>
-                    <span style="font-size:11px; color:var(--accent); font-weight:800;">🔒 Blindagem LGPD Ativa</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="docType">Tipo de Documento:</label>
+                        <select id="docType" class="select-box">
+                            <option value="AEP_NR17">AEP (NR-17)</option>
+                            <option value="AET_NR17">AET (NR-17)</option>
+                            <option value="PGR_NR01">PGR (NR-01)</option>
+                            <option value="PCMSO_ANALITICO_NR07">PCMSO Analítico (NR-07)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="docSector">Setor / GHE Alvo:</label>
+                        <input type="text" id="docSector" class="input-box" placeholder="Ex: Operações ou GERAL">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="docTitle">Título / Identificação do Documento:</label>
+                    <input type="text" id="docTitle" class="input-box" placeholder="Ex: PGR 2026 - Unidade Matriz">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="docOwner">Responsável Técnico:</label>
+                        <input type="text" id="docOwner" class="input-box" placeholder="Nome do profissional">
+                    </div>
+                    <div class="form-group">
+                        <label for="docRegistry">Registro Conselho (CRM/CREA/CRP):</label>
+                        <input type="text" id="docRegistry" class="input-box" placeholder="Ex: CRM-RJ 000000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="docSummary">Principais Riscos, CIDs/Afastamentos ou Apontamentos:</label>
+                    <textarea id="docSummary" placeholder="Resumo objetivo dos achados ergonômicos, psicossociais ou afastamentos do PCMSO..."></textarea>
+                </div>
+                <button class="btn btn-accent" onclick="saveComplianceDocument()">💾 Salvar Documento no Hub</button>
+
+                <div style="margin-top:16px;">
+                    <table>
+                        <thead>
+                            <tr><th>Tipo</th><th>Título / Setor</th><th>Resp. Técnico</th></tr>
+                        </thead>
+                        <tbody id="tblDocsBody">
+                            <tr><td colspan="3" class="empty-row-text">Nenhum documento externo cadastrado ainda.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">🧠 Motor E.A.S.Y. Dinâmico (Gemini + Livro Corporate OS)</div>
+                        <div class="panel-subtitle">Sem textos fixos: consulta o pacote vivo do banco + base do livro via Edge Function segura</div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="easyTargetSector">Setor para Análise:</label>
+                        <select id="easyTargetSector" class="select-box">
+                            <option value="">🏢 Toda a Empresa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="easyEdgeUrl">Endpoint Edge Function (Supabase Functions):</label>
+                        <input type="text" id="easyEdgeUrl" class="input-box" value="[suspicious link removed]">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+                    <button class="btn btn-purple" id="btnRunEasyAi" onclick="runEasyGeminiAnalysis()">✨ Gerar Análise E.A.S.Y. (Edge Gemini)</button>
+                    <button class="btn" onclick="copyEasyPromptBundle()">📋 Copiar Pacote + Prompt p/ Gemini</button>
+                    <button class="btn btn-green" onclick="openManualAiPaste()">📥 Importar JSON da IA</button>
+                </div>
+
+                <div id="easyManualPasteBox" style="display:none; margin-bottom:14px;">
+                    <label style="font-size:10px; color:var(--yellow); font-weight:800; display:block; margin-bottom:5px;">Cole abaixo o JSON retornado pelo Gemini:</label>
+                    <textarea id="txtManualAiJson" placeholder='{"examine":"...","adapt":"...","systematize":"...","yardstick":"...","actions_5w2h":[]}'></textarea>
+                    <button class="btn btn-green" style="margin-top:6px;" onclick="saveManualAiAnalysis()">Salvar Análise no Banco</button>
+                </div>
+
+                <div id="easyLatestOutput">
+                    <div class="empty-row-text">Clique em "Gerar Análise E.A.S.Y." ou copie o pacote completo para o Gemini cruzar telemetria, NR-1, ouvidoria, documentos e seu livro.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">📋 Planos de Ação 5W2H + Anuência do Gestor + Yardstick (30 Dias)</div>
+                    <div class="panel-subtitle">Planos de melhoria gerados pelo Motor E.A.S.Y. ou cadastrados pelo RH com assinatura do gestor da área</div>
+                </div>
+                <button class="btn btn-green" onclick="togglePlanForm()">+ Novo Plano 5W2H</button>
+            </div>
+
+            <div id="newPlanForm" style="display:none; background:var(--card-inner); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Setor / GHE:</label>
+                        <input type="text" id="p5Sector" class="input-box" placeholder="Ex: Operações">
+                    </div>
+                    <div class="form-group">
+                        <label>Origem:</label>
+                        <select id="p5Origin" class="select-box">
+                            <option value="MOTOR_EASY_IA">Motor E.A.S.Y. (IA)</option>
+                            <option value="TELEMETRIA_8H_17H">Telemetria 8h→17h</option>
+                            <option value="FATORES_ORG_NR01">Fatores Org. NR-1</option>
+                            <option value="DOC_NR17">AEP/AET NR-17</option>
+                            <option value="DOC_NR01">PGR NR-01</option>
+                            <option value="PCMSO_NR07">PCMSO NR-07</option>
+                            <option value="OUVIDORIA_NR05">Ouvidoria NR-05</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vetor E.A.S.Y. / C-I-R:</label>
+                        <select id="p5Factor" class="select-box">
+                            <option value="R">R — Resiliência / Carga</option>
+                            <option value="I">I — Intencionalidade / Clareza</option>
+                            <option value="C">C — Controle / Previsibilidade</option>
+                            <option value="SISTEMICO">Sistêmico</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nível de Risco:</label>
+                        <select id="p5Risk" class="select-box">
+                            <option value="MODERADO">Moderado</option>
+                            <option value="SUBSTANCIAL">Substancial</option>
+                            <option value="CRITICO">Crítico</option>
+                            <option value="TOLERAVEL">Tolerável</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>What (O que fazer):</label><input type="text" id="p5What" class="input-box" placeholder="Ex: Reduzir horas extras e redistribuir escala"></div>
+                    <div class="form-group"><label>Why (Causa-raiz):</label><input type="text" id="p5Why" class="input-box" placeholder="Ex: Delta 8h->17h +22pp e baixa autonomia"></div>
+                    <div class="form-group"><label>Who (Gestor Responsável):</label><input type="text" id="p5Who" class="input-box" placeholder="Nome do Gestor"></div>
+                    <div class="form-group"><label>When (Prazo):</label><input type="date" id="p5Due" class="input-box"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>How (Metodologia):</label><input type="text" id="p5How" class="input-box" placeholder="Como será executado"></div>
+                    <div class="form-group"><label>How Much (Descrição):</label><input type="text" id="p5CostText" class="input-box" value="Readequação de Rotina / Sem CapEx"></div>
+                    <div class="form-group"><label>Custo Estimado (R$):</label><input type="number" id="p5CostVal" class="input-box" value="0" step="0.01"></div>
+                </div>
+                <button class="btn btn-green" onclick="createActionPlan()">💾 Salvar Plano 5W2H</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setor / Vetor</th>
+                        <th>Ação (What) & Causa (Why)</th>
+                        <th>Responsável / Prazo</th>
+                        <th>Anuência do Gestor</th>
+                        <th>Yardstick (30d)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tblPlansBody">
+                    <tr><td colspan="6" class="empty-row-text">Nenhum plano 5W2H cadastrado ainda.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA 5: OUVIDORIA NR-05 & COMITÊ DE ÉTICA -->
+    <div id="tab-ouvidoria" class="tab-content">
+        <div class="grid-eq">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">📊 Resumo Agregado da Escuta Segura (NR-05 / Lei 14.457)</div>
+                        <div class="panel-subtitle">Contagem por setor e categoria sem exposição do relato sigiloso</div>
+                    </div>
                 </div>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Setor / Departamento</th>
-                            <th>Nº Check-ins</th>
-                            <th>Latência Média</th>
-                            <th>Status Prontidão</th>
-                            <th>Ação Recomendada (PDCA)</th>
-                        </tr>
+                        <tr><th>Setor</th><th>Categoria</th><th>Total</th><th>Em Aberto</th><th>Encerradas</th></tr>
                     </thead>
-                    <tbody id="tblRhSectorsBody">
-                        <tr><td colspan="5" class="empty-row-text">Aguardando primeiros check-ins da equipe... Cadastre os setores na Aba 7.</td></tr>
+                    <tbody id="tblWbSummaryBody">
+                        <tr><td colspan="5" class="empty-row-text">Nenhum registro recebido até o momento.</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="panel">
                 <div class="panel-header">
-                    <div class="panel-title">Métricas Customizadas do RH</div>
-                    <button class="btn btn-green" style="font-size:10px; padding:4px 8px;" onclick="adicionarMetricaCustomizada()">+ Adicionar</button>
+                    <div>
+                        <div class="panel-title">🔐 Área Restrita do Comitê de Ética / RH</div>
+                        <div class="panel-subtitle">Exige PIN do Comitê (padrão inicial: EXCELSILIENCE2026)</div>
+                    </div>
                 </div>
-                <div id="custom-container" style="display:flex; flex-direction:column; gap:10px;">
-                    <div class="card-metric">
-                        <div class="lbl">Turnover Voluntário Projetado</div>
-                        <div class="val val-verde" id="valCustomTurnover">1.8%</div>
-                        <div class="subtext">Dentro da meta anual</div>
-                    </div>
-                    <div class="card-metric">
-                        <div class="lbl">Horas Extras Acumuladas</div>
-                        <div class="val val-amarelo" id="valCustomHoras">12h / mês</div>
-                        <div class="subtext">Média por colaborador</div>
-                    </div>
+                <div style="display:flex; gap:8px; margin-bottom:14px;">
+                    <input type="password" id="inpCommitteePin" class="input-box" placeholder="Digite o PIN do Comitê">
+                    <button class="btn btn-purple" onclick="unlockCommitteeReports()">🔓 Acessar Relatos</button>
+                </div>
+                <div id="committeeReportsContainer">
+                    <div class="empty-row-text">Relatos sigilosos protegidos por PIN no servidor.</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ABA 2: CHECK-INS INDIVIDUAIS & HISTÓRICO -->
-    <div id="tab-checkins-historico" class="tab-content">
+    <!-- ABA 6: HISTÓRICO PASSADO VS ATUAL, ECONOMIA (X R$ / Y%) & DEFESAS TRABALHISTAS -->
+    <div id="tab-impacto-roi" class="tab-content">
+        <div class="cards-grid">
+            <div class="card-metric">
+                <div class="lbl">💰 Economia Total Consolidada (X)</div>
+                <div class="val val-verde" id="roiTotalSavings">R$ 0,00</div>
+                <div class="subtext">Ações operacionais + ganhos jurídicos reais</div>
+            </div>
+            <div class="card-metric">
+                <div class="lbl">📉 Redução sobre Custo Passado</div>
+                <div class="val val-total" id="roiCostReductionPct">-- %</div>
+                <div class="subtext">Comparado à linha de base passada</div>
+            </div>
+            <div class="card-metric">
+                <div class="lbl">📈 ROI sobre Ações (Y%)</div>
+                <div class="val val-verde" id="roiConsolidatedPct">-- %</div>
+                <div class="subtext" id="roiInvestmentLbl">Investimento informado: R$ 0,00</div>
+            </div>
+            <div class="card-metric">
+                <div class="lbl">🗓️ Dias Recuperados</div>
+                <div class="val val-total" id="roiSavedDays">0</div>
+                <div class="subtext">Redução de absenteísmo</div>
+            </div>
+            <div class="card-metric">
+                <div class="lbl">⚖️ Ganhos Autuações / Ações Estresse</div>
+                <div class="val val-purple" id="roiLegalGains">R$ 0,00</div>
+                <div class="subtext">Somente eventos reais contabilizados</div>
+            </div>
+        </div>
+
         <div class="panel">
             <div class="panel-header">
                 <div>
-                    <div class="panel-title">Histórico Geral de Check-ins de Telemetria</div>
-                    <div class="panel-subtitle">Registro cronológico de avaliações biométricas</div>
+                    <div class="panel-title">📊 Comparativo Número com Número: Histórico Passado vs. Fechamento Atual</div>
+                    <div class="panel-subtitle">Absenteísmo, afastamentos NR-7, horas extras, turnover, produtividade e prontidão preservada às 17h</div>
                 </div>
+                <button class="btn btn-green" onclick="toggleImpactForm()">+ Registrar Baseline / Fechamento</button>
             </div>
-            <div class="filter-bar">
-                <input type="text" class="input-box" id="srcIndividual" placeholder="🔍 Buscar por Setor ou Status..." onkeyup="filtrarCheckinsIndividuais()">
-                <select class="select-box" id="selIndSector" onchange="filtrarCheckinsIndividuais()">
-                    <option value="ALL">🏢 Todos os Setores</option>
-                </select>
-                <select class="select-box" id="selIndStatus" onchange="filtrarCheckinsIndividuais()">
-                    <option value="ALL">🎨 Todos os Status</option>
-                    <option value="GREEN">🟢 Verde (Homeostase)</option>
-                    <option value="YELLOW">🟡 Amarelo (Sobrecarga)</option>
-                    <option value="PURPLE">🟣 Roxo (Exaustão/Sono)</option>
-                    <option value="RED">🔴 Vermelho (Inaptidão Crítica)</option>
-                </select>
+
+            <div id="impactHistoryForm" style="display:none; background:var(--card-inner); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tipo de Registro:</label>
+                        <select id="impType" class="select-box">
+                            <option value="BASELINE_PASSADO">Linha de Base Passada (Antes do SRT)</option>
+                            <option value="FECHAMENTO_MENSAL">Fechamento Mensal (Pós-SRT)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Setor:</label><input type="text" id="impSector" class="input-box" placeholder="Ex: Operações"></div>
+                    <div class="form-group"><label>Mês de Referência (1º dia):</label><input type="date" id="impMonth" class="input-box"></div>
+                    <div class="form-group"><label>Headcount:</label><input type="number" id="impHeadcount" class="input-box" value="25"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Absenteísmo (%):</label><input type="number" id="impAbsPct" class="input-box" step="0.1" value="4.5"></div>
+                    <div class="form-group"><label>Dias Perdidos (no mês):</label><input type="number" id="impLostDays" class="input-box" value="22"></div>
+                    <div class="form-group"><label>Afastamentos CID-F/Ergo:</label><input type="number" id="impLeaves" class="input-box" value="2"></div>
+                    <div class="form-group"><label>Horas Extras Médias/Pessoa:</label><input type="number" id="impOvertime" class="input-box" step="0.1" value="18"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Turnover Voluntário (%):</label><input type="number" id="impTurnover" class="input-box" step="0.1" value="3.0"></div>
+                    <div class="form-group"><label>Índice Produtividade:</label><input type="number" id="impProdIdx" class="input-box" step="0.1" value="88"></div>
+                    <div class="form-group"><label>Custo Médio Hora Setor (R$):</label><input type="number" id="impHourCost" class="input-box" step="0.01" value="45"></div>
+                    <div class="form-group"><label>Custo Reposição Turnover (R$):</label><input type="number" id="impTurnCost" class="input-box" step="0.01" value="6500"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Investimento nas Ações (R$):</label><input type="number" id="impInvest" class="input-box" step="0.01" value="0"></div>
+                    <div class="form-group"><label>Ganho Produtividade Apurado (R$):</label><input type="number" id="impProdGainBrl" class="input-box" step="0.01" value="0"></div>
+                </div>
+                <button class="btn btn-green" onclick="saveImpactHistoryRecord()">💾 Salvar Registro Histórico</button>
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th>Data / Hora</th>
-                        <th>Empresa</th>
                         <th>Setor</th>
-                        <th>Latência (ms)</th>
-                        <th>Erros de Veto</th>
-                        <th>Score VSI</th>
-                        <th>Status Final</th>
+                        <th>Absenteísmo (Base → Atual)</th>
+                        <th>Dias Salvos / Afast.</th>
+                        <th>H. Extras & Turnover</th>
+                        <th>Produtividade / 17h Verde</th>
+                        <th>Economia Apurada (R$ / %)</th>
                     </tr>
                 </thead>
-                <tbody id="tblIndividualBody">
-                    <tr><td colspan="7" class="empty-row-text">Nenhum check-in registrado no sistema até o momento.</td></tr>
+                <tbody id="tblImpactCompBody">
+                    <tr><td colspan="6" class="empty-row-text">Cadastre a Linha de Base Passada e o Fechamento Mensal para comparar números reais.</td></tr>
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- ABA 3: SAÚDE OCUPACIONAL (CLINICAL COCKPIT CFM) -->
-    <div id="tab-saude-ocupacional" class="tab-content">
         <div class="panel">
             <div class="panel-header">
                 <div>
-                    <div class="panel-title">Triagem de Prontidão Ocupacional & Sobrecarga Fisiológica Auditada</div>
-                    <div class="panel-subtitle">Painel Ocupacional Preventivo sob Diretrizes de People Analytics Anônimo (N ≥ 5) e Delta Setorial</div>
+                    <div class="panel-title">⚖️ Registro de Ganhos em Autuações Fiscais & Ações Trabalhistas (Estresse / Sobrecarga)</div>
+                    <div class="panel-subtitle">Multas hipotéticas não entram na conta. Contabilize aqui apenas quando houver caso real defendido com evidências da plataforma.</div>
                 </div>
-                <span style="font-size:11px; color:var(--purple); font-weight:800;">🔐 Sigilo Médico CFM Preservado</span>
+                <button class="btn btn-purple" onclick="toggleLegalForm()">+ Registrar Autuação / Ação</button>
             </div>
+
+            <div id="legalDefenseForm" style="display:none; background:var(--card-inner); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tipo de Evento:</label>
+                        <select id="legType" class="select-box">
+                            <option value="ACAO_TRABALHISTA_ESTRESSE">Ação Trabalhista (Pedido por Estresse/Sobrecarga)</option>
+                            <option value="AUTUACAO_FISCALIZACAO">Autuação / Fiscalização (MTE)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Nº Processo / Auto:</label><input type="text" id="legRef" class="input-box" placeholder="Ex: 0001234-55.2026.5.01"></div>
+                    <div class="form-group"><label>Setor Relacionado:</label><input type="text" id="legSector" class="input-box" placeholder="Ex: Operações"></div>
+                    <div class="form-group">
+                        <label>Status Contábil:</label>
+                        <select id="legStatus" class="select-box">
+                            <option value="GANHO_CONTABILIZADO">Ganho Contabilizado</option>
+                            <option value="ENCERRADO">Encerrado</option>
+                            <option value="EM_ANDAMENTO">Em Andamento (não soma ainda)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Valor Pedido / Autuado (R$):</label><input type="number" id="legClaimed" class="input-box" step="0.01" value="80000"></div>
+                    <div class="form-group"><label>Valor Efetivamente Pago (R$):</label><input type="number" id="legSettled" class="input-box" step="0.01" value="0"></div>
+                    <div class="form-group"><label>Evidências Utilizadas:</label><input type="text" id="legEvidence" class="input-box" placeholder="Ex: Delta 8h/17h + Plano 5W2H + Ouvidoria"></div>
+                </div>
+                <div class="form-group"><label>Resumo do Caso:</label><input type="text" id="legSummary" class="input-box" placeholder="Ex: Pedido de dano moral por estresse julgado improcedente"></div>
+                <button class="btn btn-purple" onclick="saveLegalDefenseGain()">💾 Salvar Registro Jurídico</button>
+            </div>
+
             <table>
                 <thead>
-                    <tr>
-                        <th>Prontuário ID</th>
-                        <th>Setor / Departamento</th>
-                        <th>Tensão Vocal (Score VSI)</th>
-                        <th>Status Autonômico</th>
-                        <th>Indicador de Risco Operacional</th>
-                        <th>Conduta Preventiva Prescrita</th>
-                    </tr>
+                    <tr><th>Tipo</th><th>Referência / Setor</th><th>Pedido vs. Pago</th><th>Ganho Real</th><th>Evidências & Status</th></tr>
                 </thead>
-                <tbody id="tblMedicoBody">
-                    <!-- Preenchido dinamicamente via JS baseado nos check-ins do Supabase -->
+                <tbody id="tblLegalGainsBody">
+                    <tr><td colspan="5" class="empty-row-text">Nenhuma autuação ou ação trabalhista registrada.</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ABA 4: MAPA DE CALOR & ACOMPANHAMENTO TEMPORAL -->
-    <div id="tab-mapa-calor" class="tab-content">
+    <!-- ABA 7: CENTRAL DE RELATÓRIOS CRUZADOS & VALIDAÇÃO DE PROFISSIONAL REGULARIZADO -->
+    <div id="tab-relatorios" class="tab-content">
         <div class="panel">
             <div class="panel-header">
                 <div>
-                    <div class="panel-title">🔥 Mapa de Calor de Carga Cognitiva por Setor (GHE)</div>
-                    <div class="panel-subtitle">Visualização matricial de estresse e fadiga por dia da semana (Trava LGPD N ≥ 5)</div>
-                </div>
-                <span style="font-size:11px; color:var(--accent); font-weight:800;">Atalhos: 🟢 ≥4.2 | 🟡 3.0-4.1 | 🟣 2.0-2.9 | 🔴 &lt;2.0</span>
-            </div>
-
-            <div class="heatmap-grid" id="heatmapGridContainer">
-                <div class="heatmap-header-cell">Setor / Dia</div>
-                <div class="heatmap-header-cell">Seg</div>
-                <div class="heatmap-header-cell">Ter</div>
-                <div class="heatmap-header-cell">Qua</div>
-                <div class="heatmap-header-cell">Qui</div>
-                <div class="heatmap-header-cell">Sex</div>
-                <div class="heatmap-header-cell">Sáb/Dom</div>
-
-                <!-- Células geradas dinamicamente via JS -->
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header">
-                <div>
-                    <div class="panel-title">📈 Gráfico de Acompanhamento Temporal da Prontidão</div>
-                    <div class="panel-subtitle">Linha de tendência da latência de resposta ao longo dos check-ins (ms)</div>
-                </div>
-                <select class="select-box" id="selChartSector" onchange="renderTemporalChart()">
-                    <option value="ALL">🏢 Todos os Setores</option>
-                </select>
-            </div>
-            <div style="height: 280px; position: relative;">
-                <canvas id="trendChartCanvas"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- ABA 5: MATRIZ DE CONTÁGIO C-LEVEL -->
-    <div id="tab-matriz-contagio" class="tab-content">
-        <div class="panel">
-            <div class="panel-header">
-                <div>
-                    <div class="panel-title">👑 Matriz de Contágio Emocional & Carga C-Level (v5.7 Grou)</div>
-                    <div class="panel-subtitle">Auditoria de contágio de sobrecarga das lideranças sobre os times operacionais</div>
+                    <div class="panel-title">📄 Central de Relatórios Cruzados & Validação Técnica Obrigatória</div>
+                    <div class="panel-subtitle">Todos os relatórios cruzam as informações incluídas na plataforma + Motor E.A.S.Y. e exigem avaliação de profissional regularizado</div>
                 </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Diretoria / C-Level</th>
-                        <th>Score Executivo (ES-Crise)</th>
-                        <th>Setor Liderado</th>
-                        <th>Exaustão do Setor (%)</th>
-                        <th>Diagnóstico de Governança</th>
-                        <th>Plano de Intervenção DHO Grou</th>
-                    </tr>
-                </thead>
-                <tbody id="tblContagioBody">
-                    <tr><td>Presidência / CEO</td><td>4.85 (Soberano)</td><td>Diretoria Executiva</td><td>5%</td><td><span class="badge badge-verde">Homeostase Perfeita</span></td><td>Manter cadência de decisões estratégicas</td></tr>
-                    <tr><td>Diretoria Operacional</td><td>3.40 (Sobrecarga)</td><td>Operações / Logística</td><td>22%</td><td><span class="badge badge-amarelo">Fadiga Transmitida</span></td><td>Pausa tática pré-comitê + Rotação de turno</td></tr>
-                    <tr><td>Diretoria Comercial</td><td>2.95 (Exaustão)</td><td>Comercial / Vendas</td><td>34%</td><td><span class="badge badge-vermelho">Contágio Crítico</span></td><td>Intervenção de DHO + Ajuste de metas</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
-    <!-- ABA 6: CENTRAL DE LAUDOS & COMPLIANCE -->
-    <div id="tab-laudos" class="tab-content">
-        <div class="panel">
-            <div class="panel-header">
-                <div>
-                    <div class="panel-title">📄 Central de Laudos Regulatórios & Compliance SST</div>
-                    <div class="panel-subtitle">Emissão de documentos auditáveis para entrega ao Ministério do Trabalho e eSocial</div>
-                </div>
+            <div class="warn-box">
+                <b>⚠️ Regra Obrigatória de Governança:</b> Este relatório é gerado pelo cruzamento de todos os dados da plataforma (Telemetria N ≥ 5, Delta 8h→17h, Fatores NR-1, Ouvidoria NR-05, Documentos Externos, Histórico e Motor E.A.S.Y.) para subsidiar informações e ações de melhoria. <b>Ele não substitui avaliação técnica nem possui validade legal sem a revisão e assinatura de profissional legalmente regularizado no conselho competente (CRM, CRP, CREA ou habilitação SST).</b>
             </div>
 
             <div class="grid-two">
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    <button class="btn btn-green" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR01')">📄 Visualizar Laudo NR-01 (PGR - Riscos Psicossociais)</button>
-                    <button class="btn btn-accent" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('NR17')">📋 Visualizar Laudo NR-17 (AEP - Carga Cognitiva)</button>
-                    <button class="btn btn-purple" style="padding:14px; justify-content:center;" onclick="gerarPreviewLaudo('eSocial')">📊 Visualizar Evento eSocial S-2240 (Fatores de Risco)</button>
-                    <button class="btn" style="padding:14px; justify-content:center; background:#334155;" onclick="gerarPreviewLaudo('GrouMaster')">🏢 Visualizar Relatório Mestre DHO</button>
+                <div>
+                    <div class="form-group">
+                        <label for="repType">Tipo de Relatório de Apoio:</label>
+                        <select id="repType" class="select-box">
+                            <option value="RELATORIO_APOIO_NR01_PGR">Relatório de Apoio ao PGR (NR-01)</option>
+                            <option value="RELATORIO_APOIO_NR17_AEP">Relatório de Apoio à AEP / AET (NR-17)</option>
+                            <option value="RELATORIO_APOIO_PCMSO_NR07">Relatório de Apoio ao PCMSO (NR-07)</option>
+                            <option value="RELATORIO_EXECUTIVO_EASY">Relatório Executivo Consolidado E.A.S.Y.</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="repSector">Setor-Alvo (ou GERAL):</label>
+                        <input type="text" id="repSector" class="input-box" value="GERAL">
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+                        <button class="btn btn-accent" onclick="generateAndSaveCrossReport()">🔄 Gerar Relatório Cruzado (Salvar p/ Avaliação)</button>
+                        <button class="btn btn-green no-print" onclick="printCleanReport()">🖨️ Imprimir / Exportar PDF Limpo (A4)</button>
+                    </div>
+
+                    <div style="background:var(--card-inner); border:1px solid var(--border); border-radius:12px; padding:14px;">
+                        <div style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:10px;">✍️ Validação do Profissional Regularizado</div>
+                        <div class="form-group"><label>Selecionar Relatório Gerado:</label><select id="selReportToValidate" class="select-box" onchange="loadSelectedReportIntoPreview()"></select></div>
+                        <div class="form-group"><label>Nome do Profissional Habilitado:</label><input type="text" id="profName" class="input-box" placeholder="Ex: Dra. Ana Souza"></div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Conselho:</label><input type="text" id="profCouncil" class="input-box" placeholder="CRM / CRP / CREA"></div>
+                            <div class="form-group"><label>Registro:</label><input type="text" id="profReg" class="input-box" placeholder="Ex: CRP 05/12345"></div>
+                        </div>
+                        <div class="form-group"><label>Parecer Técnico do Profissional:</label><textarea id="profNotes" placeholder="Considerações, ajustes ou aprovação técnica do profissional regularizado..."></textarea></div>
+                        <button class="btn btn-purple" onclick="validateReportByProfessional()">✅ Registrar Avaliação Profissional</button>
+                    </div>
                 </div>
 
                 <div>
-                    <div style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:8px;" class="no-print">Pré-visualização do Documento Auditável:</div>
-                    <div class="report-preview-box" id="laudoPreviewText">Selecione um laudo à esquerda para visualizar o texto consolidado e realizar o download em PDF limpo...</div>
-                    <button class="btn btn-green no-print" style="width:100%; justify-content:center; padding:12px; margin-top:10px;" onclick="baixarLaudoPDF()">⬇️ Baixar Laudo Oficial em PDF Auditável (Limpo)</button>
+                    <div style="font-size:12px; font-weight:800; color:var(--accent);" class="no-print">Pré-visualização do Documento Cruzado:</div>
+                    <div class="report-preview-box" id="reportPreviewBox">Clique em "Gerar Relatório Cruzado" para consolidar todas as fontes da plataforma + Motor E.A.S.Y.</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ABA 7: GERENCIADOR DE SETORES & LINKS -->
-    <div id="tab-gerenciador-setores" class="tab-content">
-        <div class="grid-two">
+    <!-- ABA 8: MATRIZ DE CONTÁGIO C-LEVEL & ES-CRISIS 360° -->
+    <div id="tab-contagio-clevel" class="tab-content">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">👑 Matriz de Contágio & Auditoria 360° da Liderança (C, I, R + Projeto Aristóteles)</div>
+                    <div class="panel-subtitle">Cruza ciclos 360° do ES-CRISIS com o desgaste real 8h→17h do setor gerenciado (<code>((C+I+R)+MIN)/4</code>)</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ciclo / Liderança</th>
+                        <th>Setor Gerenciado</th>
+                        <th>C / I / R (360°) & ES-Crisis</th>
+                        <th>Projeto Aristóteles (Seg. Psic. / Conf. / Imp.)</th>
+                        <th>Desgaste Real 17h da Área</th>
+                        <th>Detector de Contradições</th>
+                    </tr>
+                </thead>
+                <tbody id="tblEsCrisis360Body">
+                    <tr><td colspan="6" class="empty-row-text">Nenhum ciclo 360° de liderança registrado ainda.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA 9: GERENCIADOR DE SETORES, BENEFÍCIOS & LINKS -->
+    <div id="tab-config-setores" class="tab-content">
+        <div class="grid-eq">
             <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">🏢 Cadastro de Setores / Departamentos (GHE)</div>
+                <div class="panel-header"><div class="panel-title">🏢 Cadastro de Setores & Gerador de Links</div></div>
+                <div style="display:flex; gap:8px; margin-bottom:12px;">
+                    <input type="text" class="input-box" id="inpNovoSetor" placeholder="Novo setor (ex: Logística, Comercial)">
+                    <button class="btn btn-accent" onclick="cadastrarNovoSetor()">+ Adicionar</button>
                 </div>
-                <div style="display:flex; gap:10px; margin-bottom:16px;">
-                    <input type="text" class="input-box" id="inpNovoSetor" placeholder="Nome do novo setor (ex: Consultoria, RH, Vendas)" style="flex:1;">
-                    <button class="btn btn-accent" onclick="cadastrarNovoSetor()">+ Cadastrar</button>
-                </div>
-                <div id="setores-lista-cadastrados">
-                    <!-- Gerado dinamicamente -->
-                </div>
+                <div id="setores-lista-cadastrados" style="margin-bottom:16px;"></div>
+                <div style="font-size:11px; color:var(--accent); font-weight:800; margin-bottom:8px;">Links Parametrizados (Produção e Modo Demo):</div>
+                <div id="link-generator-list" style="max-height:260px; overflow-y:auto;"></div>
             </div>
 
             <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">🔗 Central de Links Parametrizados por Setor</div>
+                <div class="panel-header"><div class="panel-title">🎁 Ponte Bem-Estar ↔ Benefícios Corporativos (Adesão N ≥ 5)</div></div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Nome do Benefício:</label><input type="text" id="benName" class="input-box" placeholder="Ex: Apoio Psicológico EAP"></div>
+                    <div class="form-group"><label>Fornecedor:</label><input type="text" id="benProvider" class="input-box" placeholder="Ex: Vittude / Wellhub"></div>
+                    <div class="form-group">
+                        <label>Categoria:</label>
+                        <select id="benCat" class="select-box">
+                            <option value="SAUDE_MENTAL_EAP">Saúde Mental / EAP</option>
+                            <option value="SONO_RECUPERACAO">Sono & Recuperação</option>
+                            <option value="ATIVIDADE_FISICA">Atividade Física</option>
+                            <option value="TELEMEDICINA">Telemedicina</option>
+                            <option value="FLEXIBILIDADE_PAUSAS">Flexibilidade & Pausas</option>
+                            <option value="OUTRO">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Link de Acesso:</label><input type="text" id="benUrl" class="input-box" placeholder="https://..."></div>
                 </div>
-                <p style="font-size:11px; color:var(--muted); margin-bottom:12px;">Gere e copie links parametrizados para envio no WhatsApp, Slack ou e-mail:</p>
-                <div id="link-generator-list" style="max-height: 280px; overflow-y: auto;">
-                    <!-- Preenchido via JavaScript -->
-                </div>
+                <div class="form-group"><label>Descrição Confidencial p/ Colaborador:</label><input type="text" id="benDesc" class="input-box" placeholder="Como o colaborador acessa com sigilo..."></div>
+                <button class="btn btn-green" style="margin-bottom:14px;" onclick="saveCompanyBenefit()">+ Cadastrar Benefício</button>
+
+                <table>
+                    <thead><tr><th>Benefício</th><th>Setor</th><th>Acessos Anônimos (30d)</th><th>8h / 17h</th></tr></thead>
+                    <tbody id="tblBenefitsAdoptionBody">
+                        <tr><td colspan="4" class="empty-row-text">Carregando adesão anônima aos benefícios...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT DE INTELIGÊNCIA & INTEGRAÇÃO SUPABASE -->
     <script>
-        // CONFIGURAÇÕES GERAIS & SUPABASE
         const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
         const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentCompany = (urlParams.get('company') || 'TODAS').toUpperCase();
+        const sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-        // ESTADO GLOBAL DE DADOS
-        let currentPeriod = 'WEEK';
-        let rawCheckinsData = [];
-        let setoresCadastrados = ["TI", "Operações / Logística", "Comercial / Vendas", "Consultoria / DHO", "Recursos Humanos"];
-        let isDemoMode = false;
+        const urlParams = new URLSearchParams(window.location.search);
+        const rawCompanyParam = (urlParams.get('company') || 'ALL').toUpperCase().trim();
+        const currentCompany = (rawCompanyParam === 'TODAS' || rawCompanyParam === '') ? 'ALL' : rawCompanyParam;
+        const effectiveWriteCompany = currentCompany === 'ALL' ? 'EXCELSILIENCE' : currentCompany;
+        const isMasterMode = (urlParams.get('master') === 'true' || urlParams.get('admin') === 'true' || urlParams.get('key') === 'master');
+
+        let currentPeriodDays = 30;
+        let isLocalSimMode = false;
         let trendChartInstance = null;
 
-        function normalizarNomeSetor(secRaw) {
-            if (!secRaw) return "TI";
-            let s = secRaw.toString().trim();
-            let sUpper = s.toUpperCase();
-            if (sUpper === "TI" || sUpper.includes("TECNOLOGIA") || sUpper.includes("INFORMÁTICA") || sUpper.includes("INFORMATICA") || sUpper.includes("DEPT TI")) {
-                return "TI";
-            }
-            if (sUpper.includes("OPERAÇ") || sUpper.includes("LOGÍSTICA") || sUpper.includes("LOGISTICA")) {
-                return "Operações / Logística";
-            }
-            if (sUpper.includes("COMERCIAL") || sUpper.includes("VENDAS")) {
-                return "Comercial / Vendas";
-            }
-            if (sUpper.includes("CONSULTORIA") || sUpper.includes("DHO")) {
-                return "Consultoria / DHO";
-            }
-            if (sUpper.includes("RECURSOS HUMANOS") || sUpper.includes("RH")) {
-                return "Recursos Humanos";
-            }
-            return s;
+        let setoresCadastrados = ["TI", "Operações", "Vendas", "Financeiro", "RH", "Atendimento", "Produção"];
+        let overviewRows = [];
+        let deltaRows = [];
+        let trendRows = [];
+        let docsRows = [];
+        let plansRows = [];
+        let wbSummaryRows = [];
+        let impactRows = [];
+        let companyRoiSummary = null;
+        let legalGainsRows = [];
+        let reportsRows = [];
+        let esCrisis360Rows = [];
+        let benefitsAdoptionRows = [];
+        let latestEasyAnalysis = null;
+
+        function escapeHtml(str) {
+            return String(str === null || str === undefined ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
+        function fmtMoney(v) {
+            const n = Number(v || 0);
+            return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
 
-
-        const isMasterMode = (urlParams.get('master') === 'true' || urlParams.get('admin') === 'true' || urlParams.get('key') === 'master');
         window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const storedSectors = JSON.parse(localStorage.getItem('srt_rh_custom_sectors') || 'null');
+                if (Array.isArray(storedSectors) && storedSectors.length > 0) {
+                    setoresCadastrados = storedSectors;
+                }
+            } catch (e) {}
+
             if (isMasterMode) {
-                const btnInd = document.getElementById('tabBtnIndividual');
-                if (btnInd) btnInd.style.display = 'inline-block';
+                document.getElementById('tabBtnDemoIndividual').style.display = 'flex';
             }
 
-            document.getElementById('companyBadgeLabel').innerText = (currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany) ? 'EXCELSILIENCE' : currentCompany;
+            document.getElementById('companyBadgeLabel').innerText = currentCompany === 'ALL' ? 'EXCELSILIENCE (TODAS)' : currentCompany;
+            const dueDefault = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+            const monthDefault = new Date().toISOString().slice(0, 7) + '-01';
+            if (document.getElementById('p5Due')) document.getElementById('p5Due').value = dueDefault;
+            if (document.getElementById('impMonth')) document.getElementById('impMonth').value = monthDefault;
+
             initSetoresEGenerators();
-            fetchSupabaseData(); // Carrega automaticamente os dados reais do Supabase na inicialização
+            loadAllHubData();
         });
 
         function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.nav-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
+            document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
             const target = document.getElementById('tab-' + tabId);
             if (target) target.classList.add('active');
-
-            if (tabId === 'mapa-calor') {
-                setTimeout(() => { renderTemporalChart(); }, 100);
+            if (tabId === 'tendencia-calor') {
+                setTimeout(() => renderTrendChart(), 100);
             }
+        }
+
+        function goTab(tabId) {
+            const btn = document.querySelector(`.nav-tabs .tab-btn[data-tab="${tabId}"]`);
+            switchTab(tabId, btn);
         }
 
         function setPeriod(p) {
-            currentPeriod = p;
             document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-            if (p === 'DAY') document.getElementById('pBtnDay').classList.add('active');
-            if (p === 'WEEK') document.getElementById('pBtnWeek').classList.add('active');
-            if (p === 'MONTH') document.getElementById('pBtnMonth').classList.add('active');
-
-            renderDashboard();
+            if (p === 'DAY') { currentPeriodDays = 1; document.getElementById('pBtnDay').classList.add('active'); }
+            else if (p === 'WEEK') { currentPeriodDays = 7; document.getElementById('pBtnWeek').classList.add('active'); }
+            else { currentPeriodDays = 30; document.getElementById('pBtnMonth').classList.add('active'); }
+            loadAllHubData();
         }
 
-        function toggleDemoData() {
-            isDemoMode = !isDemoMode;
-            carregarDadosDemonstracao();
-        }
-
-        function carregarDadosDemonstracao() {
-            const agora = new Date();
-            const setores = setoresCadastrados;
-            const statuses = ["GREEN", "GREEN", "GREEN", "YELLOW", "PURPLE", "RED"];
-            rawCheckinsData = [];
-
-            for (let i = 0; i < 28; i++) {
-                const setor = setores[i % setores.length];
-                const status = statuses[Math.floor(Math.random() * statuses.length)];
-                const dataCheckin = new Date(agora.getTime() - (i % 7) * 86400000 - Math.random() * 3600000 * 5);
-
-                let latencia = status === 'GREEN' ? 450 + Math.floor(Math.random() * 100) :
-                               status === 'YELLOW' ? 680 + Math.floor(Math.random() * 80) :
-                               status === 'PURPLE' ? 790 + Math.floor(Math.random() * 90) : 920 + Math.floor(Math.random() * 150);
-
-                let vsi = status === 'GREEN' ? 1.80 : status === 'YELLOW' ? 2.80 : status === 'PURPLE' ? 3.80 : 4.60;
-                let rmssd = status === 'GREEN' ? 58 : status === 'YELLOW' ? 32 : status === 'PURPLE' ? 24 : 18;
-
-                rawCheckinsData.push({
-                    id: 1000 + i,
-                    company: currentCompany,
-                    sector: setor,
-                    latency_ms: latencia,
-                    veto_errors: status === 'RED' ? 2 : (status === 'YELLOW' || status === 'PURPLE') ? 1 : 0,
-                    vsi_score: vsi,
-                    rmssd: rmssd,
-                    status: status,
-                    created_at: dataCheckin.toISOString()
-                });
+        function consolidateRoiRows(rows) {
+            if (!Array.isArray(rows) || rows.length === 0) return null;
+            if (rows.length === 1) return rows[0];
+            const agg = rows.reduce((acc, r) => {
+                acc.economia_total_empresa_brl += Number(r.economia_total_empresa_brl || 0);
+                acc.investimento_total_acoes_brl += Number(r.investimento_total_acoes_brl || 0);
+                acc.total_saved_workdays += Number(r.total_saved_workdays || 0);
+                acc.ganho_real_autuacoes_brl += Number(r.ganho_real_autuacoes_brl || 0);
+                acc.ganho_real_acoes_trabalhistas_brl += Number(r.ganho_real_acoes_trabalhistas_brl || 0);
+                return acc;
+            }, {
+                economia_total_empresa_brl: 0,
+                investimento_total_acoes_brl: 0,
+                total_saved_workdays: 0,
+                ganho_real_autuacoes_brl: 0,
+                ganho_real_acoes_trabalhistas_brl: 0,
+                reducao_custo_operacional_pct: null,
+                roi_consolidado_pct: null
+            });
+            if (agg.investimento_total_acoes_brl > 0) {
+                agg.roi_consolidado_pct = Number((((agg.economia_total_empresa_brl - agg.investimento_total_acoes_brl) / agg.investimento_total_acoes_brl) * 100).toFixed(1));
             }
-
-            // Ordena os dados de demonstração cronologicamente (mais recente primeiro)
-            rawCheckinsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-            renderDashboard();
+            return agg;
         }
 
-                async function fetchSupabaseData() {
-            try {
-                let h = {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_KEY
-                };
-
-                // Busca dados das tabelas do Supabase
-                const tables = [
-                { name: 'srt_rh_checkins', url: `${SUPABASE_URL}/rest/v1/srt_rh_checkins?select=*&order=created_at.desc` },
-                { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc` },
-                { name: 'es_crisis_backup_checkins', url: `${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins?select=*&order=created_at.desc` }
-            ];
-
-                const results = await Promise.allSettled(tables.map(t => fetch(t.url, { headers: h }).then(r => r.ok ? r.json().then(d => ({ table: t.name, data: d })) : { table: t.name, data: [] })));
-                let allFetched = [];
-
-                for (const resObj of results) {
-                    if (resObj.status === 'fulfilled' && resObj.value && Array.isArray(resObj.value.data)) {
-                        const tableName = resObj.value.table;
-                        resObj.value.data.forEach(item => {
-                            if (item.company === 'ES_CRISIS_EXEC' || (item.action && item.action.includes('[ES-CRISE C-SUITE]'))) return;
-                        allFetched.push({ ...item, _tableName: tableName });
-                        });
-                    }
-                }
-
-                if (allFetched.length > 0) {
-                    rawCheckinsData = [];
-                    // Ordena por data decrescente para priorizar os mais recentes
-                    allFetched.sort((a, b) => new Date(b.created_at || Date.now()) - new Date(a.created_at || Date.now()));
-
-                    allFetched.forEach((item, idx) => {
-                        // 1. Filtros de Módulo e Exclusão (Ignora C-Suite e Motoristas de Frota)
-                        if (item._tableName === 'es_crisis_backup_checkins' && item.module_type !== 'SRT_RH') return;
-
-                        let rawRole = (item.role || item.cargo || '').toString().toLowerCase();
-                        let isMobilityDriver = rawRole.includes('motorista') || rawRole.includes('condutor') || rawRole.includes('cnh') || rawRole.includes('operador de empilhadeira');
-                        if (item._tableName === 'srt_checkins' && isMobilityDriver) return;
-
-                        let sec = item.sector || item.department || item.setor || item.ghe || item.dept || 'TI';
-                        let normSector = normalizarNomeSetor(sec);
-                        let lat = Number(item.latency_ms || item.reaction_time_ms || item.latency || item.reaction_time || 450);
-                        let errs = Number(item.veto_errors !== undefined ? item.veto_errors : (item.errors || 0));
-                        let vsiVal = Number(item.vsi_score || item.vsi || item.vsi_val || 0.37);
-                        let rawDt = item.created_at || new Date().toISOString();
-                        let dtObj = new Date(rawDt);
-                        if (isNaN(dtObj.getTime())) dtObj = new Date();
-
-                        // 2. Trava de Deduplicação em Janela de Tempo (120 segundos / 2 minutos)
-                        // Descarta registros idênticos gravados em tabelas espelho com timestamp próximo
-                        let isDuplicate = false;
-                        const itemTime = dtObj.getTime();
-
-                        for (let i = 0; i < rawCheckinsData.length; i++) {
-                            const exist = rawCheckinsData[i];
-                            const existTime = new Date(exist.created_at).getTime();
-                            if (exist.sector === normSector &&
-                                Math.abs(exist.latency_ms - lat) < 1.0 &&
-                                Math.abs(exist.vsi_score - vsiVal) < 0.05 &&
-                                exist.veto_errors === errs) {
-                                if (Math.abs(itemTime - existTime) < 120000) {
-                                    isDuplicate = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (isDuplicate) return;
-
-                        let rawEmp = item.company || item.empresa || item.company_id || item.organization;
-                        let emp = (rawEmp && rawEmp.toString().trim() !== 'null' && rawEmp.toString().trim() !== '' && rawEmp.toString().trim() !== 'undefined') ? rawEmp.toString().toUpperCase().trim() : 'EXCELSILIENCE';
-                        let rmssdVal = item.rmssd || item.vfc || item.hrv_rmssd || item.hrv || 42;
-                        let st = (item.status || 'GREEN').toString().toUpperCase();
-
-                        if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO') || st.includes('EXAUSTÃO')) st = 'PURPLE';
-                        else if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('VETO')) st = 'RED';
-                        else if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO')) st = 'YELLOW';
-                        else st = 'GREEN';
-
-                        if (!setoresCadastrados.includes(normSector)) {
-                            setoresCadastrados.push(normSector);
-                        }
-
-                        rawCheckinsData.push({
-                            id: item.id || (2000 + idx),
-                            company: emp,
-                            sector: normSector,
-                            latency_ms: Number(lat),
-                            veto_errors: Number(errs),
-                            vsi_score: Number(vsiVal),
-                            rmssd: Number(rmssdVal),
-                            status: st,
-                            created_at: dtObj.toISOString(),
-                            sourceTable: item._tableName
-                        });
-                    });
-
-                    rawCheckinsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                } else {
-                    carregarDadosDemonstracao();
-                    return;
-                }
-            } catch (err) {
-                console.warn('Erro ao conectar com Supabase:', err);
-                carregarDadosDemonstracao();
+        async function loadAllHubData() {
+            if (isLocalSimMode) {
+                renderSimulatedPreview();
+                return;
+            }
+            if (!sbClient) {
+                alert("Cliente Supabase não carregou. Verifique a conexão.");
                 return;
             }
 
-            renderDashboard();
-        }
+            try {
+                const [
+                    resOver, resDelta, resTrend, resDocs, resPlans, resWb,
+                    resImp, resRoi, resLeg, resRep, res360, resBen, resAi
+                ] = await Promise.all([
+                    sbClient.rpc('get_rh_sector_overview', { p_company: currentCompany, p_days: currentPeriodDays }),
+                    sbClient.rpc('get_rh_delta_8h_17h', { p_company: currentCompany, p_days: currentPeriodDays }),
+                    sbClient.rpc('get_rh_daily_trend', { p_company: currentCompany, p_sector: 'ALL', p_days: currentPeriodDays }),
+                    filterCompanyQuery(sbClient.from('rh_compliance_documents').select('*').order('created_at', { ascending: false })),
+                    filterCompanyQuery(sbClient.from('easy_action_plans').select('*').order('created_at', { ascending: false })),
+                    sbClient.rpc('get_whistleblower_sector_summary', { p_company: currentCompany }),
+                    filterCompanyQuery(sbClient.from('vw_rh_impact_comparison').select('*')),
+                    filterCompanyQuery(sbClient.from('vw_rh_company_roi_summary').select('*')),
+                    filterCompanyQuery(sbClient.from('rh_legal_defense_gains').select('*').order('event_date', { ascending: false })),
+                    filterCompanyQuery(sbClient.from('rh_generated_reports').select('*').order('created_at', { ascending: false })),
+                    sbClient.rpc('get_es_crisis_360_audit', { p_company: currentCompany }),
+                    sbClient.rpc('get_rh_benefits_adoption', { p_company: currentCompany, p_days: currentPeriodDays }),
+                    filterCompanyQuery(sbClient.from('easy_ai_analyses').select('*').order('created_at', { ascending: false }).limit(1))
+                ]);
 
-        function renderDashboard() {
-            filtrarDadosPorPeriodo();
-            renderMetricsCards();
-            renderRhSectorsTable();
-            renderIndividualTable();
-            renderSaudeOcupacionalTable();
-            renderHeatmapGrid();
-            renderTemporalChart();
-            gerarPreviewLaudo('NR01');
-        }
+                overviewRows = Array.isArray(resOver.data) ? resOver.data : [];
+                deltaRows = Array.isArray(resDelta.data) ? resDelta.data : [];
+                trendRows = Array.isArray(resTrend.data) ? resTrend.data : [];
+                docsRows = Array.isArray(resDocs.data) ? resDocs.data : [];
+                plansRows = Array.isArray(resPlans.data) ? resPlans.data : [];
+                wbSummaryRows = Array.isArray(resWb.data) ? resWb.data : [];
+                impactRows = Array.isArray(resImp.data) ? resImp.data : [];
+                companyRoiSummary = consolidateRoiRows(resRoi.data);
+                legalGainsRows = Array.isArray(resLeg.data) ? resLeg.data : [];
+                reportsRows = Array.isArray(resRep.data) ? resRep.data : [];
+                esCrisis360Rows = Array.isArray(res360.data) ? res360.data : [];
+                benefitsAdoptionRows = Array.isArray(resBen.data) ? resBen.data : [];
+                latestEasyAnalysis = (Array.isArray(resAi.data) && resAi.data.length > 0) ? resAi.data[0] : null;
 
-        let filteredData = [];
-        function filtrarDadosPorPeriodo() {
-            const agora = new Date();
-            filteredData = rawCheckinsData.filter(item => {
-                // Filtro Rígido de RH: Exclui estritamente motoristas/condutores de frota do Mobility
-                const nameStr = (item.name || item.driver_name || '').toString();
-                const roleStr = (item.role || item.cargo || '').toString();
-                if (roleStr.includes('Motorista') || roleStr.includes('Condutor') || item.photo_url || item.photo) {
-                    return false;
-                }
-
-                // Filtro Rígido de Empresa (Company)
-                if (currentCompany !== 'TODAS' && currentCompany !== 'ALL' && currentCompany !== '') {
-                    const itemCompany = (item.company || '').toString().toUpperCase().trim();
-                    const targetCompany = currentCompany.toUpperCase().trim();
-
-                    // Se o filtro for GROU, aceita registros com GROU ou corporativos vinculados
-                    if (targetCompany === 'EXCELSILIENCE' || targetCompany === 'GROU') {
-                        if (!itemCompany.includes('EXCELSILIENCE') && !itemCompany.includes('GROU') && itemCompany !== 'CORPORATIVO ANÔNIMO (RH)' && itemCompany !== 'SRT_RH' && itemCompany !== '') {
-                            return false;
-                        }
-                    } else {
-                        if (itemCompany !== targetCompany && !itemCompany.includes(targetCompany) && !targetCompany.includes(itemCompany)) {
-                            return false;
-                        }
+                overviewRows.forEach(r => {
+                    if (r.sector && !setoresCadastrados.includes(r.sector)) {
+                        setoresCadastrados.push(r.sector);
                     }
+                });
+                initSetoresEGenerators();
+                renderAllSections();
+            } catch (err) {
+                console.error("Erro ao carregar Hub:", err);
+            }
+        }
+
+        function filterCompanyQuery(query) {
+            if (currentCompany !== 'ALL') {
+                return query.eq('company', currentCompany);
+            }
+            return query;
+        }
+
+        function renderAllSections() {
+            renderTopMetrics();
+            renderSectorOverviewTable();
+            renderDelta8h17hTable();
+            renderHeatmapMatrix();
+            renderTrendChart();
+            renderDocsTable();
+            renderLatestEasyAnalysis();
+            renderPlansTable();
+            renderWhistleSummaryTable();
+            renderRoiAndImpactSection();
+            renderLegalGainsTable();
+            renderReportsDropdown();
+            renderEsCrisis360Table();
+            renderBenefitsAdoptionTable();
+        }
+
+        function renderTopMetrics() {
+            let total = 0, g = 0, y = 0, p = 0, r = 0;
+            overviewRows.forEach(row => {
+                total += Number(row.total_checkins || 0);
+                if (row.quorum_lgpd_ok) {
+                    g += Number(row.cnt_green || 0);
+                    y += Number(row.cnt_yellow || 0);
+                    p += Number(row.cnt_purple || 0);
+                    r += Number(row.cnt_red || 0);
                 }
-
-                const d = new Date(item.created_at);
-                if (isNaN(d.getTime())) return true;
-                const diffDias = (agora - d) / (1000 * 3600 * 24);
-                if (currentPeriod === 'DAY') return diffDias <= 1.5;
-                if (currentPeriod === 'WEEK') return diffDias <= 7.5;
-                if (currentPeriod === 'MONTH') return diffDias <= 30.5;
-                return true;
             });
-            filteredData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            document.getElementById('metricTotalCheckins').innerText = total;
+            document.getElementById('metricVerde').innerText = g;
+            document.getElementById('metricAmarelo').innerText = y;
+            document.getElementById('metricRoxo').innerText = p;
+            document.getElementById('metricVermelho').innerText = r;
+
+            if (companyRoiSummary) {
+                document.getElementById('metricEconomiaTop').innerText = fmtMoney(companyRoiSummary.economia_total_empresa_brl);
+                document.getElementById('metricRoiSubTop').innerText = companyRoiSummary.roi_consolidado_pct !== null
+                    ? `ROI consolidado: ${companyRoiSummary.roi_consolidado_pct}%`
+                    : `Redução custo op.: ${companyRoiSummary.reducao_custo_operacional_pct ?? '--'}%`;
+            } else {
+                document.getElementById('metricEconomiaTop').innerText = "R$ 0,00";
+                document.getElementById('metricRoiSubTop').innerText = "Aguardando histórico na Aba 6";
+            }
         }
 
-        function renderMetricsCards() {
-            document.getElementById('metricTotalCheckins').innerText = filteredData.length;
-            document.getElementById('metricVerde').innerText = filteredData.filter(d => d.status === 'GREEN').length;
-            document.getElementById('metricAmarelo').innerText = filteredData.filter(d => d.status === 'YELLOW').length;
-            document.getElementById('metricRoxo').innerText = filteredData.filter(d => d.status === 'PURPLE').length;
-            document.getElementById('metricVermelho').innerText = filteredData.filter(d => d.status === 'RED').length;
-        }
-
-        function renderRhSectorsTable() {
+        function renderSectorOverviewTable() {
             const tbody = document.getElementById('tblRhSectorsBody');
             tbody.innerHTML = '';
-
-            const setoresMap = {};
-            setoresCadastrados.forEach(s => { setoresMap[s] = []; });
-
-            filteredData.forEach(d => {
-                if (!setoresMap[d.sector]) setoresMap[d.sector] = [];
-                setoresMap[d.sector].push(d);
-            });
-
-            let hasRows = false;
-            Object.keys(setoresMap).forEach(setor => {
-                const list = setoresMap[setor];
-                const count = list.length;
-                hasRows = true;
-
-                if (count < 5) {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${setor}</strong></td>
-                            <td><span class="badge" style="background:#334155; color:#94a3b8;">${count} check-ins</span></td>
-                            <td>—</td>
-                            <td><span class="badge" style="background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid #fbbf24;">🔒 Coleta N &lt; 5</span></td>
-                            <td>Aguardando quórum de 5 colaboradores para liberar gráfico setorial.</td>
-                        </tr>
-                    `;
-                } else {
-                    const avgLat = Math.round(list.reduce((acc, c) => acc + c.latency_ms, 0) / count);
-                    const redCount = list.filter(c => c.status === 'RED').length;
-                    const yellowCount = list.filter(c => c.status === 'YELLOW' || c.status === 'PURPLE').length;
-
-                    let statusBadge = `<span class="badge badge-verde">🟢 Homeostase</span>`;
-                    let acaoPdca = `Manter acompanhamento diário de 30s.`;
-
-                    if (redCount > 0) {
-                        statusBadge = `<span class="badge badge-vermelho">🔴 Risco Crítico</span>`;
-                        acaoPdca = `Intervenção imediata de DHO + Ajuste de carga horária.`;
-                    } else if (yellowCount > 2) {
-                        statusBadge = `<span class="badge badge-amarelo">🟡 Sobrecarga Moderada</span>`;
-                        acaoPdca = `Promover pausa tática de 15min + Hidratação no turno.`;
-                    }
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${setor}</strong></td>
-                            <td><span class="badge badge-verde">${count} check-ins</span></td>
-                            <td>${avgLat} ms</td>
-                            <td>${statusBadge}</td>
-                            <td>${acaoPdca}</td>
-                        </tr>
-                    `;
-                }
-            });
-
-            if (!hasRows) {
-                tbody.innerHTML = `<tr><td colspan="5" class="empty-row-text">Nenhum setor cadastrado.</td></tr>`;
-            }
-        }
-
-        function renderIndividualTable() {
-            const tbody = document.getElementById('tblIndividualBody');
-            const srcText = document.getElementById('srcIndividual').value.toLowerCase();
-            const selSector = document.getElementById('selIndSector').value;
-            const selStatus = document.getElementById('selIndStatus').value;
-
-            tbody.innerHTML = '';
-
-            const listFiltered = filteredData.filter(d => {
-                const matchSrc = d.sector.toLowerCase().includes(srcText) || d.status.toLowerCase().includes(srcText);
-                const matchSector = selSector === 'ALL' || d.sector === selSector;
-                const matchStatus = selStatus === 'ALL' || d.status === selStatus;
-                return matchSrc && matchSector && matchStatus;
-            });
-
-            if (listFiltered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-row-text">Nenhum check-in encontrado com os filtros selecionados.</td></tr>`;
+            if (overviewRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row-text">Ainda não há check-ins registrados nesta empresa/período.</td></tr>';
                 return;
             }
+            overviewRows.forEach(row => {
+                if (!row.quorum_lgpd_ok) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${escapeHtml(row.sector)}</b><br><small style="color:var(--muted);">${escapeHtml(row.company)}</small></td>
+                            <td><span class="badge badge-neutro">${row.total_checkins} check-ins</span></td>
+                            <td>—</td><td>—</td><td>—</td>
+                            <td><span class="badge badge-amarelo">🔒 Bloqueado LGPD (N &lt; 5)</span></td>
+                        </tr>`;
+                    return;
+                }
+                const pct = Number(row.pct_alerta_total || 0);
+                let badge = '<span class="badge badge-verde">🟢 Equilibrado</span>';
+                if (pct >= 35 || Number(row.cnt_red || 0) > 0) badge = '<span class="badge badge-vermelho">🔴 Atenção Crítica</span>';
+                else if (pct >= 20) badge = '<span class="badge badge-amarelo">🟡 Sobrecarga Moderada</span>';
 
-            listFiltered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            listFiltered.forEach(d => {
-                const dt = new Date(d.created_at);
-                const dtFmt = `${dt.toLocaleDateString('pt-BR')} ${dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'})}`;
+                const nr1Txt = `D:${row.avg_org_demands ?? '-'} | A:${row.avg_org_autonomy ?? '-'} | C:${row.avg_org_clarity ?? '-'} | S:${row.avg_org_support ?? '-'}`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${escapeHtml(row.sector)}</b><br><small style="color:var(--muted);">${escapeHtml(row.company)}</small></td>
+                        <td><span class="badge badge-verde">${row.total_checkins} (N≥5 OK)</span></td>
+                        <td><b>${pct}%</b><br><small>G:${row.cnt_green} Y:${row.cnt_yellow} P:${row.cnt_purple} R:${row.cnt_red}</small></td>
+                        <td>${row.avg_latency_ms ?? '-'} ms<br><small>VSI válido: ${row.avg_vsi_valid ?? '-'}</small></td>
+                        <td><span style="font-size:11px;">${nr1Txt}</span></td>
+                        <td>${badge}</td>
+                    </tr>`;
+            });
+        }
 
-                let statusBadge = `<span class="badge badge-verde">🟢 Verde (Homeostase)</span>`;
-                if (d.status === 'YELLOW') statusBadge = `<span class="badge badge-amarelo">🟡 Amarelo (Sobrecarga)</span>`;
-                if (d.status === 'PURPLE') statusBadge = `<span class="badge badge-roxo">🟣 Roxo (Fadiga/Sono)</span>`;
-                if (d.status === 'RED') statusBadge = `<span class="badge badge-vermelho">🔴 Vermelho (Inaptidão)</span>`;
+        function renderDelta8h17hTable() {
+            const tbody = document.getElementById('tblDelta8h17hBody');
+            tbody.innerHTML = '';
+            if (deltaRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row-text">Ainda não há registros suficientes nas janelas Entrada 8h e Saída 17h.</td></tr>';
+                return;
+            }
+            deltaRows.forEach(row => {
+                if (!row.quorum_lgpd_ok) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${escapeHtml(row.sector)}</b> (${escapeHtml(row.shift_name)})</td>
+                            <td>8h: ${row.n_8h} | 17h: ${row.n_17h}</td>
+                            <td>—</td><td>—</td><td>—</td>
+                            <td><span class="badge badge-neutro">🔒 Aguardando N≥5 em 8h e 17h</span></td>
+                        </tr>`;
+                    return;
+                }
+                let clsBadge = 'badge-verde';
+                if (row.classificacao_origem_carga === 'DESGASTE_GERADO_NO_TRABALHO' || row.classificacao_origem_carga === 'SOBRECARGA_COMPOSTA') clsBadge = 'badge-vermelho';
+                else if (row.classificacao_origem_carga === 'CARGA_PRE_JORNADA_EXTERNA' || row.classificacao_origem_carga === 'OSCILACAO_MODERADA') clsBadge = 'badge-amarelo';
 
                 tbody.innerHTML += `
                     <tr>
-                        <td>${dtFmt}</td>
-                        <td><strong>${d.company}</strong></td>
-                        <td>${d.sector}</td>
-                        <td>${d.latency_ms} ms</td>
-                        <td>${d.veto_errors}</td>
-                        <td>${d.vsi_score}</td>
-                        <td>${statusBadge}</td>
-                    </tr>
-                `;
+                        <td><b>${escapeHtml(row.sector)}</b><br><small>${escapeHtml(row.shift_name)}</small></td>
+                        <td>8h: ${row.n_8h} | 17h: ${row.n_17h}</td>
+                        <td>${row.pct_alerta_8h}% → <b>${row.pct_alerta_17h}%</b></td>
+                        <td><b>${row.delta_alerta_pp > 0 ? '+' : ''}${row.delta_alerta_pp} p.p.</b></td>
+                        <td>${row.delta_latency_ms ?? 0} ms | VSI: ${row.delta_vsi ?? '-'}</td>
+                        <td><span class="badge ${clsBadge}">${escapeHtml(row.classificacao_origem_carga)}</span></td>
+                    </tr>`;
             });
         }
 
-        function filtrarCheckinsIndividuais() {
-            renderIndividualTable();
+        async function loadDemoIndividualCheckins() {
+            const pin = document.getElementById('inpDemoPin').value.trim();
+            const tbody = document.getElementById('tblDemoIndividualBody');
+            if (!pin) { alert("Informe o PIN de demonstração."); return; }
+
+            const { data, error } = await sbClient.rpc('get_rh_demo_individual_checkins', {
+                p_company: currentCompany,
+                p_pin: pin,
+                p_limit: 50
+            });
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-row-text" style="color:var(--red);">Erro: ${escapeHtml(error.message)}</td></tr>`;
+                return;
+            }
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-row-text">Nenhum teste demo encontrado. Use index-rh.html?demo=true para gerar um teste demonstrativo.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            data.forEach(d => {
+                let badge = 'badge-verde';
+                if (d.status === 'YELLOW') badge = 'badge-amarelo';
+                else if (d.status === 'PURPLE') badge = 'badge-roxo';
+                else if (d.status === 'RED') badge = 'badge-vermelho';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${d.id} • ${d.checkin_date}</td>
+                        <td><small>${escapeHtml(d.demo_session_tag || 'DEMO')}</small></td>
+                        <td><b>${escapeHtml(d.sector)}</b><br><small>${escapeHtml(d.shift_window)}</small></td>
+                        <td>${d.reaction_time_ms ?? '-'} ms</td>
+                        <td>Veto: ${d.veto_errors ?? 0} | Lapsos: ${d.green_lapses ?? 0}</td>
+                        <td>${d.audio_quality_ok ? d.vsi_score : 'Sem áudio'}</td>
+                        <td><span class="badge ${badge}">${escapeHtml(d.status)}</span></td>
+                        <td style="font-size:11px;">${escapeHtml(d.action || '')}</td>
+                    </tr>`;
+            });
         }
 
-        function renderSaudeOcupacionalTable() {
-            const tbody = document.getElementById('tblMedicoBody');
-            tbody.innerHTML = '';
+        function renderHeatmapMatrix() {
+            const c = document.getElementById('heatmapGridContainer');
+            c.innerHTML = `
+                <div class="heatmap-header-cell">Setor</div>
+                <div class="heatmap-header-cell">Prontidão Geral</div>
+                <div class="heatmap-header-cell">Carga 17h</div>
+                <div class="heatmap-header-cell">Demandas / Autonomia</div>
+                <div class="heatmap-header-cell">Clareza / Suporte</div>
+                <div class="heatmap-header-cell">Atenção Preventiva</div>`;
 
-            if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="empty-row-text">Nenhum registro clínico de prontidão no período selecionado.</td></tr>`;
+            if (overviewRows.length === 0) {
+                c.innerHTML += '<div class="heatmap-sector-title">Sem dados</div><div class="heatmap-cell cell-empty" style="grid-column:span 5;">Aguardando quórum N ≥ 5</div>';
                 return;
             }
 
-            filteredData.slice(0, 15).forEach((d, idx) => {
-                const prtId = `PRT-${9000 + d.id}`;
-                const vsiFmt = `${(d.vsi_score || 1.80).toFixed(2)}`;
-
-                let statusAutonomico = `<span class="badge badge-verde">Homeostase Preservada</span>`;
-                let riscoOp = `Baixo`;
-                let conduta = `Liberado Turno Normal`;
-
-                if (d.status === 'YELLOW') {
-                    statusAutonomico = `<span class="badge badge-amarelo">Sobrecarga Moderada</span>`;
-                    riscoOp = `Médio`;
-                    conduta = `Pausa tática de 15 min + Hidratação`;
-                } else if (d.status === 'PURPLE') {
-                    statusAutonomico = `<span class="badge badge-roxo">Tensão Laríngea / Fadiga</span>`;
-                    riscoOp = `Médio / Alto`;
-                    conduta = `Ajuste de jornada + Pausa de tela (45m)`;
-                } else if (d.status === 'RED') {
-                    statusAutonomico = `<span class="badge badge-vermelho">Disfunção Autonômica Crítica</span>`;
-                    riscoOp = `Alto / Crítico`;
-                    conduta = `Veto Operacional + Avaliação presencial SESMT`;
+            overviewRows.forEach(r => {
+                c.innerHTML += `<div class="heatmap-sector-title">${escapeHtml(r.sector)}</div>`;
+                if (!r.quorum_lgpd_ok) {
+                    c.innerHTML += `<div class="heatmap-cell cell-empty" style="grid-column:span 5;">🔒 Coleta em andamento (${r.total_checkins}/5 respostas mínimas)</div>`;
+                    return;
                 }
+                const pct = Number(r.pct_alerta_total || 0);
+                const cls = pct >= 35 ? 'cell-red' : (pct >= 20 ? 'cell-yellow' : 'cell-green');
+                const dRow = deltaRows.find(d => d.sector === r.sector && d.quorum_lgpd_ok);
+                const c17 = dRow ? `${dRow.pct_alerta_17h}%` : 'N<5';
+                const cls17 = dRow ? (dRow.pct_alerta_17h >= 35 ? 'cell-red' : dRow.pct_alerta_17h >= 20 ? 'cell-yellow' : 'cell-green') : 'cell-empty';
+                const nr1a = (r.avg_org_demands && r.avg_org_autonomy) ? ((Number(r.avg_org_demands) + Number(r.avg_org_autonomy)) / 2).toFixed(1) : '-';
+                const nr1b = (r.avg_org_clarity && r.avg_org_support) ? ((Number(r.avg_org_clarity) + Number(r.avg_org_support)) / 2).toFixed(1) : '-';
+                const clsN1a = nr1a === '-' ? 'cell-empty' : (Number(nr1a) < 2.8 ? 'cell-red' : Number(nr1a) < 3.6 ? 'cell-yellow' : 'cell-green');
+                const clsN1b = nr1b === '-' ? 'cell-empty' : (Number(nr1b) < 2.8 ? 'cell-red' : Number(nr1b) < 3.6 ? 'cell-yellow' : 'cell-green');
+                const prevText = pct >= 35 ? 'Prioridade 1' : pct >= 20 ? 'Acompanhar' : 'Rotina';
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${prtId}</strong></td>
-                        <td>${d.sector}</td>
-                        <td><strong style="color:var(--accent);">${vsiFmt}</strong></td>
-                        <td>${statusAutonomico}</td>
-                        <td><strong>${riscoOp}</strong></td>
-                        <td>${conduta}</td>
-                    </tr>
-                `;
+                c.innerHTML += `
+                    <div class="heatmap-cell ${cls}">${(100 - pct).toFixed(0)}% Verde</div>
+                    <div class="heatmap-cell ${cls17}">${c17}</div>
+                    <div class="heatmap-cell ${clsN1a}">${nr1a} / 5.0</div>
+                    <div class="heatmap-cell ${clsN1b}">${nr1b} / 5.0</div>
+                    <div class="heatmap-cell ${cls}">${prevText}</div>`;
             });
         }
 
-        function renderHeatmapGrid() {
-            const container = document.getElementById('heatmapGridContainer');
-
-            container.innerHTML = `
-                <div class="heatmap-header-cell">Setor / Dia</div>
-                <div class="heatmap-header-cell">Seg</div>
-                <div class="heatmap-header-cell">Ter</div>
-                <div class="heatmap-header-cell">Qua</div>
-                <div class="heatmap-header-cell">Qui</div>
-                <div class="heatmap-header-cell">Sex</div>
-                <div class="heatmap-header-cell">Sáb/Dom</div>
-            `;
-
-            const setoresMap = {};
-            setoresCadastrados.forEach(s => {
-                setoresMap[s] = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
-            });
-
-            filteredData.forEach(d => {
-                const day = new Date(d.created_at).getDay();
-                const dayKey = (day === 0 || day === 6) ? 6 : day;
-                if (!setoresMap[d.sector]) {
-                    setoresMap[d.sector] = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
-                }
-                setoresMap[d.sector][dayKey].push(d);
-            });
-
-            Object.keys(setoresMap).forEach(setor => {
-                container.innerHTML += `<div class="heatmap-sector-title">${setor}</div>`;
-
-                for (let day = 1; day <= 6; day++) {
-                    const list = setoresMap[setor][day];
-                    const count = list.length;
-
-                    if (count === 0) {
-                        container.innerHTML += `<div class="heatmap-cell cell-empty">—</div>`;
-                    } else {
-                        const avgScore = (list.reduce((acc, c) => {
-                            let score = c.status === 'GREEN' ? 4.8 : c.status === 'YELLOW' ? 3.8 : c.status === 'PURPLE' ? 2.8 : 1.5;
-                            return acc + score;
-                        }, 0) / count).toFixed(1);
-
-                        let cellClass = 'cell-green';
-                        if (avgScore < 2.0) cellClass = 'cell-red';
-                        else if (avgScore < 3.0) cellClass = 'cell-purple';
-                        else if (avgScore < 4.2) cellClass = 'cell-yellow';
-
-                        container.innerHTML += `<div class="heatmap-cell ${cellClass}">${avgScore}</div>`;
-                    }
-                }
-            });
+        async function loadDailyTrendChart() {
+            if (!sbClient || isLocalSimMode) { renderTrendChart(); return; }
+            const sec = document.getElementById('selChartSector').value || 'ALL';
+            const { data } = await sbClient.rpc('get_rh_daily_trend', { p_company: currentCompany, p_sector: sec, p_days: currentPeriodDays });
+            trendRows = Array.isArray(data) ? data : [];
+            renderTrendChart();
         }
 
-        function renderTemporalChart() {
+        function renderTrendChart() {
             const canvas = document.getElementById('trendChartCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
+            if (trendChartInstance) trendChartInstance.destroy();
 
-            const selSector = document.getElementById('selChartSector').value;
-            const listData = selSector === 'ALL' ? filteredData : filteredData.filter(d => d.sector === selSector);
-
-            const datesMap = {};
-            listData.forEach(d => {
-                const dtStr = new Date(d.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-                if (!datesMap[dtStr]) datesMap[dtStr] = [];
-                datesMap[dtStr].push(d.latency_ms);
-            });
-
-            const labels = Object.keys(datesMap).reverse();
-            const values = labels.map(l => {
-                const arr = datesMap[l];
-                return Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
-            });
-
-            if (trendChartInstance) {
-                trendChartInstance.destroy();
-            }
+            const labels = trendRows.length > 0 ? trendRows.map(r => r.checkin_date) : ['Sem dias com N≥5'];
+            const latData = trendRows.length > 0 ? trendRows.map(r => Number(r.avg_latency_ms || 0)) : [0];
+            const alData = trendRows.length > 0 ? trendRows.map(r => Number(r.pct_alerta || 0)) : [0];
 
             trendChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels.length > 0 ? labels : ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
-                    datasets: [{
-                        label: 'Latência Média de Resposta (ms)',
-                        data: values.length > 0 ? values : [520, 490, 580, 610, 540],
-                        borderColor: '#38bdf8',
-                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#38bdf8'
-                    }]
+                    labels: labels,
+                    datasets: [
+                        { label: 'Latência Média (ms)', data: latData, borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.12)', yAxisID: 'y', tension: 0.3, fill: true },
+                        { label: '% Alertas no Dia', data: alData, borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.1)', yAxisID: 'y1', tension: 0.3 }
+                    ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            grid: { color: '#1e293b' },
-                            ticks: { color: '#94a3b8' },
-                            title: { display: true, text: 'Latência (ms)', color: '#94a3b8' }
-                        },
-                        x: {
-                            grid: { color: '#1e293b' },
-                            ticks: { color: '#94a3b8' }
-                        }
+                        y: { position: 'left', grid: { color: '#1e293b' }, ticks: { color: '#38bdf8' } },
+                        y1: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false }, ticks: { color: '#fbbf24' } },
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
                     },
-                    plugins: {
-                        legend: { labels: { color: '#fff', font: { weight: 'bold' } } }
-                    }
+                    plugins: { legend: { labels: { color: '#fff' } } }
                 }
             });
         }
 
-        function abrirCentralLaudos(tipo) {
-            switchTab('laudos', document.querySelectorAll('.nav-tabs .tab-btn')[5]);
-            gerarPreviewLaudo(tipo);
+        // HUB DOCUMENTAL
+        async function saveComplianceDocument() {
+            const title = document.getElementById('docTitle').value.trim();
+            const summary = document.getElementById('docSummary').value.trim();
+            if (!title || !summary) { alert("Informe o título e o resumo dos achados do documento."); return; }
+
+            const { error } = await sbClient.from('rh_compliance_documents').insert({
+                company: effectiveWriteCompany,
+                doc_type: document.getElementById('docType').value,
+                title: title,
+                target_sector: document.getElementById('docSector').value.trim() || 'GERAL',
+                technical_owner_name: document.getElementById('docOwner').value.trim() || null,
+                technical_owner_registry: document.getElementById('docRegistry').value.trim() || null,
+                raw_summary: summary
+            });
+            if (error) { alert("Erro ao salvar documento: " + error.message); return; }
+            document.getElementById('docTitle').value = '';
+            document.getElementById('docSummary').value = '';
+            await loadAllHubData();
         }
 
-        function gerarPreviewLaudo(tipo) {
-            const previewBox = document.getElementById('laudoPreviewText');
-            const dataHoje = new Date().toLocaleDateString('pt-BR');
-            const total = filteredData.length;
-            const verde = filteredData.filter(d => d.status === 'GREEN').length;
-            const amarelo = filteredData.filter(d => d.status === 'YELLOW').length;
-            const roxo = filteredData.filter(d => d.status === 'PURPLE').length;
-            const vermelho = filteredData.filter(d => d.status === 'RED').length;
+        function renderDocsTable() {
+            const tbody = document.getElementById('tblDocsBody');
+            tbody.innerHTML = '';
+            if (docsRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-row-text">Nenhum documento externo cadastrado.</td></tr>';
+                return;
+            }
+            docsRows.forEach(d => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="badge badge-cyan">${escapeHtml(d.doc_type)}</span></td>
+                        <td><b>${escapeHtml(d.title)}</b><br><small style="color:var(--muted);">Setor: ${escapeHtml(d.target_sector)}</small></td>
+                        <td>${escapeHtml(d.technical_owner_name || 'Não informado')}<br><small>${escapeHtml(d.technical_owner_registry || '')}</small></td>
+                    </tr>`;
+            });
+        }
 
-            if (tipo === 'NR01') {
-                previewBox.innerText = "LAUDO AUDITÁVEL DE RISCOS PSICOSSOCIAIS — NR-01 (PGR)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ESCOPO\nAvaliação diária de prontidão biométrica sob quórum N >= 5.\n\n2. RESULTADOS\n• Total de Vidas Auditadas: " + total + "\n• Homeostase (Verde): " + verde + "\n• Sobrecarga (Amarelo): " + amarelo + "\n• Fadiga (Roxo): " + roxo + "\n• Alertas Críticos (Vermelho): " + vermelho + "\n\n3. RECOMENDAÇÃO\nManter acompanhamento e pausas táticas de 15min.";
-            } else if (tipo === 'NR17') {
-                previewBox.innerText = "AVALIAÇÃO ERGONÔMICA PRELIMINAR — NR-17 (AEP)\nEMPRESA: " + currentCompany + "\nDATA: " + dataHoje + "\n\n1. ANÁLISE DE EXIGÊNCIA MENTAL\nMedição de latência e taxa de erros de veto motor.\n\n2. RESULTADOS\n• Carga Adequada: " + verde + "\n• Sobrecarga Moderada: " + (amarelo + roxo) + "\n• Esgotamento Severo: " + vermelho + "\n\n3. AÇÃO ERGONÔMICA\nMicropausas de descompressão cognitiva.";
-            } else if (tipo === 'eSocial') {
-                previewBox.innerText = "RELATÓRIO AUDITÁVEL DE AMBIENTE E RISCOS (S-2240 COMPLIANCE)\nEMPREGADOR: " + currentCompany + "\nDATA: " + dataHoje + "\n\n[DADOS CONSOLIDADOS S-2240]\n• Código Agente: 09.01.001 (Fatores Ergonômicos e Carga Cognitiva)\n• Protocolo: Telemetria Biométrica de Prontidão (SRT-RH)\n• Status:\n  - Isento Exposição Crítica: " + (verde + amarelo) + "\n  - Sobrecarga Monitorada: " + (roxo + vermelho);
-            } else if (tipo === 'GrouMaster') {
-                previewBox.innerText = "RELATÓRIO MESTRE DE DESENVOLVIMENTO HUMANO & ORGANIZACIONAL (DHO GROU)\nEMPRESA: " + currentCompany + " | DATA: " + dataHoje + "\n\nSÍNTESE EXECUTIVA DE PEOPLE ANALYTICS:\nÍndice de equilíbrio organizacional: " + (total ? Math.round(verde/total*100) : 100) + "%.\n\nDIAGNÓSTICO:\nÁreas operacionais estáveis.";
+        // MOTOR E.A.S.Y. DINÂMICO VIA GEMINI + BASE DO LIVRO
+        async function buildEasyPromptAndBundle() {
+            const sec = document.getElementById('easyTargetSector').value || null;
+            const { data: bundle, error } = await sbClient.rpc('get_easy_context_bundle', {
+                p_company: effectiveWriteCompany,
+                p_sector: sec,
+                p_days: currentPeriodDays
+            });
+            if (error) throw error;
+
+            const promptText = `Você é o Motor E.A.S.Y. (Examine, Adapt, Systematize, Yardstick) do sistema ExcelSilience Corporate OS.
+Analise exclusivamente os dados reais agregados da empresa (sem inventar números) e fundamente as recomendações nos protocolos do livro contidos em "book_knowledge_base".
+Regras obrigatórias:
+1. Não faça diagnóstico médico nem cite dados individuais; trabalhe com organização do trabalho, gestão preventiva, Projeto Aristóteles e vetores C, I, R.
+2. Responda ESTRITAMENTE em JSON válido com estas chaves:
+{
+  "examine": "análise objetiva cruzando telemetria, delta 8h->17h, fatores NR-1, ouvidoria, documentos externos e histórico",
+  "adapt": "ajustes táticos imediatos referenciando protocolos do livro para o gargalo identificado",
+  "systematize": "rotinas e POPs para consolidar a melhoria no trabalho",
+  "yardstick": "indicadores de eficácia para auditar após 30 dias",
+  "knowledge_refs": ["códigos das tools usadas"],
+  "actions_5w2h": [
+    {
+      "target_sector": "setor",
+      "easy_factor": "R",
+      "risk_level": "MODERADO",
+      "what_action": "ação concreta",
+      "why_root_cause": "causa-raiz cruzada",
+      "how_methodology": "como executar",
+      "who_manager_role": "Gestor da Área"
+    }
+  ]
+}
+
+DADOS E BASE DO LIVRO:
+${JSON.stringify(bundle, null, 2)}`;
+
+            return { bundle, promptText, sector: sec || 'GERAL' };
+        }
+
+        async function runEasyGeminiAnalysis() {
+            const btn = document.getElementById('btnRunEasyAi');
+            const edgeUrl = document.getElementById('easyEdgeUrl').value.trim();
+
+            if (!edgeUrl) {
+                alert("Informe a URL da Edge Function ou use 'Copiar Pacote + Prompt p/ Gemini' + 'Importar JSON da IA'.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "⏳ Consultando Banco + Base do Livro + Gemini...";
+
+            try {
+                const { bundle, promptText, sector } = await buildEasyPromptAndBundle();
+                const resp = await fetch(edgeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({ company: effectiveWriteCompany, sector, bundle, prompt: promptText })
+                });
+                if (!resp.ok) {
+                    throw new Error(`Edge Function retornou HTTP ${resp.status}. Caso ainda não tenha publicado a Edge Function 'easy-gemini-engine', use 'Copiar Pacote + Prompt p/ Gemini' e depois 'Importar JSON da IA'.`);
+                }
+                const parsed = await resp.json();
+                await persistEasyAiResult(sector, 'gemini-2.5-flash-edge', bundle, parsed);
+            } catch (err) {
+                alert("Aviso Motor E.A.S.Y.: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "✨ Gerar Análise E.A.S.Y. (Edge Gemini)";
             }
         }
 
-        function baixarLaudoPDF() {
-            const textoLaudo = document.getElementById('laudoPreviewText').innerText;
-            const win = window.open('', '_blank');
-            win.document.write("<html><head><title>Laudo_" + currentCompany + ".pdf</title><style>body{font-family:monospace;padding:40px;color:#000;background:#fff;font-size:11pt;line-height:1.6;}pre{white-space:pre-wrap;}</style></head><body><h2>EXCELSILIENCE CORPORATE OS — LAUDO AUDITÁVEL</h2><hr/><pre>" + textoLaudo + "</pre><script>window.onload=function(){window.print();};<\/script></body></html>");
-            win.document.close();
+        async function copyEasyPromptBundle() {
+            try {
+                const { promptText } = await buildEasyPromptAndBundle();
+                await navigator.clipboard.writeText(promptText);
+                alert("Pacote completo (dados vivos + base do livro + prompt E.A.S.Y.) copiado! Cole no Gemini/AI Studio e depois importe o JSON.");
+            } catch (err) {
+                alert("Erro ao gerar pacote: " + err.message);
+            }
         }
 
+        function openManualAiPaste() {
+            const el = document.getElementById('easyManualPasteBox');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function saveManualAiAnalysis() {
+            try {
+                const sec = document.getElementById('easyTargetSector').value || 'GERAL';
+                const parsed = JSON.parse(document.getElementById('txtManualAiJson').value);
+                const { bundle } = await buildEasyPromptAndBundle();
+                await persistEasyAiResult(sec, 'gemini-manual-import', bundle, parsed);
+                document.getElementById('easyManualPasteBox').style.display = 'none';
+                document.getElementById('txtManualAiJson').value = '';
+            } catch (err) {
+                alert("JSON inválido ou erro ao salvar: " + err.message);
+            }
+        }
+
+        async function persistEasyAiResult(sector, modelName, bundle, parsed) {
+            const payload = {
+                company: effectiveWriteCompany,
+                target_sector: sector,
+                analysis_scope: 'SRT_RH_SETOR',
+                ai_provider: 'GEMINI',
+                ai_model: modelName,
+                source_snapshot: bundle,
+                knowledge_refs: Array.isArray(parsed.knowledge_refs) ? parsed.knowledge_refs : [],
+                easy_e_examination: parsed.examine || '',
+                easy_a_adaptation: parsed.adapt || '',
+                easy_s_systematization: parsed.systematize || '',
+                easy_y_yardstick: parsed.yardstick || '',
+                recommended_actions_json: Array.isArray(parsed.actions_5w2h) ? parsed.actions_5w2h : []
+            };
+            const { data, error } = await sbClient.from('easy_ai_analyses').insert(payload).select().single();
+            if (error) throw error;
+            latestEasyAnalysis = data;
+            renderLatestEasyAnalysis();
+        }
+
+        function renderLatestEasyAnalysis() {
+            const box = document.getElementById('easyLatestOutput');
+            if (!latestEasyAnalysis) {
+                box.innerHTML = '<div class="empty-row-text">Nenhuma análise E.A.S.Y. gerada pela IA ainda.</div>';
+                return;
+            }
+            const acts = Array.isArray(latestEasyAnalysis.recommended_actions_json) ? latestEasyAnalysis.recommended_actions_json : [];
+            box.innerHTML = `
+                <div class="easy-card"><h4>E — Examine (${escapeHtml(latestEasyAnalysis.target_sector)})</h4><p>${escapeHtml(latestEasyAnalysis.easy_e_examination)}</p></div>
+                <div class="easy-card"><h4>A — Adapt</h4><p>${escapeHtml(latestEasyAnalysis.easy_a_adaptation)}</p></div>
+                <div class="easy-card"><h4>S — Systematize</h4><p>${escapeHtml(latestEasyAnalysis.easy_s_systematization)}</p></div>
+                <div class="easy-card"><h4>Y — Yardstick (30 dias)</h4><p>${escapeHtml(latestEasyAnalysis.easy_y_yardstick)}</p></div>
+                ${acts.length > 0 ? `<button class="btn btn-green" onclick="convertAiActionsTo5w2h()">➕ Converter ${acts.length} Ação(ões) em Planos 5W2H</button>` : ''}`;
+        }
+
+        async function convertAiActionsTo5w2h() {
+            if (!latestEasyAnalysis || !Array.isArray(latestEasyAnalysis.recommended_actions_json)) return;
+            const rows = latestEasyAnalysis.recommended_actions_json.map(a => ({
+                company: effectiveWriteCompany,
+                target_sector: a.target_sector || latestEasyAnalysis.target_sector || 'GERAL',
+                origin_source: 'MOTOR_EASY_IA',
+                ai_analysis_id: latestEasyAnalysis.id,
+                easy_factor: ['C', 'I', 'R', 'SISTEMICO'].includes(a.easy_factor) ? a.easy_factor : 'R',
+                risk_level: ['TRIVIAL', 'TOLERAVEL', 'MODERADO', 'SUBSTANCIAL', 'CRITICO'].includes(a.risk_level) ? a.risk_level : 'MODERADO',
+                what_action: a.what_action || 'Ação preventiva recomendada pelo Motor E.A.S.Y.',
+                why_root_cause: a.why_root_cause || 'Achado cruzado pela análise E.A.S.Y.',
+                where_ghe: a.target_sector || latestEasyAnalysis.target_sector || 'GERAL',
+                who_manager_name: a.who_manager_role || 'Gestor da Área',
+                how_methodology: a.how_methodology || 'Executar ritual e registrar evidência para auditoria de 30 dias.'
+            }));
+            const { error } = await sbClient.from('easy_action_plans').insert(rows);
+            if (error) { alert("Erro ao converter planos: " + error.message); return; }
+            await loadAllHubData();
+        }
+
+        // PLANOS 5W2H + ANUÊNCIA + YARDSTICK 30D
+        function togglePlanForm() {
+            const el = document.getElementById('newPlanForm');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function createActionPlan() {
+            const sector = document.getElementById('p5Sector').value.trim() || 'GERAL';
+            const what = document.getElementById('p5What').value.trim();
+            const why = document.getElementById('p5Why').value.trim();
+            const who = document.getElementById('p5Who').value.trim();
+            if (!what || !why || !who) { alert("Preencha What, Why e Who."); return; }
+
+            const { error } = await sbClient.from('easy_action_plans').insert({
+                company: effectiveWriteCompany,
+                target_sector: sector,
+                origin_source: document.getElementById('p5Origin').value,
+                easy_factor: document.getElementById('p5Factor').value,
+                risk_level: document.getElementById('p5Risk').value,
+                what_action: what,
+                why_root_cause: why,
+                where_ghe: sector,
+                who_manager_name: who,
+                when_due_date: document.getElementById('p5Due').value || undefined,
+                how_methodology: document.getElementById('p5How').value.trim() || 'Execução acompanhada pelo RH e Gestor',
+                how_much_cost: document.getElementById('p5CostText').value.trim() || 'Sem CapEx',
+                estimated_cost_brl: Number(document.getElementById('p5CostVal').value || 0)
+            });
+            if (error) { alert("Erro ao salvar plano: " + error.message); return; }
+            togglePlanForm();
+            await loadAllHubData();
+        }
+
+        function renderPlansTable() {
+            const tbody = document.getElementById('tblPlansBody');
+            tbody.innerHTML = '';
+            if (plansRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row-text">Nenhum plano 5W2H cadastrado.</td></tr>';
+                return;
+            }
+            plansRows.forEach(p => {
+                const cBadge = p.consent_status === 'ACEITO_COM_ANUENCIA' ? 'badge-verde' : 'badge-amarelo';
+                const yBadge = p.yardstick_status === 'EFICACIA_VALIDADA' ? 'badge-verde' :
+                               p.yardstick_status === 'REABERTO_POR_INEFICACIA' ? 'badge-vermelho' : 'badge-cyan';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${escapeHtml(p.target_sector)}</b><br><span class="badge badge-neutro">Vetor ${escapeHtml(p.easy_factor)} • ${escapeHtml(p.risk_level)}</span></td>
+                        <td><b>${escapeHtml(p.what_action)}</b><br><small style="color:var(--muted);">Causa: ${escapeHtml(p.why_root_cause)}</small></td>
+                        <td>${escapeHtml(p.who_manager_name)}<br><small>Prazo: ${p.when_due_date}</small></td>
+                        <td><span class="badge ${cBadge}">${escapeHtml(p.consent_status)}</span>${p.manager_consent_signature ? `<br><small>Ass.: ${escapeHtml(p.manager_consent_signature)}</small>` : ''}</td>
+                        <td><span class="badge ${yBadge}">${escapeHtml(p.yardstick_status)}</span>${p.reopen_count > 0 ? `<br><small>Reaberto: ${p.reopen_count}x</small>` : ''}</td>
+                        <td>
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <button class="btn btn-accent" style="padding:4px 8px; font-size:10px;" onclick="registerManagerConsent('${p.id}')">✍️ Anuência</button>
+                                <button class="btn btn-green" style="padding:4px 8px; font-size:10px;" onclick="auditYardstick('${p.id}', '${escapeHtml(p.target_sector)}')">📐 Yardstick 30d</button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function registerManagerConsent(planId) {
+            const sig = prompt("Nome completo do Gestor que dá anuência (ou deixe em branco para registrar contraproposta):");
+            if (sig === null) return;
+            let errObj = null;
+            if (sig.trim()) {
+                const { error } = await sbClient.from('easy_action_plans').update({
+                    consent_status: 'ACEITO_COM_ANUENCIA',
+                    manager_consent_signature: sig.trim(),
+                    consented_at: new Date().toISOString(),
+                    yardstick_status: 'EM_EXECUCAO'
+                }).eq('id', planId);
+                errObj = error;
+            } else {
+                const counter = prompt("Informe a contraproposta / ajuste solicitado pelo gestor:");
+                if (!counter) return;
+                const { error } = await sbClient.from('easy_action_plans').update({
+                    consent_status: 'EM_AJUSTE_GESTOR',
+                    manager_counterproposal: counter
+                }).eq('id', planId);
+                errObj = error;
+            }
+            if (errObj) { alert("Erro ao registrar anuência: " + errObj.message); return; }
+            await loadAllHubData();
+        }
+
+        async function auditYardstick(planId, sector) {
+            const ev = prompt("Descreva a evidência de execução realizada pelo setor:");
+            if (ev === null) return;
+            const postPctStr = prompt(`Informe a % atual de alertas às 17h no setor ${sector} após 30 dias (ou deixe vazio para buscar da telemetria):`);
+            const dRow = deltaRows.find(d => d.sector.toUpperCase() === sector.toUpperCase() && d.quorum_lgpd_ok);
+            const postPct = postPctStr && postPctStr.trim() !== '' ? Number(postPctStr) : (dRow ? Number(dRow.pct_alerta_17h) : 15);
+            const plan = plansRows.find(p => p.id === planId);
+            const baseline = plan && plan.baseline_pct_alert_17h !== null ? Number(plan.baseline_pct_alert_17h) : 25;
+            const validated = postPct <= baseline;
+
+            const { error } = await sbClient.from('easy_action_plans').update({
+                evidence_note: ev,
+                manager_completed_at: new Date().toISOString(),
+                post_30d_pct_alert_17h: postPct,
+                yardstick_status: validated ? 'EFICACIA_VALIDADA' : 'REABERTO_POR_INEFICACIA',
+                reopen_count: validated ? (plan?.reopen_count || 0) : ((plan?.reopen_count || 0) + 1)
+            }).eq('id', planId);
+            if (error) { alert("Erro ao atualizar Yardstick: " + error.message); return; }
+            await loadAllHubData();
+        }
+
+        // OUVIDORIA NR-05
+        function renderWhistleSummaryTable() {
+            const tbody = document.getElementById('tblWbSummaryBody');
+            tbody.innerHTML = '';
+            if (wbSummaryRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row-text">Nenhum relato registrado no canal.</td></tr>';
+                return;
+            }
+            wbSummaryRows.forEach(w => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${escapeHtml(w.target_sector)}</b></td>
+                        <td><span class="badge badge-neutro">${escapeHtml(w.category)}</span></td>
+                        <td>${w.total_reports}</td>
+                        <td><b style="color:var(--yellow);">${w.open_reports}</b></td>
+                        <td><b style="color:var(--green);">${w.closed_reports}</b></td>
+                    </tr>`;
+            });
+        }
+
+        async function unlockCommitteeReports() {
+            const pin = document.getElementById('inpCommitteePin').value.trim();
+            const container = document.getElementById('committeeReportsContainer');
+            if (!pin) { alert("Informe o PIN do Comitê de Ética."); return; }
+
+            const { data, error } = await sbClient.rpc('committee_list_whistleblower_reports', {
+                p_company: currentCompany,
+                p_pin: pin
+            });
+            if (error) {
+                container.innerHTML = `<div class="warn-box">Acesso negado: ${escapeHtml(error.message)}</div>`;
+                return;
+            }
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty-row-text">Nenhum relato encontrado para esta empresa.</div>';
+                return;
+            }
+            container.innerHTML = '';
+            data.forEach(r => {
+                container.innerHTML += `
+                    <div class="easy-card">
+                        <h4>${escapeHtml(r.protocol_code)} • ${escapeHtml(r.category)} • Setor: ${escapeHtml(r.target_sector)}</h4>
+                        <p style="margin-bottom:8px;">${escapeHtml(r.description)}</p>
+                        <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">
+                            Status: <b>${escapeHtml(r.status)}</b> | Envolvido: ${escapeHtml(r.reported_leader_role || 'Não informado')} | Data: ${r.created_day}
+                        </div>
+                        <button class="btn btn-accent" style="padding:5px 10px; font-size:10px;" onclick="updateCommitteeReport('${r.id}')">✏️ Registrar Parecer / Atualizar Status</button>
+                    </div>`;
+            });
+        }
+
+        async function updateCommitteeReport(reportId) {
+            const pin = document.getElementById('inpCommitteePin').value.trim();
+            const st = prompt("Novo status (RECEBIDA, EM_APURACAO, MEDIDA_APLICADA ou ENCERRADA):", "EM_APURACAO");
+            if (!st) return;
+            const reply = prompt("Resposta pública visível ao denunciante pelo protocolo DEN-XXXX-X:");
+            const action = prompt("Medida corretiva interna aplicada:");
+            const { error } = await sbClient.rpc('committee_update_whistleblower_report', {
+                p_company: currentCompany,
+                p_pin: pin,
+                p_report_id: reportId,
+                p_new_status: st.trim().toUpperCase(),
+                p_public_reply: reply || null,
+                p_resolution_action: action || null
+            });
+            if (error) { alert("Erro: " + error.message); return; }
+            unlockCommitteeReports();
+            loadAllHubData();
+        }
+
+        // HISTÓRICO, ROI & DEFESAS TRABALHISTAS
+        function toggleImpactForm() {
+            const el = document.getElementById('impactHistoryForm');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+        function toggleLegalForm() {
+            const el = document.getElementById('legalDefenseForm');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function saveImpactHistoryRecord() {
+            const sector = document.getElementById('impSector').value.trim() || 'GERAL';
+            const month = document.getElementById('impMonth').value;
+            if (!month) { alert("Informe o mês de referência."); return; }
+
+            const { error } = await sbClient.from('rh_sector_impact_history').upsert({
+                company: effectiveWriteCompany,
+                sector: sector,
+                record_type: document.getElementById('impType').value,
+                reference_month: month,
+                headcount: Number(document.getElementById('impHeadcount').value || 10),
+                absenteeism_rate_pct: Number(document.getElementById('impAbsPct').value || 0),
+                lost_workdays: Number(document.getElementById('impLostDays').value || 0),
+                cid_f_ergo_leaves: Number(document.getElementById('impLeaves').value || 0),
+                overtime_hours_avg: Number(document.getElementById('impOvertime').value || 0),
+                voluntary_turnover_pct: Number(document.getElementById('impTurnover').value || 0),
+                productivity_index: Number(document.getElementById('impProdIdx').value || 0),
+                avg_hourly_cost_brl: Number(document.getElementById('impHourCost').value || 0),
+                turnover_replacement_cost_brl: Number(document.getElementById('impTurnCost').value || 0),
+                actions_investment_brl: Number(document.getElementById('impInvest').value || 0),
+                productivity_gain_value_brl: Number(document.getElementById('impProdGainBrl').value || 0)
+            }, { onConflict: 'company,sector,record_type,reference_month' });
+
+            if (error) { alert("Erro ao salvar histórico: " + error.message); return; }
+            toggleImpactForm();
+            await loadAllHubData();
+        }
+
+        function renderRoiAndImpactSection() {
+            if (companyRoiSummary) {
+                document.getElementById('roiTotalSavings').innerText = fmtMoney(companyRoiSummary.economia_total_empresa_brl);
+                document.getElementById('roiCostReductionPct').innerText = companyRoiSummary.reducao_custo_operacional_pct !== null ? `${companyRoiSummary.reducao_custo_operacional_pct}%` : '-- %';
+                document.getElementById('roiConsolidatedPct').innerText = companyRoiSummary.roi_consolidado_pct !== null ? `${companyRoiSummary.roi_consolidado_pct}%` : '-- %';
+                document.getElementById('roiInvestmentLbl').innerText = `Investimento nas ações: ${fmtMoney(companyRoiSummary.investimento_total_acoes_brl)}`;
+                document.getElementById('roiSavedDays').innerText = companyRoiSummary.total_saved_workdays || 0;
+                const legalSum = Number(companyRoiSummary.ganho_real_autuacoes_brl || 0) + Number(companyRoiSummary.ganho_real_acoes_trabalhistas_brl || 0);
+                document.getElementById('roiLegalGains').innerText = fmtMoney(legalSum);
+            }
+
+            const tbody = document.getElementById('tblImpactCompBody');
+            tbody.innerHTML = '';
+            if (impactRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row-text">Cadastre a Linha de Base Passada e o Fechamento Mensal para visualizar o comparativo.</td></tr>';
+                return;
+            }
+            impactRows.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${escapeHtml(r.sector)}</b><br><small>HC: ${r.headcount}</small></td>
+                        <td>${r.base_absenteeism_pct}% → <b>${r.curr_absenteeism_pct ?? '--'}%</b><br><small>Delta: ${r.delta_absenteeism_pp ?? '--'} p.p.</small></td>
+                        <td>Dias salvos: <b>${r.saved_workdays ?? '--'}</b><br><small>Redução CID-F: ${r.reduction_cid_leaves ?? '--'}</small></td>
+                        <td>HE: ${r.base_overtime_h}h → ${r.curr_overtime_h ?? '--'}h<br><small>Turn.: ${r.base_turnover_pct}% → ${r.curr_turnover_pct ?? '--'}%</small></td>
+                        <td>Prod.: ${r.productivity_gain_pct !== null ? `+${r.productivity_gain_pct}%` : '--'}<br><small>17h Verde (30d): ${r.readiness_preserved_17h_pct ?? 'N<5'}%</small></td>
+                        <td><b style="color:var(--green);">${fmtMoney(r.operational_savings_brl)}</b><br><small>Redução: ${r.operational_savings_pct ?? '--'}% | ROI: ${r.actions_roi_pct ?? '--'}%</small></td>
+                    </tr>`;
+            });
+        }
+
+        async function saveLegalDefenseGain() {
+            const ref = document.getElementById('legRef').value.trim();
+            const sum = document.getElementById('legSummary').value.trim();
+            if (!ref || !sum) { alert("Informe a referência e o resumo do caso."); return; }
+
+            const { error } = await sbClient.from('rh_legal_defense_gains').insert({
+                company: effectiveWriteCompany,
+                sector: document.getElementById('legSector').value.trim() || 'GERAL',
+                event_type: document.getElementById('legType').value,
+                case_reference: ref,
+                claim_summary: sum,
+                claimed_amount_brl: Number(document.getElementById('legClaimed').value || 0),
+                settled_amount_brl: Number(document.getElementById('legSettled').value || 0),
+                evidence_used: document.getElementById('legEvidence').value.trim() || null,
+                status: document.getElementById('legStatus').value
+            });
+            if (error) { alert("Erro ao salvar registro jurídico: " + error.message); return; }
+            toggleLegalForm();
+            await loadAllHubData();
+        }
+
+        function renderLegalGainsTable() {
+            const tbody = document.getElementById('tblLegalGainsBody');
+            tbody.innerHTML = '';
+            if (legalGainsRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row-text">Nenhuma autuação ou ação trabalhista registrada.</td></tr>';
+                return;
+            }
+            legalGainsRows.forEach(l => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="badge badge-purple">${escapeHtml(l.event_type)}</span></td>
+                        <td><b>${escapeHtml(l.case_reference)}</b><br><small>${escapeHtml(l.sector)} • ${l.event_date}</small></td>
+                        <td>Pedido: ${fmtMoney(l.claimed_amount_brl)}<br><small>Pago: ${fmtMoney(l.settled_amount_brl)}</small></td>
+                        <td><b style="color:var(--green);">${fmtMoney(l.verified_gain_brl)}</b></td>
+                        <td><span class="badge badge-neutro">${escapeHtml(l.status)}</span><br><small>${escapeHtml(l.evidence_used || '')}</small></td>
+                    </tr>`;
+            });
+        }
+
+        // RELATÓRIOS CRUZADOS & VALIDAÇÃO DE PROFISSIONAL REGULARIZADO
+        async function generateAndSaveCrossReport() {
+            const repType = document.getElementById('repType').value;
+            const sec = document.getElementById('repSector').value.trim() || 'GERAL';
+            const secFilter = sec.toUpperCase() === 'GERAL' ? null : sec;
+
+            const { data: bundle, error: bErr } = await sbClient.rpc('get_easy_context_bundle', {
+                p_company: effectiveWriteCompany,
+                p_sector: secFilter,
+                p_days: currentPeriodDays
+            });
+            if (bErr) { alert("Erro ao cruzar dados: " + bErr.message); return; }
+
+            const dtNow = new Date().toLocaleDateString('pt-BR');
+            const easyPart = latestEasyAnalysis
+                ? `\n[ANÁLISE MOTOR E.A.S.Y. (IA + LIVRO EXCELSILIENCE)]\n• Examine: ${latestEasyAnalysis.easy_e_examination}\n• Adapt: ${latestEasyAnalysis.easy_a_adaptation}\n• Systematize: ${latestEasyAnalysis.easy_s_systematization}\n• Yardstick (30d): ${latestEasyAnalysis.easy_y_yardstick}\n`
+                : `\n[ANÁLISE MOTOR E.A.S.Y.]\n• Ainda não há análise gerada pelo Gemini para este ciclo. Recomenda-se rodar o Motor E.A.S.Y. na Aba 4 antes da validação final.\n`;
+
+            const bodyMd = `====================================================================
+${repType} — RELATÓRIO TÉCNICO CRUZADO (APOIO PREVENTIVO)
+====================================================================
+Empresa: ${effectiveWriteCompany} | Setor-Alvo: ${sec} | Data: ${dtNow}
+Status de Governança: AGUARDANDO AVALIAÇÃO DE PROFISSIONAL REGULARIZADO
+
+AVISO OBRIGATÓRIO:
+Este documento foi gerado pelo cruzamento integral das informações incluídas
+na plataforma ExcelSilience SRT-RH e processado pelo Motor E.A.S.Y. para
+subsidiar informações e ações de melhoria. Deve ser obrigatoriamente avaliado,
+interpretado e assinado por profissional devidamente habilitado e regularizado
+no conselho competente (CRM, CRP, CREA ou habilitação legal em SST).
+
+1. TELEMETRIA SETORIAL ANÔNIMA (QUÓRUM N >= 5)
+${JSON.stringify(bundle.telemetry_overview || [], null, 2)}
+
+2. COMPARATIVO INTRA-JORNADA (ENTRADA 8H vs. SAÍDA 17H)
+${JSON.stringify(bundle.delta_8h_17h || [], null, 2)}
+
+3. RESUMO AGREGADO DA OUVIDORIA NR-05 (SEM IDENTIFICAÇÃO)
+${JSON.stringify(bundle.whistleblower_summary || [], null, 2)}
+
+4. DOCUMENTOS EXTERNOS CADASTRADOS (AEP / AET / PGR / PCMSO)
+${JSON.stringify((bundle.external_documents || []).map(d => ({ tipo: d.doc_type, titulo: d.title, setor: d.target_sector, resumo: d.raw_summary })), null, 2)}
+
+5. PLANOS DE AÇÃO 5W2H & HISTÓRICO DE IMPACTO
+Planos ativos no painel: ${plansRows.length}
+${JSON.stringify(bundle.historical_impact || [], null, 2)}
+${easyPart}
+6. CAMPO DE AVALIAÇÃO DO PROFISSIONAL REGULARIZADO
+Nome / Conselho / Registro: [Aguardando preenchimento e assinatura técnica]
+====================================================================`;
+
+            const { data: savedRep, error: sErr } = await sbClient.from('rh_generated_reports').insert({
+                company: effectiveWriteCompany,
+                target_sector: sec,
+                report_type: repType,
+                title: `${repType} — ${sec} (${dtNow})`,
+                reference_period: `${currentPeriodDays} dias`,
+                easy_analysis_id: latestEasyAnalysis ? latestEasyAnalysis.id : null,
+                cross_referenced_sources: {
+                    telemetry_count: (bundle.telemetry_overview || []).length,
+                    delta_count: (bundle.delta_8h_17h || []).length,
+                    whistleblower_groups: (bundle.whistleblower_summary || []).length,
+                    docs_count: (bundle.external_documents || []).length,
+                    plans_count: plansRows.length
+                },
+                report_body_markdown: bodyMd
+            }).select().single();
+
+            if (sErr) { alert("Erro ao salvar relatório: " + sErr.message); return; }
+            document.getElementById('reportPreviewBox').innerText = savedRep.report_body_markdown;
+            await loadAllHubData();
+        }
+
+        function renderReportsDropdown() {
+            const sel = document.getElementById('selReportToValidate');
+            sel.innerHTML = '<option value="">-- Selecione um relatório --</option>';
+            reportsRows.forEach(r => {
+                sel.innerHTML += `<option value="${r.id}">${escapeHtml(r.title)} [${escapeHtml(r.review_status)}]</option>`;
+            });
+            if (reportsRows.length > 0 && document.getElementById('reportPreviewBox').innerText.startsWith('Clique')) {
+                sel.value = reportsRows[0].id;
+                loadSelectedReportIntoPreview();
+            }
+        }
+
+        function loadSelectedReportIntoPreview() {
+            const id = document.getElementById('selReportToValidate').value;
+            const r = reportsRows.find(x => x.id === id);
+            if (!r) return;
+            let text = r.report_body_markdown;
+            if (r.review_status === 'AVALIADO_E_VALIDADO_PROFISSIONAL') {
+                text += `\n\n[VALIDAÇÃO TÉCNICA REGISTRADA]\nProfissional: ${r.regulated_professional_name} (${r.regulated_professional_council} ${r.regulated_professional_registry})\nData: ${r.professional_validated_at}\nParecer: ${r.professional_evaluation_notes || 'Aprovado'}`;
+            }
+            document.getElementById('reportPreviewBox').innerText = text;
+        }
+
+        async function validateReportByProfessional() {
+            const id = document.getElementById('selReportToValidate').value;
+            const name = document.getElementById('profName').value.trim();
+            const council = document.getElementById('profCouncil').value.trim();
+            const reg = document.getElementById('profReg').value.trim();
+            if (!id || !name || !council || !reg) {
+                alert("Selecione o relatório e informe Nome, Conselho e Registro do profissional regularizado.");
+                return;
+            }
+            const { error } = await sbClient.from('rh_generated_reports').update({
+                review_status: 'AVALIADO_E_VALIDADO_PROFISSIONAL',
+                regulated_professional_name: name,
+                regulated_professional_council: council,
+                regulated_professional_registry: reg,
+                professional_evaluation_notes: document.getElementById('profNotes').value.trim() || 'Validado tecnicamente.',
+                professional_validated_at: new Date().toISOString()
+            }).eq('id', id);
+
+            if (error) { alert("Erro ao validar: " + error.message); return; }
+            await loadAllHubData();
+            document.getElementById('selReportToValidate').value = id;
+            loadSelectedReportIntoPreview();
+        }
+
+        function printCleanReport() {
+            window.print();
+        }
+
+        // ES-CRISIS 360° + PROJETO ARISTÓTELES
+        function renderEsCrisis360Table() {
+            const tbody = document.getElementById('tblEsCrisis360Body');
+            tbody.innerHTML = '';
+            if (esCrisis360Rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row-text">Nenhum ciclo 360° do ES-CRISIS encontrado.</td></tr>';
+                return;
+            }
+            esCrisis360Rows.forEach(r => {
+                const cList = Array.isArray(r.detector_contradicoes) ? r.detector_contradicoes : [];
+                const badges = cList.length > 0
+                    ? cList.map(x => `<span class="badge badge-vermelho" style="margin:2px;">${escapeHtml(x)}</span>`).join(' ')
+                    : '<span class="badge badge-verde">Sem contradições</span>';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${escapeHtml(r.leader_name)}</b><br><small>${escapeHtml(r.leader_role)} • ${escapeHtml(r.cycle_label)}</small></td>
+                        <td><b>${escapeHtml(r.managed_sector)}</b><br><small>N equipe válida: ${r.n_equipe_valida}</small></td>
+                        <td>C:${r.c_360 ?? '-'} | I:${r.i_360 ?? '-'} | R:${r.r_360 ?? '-'}<br><b style="color:var(--accent);">ES: ${r.es_360_score ?? '-'} (Min: ${r.weakest_vector_360 ?? '-'})</b></td>
+                        <td>Seg.Psic: ${r.media_psych_safety ?? 'N<5'} | Conf.: ${r.media_reliability ?? 'N<5'} | Imp.: ${r.media_impact ?? 'N<5'}</td>
+                        <td>17h: ${r.area_pct_alerta_17h ?? '--'}%<br><small>${escapeHtml(r.area_classificacao_carga || '')}</small></td>
+                        <td>${badges}</td>
+                    </tr>`;
+            });
+        }
+
+        // SETORES, LINKS & BENEFÍCIOS
         function initSetoresEGenerators() {
-            renderListaSetoresCadastrados();
-            renderLinkGeneratorList();
-            populateSectorDropdowns();
+            const listaEl = document.getElementById('setores-lista-cadastrados');
+            const linkEl = document.getElementById('link-generator-list');
+            const selChart = document.getElementById('selChartSector');
+            const selEasy = document.getElementById('easyTargetSector');
+
+            if (listaEl) {
+                listaEl.innerHTML = setoresCadastrados.map(s => `
+                    <div class="dept-item-row">
+                        <span>🏢 ${escapeHtml(s)}</span>
+                        <button class="btn btn-red" style="padding:3px 8px; font-size:10px;" onclick="removerSetor('${escapeHtml(s)}')">Remover</button>
+                    </div>`).join('');
+            }
+            if (selChart) {
+                const prev = selChart.value;
+                selChart.innerHTML = '<option value="ALL">🏢 Todos os Setores</option>' + setoresCadastrados.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+                if (prev) selChart.value = prev;
+            }
+            if (selEasy) {
+                const prevE = selEasy.value;
+                selEasy.innerHTML = '<option value="">🏢 Toda a Empresa</option>' + setoresCadastrados.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+                if (prevE) selEasy.value = prevE;
+            }
+            if (linkEl) {
+                const base = window.location.origin + window.location.pathname.replace(/[^/]+$/, 'index-rh.html');
+                const compQ = effectiveWriteCompany;
+                linkEl.innerHTML = setoresCadastrados.map(s => {
+                    const urlProd = `${base}?company=${encodeURIComponent(compQ)}&sector=${encodeURIComponent(s)}`;
+                    const urlDemo = `${urlProd}&demo=true`;
+                    return `
+                        <div style="background:var(--card-inner); border:1px solid var(--border); padding:9px; border-radius:8px; margin-bottom:8px;">
+                            <div style="font-size:11px; font-weight:800; color:var(--accent); margin-bottom:4px;">${escapeHtml(s)}</div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <button class="btn btn-green" style="padding:4px 8px; font-size:10px;" onclick="navigator.clipboard.writeText('${urlProd}'); alert('Link de Produção copiado!')">📋 Copiar Link Produção</button>
+                                <button class="btn btn-amber" style="padding:4px 8px; font-size:10px;" onclick="navigator.clipboard.writeText('${urlDemo}'); alert('Link Demo copiado!')">🧪 Copiar Link Demo</button>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
         }
 
         function cadastrarNovoSetor() {
-            const input = document.getElementById('inpNovoSetor');
-            const nome = input.value.trim();
+            const inp = document.getElementById('inpNovoSetor');
+            const nome = inp.value.trim();
             if (nome && !setoresCadastrados.includes(nome)) {
                 setoresCadastrados.push(nome);
-                input.value = '';
+                try { localStorage.setItem('srt_rh_custom_sectors', JSON.stringify(setoresCadastrados)); } catch (e) {}
+                inp.value = '';
                 initSetoresEGenerators();
-                renderDashboard();
             }
         }
 
         function removerSetor(nome) {
             setoresCadastrados = setoresCadastrados.filter(s => s !== nome);
+            try { localStorage.setItem('srt_rh_custom_sectors', JSON.stringify(setoresCadastrados)); } catch (e) {}
             initSetoresEGenerators();
-            renderDashboard();
         }
 
-        function renderListaSetoresCadastrados() {
-            const container = document.getElementById('setores-lista-cadastrados');
-            container.innerHTML = '';
-            setoresCadastrados.forEach(setor => {
-                container.innerHTML += `
-                    <div class="dept-item-row">
-                        <span>🏢 ${setor}</span>
-                        <button class="btn" style="background:#ef4444; color:#fff; font-size:10px; padding:2px 8px;" onclick="removerSetor('${setor}')">Excluir</button>
-                    </div>
-                `;
+        async function saveCompanyBenefit() {
+            const name = document.getElementById('benName').value.trim();
+            const desc = document.getElementById('benDesc').value.trim();
+            if (!name || !desc) { alert("Informe o nome e a descrição do benefício."); return; }
+
+            const { error } = await sbClient.from('company_benefits').insert({
+                company: effectiveWriteCompany,
+                benefit_name: name,
+                provider_name: document.getElementById('benProvider').value.trim() || null,
+                category: document.getElementById('benCat').value,
+                description: desc,
+                access_url: document.getElementById('benUrl').value.trim() || '#beneficio'
             });
+            if (error) { alert("Erro ao cadastrar benefício: " + error.message); return; }
+            document.getElementById('benName').value = '';
+            document.getElementById('benDesc').value = '';
+            await loadAllHubData();
         }
 
-        function populateSectorDropdowns() {
-            const selInd = document.getElementById('selIndSector');
-            const selChart = document.getElementById('selChartSector');
-
-            selInd.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
-            selChart.innerHTML = `<option value="ALL">🏢 Todos os Setores</option>`;
-
-            setoresCadastrados.forEach(s => {
-                selInd.innerHTML += `<option value="${s}">${s}</option>`;
-                selChart.innerHTML += `<option value="${s}">${s}</option>`;
-            });
-        }
-
-        function renderLinkGeneratorList() {
-            const container = document.getElementById('link-generator-list');
-            container.innerHTML = '';
-
-            const baseUrl = window.location.origin + window.location.pathname.replace('dashboard_rh_srt.html', 'index-rh.html');
-
-            setoresCadastrados.forEach(setor => {
-                const slug = setor.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                const link = `${baseUrl}?company=${currentCompany.toLowerCase()}&sector=${slug}`;
-
-                container.innerHTML += `
-                    <div style="background:#0d1527; border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:8px;">
-                        <div style="font-size:11px; font-weight:800; color:var(--accent);">${setor}</div>
-                        <input type="text" value="${link}" readonly style="width:100%; background:#0b0f19; border:1px solid var(--border); color:#cbd5e1; font-size:10px; padding:4px; margin:4px 0; border-radius:4px;">
-                        <button class="btn btn-green" style="font-size:10px; padding:3px 8px;" onclick="navigator.clipboard.writeText('${link}'); alert('Link copiado!')">📋 Copiar Link</button>
-                    </div>
-                `;
-            });
-        }
-
-        function adicionarMetricaCustomizada() {
-            const nome = prompt("Nome da nova métrica customizada de RH:");
-            if (nome) {
-                const val = prompt("Valor inicial (ex: 94%):") || "100%";
-                const container = document.getElementById('custom-container');
-                container.innerHTML += `
-                    <div class="card-metric">
-                        <div class="lbl">${nome}</div>
-                        <div class="val val-total">${val}</div>
-                        <div class="subtext">Indicador Personalizado</div>
-                    </div>
-                `;
+        function renderBenefitsAdoptionTable() {
+            const tbody = document.getElementById('tblBenefitsAdoptionBody');
+            tbody.innerHTML = '';
+            if (benefitsAdoptionRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-row-text">Nenhum benefício ativo encontrado.</td></tr>';
+                return;
             }
+            benefitsAdoptionRows.forEach(b => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${escapeHtml(b.benefit_name)}</b><br><small>${escapeHtml(b.category)}</small></td>
+                        <td>${escapeHtml(b.sector)}</td>
+                        <td>${b.quorum_lgpd_ok ? `<b>${b.total_acessos_anonimos}</b>` : '<span class="badge badge-neutro">N &lt; 5</span>'}</td>
+                        <td>${b.quorum_lgpd_ok ? `8h: ${b.acessos_janela_8h} | 17h: ${b.acessos_janela_17h}` : '—'}</td>
+                    </tr>`;
+            });
+        }
+
+        function toggleLocalSimulation() {
+            isLocalSimMode = !isLocalSimMode;
+            const btn = document.getElementById('btnDemoSim');
+            if (isLocalSimMode) {
+                btn.innerText = "🛑 Sair da Simulação Demo";
+                renderSimulatedPreview();
+            } else {
+                btn.innerText = "⚡ Simulação Demo Local";
+                loadAllHubData();
+            }
+        }
+
+        function renderSimulatedPreview() {
+            overviewRows = [
+                { company: effectiveWriteCompany, sector: 'Operações', total_checkins: 28, quorum_lgpd_ok: true, cnt_green: 16, cnt_yellow: 7, cnt_purple: 4, cnt_red: 1, pct_alerta_total: 42.9, avg_latency_ms: 635, avg_vsi_valid: 2.75, avg_org_demands: 2.4, avg_org_autonomy: 2.6, avg_org_clarity: 3.4, avg_org_support: 3.1 },
+                { company: effectiveWriteCompany, sector: 'TI', total_checkins: 18, quorum_lgpd_ok: true, cnt_green: 15, cnt_yellow: 2, cnt_purple: 1, cnt_red: 0, pct_alerta_total: 16.7, avg_latency_ms: 485, avg_vsi_valid: 1.92, avg_org_demands: 3.8, avg_org_autonomy: 4.2, avg_org_clarity: 4.1, avg_org_support: 4.3 },
+                { company: effectiveWriteCompany, sector: 'RH', total_checkins: 3, quorum_lgpd_ok: false, cnt_green: null, cnt_yellow: null, cnt_purple: null, cnt_red: null, pct_alerta_total: null, avg_latency_ms: null, avg_vsi_valid: null }
+            ];
+            deltaRows = [
+                { company: effectiveWriteCompany, sector: 'Operações', shift_name: 'Comercial', n_8h: 14, n_17h: 14, quorum_lgpd_ok: true, pct_alerta_8h: 18.0, pct_alerta_17h: 46.0, delta_alerta_pp: 28.0, delta_latency_ms: 142, delta_vsi: 0.68, classificacao_origem_carga: 'DESGASTE_GERADO_NO_TRABALHO' },
+                { company: effectiveWriteCompany, sector: 'TI', shift_name: 'Comercial', n_8h: 9, n_17h: 9, quorum_lgpd_ok: true, pct_alerta_8h: 14.0, pct_alerta_17h: 17.0, delta_alerta_pp: 3.0, delta_latency_ms: 18, delta_vsi: 0.08, classificacao_origem_carga: 'EQUILIBRIO_SUSTENTADO' }
+            ];
+            trendRows = [
+                { checkin_date: 'Dia 1', avg_latency_ms: 510, pct_alerta: 18 },
+                { checkin_date: 'Dia 2', avg_latency_ms: 545, pct_alerta: 24 },
+                { checkin_date: 'Dia 3', avg_latency_ms: 590, pct_alerta: 31 },
+                { checkin_date: 'Dia 4', avg_latency_ms: 530, pct_alerta: 21 }
+            ];
+            companyRoiSummary = {
+                economia_total_empresa_brl: 48600,
+                reducao_custo_operacional_pct: 27.4,
+                roi_consolidado_pct: 210.0,
+                investimento_total_acoes_brl: 15600,
+                total_saved_workdays: 38,
+                ganho_real_autuacoes_brl: 0,
+                ganho_real_acoes_trabalhistas_brl: 0
+            };
+            renderAllSections();
         }
     </script>
 </body>
