@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT-RH — Aferição de Prontidão Ocupacional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ExcelSilience SRT-RH — Check-in Anônimo de Prontidão e Bem-Estar</title>
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -13,7 +13,7 @@
             --input-border: #334155;
             --text-main: #e2e8f0;
             --text-sub: #cbd5e1;
-            --text-muted: #64748b;
+            --text-muted: #94a3b8;
             --accent-cyan: #38bdf8;
             --accent-cyan-hover: #0284c7;
             --accent-green: #10b981;
@@ -27,58 +27,415 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; overflow-x: hidden; }
-        .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 520px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); position: relative; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+        .container {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 540px;
+            padding: 26px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
 
-        .header-box { text-align: center; margin-bottom: 22px; border-bottom: 1px solid var(--panel-border); padding-bottom: 18px; }
-        .header-box h1 { font-size: 1.35rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .header-box {
+            text-align: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 16px;
+        }
+        .header-box h1 {
+            font-size: 1.35rem;
+            color: var(--accent-cyan);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-        .badge-gov { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: block; margin-bottom: 18px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
+        .company-pill {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--accent-cyan);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .badge-gov {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green-bright);
+            padding: 8px 12px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 16px;
+            text-align: center;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .demo-banner {
+            display: none;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--accent-yellow);
+            color: var(--accent-yellow-bright);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 14px;
+        }
 
-        .step { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
+        .step { display: none; animation: fadeIn 0.25s ease-in-out forwards; }
         .step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-group { margin-bottom: 16px; }
-        label { font-size: 11px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
-        select, input[type="text"] { width: 100%; padding: 13px 16px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: #ffffff; font-size: 14px; outline: none; }
-        select:focus, input[type="text"]:focus { border-color: var(--accent-cyan); }
+        .form-group { margin-bottom: 14px; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
+        }
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+        }
+        select:focus, input[type="text"]:focus, textarea:focus { border-color: var(--accent-cyan); }
+        textarea { resize: vertical; min-height: 92px; line-height: 1.45; }
 
-        .chk-box { display: flex; align-items: flex-start; gap: 12px; background: var(--input-bg); padding: 14px; border-radius: 10px; border: 1px solid var(--input-border); margin-bottom: 20px; }
-        .chk-box input[type="checkbox"] { margin-top: 3px; accent-color: var(--accent-cyan-hover); width: 20px; height: 20px; cursor: pointer; }
-        .chk-box label { font-size: 11px; color: var(--text-sub); text-transform: none; line-height: 1.45; margin: 0; }
+        .window-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .window-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-sub);
+            padding: 10px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .window-btn small { display: block; font-size: 9px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+        .window-btn.selected {
+            background: rgba(56, 189, 248, 0.16);
+            border-color: var(--accent-cyan);
+            color: #ffffff;
+        }
+        .window-btn.selected small { color: var(--accent-cyan); }
 
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: var(--accent-cyan-hover); color: #ffffff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
-        .btn:hover { background: #0369a1; }
-        .btn-secondary { background: #1e293b; color: var(--text-sub); border: 1px solid var(--input-border); margin-top: 10px; }
+        .chk-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: var(--input-bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--input-border);
+            margin-bottom: 16px;
+        }
+        .chk-box input[type="checkbox"] {
+            margin-top: 3px;
+            accent-color: var(--accent-cyan-hover);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .chk-box label {
+            font-size: 11px;
+            color: var(--text-sub);
+            text-transform: none;
+            line-height: 1.45;
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
 
-        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            background: var(--accent-cyan-hover);
+            color: #ffffff;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+        .btn:hover:not(:disabled) { background: #0369a1; }
+        .btn:disabled { opacity: 0.65; cursor: not-allowed; }
+        .btn-secondary {
+            background: #1e293b;
+            color: var(--text-sub);
+            border: 1px solid var(--input-border);
+            margin-top: 10px;
+            text-transform: none;
+            font-weight: 700;
+        }
+        .btn-secondary:hover:not(:disabled) { border-color: var(--accent-cyan); color: #ffffff; background: #263349; }
+        .btn-warning { background: #b45309; color: #ffffff; margin-top: 10px; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-danger-outline {
+            background: rgba(239, 68, 68, 0.08);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            margin-top: 10px;
+            text-transform: none;
+        }
+
+        .nr1-card {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .nr1-question { font-size: 12px; color: var(--text-main); font-weight: 700; margin-bottom: 8px; }
+        .likert-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .likert-btn {
+            background: #151c2c;
+            border: 1px solid var(--input-border);
+            color: var(--text-muted);
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+        }
+        .likert-btn.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-cyan);
+            color: #ffffff;
+        }
+        .likert-hints { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 5px; }
+
+        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
         .meter-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.2s linear; }
 
-        .audio-vis-box { width: 100%; height: 90px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .audio-vis-box {
+            width: 100%;
+            height: 90px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
         canvas.audio-canvas { width: 100%; height: 100%; display: block; }
+        .voice-feedback {
+            display: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.45;
+            margin-bottom: 12px;
+            background: rgba(245, 158, 11, 0.14);
+            border: 1px solid var(--accent-yellow);
+            color: #fde68a;
+        }
 
-        .game-box { width: 100%; height: 250px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 18px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-        .target-ball { width: 64px; height: 64px; border-radius: 50%; position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); }
-        .ball-green { background: var(--accent-green); border: 2px solid var(--accent-green-bright); }
-        .ball-red { background: var(--accent-red); border: 2px solid var(--accent-red-bright); }
+        .game-box {
+            width: 100%;
+            height: 260px;
+            background: var(--input-bg);
+            border: 2px dashed var(--input-border);
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .target-ball {
+            width: 68px;
+            height: 68px;
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 11px;
+            color: #ffffff;
+            user-select: none;
+            touch-action: none;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+        }
+        .ball-green {
+            border-radius: 50%;
+            background: var(--accent-green);
+            border: 3px solid #a7f3d0;
+        }
+        .ball-red {
+            border-radius: 14px;
+            background: var(--accent-red);
+            border: 3px solid #fecaca;
+        }
 
         .badge-status { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-block; text-transform: uppercase; }
         .b-verde { background: rgba(16, 185, 129, 0.18); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
         .b-amarelo { background: rgba(245, 158, 11, 0.18); color: var(--accent-yellow-bright); border: 1px solid var(--accent-yellow); }
+        .b-roxo { background: rgba(168, 85, 247, 0.18); color: var(--accent-purple-bright); border: 1px solid var(--accent-purple); }
         .b-vermelho { background: rgba(239, 68, 68, 0.18); color: var(--accent-red-bright); border: 1px solid var(--accent-red); }
 
-        .sync-banner { padding: 14px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 18px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
-        .info-card { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; font-size: 12px; color: var(--text-sub); line-height: 1.5; }
-        .info-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 8px; font-weight: 700; }
+        .sync-banner {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+        .info-card {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+        .info-card h4 { color: var(--accent-cyan); font-size: 12px; margin-bottom: 8px; font-weight: 800; text-transform: uppercase; }
 
-        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+        .benefit-item {
+            background: #111827;
+            border: 1px solid #263349;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-top: 8px;
+        }
+        .benefit-item b { color: #ffffff; font-size: 12px; display: block; }
+        .benefit-item small { color: var(--text-muted); font-size: 11px; display: block; margin: 3px 0 8px 0; }
+        .benefit-btn {
+            background: rgba(56, 189, 248, 0.16);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
         .modal-backdrop.active { display: flex; }
-        .modal-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 16px; }
-        .modal-header h3 { font-size: 16px; color: var(--accent-cyan); }
-        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
-        .footer-brand { margin-top: 20px; text-align: center; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--panel-border); padding-top: 14px; }
+        .modal-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 22px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+        .modal-header h3 { font-size: 15px; color: var(--accent-cyan); }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; }
+
+        .tab-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+        .tab-pill {
+            padding: 9px;
+            border-radius: 8px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+        }
+        .tab-pill.active { background: #0284c7; color: #ffffff; border-color: var(--accent-cyan); }
+
+        .protocol-box {
+            display: none;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            margin-top: 12px;
+        }
+        .protocol-code {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--accent-green-bright);
+            letter-spacing: 1px;
+            margin: 6px 0;
+        }
+
+        .footer-brand {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--panel-border);
+            padding-top: 12px;
+            line-height: 1.45;
+        }
         .footer-brand b { color: var(--accent-cyan); }
     </style>
 </head>
@@ -87,128 +444,346 @@
 <div class="container">
     <div class="header-box">
         <h1>ExcelSilience SRT-RH</h1>
-        <p>Telemetria de Prontidão Ocupacional & Saúde Mental</p>
+        <p>Check-in Anônimo de Prontidão & Bem-Estar no Trabalho</p>
+        <div class="company-pill" id="lblCompanyPill">UNIDADE: EXCELSILIENCE</div>
     </div>
 
-    <span class="badge-gov">🔒 100% ANÔNIMO — ZERO CÂMERA & BLINDAGEM LGPD (N ≥ 5)</span>
+    <div class="demo-banner" id="demoBanner">
+        🧪 MODO DEMONSTRAÇÃO / TESTE ATIVO — Registro marcado como teste para exibição na Aba Demo do painel.
+    </div>
 
-    <!-- PASSO 1: SELEÇÃO DO SETOR -->
+    <span class="badge-gov">🔒 100% ANÔNIMO — ZERO CÂMERA • SEM CADASTRO • QUÓRUM MÍNIMO N ≥ 5</span>
+
+    <!-- PASSO 1: SETOR, TURNO, JANELA 8H/17H & CONSENTIMENTO -->
     <div id="stepForm" class="step active">
         <div class="form-group">
-            <label for="txtDept">Selecione seu Setor / Departamento:</label>
+            <label for="txtDept">1. Seu Setor / Departamento (GHE):</label>
             <select id="txtDept" required>
-                <option value="">-- Selecione o setor --</option>
+                <option value="">-- Selecione seu setor --</option>
                 <option value="TI">TI / Tecnologia & Sistemas</option>
                 <option value="Vendas">Vendas & Comercial</option>
                 <option value="Financeiro">Financeiro & Contabilidade</option>
                 <option value="Operações">Operações & Logística</option>
                 <option value="RH">Recursos Humanos / DHO</option>
-                <option value="Diretoria">Diretoria & C-Suite</option>
+                <option value="Diretoria">Diretoria & Gestão</option>
                 <option value="Atendimento">Atendimento & Suporte ao Cliente</option>
                 <option value="Marketing">Marketing & Comunicação</option>
                 <option value="Produção">Produção & Fábrica</option>
+                <option value="Manutenção">Manutenção & Engenharia</option>
             </select>
         </div>
 
+        <div class="form-group">
+            <label for="txtShift">2. Seu Turno de Trabalho:</label>
+            <select id="txtShift">
+                <option value="Comercial">Comercial (Diurno)</option>
+                <option value="Matutino">1º Turno (Matutino)</option>
+                <option value="Vespertino">2º Turno (Vespertino)</option>
+                <option value="Noturno">3º Turno (Noturno)</option>
+                <option value="Revezamento">Escala / Revezamento</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>3. Momento da Checagem (Comparativo de Jornada):</label>
+            <div class="window-grid">
+                <div class="window-btn selected" id="win8h" onclick="selectWindow('ENTRADA_8H')">
+                    ☀️ Entrada (8h)
+                    <small>Início do Turno</small>
+                </div>
+                <div class="window-btn" id="win17h" onclick="selectWindow('SAIDA_17H')">
+                    🌇 Saída (17h)
+                    <small>Fim do Turno</small>
+                </div>
+                <div class="window-btn" id="winAvulso" onclick="selectWindow('AVULSO')">
+                    ⏱️ Outro Horário
+                    <small>Pulso Avulso</small>
+                </div>
+            </div>
+        </div>
+
         <div class="chk-box">
-            <input type="checkbox" id="chkAuth" checked>
+            <input type="checkbox" id="chkAuth">
             <label for="chkAuth">
-                <b>Garantia de Anonimato & LGPD (Art. 7º):</b> Este teste é 100% anônimo. Não capturamos foto, nome ou CPF. As respostas são agrupadas por setor (mínimo N ≥ 5) para gerar relatórios de bem-estar para o RH e compliance com NR-01 (PGR) e NR-17 (AEP).
+                <b>Participação Voluntária & Anonimato Real (LGPD):</b> Este aplicativo <b>não usa câmera</b>, não coleta nome, CPF, e-mail nem horário exato individual. O RH visualiza apenas médias do setor quando há no mínimo <b>5 respostas</b> no recorte. A participação é <b>opcional</b> e não gera qualquer punição, desconto ou consequência trabalhista caso você opte por não realizar.
             </label>
         </div>
 
-        <button class="btn" onclick="startCheckinFlow()">Iniciar Aferição Anônima (30s) 🚀</button>
-        <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Como funciona o anonimato?</button>
+        <button class="btn" onclick="startCheckinFlow()">Iniciar Checagem Anônima (~40s) 🚀</button>
+        <button class="btn btn-danger-outline" onclick="openWhistleblowerModal()">🛡️ Canal de Escuta Anônima (NR-05) / Relatar Desconforto</button>
+        <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Como protegemos seu anonimato e o que esta ferramenta faz</button>
     </div>
 
-    <!-- PASSO 2: ANÁLISE BIOACÚSTICA DA VOZ VSI (7 SEGUNDOS) -->
-    <div id="stepVoz" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Análise Bioacústica da Voz (VSI)</h3>
-        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:12px;">
-            Clique no botão e leia a frase em voz alta no microfone durante 7 segundos:
+    <!-- PASSO 1B: PULSO RÁPIDO ORGANIZACIONAL NR-1 (OPCIONAL) -->
+    <div id="stepOrgPulse" class="step">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📋 Como foi o ambiente de trabalho hoje?</h3>
+        <p style="font-size:11px; text-align:center; color:var(--text-muted); margin-bottom:14px;">
+            Pulso rápido anônimo (fatores organizacionais NR-1). Marque de <b>1 (muito desfavorável)</b> a <b>5 (muito favorável)</b>:
         </p>
 
-        <div style="background:var(--input-bg); padding:16px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:16px; border:1px solid var(--input-border); font-size:14px;">
-            "Pronto para operar hoje com foco, energia e segurança."
+        <div class="nr1-card">
+            <div class="nr1-question">1. Ritmo e volume de demandas do setor estiveram equilibrados?</div>
+            <div class="likert-row" data-field="demands">
+                <button type="button" class="likert-btn" onclick="setLikert('demands', 1, this)">1</button>
+                <button type="button" class="likert-btn" onclick="setLikert('demands', 2, this)">2</button>
+                <button type="button" class="likert-btn" onclick="setLikert('demands', 3, this)">3</button>
+                <button type="button" class="likert-btn" onclick="setLikert('demands', 4, this)">4</button>
+                <button type="button" class="likert-btn" onclick="setLikert('demands', 5, this)">5</button>
+            </div>
+            <div class="likert-hints"><span>1 = Sobrecarga</span><span>5 = Equilibrado</span></div>
+        </div>
+
+        <div class="nr1-card">
+            <div class="nr1-question">2. Você teve autonomia e pausas adequadas para organizar suas tarefas?</div>
+            <div class="likert-row" data-field="autonomy">
+                <button type="button" class="likert-btn" onclick="setLikert('autonomy', 1, this)">1</button>
+                <button type="button" class="likert-btn" onclick="setLikert('autonomy', 2, this)">2</button>
+                <button type="button" class="likert-btn" onclick="setLikert('autonomy', 3, this)">3</button>
+                <button type="button" class="likert-btn" onclick="setLikert('autonomy', 4, this)">4</button>
+                <button type="button" class="likert-btn" onclick="setLikert('autonomy', 5, this)">5</button>
+            </div>
+            <div class="likert-hints"><span>1 = Nenhuma</span><span>5 = Plena</span></div>
+        </div>
+
+        <div class="nr1-card">
+            <div class="nr1-question">3. As prioridades e orientações do seu trabalho estiveram claras?</div>
+            <div class="likert-row" data-field="clarity">
+                <button type="button" class="likert-btn" onclick="setLikert('clarity', 1, this)">1</button>
+                <button type="button" class="likert-btn" onclick="setLikert('clarity', 2, this)">2</button>
+                <button type="button" class="likert-btn" onclick="setLikert('clarity', 3, this)">3</button>
+                <button type="button" class="likert-btn" onclick="setLikert('clarity', 4, this)">4</button>
+                <button type="button" class="likert-btn" onclick="setLikert('clarity', 5, this)">5</button>
+            </div>
+            <div class="likert-hints"><span>1 = Confusas</span><span>5 = Claras</span></div>
+        </div>
+
+        <div class="nr1-card">
+            <div class="nr1-question">4. Você sentiu respeito e apoio da liderança e dos colegas?</div>
+            <div class="likert-row" data-field="support">
+                <button type="button" class="likert-btn" onclick="setLikert('support', 1, this)">1</button>
+                <button type="button" class="likert-btn" onclick="setLikert('support', 2, this)">2</button>
+                <button type="button" class="likert-btn" onclick="setLikert('support', 3, this)">3</button>
+                <button type="button" class="likert-btn" onclick="setLikert('support', 4, this)">4</button>
+                <button type="button" class="likert-btn" onclick="setLikert('support', 5, this)">5</button>
+            </div>
+            <div class="likert-hints"><span>1 = Sem apoio</span><span>5 = Alto apoio</span></div>
+        </div>
+
+        <button class="btn" onclick="goToVoiceStep()">Avançar para Leitura Vocal (7s) ➡️</button>
+        <button class="btn btn-secondary" onclick="skipOrgPulse()">Pular perguntas e ir direto à checagem rápida</button>
+    </div>
+
+    <!-- PASSO 2: CAPTAÇÃO VOCAL (VSI - 7 SEGUNDOS) -->
+    <div id="stepVoz" class="step">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Captação de Estabilidade Vocal (7s)</h3>
+        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:10px;">
+            Em local silencioso, clique abaixo e leia a frase em tom natural e contínuo durante 7 segundos:
+        </p>
+
+        <div style="background:var(--input-bg); padding:14px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:12px; border:1px solid var(--input-border); font-size:14px;">
+            "Estou realizando minha checagem de prontidão com atenção e ritmo estável."
         </div>
 
         <div class="audio-vis-box">
             <canvas id="audioCanvas" class="audio-canvas"></canvas>
         </div>
 
-        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar e Analisar Voz (7s)</button>
+        <div class="voice-feedback" id="voiceRetryBox"></div>
+
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz por 7 Segundos</button>
+        <button id="btnSkipAudio" class="btn btn-secondary" style="display:none;" onclick="continueWithoutVoice()">
+            Continuar apenas com o desafio visual ➡️
+        </button>
+
         <div class="meter-bar" style="margin-top:14px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 3: DESAFIO VISUOMOTOR GO/NO-GO (12 RODADAS) -->
+    <!-- PASSO 3: DESAFIO VISUOMOTOR GO/NO-GO (16 RODADAS ACESSÍVEIS) -->
     <div id="stepInstruction" class="step">
-        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Reatividade Cognitiva e Foco</h3>
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Desafio de Atenção & Freio de Impulso</h3>
         <div class="info-card">
-            <p style="color:var(--accent-green-bright); margin-bottom:8px;">⚡ <b>Bolinha VERDE:</b> Toque na tela o mais rápido possível!</p>
-            <p style="color:var(--accent-red-bright);">🛑 <b>Bolinha VERMELHA:</b> NÃO toque! Contenha o impulso e deixe desaparecer.</p>
+            <p style="color:var(--accent-green-bright); margin-bottom:10px;">
+                ● <b>Círculo VERDE (✔ GO!):</b> Toque ou clique o mais rápido possível!
+            </p>
+            <p style="color:var(--accent-red-bright);">
+                ■ <b>Quadrado VERMELHO (✖ NO-GO!):</b> NÃO toque! Contenha o impulso até desaparecer.
+            </p>
+            <p style="color:var(--text-muted); margin-top:10px; font-size:11px;">
+                Dica de acessibilidade: os estímulos possuem cor, formato e símbolo diferentes.
+            </p>
         </div>
-        <button class="btn" onclick="startGame()">Start no Desafio (12 Rodadas) 🎯</button>
+        <button class="btn" onclick="startGame()">Iniciar Desafio (16 Rodadas) 🎯</button>
     </div>
 
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
-            <span>Erros de Impulso: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 16</b></span>
+            <span>Antecipações/Erros: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 4: RESULTADO CONFIDENCIAL & ORIENTAÇÃO -->
+    <!-- PASSO 4: RESULTADO CONFIDENCIAL, BENEFÍCIOS & FEEDBACK DO PILOTO -->
     <div id="stepResult" class="step">
-        <div id="syncStatus" class="sync-banner">⏳ Registrando indicador anônimo no Dashboard...</div>
+        <div id="syncStatus" class="sync-banner">⏳ Registrando indicador anônimo no servidor...</div>
 
-        <div style="text-align:center; margin-bottom:18px;">
-            <div style="font-size:36px; margin-bottom:6px;">🧠</div>
-            <h3 style="color:var(--accent-cyan); font-size:16px;">Prontidão Ocupacional Aferida</h3>
-            <p style="font-size:12px; color:var(--text-muted);" id="resDept">Setor: --</p>
-            <div id="resBadge" class="badge-status b-verde" style="margin-top:8px;">🟢 PRONTIDÃO EXCELENTE</div>
+        <div style="text-align:center; margin-bottom:16px;">
+            <div style="font-size:32px; margin-bottom:4px;">🧭</div>
+            <h3 style="color:var(--accent-cyan); font-size:16px;">Sua Devolutiva Confidencial de Bem-Estar</h3>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:2px;" id="resDept">Setor: --</p>
+            <div id="resBadge" class="badge-status b-verde" style="margin-top:10px;">🟢 PRONTIDÃO PRESERVADA</div>
         </div>
 
         <div class="info-card">
-            <h4>📊 Métricas do Seu Teste:</h4>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px; font-size:11px;">
-                <div>⚡ <b>Reatividade:</b> <span id="resLatency" style="color:#fff; font-weight:700;">0 ms</span></div>
-                <div>🛑 <b>Veto Motor:</b> <span id="resErrors" style="color:#fff; font-weight:700;">0 erros</span></div>
-                <div>🎙️ <b>Voz (VSI):</b> <span id="resVsi" style="color:#fff; font-weight:700;">Estável</span></div>
-                <div>🔒 <b>Privacidade:</b> <span style="color:var(--accent-green-bright); font-weight:700;">100% Anônimo</span></div>
+            <h4>📊 Indicadores Desta Sessão:</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px; font-size:11px;">
+                <div>⚡ <b>Tempo Médio:</b> <span id="resLatency" style="color:#fff; font-weight:700;">0 ms</span></div>
+                <div>🛑 <b>Erros de Impulso / Omissões:</b> <span id="resErrors" style="color:#fff; font-weight:700;">0</span></div>
+                <div>🎙️ <b>Estabilidade Vocal:</b> <span id="resVsi" style="color:#fff; font-weight:700;">--</span></div>
+                <div>🔒 <b>Registro:</b> <span style="color:var(--accent-green-bright); font-weight:700;">Sem Identificação</span></div>
             </div>
         </div>
 
         <div class="info-card" style="border-color:var(--accent-cyan);">
-            <h4>💡 Orientação Confidencial de Autocuidado:</h4>
-            <p id="resAction" style="font-weight:700; color:var(--accent-cyan); font-size:13px; margin-top:4px;">--</p>
+            <h4>💡 Sugestão Confidencial de Autocuidado:</h4>
+            <p id="resAction" style="font-weight:700; color:#e2e8f0; font-size:12px; margin-top:4px;"></p>
+            <p style="font-size:10px; color:var(--text-muted); margin-top:8px;">
+                Aviso: Este aplicativo oferece indicadores preventivos de atenção e bem-estar. Não realiza diagnóstico médico ou avaliação psicológica clínica.
+            </p>
         </div>
 
-        <button class="btn" onclick="location.reload()">🔄 Concluir & Novo Check-in</button>
+        <!-- PONTE DE BENEFÍCIOS CORPORATIVOS -->
+        <div class="info-card" id="benefitsCard" style="display:none; border-color:var(--accent-green);">
+            <h4>🎁 Recursos e Benefícios de Apoio Disponíveis para Você</h4>
+            <p style="font-size:11px; color:var(--text-muted);">O acesso é sigiloso. Contamos apenas cliques agregados do setor (N ≥ 5) para o RH saber quais benefícios ajudam mais.</p>
+            <div id="benefitsList"></div>
+        </div>
+
+        <!-- MICRO-AVALIAÇÃO DO PILOTO (UX / CONFIANÇA) -->
+        <div class="info-card" id="pilotFeedbackCard">
+            <h4>📝 Avaliação Rápida da Experiência (Opcional — Piloto)</h4>
+            <div class="form-row-2" style="margin-top:8px;">
+                <div>
+                    <label for="selClarity">Clareza da devolutiva:</label>
+                    <select id="selClarity">
+                        <option value="">-- Nota --</option>
+                        <option value="5">5 - Muito clara</option>
+                        <option value="4">4 - Clara</option>
+                        <option value="3">3 - Razoável</option>
+                        <option value="2">2 - Confusa</option>
+                        <option value="1">1 - Nada clara</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="selTrust">Confiança no anonimato:</label>
+                    <select id="selTrust">
+                        <option value="">-- Nota --</option>
+                        <option value="5">5 - Confio totalmente</option>
+                        <option value="4">4 - Confio</option>
+                        <option value="3">3 - Neutro</option>
+                        <option value="2">2 - Desconfio</option>
+                        <option value="1">1 - Não confio</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-secondary" id="btnSendPilotFeedback" onclick="submitPilotFeedback()">Enviar Avaliação Anônima do App</button>
+        </div>
+
+        <button class="btn" onclick="location.reload()">🔄 Concluir Checagem</button>
+        <button class="btn btn-danger-outline" onclick="openWhistleblowerModal()">🛡️ Abrir Canal de Escuta / Desconforto com a Ferramenta</button>
     </div>
 
-    <!-- MODAL DE AJUDA -->
+    <!-- MODAL DE AJUDA & TRANSPARÊNCIA -->
     <div id="helpModal" class="modal-backdrop">
         <div class="modal-box">
             <div class="modal-header">
-                <h3>❓ Anonimato & Privacidade Garantidos</h3>
+                <h3>❓ Transparência, Anonimato e Escopo</h3>
                 <button class="modal-close" onclick="closeModal('helpModal')">&times;</button>
             </div>
             <div style="font-size:12px; color:var(--text-sub); line-height:1.6;">
-                <p style="margin-bottom:10px;">O <b>SRT-RH</b> foi projetado para garantir total segurança psicológica aos colaboradores:</p>
+                <p style="margin-bottom:8px;"><b>O que este aplicativo faz:</b></p>
                 <ul style="padding-left:18px; margin-bottom:12px;">
-                    <li><b>Zero Câmera:</b> Nenhuma foto ou imagem é capturada.</li>
-                    <li><b>Sem Cadastro:</b> Não solicitamos nome, CPF ou e-mail.</li>
-                    <li><b>Trava LGPD ($N \ge 5$):</b> O RH só enxerga dados consolidados do setor quando houver no mínimo 5 respostas ativas.</li>
+                    <li>Coleta sinais comportamentais de atenção (Go/No-Go), estabilidade vocal (quando o microfone capta voz limpa) e percepção sobre o ambiente de trabalho.</li>
+                    <li>Agrupa os resultados por setor e janela (8h vs. 17h) apenas quando há no mínimo <b>5 respostas</b> no recorte, sem guardar horário exato nem identificador pessoal.</li>
                 </ul>
-                <p>Os dados ajudam a empresa a mapear setores com sobrecarga e ajustar processos de trabalho (NR-01 e NR-17).</p>
+                <p style="margin-bottom:8px;"><b>O que este aplicativo NÃO faz:</b></p>
+                <ul style="padding-left:18px; margin-bottom:12px;">
+                    <li>Não usa câmera, não grava áudio bruto no servidor, não faz diagnóstico médico/psicológico e não serve para punição, promoção ou demissão.</li>
+                </ul>
+                <p>Caso sinta qualquer desconforto com a ferramenta ou queira relatar uma situação de assédio, pressão abusiva ou risco no trabalho, utilize o <b>Canal de Escuta Anônima (NR-05)</b>.</p>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER BRANDING -->
+    <!-- MODAL DE OUVIDORIA NR-05 & DESCONFORTO -->
+    <div id="whistleModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>🛡️ Canal de Escuta Segura (NR-05)</h3>
+                <button class="modal-close" onclick="closeModal('whistleModal')">&times;</button>
+            </div>
+
+            <div class="tab-pills">
+                <button type="button" class="tab-pill active" id="tabBtnReport" onclick="switchWhistleTab('report')">✍️ Novo Relato Anônimo</button>
+                <button type="button" class="tab-pill" id="tabBtnCheck" onclick="switchWhistleTab('check')">🔍 Consultar Protocolo</button>
+            </div>
+
+            <div id="whistleTabReport">
+                <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px; line-height:1.45;">
+                    Este canal grava em base isolada da telemetria, sem identificar você. Se envolver liderança, o relato vai direto para o Comitê de Ética/RH. Ao final, você recebe um código para acompanhar sem login.
+                </p>
+
+                <div class="form-group">
+                    <label for="wbSector">Setor / Área Envolvida:</label>
+                    <input type="text" id="wbSector" placeholder="Ex: Operações, Vendas, TI...">
+                </div>
+
+                <div class="form-group">
+                    <label for="wbCategory">Categoria do Relato:</label>
+                    <select id="wbCategory">
+                        <option value="PRESSAO_ABUSIVA_METAS">Pressão Abusiva por Metas / Sobrecarga</option>
+                        <option value="ASSEDIO_MORAL">Assédio Moral / Humilhação</option>
+                        <option value="ASSEDIO_SEXUAL">Assédio Sexual / Importunação</option>
+                        <option value="CONFLITO_LIDERANCA">Conflito com Liderança / Gestão</option>
+                        <option value="DISCRIMINACAO">Discriminação / Preconceito</option>
+                        <option value="ERGONOMIA_CONDICAO_INSEGURA">Ergonomia / Condição Insegura</option>
+                        <option value="DESCONFORTO_FERRAMENTA_APP">Dúvida ou Desconforto com este Aplicativo</option>
+                        <option value="OUTRO">Outro Tema</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="wbLeaderRole">Função Envolvida (opcional, sem expor você):</label>
+                    <input type="text" id="wbLeaderRole" placeholder="Ex: Supervisão, Gerência, Colega, App...">
+                </div>
+
+                <div class="form-group">
+                    <label for="wbDescription">Descreva o ocorrido ou sugestão de melhoria:</label>
+                    <textarea id="wbDescription" placeholder="Relate os fatos com o máximo de clareza possível sem precisar se identificar..."></textarea>
+                </div>
+
+                <button class="btn" id="btnSubmitWhistle" onclick="submitWhistleblowerReport()">Enviar Relato Sigiloso & Gerar Protocolo 🔒</button>
+
+                <div class="protocol-box" id="wbSuccessBox">
+                    <div style="font-size:12px; font-weight:700; color:#e2e8f0;">Relato registrado com sigilo! Guarde seu código:</div>
+                    <div class="protocol-code" id="wbProtocolCode">DEN-0000-A</div>
+                    <button type="button" class="benefit-btn" onclick="copyProtocolCode()">📋 Copiar Protocolo</button>
+                </div>
+            </div>
+
+            <div id="whistleTabCheck" style="display:none;">
+                <div class="form-group">
+                    <label for="wbLookupCode">Digite seu Código de Protocolo:</label>
+                    <input type="text" id="wbLookupCode" placeholder="Ex: DEN-4821-K">
+                </div>
+                <button class="btn" onclick="lookupWhistleProtocol()">Consultar Andamento 🔍</button>
+                <div id="wbLookupResult" class="info-card" style="display:none; margin-top:12px;"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="footer-brand">
-        Plataforma <b>ExcelSilience SRT-RH</b> &copy; 2026 — Gestão Humana & Saúde Ocupacional.
+        Plataforma <b>ExcelSilience SRT-RH</b> &copy; 2026 — Ferramenta preventiva e complementar de bem-estar ocupacional (não substitui avaliação clínica ou PGR/AEP formal).
     </div>
 </div>
 
@@ -218,177 +793,314 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
+    const preDeptParam = urlParams.get('dept') || urlParams.get('sector') || '';
+    const isDemoMode = (
+        urlParams.get('demo') === 'true' ||
+        urlParams.get('master') === 'true' ||
+        urlParams.get('teste') === 'true'
+    );
 
+    let selectedWindow = 'ENTRADA_8H';
+    let orgPulse = { demands: null, autonomy: null, clarity: null, support: null };
+
+    let sessionStartMs = performance.now();
     let checkinSubmitted = false;
     let isRoundProcessing = false;
+    let roundPlan = [];
+    let currentRound = 0;
+    const totalRounds = 16; // 11 GO + 5 NO-GO balanceadas
     let reactionTimes = [];
     let vetoErrors = 0;
-    let currentRound = 0;
-    const totalRounds = 12;
+    let greenLapses = 0;
     let ballTimer = null;
     let ballSpawnTime = 0;
-    let vsiScoreVal = 1.80;
-    let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
+
+    let audioRetryCount = 0;
+    let audioQualityOk = false;
+    let vsiScoreVal = null;
+    let vsiStatusText = "Amostra vocal não coletada";
+    let finalBand = "GREEN";
 
     window.addEventListener('DOMContentLoaded', () => {
-        const savedDept = localStorage.getItem('srt_rh_dept');
-        if (savedDept) document.getElementById('txtDept').value = savedDept;
-    });
+        document.getElementById('lblCompanyPill').innerText = `UNIDADE: ${companyParam}`;
+        if (isDemoMode) {
+            document.getElementById('demoBanner').style.display = 'block';
+        }
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        const savedDept = preDeptParam || localStorage.getItem('srt_rh_dept');
+        if (savedDept) {
+            const sel = document.getElementById('txtDept');
+            const exists = Array.from(sel.options).some(o => o.value.toUpperCase() === savedDept.toUpperCase());
+            if (!exists) {
+                const opt = document.createElement('option');
+                opt.value = savedDept;
+                opt.text = savedDept;
+                sel.appendChild(opt);
+            }
+            sel.value = Array.from(sel.options).find(o => o.value.toUpperCase() === savedDept.toUpperCase()).value;
+        }
+
+        // Sugere janela inicial conforme hora local (antes das 13h -> Entrada 8h; após 13h -> Saída 17h)
+        const hr = new Date().getHours();
+        if (hr >= 13 && hr <= 21) {
+            selectWindow('SAIDA_17H');
+        } else {
+            selectWindow('ENTRADA_8H');
+        }
+    });
 
     function showStep(stepId) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById(stepId).classList.add('active');
     }
 
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function selectWindow(win) {
+        selectedWindow = win;
+        document.getElementById('win8h').classList.remove('selected');
+        document.getElementById('win17h').classList.remove('selected');
+        document.getElementById('winAvulso').classList.remove('selected');
+        if (win === 'ENTRADA_8H') document.getElementById('win8h').classList.add('selected');
+        else if (win === 'SAIDA_17H') document.getElementById('win17h').classList.add('selected');
+        else document.getElementById('winAvulso').classList.add('selected');
+    }
+
     function startCheckinFlow() {
-        const deptInput = document.getElementById('txtDept');
+        const dept = document.getElementById('txtDept').value.trim();
         const auth = document.getElementById('chkAuth').checked;
 
-        if (!deptInput.value || !deptInput.value.trim()) {
-            deptInput.value = "TI";
+        if (!dept) {
+            alert("Por favor, selecione o seu Setor / Departamento.");
+            return;
         }
-
-        localStorage.setItem('srt_rh_dept', deptInput.value.trim());
-
         if (!auth) {
-            alert("É necessário aceitar os termos de governança anônima para prosseguir.");
+            alert("Para continuar, confirme a leitura do termo de participação voluntária e anonimato.");
             return;
         }
 
+        try { localStorage.setItem('srt_rh_dept', dept); } catch (e) {}
+        sessionStartMs = performance.now();
+        showStep('stepOrgPulse');
+    }
+
+    function setLikert(field, val, btnEl) {
+        orgPulse[field] = val;
+        const row = btnEl.parentElement;
+        row.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+    }
+
+    function goToVoiceStep() {
         showStep('stepVoz');
+    }
+
+    function skipOrgPulse() {
+        orgPulse = { demands: null, autonomy: null, clarity: null, support: null };
+        showStep('stepVoz');
+    }
+
+    // Estima frequência fundamental (F0) por autocorrelação normalizada simples em janelas vozeadas
+    function estimatePitchAutocorr(buf, sampleRate) {
+        let rms = 0;
+        for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+        rms = Math.sqrt(rms / buf.length);
+        if (rms < 0.015) return { rms: rms, f0: null };
+
+        const minLag = Math.floor(sampleRate / 320); // ~320 Hz máx
+        const maxLag = Math.floor(sampleRate / 70);  // ~70 Hz mín
+        let bestLag = -1;
+        let bestCorr = 0;
+
+        for (let lag = minLag; lag <= maxLag; lag++) {
+            let num = 0;
+            let denA = 0;
+            let denB = 0;
+            for (let i = 0; i < buf.length - lag; i++) {
+                num += buf[i] * buf[i + lag];
+                denA += buf[i] * buf[i];
+                denB += buf[i + lag] * buf[i + lag];
+            }
+            const corr = (denA > 0 && denB > 0) ? (num / Math.sqrt(denA * denB)) : 0;
+            if (corr > bestCorr) {
+                bestCorr = corr;
+                bestLag = lag;
+            }
+        }
+
+        if (bestCorr > 0.55 && bestLag > 0) {
+            return { rms: rms, f0: sampleRate / bestLag };
+        }
+        return { rms: rms, f0: null };
     }
 
     async function runAudioTest() {
         const btn = document.getElementById('btnRec');
+        const btnSkip = document.getElementById('btnSkipAudio');
+        const retryBox = document.getElementById('voiceRetryBox');
         const progress = document.getElementById('progressAudio');
         const canvas = document.getElementById('audioCanvas');
+
+        retryBox.style.display = 'none';
+        btnSkip.style.display = 'none';
         btn.disabled = true;
-        btn.innerText = "🎙️ Analisando voz em tempo real (7s)... Fale a frase!";
-        btn.style.background = "#f59e0b";
+        btn.innerText = "🎙️ Gravando... Leia a frase em tom contínuo (7s)";
+        btn.style.background = "#d97706";
+        progress.style.width = "0%";
+
+        let audioStream = null;
+        let audioCtx = null;
 
         try {
-            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            });
+
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const analyser = audioCtx.createAnalyser();
             const source = audioCtx.createMediaStreamSource(audioStream);
             source.connect(analyser);
 
-            analyser.fftSize = 64;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
+            analyser.fftSize = 2048;
+            const timeData = new Float32Array(analyser.fftSize);
+            const freqData = new Uint8Array(analyser.frequencyBinCount);
 
-            let audioFrames = [];
+            const voicedRms = [];
+            const voicedF0 = [];
             let animId = null;
 
-            if (canvas) {
+            function drawWave() {
+                animId = requestAnimationFrame(drawWave);
+                analyser.getByteFrequencyData(freqData);
+                if (!canvas) return;
                 const ctx = canvas.getContext('2d');
-                function drawEq() {
-                    animId = requestAnimationFrame(drawEq);
-                    analyser.getByteFrequencyData(dataArray);
-
-                    // Coleta quadros de sinal para cálculo de DSP real
-                    let sum = 0;
-                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-                    audioFrames.push(sum / bufferLength);
-
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    const barWidth = (canvas.width / bufferLength) * 1.5;
-                    let x = 0;
-                    for (let i = 0; i < bufferLength; i++) {
-                        const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
-                        ctx.fillStyle = '#38bdf8';
-                        ctx.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
-                        x += barWidth;
-                    }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const bars = 32;
+                const barW = canvas.width / bars;
+                for (let i = 0; i < bars; i++) {
+                    const v = freqData[i * 4] || 0;
+                    const h = (v / 255) * canvas.height * 0.9;
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(i * barW + 2, canvas.height - h, barW - 4, h);
                 }
-                drawEq();
             }
+            drawWave();
 
-            let p = 0;
-            const timer = setInterval(() => {
-                p += 15;
-                progress.style.width = p + '%';
-                if (p >= 100) {
-                    clearInterval(timer);
+            const sampler = setInterval(() => {
+                analyser.getFloatTimeDomainData(timeData);
+                const res = estimatePitchAutocorr(timeData, audioCtx.sampleRate);
+                if (res.rms >= 0.018) voicedRms.push(res.rms);
+                if (res.f0 !== null) voicedF0.push(res.f0);
+            }, 80);
+
+            let elapsedMs = 0;
+            const totalMs = 7000;
+            const progTimer = setInterval(() => {
+                elapsedMs += 250;
+                progress.style.width = Math.min(100, Math.round((elapsedMs / totalMs) * 100)) + "%";
+
+                if (elapsedMs >= totalMs) {
+                    clearInterval(progTimer);
+                    clearInterval(sampler);
                     if (animId) cancelAnimationFrame(animId);
                     if (audioStream) audioStream.getTracks().forEach(t => t.stop());
-                    audioCtx.close();
+                    try { audioCtx.close(); } catch (e) {}
 
-                    btn.innerText = "🟢 Análise Vocal Concluída!";
+                    // Validação rigorosa de qualidade: exige voz detectada real
+                    if (voicedRms.length < 18 || voicedF0.length < 10) {
+                        audioRetryCount++;
+                        audioQualityOk = false;
+                        vsiScoreVal = null;
+                        vsiStatusText = "Amostra vocal insuficiente — solicitada repetição";
+                        btn.disabled = false;
+                        btn.style.background = "#0284c7";
+                        btn.innerText = "🔄 Repetir Gravação de Voz (7s)";
+                        retryBox.style.display = 'block';
+                        retryBox.innerHTML = `<b>Amostra de voz fora dos parâmetros:</b> detectamos silêncio, volume muito baixo ou ruído de fundo (${voicedF0.length} quadros vocais válidos). Aproxime-se do microfone e repita a leitura — <b>nenhum número foi inventado</b>.`;
+                        btnSkip.style.display = 'block';
+                        return;
+                    }
+
+                    // Calcula instabilidade relativa de amplitude (RMS) e frequência fundamental (F0)
+                    const meanRms = voicedRms.reduce((a, b) => a + b, 0) / voicedRms.length;
+                    let ampDiffSum = 0;
+                    for (let i = 1; i < voicedRms.length; i++) {
+                        ampDiffSum += Math.abs(voicedRms[i] - voicedRms[i - 1]);
+                    }
+                    const relAmpVar = meanRms > 0 ? (ampDiffSum / (voicedRms.length - 1)) / meanRms : 0;
+
+                    const meanF0 = voicedF0.reduce((a, b) => a + b, 0) / voicedF0.length;
+                    let f0DiffSum = 0;
+                    for (let i = 1; i < voicedF0.length; i++) {
+                        f0DiffSum += Math.abs(voicedF0[i] - voicedF0[i - 1]);
+                    }
+                    const relF0Var = meanF0 > 0 ? (f0DiffSum / (voicedF0.length - 1)) / meanF0 : 0;
+
+                    // Escala comportamental VSI (1.00 a 5.00) baseada exclusivamente no sinal real
+                    const rawVsi = 1.25 + (relF0Var * 10.5) + (relAmpVar * 2.4);
+                    if (!isFinite(rawVsi) || relF0Var > 0.45) {
+                        audioRetryCount++;
+                        audioQualityOk = false;
+                        vsiScoreVal = null;
+                        vsiStatusText = "Ruído externo excessivo — solicitada repetição";
+                        btn.disabled = false;
+                        btn.style.background = "#0284c7";
+                        btn.innerText = "🔄 Repetir Gravação de Voz (7s)";
+                        retryBox.style.display = 'block';
+                        retryBox.innerHTML = `<b>Oscilação compatível com ruído ambiente:</b> tente repetir a frase em local mais silencioso para garantir leitura limpa.`;
+                        btnSkip.style.display = 'block';
+                        return;
+                    }
+
+                    audioQualityOk = true;
+                    vsiScoreVal = Number(Math.min(5.00, Math.max(1.00, rawVsi)).toFixed(2));
+                    if (vsiScoreVal < 2.30) vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal.toFixed(2)})`;
+                    else if (vsiScoreVal <= 3.40) vsiStatusText = `🟡 Tensão Vocal Moderada (VSI ${vsiScoreVal.toFixed(2)})`;
+                    else if (vsiScoreVal <= 4.40) vsiStatusText = `🟣 Desgaste Vocal Acentuado (VSI ${vsiScoreVal.toFixed(2)})`;
+                    else vsiStatusText = `🔴 Instabilidade Vocal Alta (VSI ${vsiScoreVal.toFixed(2)})`;
+
+                    btn.innerText = "🟢 Captação Vocal Válida!";
                     btn.style.background = "#10b981";
-
-                    // === CÁLCULO DE DSP REAL COM FILTRO VAD E SUAVIZAÇÃO EMA PARA VSI (0.00 a 5.00) ===
-                    if (audioFrames.length > 10) {
-                        // 1. Filtro VAD (Voice Activity Detection): Descarta ruído de fundo e silêncio (< 5.0)
-                        let speechFrames = audioFrames.filter(val => val > 5.0);
-                        if (speechFrames.length < 10) {
-                            speechFrames = audioFrames.length > 0 ? audioFrames : [10.0];
-                        }
-
-                        // 2. Remoção de Outliers (Corte de 2.5% dos picos extremos de estalados)
-                        let speechSorted = [...speechFrames].sort((a, b) => a - b);
-                        let n = speechSorted.length;
-                        let trimK = Math.floor(n * 0.025);
-                        let speechClean = (trimK > 0 && n - 2 * trimK >= 10) ? speechSorted.slice(trimK, n - trimK) : speechFrames;
-
-                        // 3. Suavização por Média Móvel Exponencial (EMA - Exponential Moving Average)
-                        let smoothedFrames = [];
-                        let ema = speechClean[0];
-                        const alpha = 0.25;
-                        for (let i = 0; i < speechClean.length; i++) {
-                            ema = alpha * speechClean[i] + (1 - alpha) * ema;
-                            smoothedFrames.push(ema);
-                        }
-
-                        // 4. Métrica Relativa de Jitter e Shimmer (Normalizada pelo Volume Médio)
-                        let mean = smoothedFrames.reduce((a, b) => a + b, 0) / smoothedFrames.length;
-                        if (mean > 0) {
-                            let diffSum = 0;
-                            for (let i = 1; i < smoothedFrames.length; i++) {
-                                diffSum += Math.abs(smoothedFrames[i] - smoothedFrames[i-1]);
-                            }
-                            let relJitter = (diffSum / smoothedFrames.length) / mean;
-
-                            let variance = smoothedFrames.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / smoothedFrames.length;
-                            let relShimmer = Math.sqrt(variance) / mean;
-
-                            // Fórmula do VSI na escala neurofisiológica de 0.00 a 5.00:
-                            let calcVsi = 1.50 + (relJitter * 2.2) + (relShimmer * 1.8);
-                            vsiScoreVal = Math.min(5.00, Math.max(1.00, calcVsi)).toFixed(2);
-                        } else {
-                            vsiScoreVal = "1.80";
-                        }
-                    } else {
-                        vsiScoreVal = (1.60 + Math.random() * 0.30).toFixed(2);
-                    }
-
-                    if (vsiScoreVal < 2.30) {
-                        vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
-                    } else if (vsiScoreVal <= 3.40) {
-                        vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
-                    } else if (vsiScoreVal <= 4.40) {
-                        vsiStatusText = `🟣 Exaustão Autonômica (VSI ${vsiScoreVal})`;
-                    } else {
-                        vsiStatusText = `🔴 Instabilidade Vocal Crítica (VSI ${vsiScoreVal})`;
-                    }
-
-                    setTimeout(() => { showStep('stepInstruction'); }, 1000);
+                    setTimeout(() => showStep('stepInstruction'), 700);
                 }
-            }, 600);
+            }, 250);
 
         } catch (err) {
-            console.warn("Microfone indisponível ou negado:", err);
-            progress.style.width = '100%';
-            btn.innerText = "⚠️ Microfone Ausente (Voz Padrão)";
-            btn.style.background = "#334155";
-            vsiScoreVal = "1.80";
-            vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
-
-            setTimeout(() => { showStep('stepInstruction'); }, 1200);
+            audioRetryCount++;
+            audioQualityOk = false;
+            vsiScoreVal = null;
+            vsiStatusText = "Microfone indisponível";
+            btn.disabled = false;
+            btn.style.background = "#0284c7";
+            btn.innerText = "🔄 Tentar Microfone Novamente";
+            retryBox.style.display = 'block';
+            retryBox.innerHTML = `<b>Microfone não autorizado ou indisponível.</b> Você pode liberar a permissão e tentar novamente, ou seguir apenas com o desafio visual.`;
+            btnSkip.style.display = 'block';
         }
+    }
+
+    function continueWithoutVoice() {
+        audioQualityOk = false;
+        vsiScoreVal = null;
+        vsiStatusText = "Não aferida (microfone indisponível/ignorado)";
+        showStep('stepInstruction');
+    }
+
+    function buildBalancedRounds() {
+        // 11 GO + 5 NO-GO embaralhados (sempre garante 5 estímulos de contenção)
+        const arr = [];
+        for (let i = 0; i < 11; i++) arr.push(true);
+        for (let i = 0; i < 5; i++) arr.push(false);
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
     }
 
     function startGame() {
@@ -396,72 +1108,66 @@
         isRoundProcessing = false;
         reactionTimes = [];
         vetoErrors = 0;
+        greenLapses = 0;
         currentRound = 0;
+        roundPlan = buildBalancedRounds();
         if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+        document.getElementById('lblErrors').innerText = "0";
         showStep('stepBolinhas');
         nextRound();
     }
 
     function nextRound() {
         if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
-
         if (currentRound >= totalRounds) {
             finishGame();
             return;
         }
 
+        const isGreen = roundPlan[currentRound];
         currentRound++;
         isRoundProcessing = false;
-        const lblRound = document.getElementById('lblRound');
-        if (lblRound) lblRound.innerText = currentRound + " / " + totalRounds;
+        document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
 
         const area = document.getElementById('gameArea');
-        if (!area) return;
         area.innerHTML = '';
 
-        const isGreen = Math.random() > 0.3;
         const ball = document.createElement('div');
         ball.className = "target-ball " + (isGreen ? "ball-green" : "ball-red");
-        ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
+        ball.innerHTML = isGreen
+            ? `<span style="font-size:15px; line-height:1;">✔</span><span>GO!</span>`
+            : `<span style="font-size:15px; line-height:1;">✖</span><span>NO-GO</span>`;
 
-        const maxX = Math.max(40, (area.clientWidth || 300) - 70);
-        const maxY = Math.max(40, (area.clientHeight || 200) - 70);
-        const posX = Math.max(10, Math.floor(Math.random() * maxX));
-        const posY = Math.max(10, Math.floor(Math.random() * maxY));
+        const maxX = Math.max(40, (area.clientWidth || 300) - 78);
+        const maxY = Math.max(40, (area.clientHeight || 200) - 78);
+        ball.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
+        ball.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
 
-        ball.style.left = posX + 'px';
-        ball.style.top = posY + 'px';
+        ballSpawnTime = performance.now();
 
-        ballSpawnTime = Date.now();
-
-        function handleBallHit(e) {
-            if (e) {
-                try { e.preventDefault(); e.stopPropagation(); } catch(err){}
-            }
+        function handleHit(e) {
+            if (e) { try { e.preventDefault(); e.stopPropagation(); } catch (err) {} }
             if (isRoundProcessing) return;
-            isRoundProcessing = true;
 
+            const rt = Math.round(performance.now() - ballSpawnTime);
+            // Ignora toques impossíveis (< 100 ms / duplo toque acidental)
+            if (rt < 100) return;
+
+            isRoundProcessing = true;
             if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
 
-            const rt = Date.now() - ballSpawnTime;
-            const finalRt = Math.max(100, rt);
-
             if (isGreen) {
-                reactionTimes.push(finalRt);
+                reactionTimes.push(rt);
             } else {
                 vetoErrors++;
-                const lblErr = document.getElementById('lblErrors');
-                if (lblErr) lblErr.innerText = vetoErrors;
+                document.getElementById('lblErrors').innerText = vetoErrors + greenLapses;
             }
 
             area.innerHTML = '';
-            setTimeout(nextRound, 300);
+            setTimeout(nextRound, 280);
         }
 
-        ball.addEventListener('pointerdown', handleBallHit, { passive: false });
-        ball.addEventListener('touchstart', handleBallHit, { passive: false });
-        ball.onclick = handleBallHit;
-
+        ball.addEventListener('pointerdown', handleHit, { passive: false });
         area.appendChild(ball);
 
         ballTimer = setTimeout(() => {
@@ -469,10 +1175,12 @@
             isRoundProcessing = true;
             area.innerHTML = '';
             if (isGreen) {
-                reactionTimes.push(850);
+                greenLapses++;
+                reactionTimes.push(1050); // lapso de omissão entra na média sem ser mascarado
+                document.getElementById('lblErrors').innerText = vetoErrors + greenLapses;
             }
-            setTimeout(nextRound, 300);
-        }, 1100);
+            setTimeout(nextRound, 280);
+        }, 1050);
     }
 
     async function finishGame() {
@@ -480,135 +1188,311 @@
         checkinSubmitted = true;
         showStep('stepResult');
 
-        const validGreenTimes = reactionTimes.filter(t => t < 800);
-        const avgRt = validGreenTimes.length > 0 ? Math.round(validGreenTimes.reduce((a, b) => a + b, 0) / validGreenTimes.length) : (reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 450);
+        const avgRt = reactionTimes.length > 0
+            ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
+            : 750;
 
         let status = 'GREEN';
         let badgeClass = 'b-verde';
-        let badgeText = '🟢 PRONTIDÃO EXCELENTE';
-        let actionText = '🟢 Sua fisiologia e controle inibitório estão em equilíbrio. Excelente dia de trabalho!';
+        let badgeText = '🟢 PRONTIDÃO PRESERVADA';
+        let actionText = 'Seus indicadores de atenção e resposta estão estáveis no momento. Mantenha pausas curtas de hidratação ao longo do expediente.';
 
-        if (vetoErrors >= 2 || avgRt > 800 || Number(vsiScoreVal) >= 4.40) {
+        const vsiNum = (audioQualityOk && vsiScoreVal !== null) ? Number(vsiScoreVal) : null;
+
+        if (vetoErrors >= 2 || greenLapses >= 3 || avgRt > 780 || (vsiNum !== null && vsiNum >= 4.41)) {
             status = 'RED';
             badgeClass = 'b-vermelho';
-            badgeText = '🔴 ALERTA CRÍTICO DE SOBRECARGA';
-            actionText = '🔴 Indicador de alta carga cognitiva / fadiga acumulada. Recomendamos fazer uma pausa de descompressão antes de focar em decisões complexas.';
-        } else if (avgRt > 700 || vetoErrors === 1 || Number(vsiScoreVal) > 2.80) {
+            badgeText = '🔴 SINAL DE SOBRECARGA ELEVADA';
+            actionText = 'Sinais compatíveis com fadiga ou sobrecarga acentuada agora. Recomenda-se fazer uma pausa imediata de descompressão (15–20 min), hidratar-se e, se necessário, acionar os canais confidenciais de apoio abaixo.';
+        } else if ((vsiNum !== null && vsiNum >= 3.41) || greenLapses === 2 || avgRt > 680) {
+            status = 'PURPLE';
+            badgeClass = 'b-roxo';
+            badgeText = '🟣 SINAL DE CANSAÇO ACUMULADO';
+            actionText = 'Indício de cansaço ou queda de ritmo atencional. Faça uma pausa de respiração e descanso ocular longe das telas antes da próxima tarefa exigente.';
+        } else if (vetoErrors === 1 || greenLapses === 1 || avgRt > 600 || (vsiNum !== null && vsiNum >= 2.30)) {
             status = 'YELLOW';
             badgeClass = 'b-amarelo';
-            badgeText = '🟡 PAUSA TÁTICA RECOMENDADA';
-            actionText = '🟡 Tensão autonômica moderada detectada. Recomendamos uma pausa de 10 minutos, hidratação (300 ml de água) e exercício de respiração 4-7-8.';
+            badgeText = '🟡 SINAL DE ATENÇÃO MODERADA';
+            actionText = 'Pequena oscilação de foco ou tensão percebida. Recomendamos uma pausa tática de 10 minutos (água, alongamento leve e organização das prioridades).';
         }
 
-        const dept = document.getElementById('txtDept').value.trim();
+        finalBand = status;
+        const dept = document.getElementById('txtDept').value.trim() || 'Geral';
+        const shiftName = document.getElementById('txtShift').value || 'Comercial';
 
-        document.getElementById('resDept').innerText = "Setor: " + dept + " • " + companyParam;
+        document.getElementById('resDept').innerText = `Setor: ${dept} • Turno: ${shiftName} • Janela: ${selectedWindow === 'ENTRADA_8H' ? 'Entrada (8h)' : (selectedWindow === 'SAIDA_17H' ? 'Saída (17h)' : 'Avulso')}`;
         document.getElementById('resBadge').className = `badge-status ${badgeClass}`;
         document.getElementById('resBadge').innerText = badgeText;
-        document.getElementById('resLatency').innerText = avgRt + " ms";
-        document.getElementById('resErrors').innerText = vetoErrors + " erro(s)";
+        document.getElementById('resLatency').innerText = `${avgRt} ms`;
+        document.getElementById('resErrors').innerText = `${vetoErrors} impulso / ${greenLapses} omissões`;
         document.getElementById('resVsi').innerText = vsiStatusText;
         document.getElementById('resAction').innerText = actionText;
 
-        // PAYLOAD COMPATÍVEL COM SRT_CHECKINS (100% ANÔNIMO - ZERO FOTO)
-        const payload = {
-            name: "Colaborador Anônimo (RH)",
-            role: "Membro da Equipe",
-            department: dept,
-            company: companyParam,
-            reaction_time_ms: avgRt,
-            veto_errors: vetoErrors,
-            vsi_score: Number(vsiScoreVal),
-            vsi_status: vsiStatusText,
-            status: status,
-            action: actionText,
-            photo_url: null
-        };
-
-
-    async function sendBackupCopy(moduleType, payloadData) {
-        try {
-            const backupPayload = {
-                module_type: moduleType,
-                name: payloadData.name || null,
-                role: payloadData.role || null,
-                department: payloadData.department || payloadData.dept || null,
-                company: payloadData.company || null,
-                reaction_time_ms: payloadData.reaction_time_ms || payloadData.latency_ms || null,
-                veto_errors: payloadData.veto_errors !== undefined ? payloadData.veto_errors : null,
-                vsi_score: payloadData.vsi_score || null,
-                vsi_status: payloadData.vsi_status || null,
-                status: payloadData.status || null,
-                action: payloadData.action || null,
-                photo_url: payloadData.photo_url || null,
-                raw_payload: payloadData
-            };
-            fetch(`${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(backupPayload)
-            }).catch(e => console.warn("Espelho de Segurança (Backup) aviso:", e));
-        } catch(e) {
-            console.warn("Espelho de Segurança falha:", e);
-        }
-    }
-
         const syncEl = document.getElementById('syncStatus');
-        sendBackupCopy('SRT_RH', payload);
-
-        syncEl.innerText = '⏳ Registrando indicador anônimo no Dashboard...';
+        const demoTag = isDemoMode ? `DEMO_${new Date().toISOString().slice(0, 16)}` : null;
 
         try {
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_srt_rh_telemetry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    p_company: companyParam,
+                    p_sector: dept,
+                    p_shift_name: shiftName,
+                    p_shift_window: selectedWindow,
+                    p_reaction_time_ms: avgRt,
+                    p_veto_errors: vetoErrors,
+                    p_green_lapses: greenLapses,
+                    p_audio_quality_ok: audioQualityOk,
+                    p_vsi_score: audioQualityOk ? vsiScoreVal : null,
+                    p_vsi_status: vsiStatusText,
+                    p_status: status,
+                    p_action: actionText,
+                    p_org_demands: orgPulse.demands,
+                    p_org_autonomy: orgPulse.autonomy,
+                    p_org_clarity: orgPulse.clarity,
+                    p_org_support: orgPulse.support,
+                    p_is_demo_test: isDemoMode,
+                    p_demo_session_tag: demoTag
+                })
             });
 
             if (res.ok) {
-                syncEl.innerText = '✅ INDICADOR ANÔNIMO REGISTRADO COM SUCESSO NO DASHBOARD DO RH!';
+                syncEl.innerText = isDemoMode
+                    ? '✅ TESTE DE DEMONSTRAÇÃO REGISTRADO (Visível na Aba Demo com PIN)!'
+                    : '✅ REGISTRO ANÔNIMO ENVIADO COM SEGURANÇA AO PAINEL DO SETOR!';
                 syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
                 syncEl.style.color = '#34d399';
-                return;
             } else {
-                let res2 = await fetch(`${SUPABASE_URL}/rest/v1/srt_rh_checkins`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(payload)
-                });
-                if (res2.ok) {
-                    syncEl.innerText = '✅ INDICADOR ANÔNIMO REGISTRADO COM SUCESSO NO DASHBOARD DO RH!';
-                    syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
-                    syncEl.style.color = '#34d399';
-                    return;
-                }
+                syncEl.innerText = '⚠️ Concluído localmente (verifique conexão com o servidor).';
+                syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
+                syncEl.style.color = '#fbbf24';
             }
-            syncEl.innerText = '✅ Indicador concluído e salvo localmente.';
-            syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
-            syncEl.style.color = '#fbbf24';
         } catch (err) {
-            console.warn("Erro de conexão com o Supabase:", err);
-            syncEl.innerText = '✅ Indicador registrado localmente (Modo Offline).';
+            syncEl.innerText = '⚠️ Concluído localmente (sem conexão no momento).';
             syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
             syncEl.style.color = '#fbbf24';
         }
+
+        // Carrega benefícios se houver sinal de atenção ou para apoio voluntário
+        loadCompanyBenefits(dept, status);
     }
 
-    </script>
+    async function loadCompanyBenefits(dept, status) {
+        try {
+            const url = `${SUPABASE_URL}/rest/v1/company_benefits?is_active=eq.true&or=(company.eq.${encodeURIComponent(companyParam)},company.eq.EXCELSILIENCE)&select=*`;
+            const res = await fetch(url, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            if (!res.ok) return;
+            const benefits = await res.json();
+            if (!Array.isArray(benefits) || benefits.length === 0) return;
+
+            // Prioriza benefícios compatíveis com a janela/status atual
+            const filtered = benefits.filter(b => {
+                if (status === 'GREEN') return true;
+                const tags = Array.isArray(b.trigger_tags) ? b.trigger_tags : [];
+                return tags.length === 0 || tags.includes(status) || tags.includes(selectedWindow === 'ENTRADA_8H' ? 'ENTRADA_8H_ALERTA' : 'SAIDA_17H_DESGASTE');
+            });
+            const list = filtered.length > 0 ? filtered : benefits;
+
+            const container = document.getElementById('benefitsList');
+            container.innerHTML = '';
+            list.forEach(b => {
+                const div = document.createElement('div');
+                div.className = 'benefit-item';
+                div.innerHTML = `
+                    <b>${b.benefit_name}</b>
+                    <small>${b.description}</small>
+                    <button type="button" class="benefit-btn">Acessar com Sigilo 🔗</button>
+                `;
+                div.querySelector('button').onclick = () => logBenefitEngagement(b.id, dept, status, b.access_url);
+                container.appendChild(div);
+            });
+            document.getElementById('benefitsCard').style.display = 'block';
+        } catch (e) {}
+    }
+
+    async function logBenefitEngagement(benefitId, dept, status, accessUrl) {
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/benefit_engagement_logs`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    company: companyParam,
+                    benefit_id: benefitId,
+                    sector: dept,
+                    shift_window: selectedWindow,
+                    trigger_band: status
+                })
+            });
+        } catch (e) {}
+
+        if (accessUrl && accessUrl.startsWith('http')) {
+            window.open(accessUrl, '_blank', 'noopener,noreferrer');
+        } else {
+            alert("Acesso sigiloso registrado! Consulte o portal interno de benefícios do RH para agendamento direto.");
+        }
+    }
+
+    async function submitPilotFeedback() {
+        const clarity = document.getElementById('selClarity').value;
+        const trust = document.getElementById('selTrust').value;
+        const dept = document.getElementById('txtDept').value.trim() || 'Geral';
+        const durationSec = Math.max(10, Math.round((performance.now() - sessionStartMs) / 1000));
+        const btn = document.getElementById('btnSendPilotFeedback');
+
+        btn.disabled = true;
+        btn.innerText = "Enviando...";
+
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/rh_pilot_ux_metrics`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    company: companyParam,
+                    sector: dept,
+                    completed: true,
+                    duration_sec: durationSec,
+                    audio_retry_count: audioRetryCount,
+                    audio_failed: !audioQualityOk,
+                    clarity_rating: clarity ? parseInt(clarity, 10) : null,
+                    trust_rating: trust ? parseInt(trust, 10) : null
+                })
+            });
+            btn.innerText = "✅ Obrigado! Avaliação do piloto registrada.";
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerText = "Tentar enviar novamente";
+        }
+    }
+
+    // === CANAL DE ESCUTA & DENÚNCIAS NR-05 ===
+    function openWhistleblowerModal() {
+        const currentDept = document.getElementById('txtDept').value.trim();
+        if (currentDept && !document.getElementById('wbSector').value) {
+            document.getElementById('wbSector').value = currentDept;
+        }
+        document.getElementById('wbSuccessBox').style.display = 'none';
+        openModal('whistleModal');
+    }
+
+    function switchWhistleTab(tab) {
+        document.getElementById('tabBtnReport').classList.toggle('active', tab === 'report');
+        document.getElementById('tabBtnCheck').classList.toggle('active', tab === 'check');
+        document.getElementById('whistleTabReport').style.display = (tab === 'report') ? 'block' : 'none';
+        document.getElementById('whistleTabCheck').style.display = (tab === 'check') ? 'block' : 'none';
+    }
+
+    async function submitWhistleblowerReport() {
+        const sector = document.getElementById('wbSector').value.trim() || 'Geral';
+        const category = document.getElementById('wbCategory').value;
+        const leaderRole = document.getElementById('wbLeaderRole').value.trim();
+        const desc = document.getElementById('wbDescription').value.trim();
+        const btn = document.getElementById('btnSubmitWhistle');
+
+        if (desc.length < 10) {
+            alert("Por favor, descreva a situação ou desconforto com pelo menos algumas palavras.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Registrando com sigilo...";
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_whistleblower_report`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                },
+                body: JSON.stringify({
+                    p_company: companyParam,
+                    p_target_sector: sector,
+                    p_category: category,
+                    p_reported_leader_role: leaderRole,
+                    p_description: desc
+                })
+            });
+
+            if (res.ok) {
+                const code = await res.json();
+                document.getElementById('wbProtocolCode').innerText = code;
+                document.getElementById('wbSuccessBox').style.display = 'block';
+                document.getElementById('wbDescription').value = '';
+                btn.innerText = "Relato Enviado 🔒";
+            } else {
+                alert("Não foi possível registrar agora. Tente novamente.");
+                btn.disabled = false;
+                btn.innerText = "Enviar Relato Sigiloso & Gerar Protocolo 🔒";
+            }
+        } catch (err) {
+            alert("Erro de conexão ao enviar relato.");
+            btn.disabled = false;
+            btn.innerText = "Enviar Relato Sigiloso & Gerar Protocolo 🔒";
+        }
+    }
+
+    function copyProtocolCode() {
+        const code = document.getElementById('wbProtocolCode').innerText;
+        if (navigator.clipboard) navigator.clipboard.writeText(code);
+        alert(`Protocolo ${code} copiado!`);
+    }
+
+    async function lookupWhistleProtocol() {
+        const code = document.getElementById('wbLookupCode').value.trim().toUpperCase();
+        const box = document.getElementById('wbLookupResult');
+        if (!code) {
+            alert("Informe o código do protocolo (ex: DEN-4821-K).");
+            return;
+        }
+
+        box.style.display = 'block';
+        box.innerHTML = 'Consultando protocolo...';
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_whistleblower_protocol`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                },
+                body: JSON.stringify({ p_protocol_code: code })
+            });
+            const data = await res.json();
+            if (!Array.isArray(data) || data.length === 0) {
+                box.innerHTML = '❌ Protocolo não encontrado. Verifique o código digitado.';
+                return;
+            }
+            const item = data[0];
+            box.innerHTML = `
+                <b>Protocolo:</b> ${item.protocol_code}<br>
+                <b>Categoria:</b> ${item.category}<br>
+                <b>Status Atual:</b> <span style="color:#38bdf8; font-weight:800;">${item.status}</span><br>
+                <b>Data de Abertura:</b> ${item.created_day}<br>
+                <b>Parecer do Comitê:</b> ${item.committee_public_reply || 'Em análise confidencial pelo Comitê.'}<br>
+                <b>Ação / Encaminhamento:</b> ${item.resolution_action || 'Aguardando conclusão da apuração.'}
+            `;
+        } catch (err) {
+            box.innerHTML = '⚠️ Erro ao consultar protocolo.';
+        }
+    }
+</script>
 </body>
 </html>
