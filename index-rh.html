@@ -77,7 +77,6 @@
         canvas.audio-canvas { width: 100%; height: 100%; display: block; }
 
         .game-box { width: 100%; height: 255px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 14px; touch-action: none; user-select: none; -webkit-user-select: none; }
-        /* Acessibilidade Daltonismo: forma distinta + ícone + texto + contraste */
         .target-shape { position: absolute; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #ffffff; user-select: none; touch-action: none; box-shadow: 0 0 18px rgba(255, 255, 255, 0.3); }
         .shape-go { width: 68px; height: 68px; border-radius: 50%; background: var(--accent-green); border: 3px solid #a7f3d0; }
         .shape-nogo { width: 66px; height: 66px; border-radius: 12px; background: var(--accent-red); border: 3px solid #fecaca; }
@@ -86,12 +85,18 @@
         .info-card { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 14px; margin-bottom: 12px; font-size: 12px; color: var(--text-sub); line-height: 1.5; }
         .info-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 6px; font-weight: 700; }
 
+        .benefit-item { background: #151c2c; border: 1px solid var(--input-border); border-radius: 10px; padding: 10px; margin-bottom: 8px; font-size: 11px; }
+        .benefit-btn { margin-top: 6px; background: rgba(56, 189, 248, 0.16); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.4); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
+
         .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 999; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
         .modal-backdrop.active { display: flex; }
         .modal-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; max-width: 500px; width: 100%; padding: 20px; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 14px; }
         .modal-header h3 { font-size: 15px; color: var(--accent-cyan); }
         .modal-close { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; }
+        .tab-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+        .tab-pill { padding: 9px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-muted); font-size: 11px; font-weight: 800; cursor: pointer; text-align: center; }
+        .tab-pill.active { background: #0284c7; color: #fff; border-color: var(--accent-cyan); }
         .footer-brand { margin-top: 16px; text-align: center; font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--panel-border); padding-top: 12px; }
     </style>
 </head>
@@ -134,6 +139,15 @@
             </select>
         </div>
 
+        <div class="form-group" id="sandboxWindowGroup" style="display:none;">
+            <label for="selSandboxWindow">🧪 Janela Simulada (exclusivo Sandbox para testar Delta 8h→17h):</label>
+            <select id="selSandboxWindow">
+                <option value="ENTRADA_8H">☀️ Simular Entrada (8h)</option>
+                <option value="SAIDA_17H">🌇 Simular Saída (17h)</option>
+                <option value="AVULSO">⏱️ Avulso</option>
+            </select>
+        </div>
+
         <div class="chk-box">
             <input type="checkbox" id="chkAuth" checked>
             <label for="chkAuth">
@@ -149,7 +163,7 @@
         </div>
 
         <button id="btnStartCheckin" class="btn" onclick="startCheckinFlow()">Iniciar Checagem Anônima (30s) 🚀</button>
-        <button class="btn btn-ethics" onclick="openModal('whistleModal')">🛡️ Canal de Denúncias & Escuta Segura (NR-05) — 24h</button>
+        <button class="btn btn-ethics" onclick="openWhistleModal()">🛡️ Canal de Denúncias & Escuta Segura (NR-05) — 24h</button>
         <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Como funciona o anonimato e seus direitos?</button>
     </div>
 
@@ -169,32 +183,31 @@
         <div class="meter-bar"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 3: GO/NO-GO ACESSÍVEL -->
+    <!-- PASSO 3: GO/NO-GO ACESSÍVEL (16 RODADAS BALANCEADAS) -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Teste de Atenção e Controle de Impulso</h3>
         <div class="info-card">
             <p style="color:var(--accent-green-bright); margin-bottom:8px;">● <b>CÍRCULO VERDE (✓ GO!):</b> Toque o mais rápido possível.</p>
             <p style="color:var(--accent-red-bright);">■ <b>QUADRADO VERMELHO (✕ NO-GO!):</b> NÃO toque! Aguarde desaparecer.</p>
         </div>
-        <button class="btn" onclick="startGame()">Iniciar 12 Rodadas 🎯</button>
+        <button class="btn" onclick="startGame()">Iniciar 16 Rodadas 🎯</button>
     </div>
 
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
-            <span>Erros de impulso: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 16</b></span>
+            <span>Erros / Omissões: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 4 (EXCLUSIVO SEXTA-FEIRA SEMANAL OU SANDBOX): RÉGUAS 1 A 5 + 12 OPÇÕES -->
+    <!-- PASSO 4 (SEXTA-FEIRA SEMANAL OU SANDBOX): RÉGUAS 1 A 5 + 12 OPÇÕES -->
     <div id="stepWeeklyQuestions" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📏 Pulso Semanal de Condições de Trabalho</h3>
         <p style="font-size:11px; text-align:center; color:var(--text-muted); margin-bottom:14px;">
             Aparece apenas 1x por semana (Sexta-feira). Responda usando as réguas de 1 a 5 — sem digitação aberta para proteger seu anonimato.
         </p>
 
-        <!-- PERGUNTA 1: RÉGUA NEUTRA DE DESCANSO PRÉ-SEMANA -->
         <div class="ruler-card">
             <div class="ruler-title">1. Você sentiu que conseguiu descansar o suficiente antes de iniciar esta semana de trabalho?</div>
             <div class="ruler-wrap">
@@ -204,7 +217,6 @@
             <div class="ruler-scale-labels"><span>1 • Quase nada</span><span>3 • Razoável</span><span>5 • Totalmente</span></div>
         </div>
 
-        <!-- PERGUNTA 2: ESSE LOCAL PODE SER MELHOR? SIM/NÃO + 12 OPÇÕES -->
         <div class="ruler-card">
             <div class="ruler-title">2. Esse local de trabalho pode ser melhor?</div>
             <div class="yn-row">
@@ -227,13 +239,12 @@
                     <label class="opt-chip"><input type="checkbox" value="COMUNICACAO_APOIO"> Comunicação / Treinamento</label>
                     <label class="opt-chip"><input type="checkbox" value="OUTRO_OUVIDORIA" onchange="if(this.checked) document.getElementById('btnOutroOuvidoria').style.display='flex';"> Outro (Canal NR-05)</label>
                 </div>
-                <button type="button" id="btnOutroOuvidoria" class="btn btn-ethics" style="display:none; margin-top:10px; font-size:11px; padding:10px;" onclick="openModal('whistleModal')">
+                <button type="button" id="btnOutroOuvidoria" class="btn btn-ethics" style="display:none; margin-top:10px; font-size:11px; padding:10px;" onclick="openWhistleModal()">
                     🛡️ Abrir Canal de Escuta Segura (NR-05) para relatar em sigilo
                 </button>
             </div>
         </div>
 
-        <!-- 4 RÉGUAS ORGANIZACIONAIS NR-1 / MTE -->
         <div class="ruler-card">
             <div class="ruler-title">3. Ritmo e volume de demandas desta semana (1 = Excessivo / 5 = Equilibrado):</div>
             <div class="ruler-wrap">
@@ -286,11 +297,26 @@
         </div>
 
         <div class="info-card">
-            <h4>🛡️ Canais Confidenciais Disponíveis para Você</h4>
-            <p style="margin-bottom:8px;">Caso queira registrar uma situação específica em sigilo (assédio, pressão abusiva, conflito ou condição insegura), utilize o Canal de Escuta NR-05 ou consulte os benefícios da empresa:</p>
-            <button class="btn btn-ethics" onclick="openModal('whistleModal')">🛡️ Abrir Canal de Denúncias / Escuta NR-05</button>
+            <h4>🛡️ Canais Confidenciais & Programas de Apoio</h4>
+            <p style="margin-bottom:8px;">Caso queira registrar uma situação específica em sigilo ou acessar os benefícios corporativos:</p>
+            <button class="btn btn-ethics" onclick="openWhistleModal()">🛡️ Abrir Canal de Denúncias / Escuta NR-05</button>
             <button class="btn btn-secondary" onclick="loadCompanyBenefits()">🎁 Ver Programas & Benefícios de Apoio</button>
             <div id="benefitsListBox" style="margin-top:10px; display:none;"></div>
+        </div>
+
+        <div class="info-card">
+            <h4>📏 Avaliação Rápida de Experiência (Opcional — Melhora do App)</h4>
+            <div class="ruler-title" style="font-size:11px;">Clareza e facilidade de uso (1 a 5):</div>
+            <div class="ruler-wrap" style="margin-bottom:8px;">
+                <input type="range" id="rngUxClarity" min="1" max="5" value="5" oninput="this.nextElementSibling.innerText=this.value">
+                <span class="ruler-val">5</span>
+            </div>
+            <div class="ruler-title" style="font-size:11px;">Confiança no anonimato da ferramenta (1 a 5):</div>
+            <div class="ruler-wrap" style="margin-bottom:10px;">
+                <input type="range" id="rngUxTrust" min="1" max="5" value="5" oninput="this.nextElementSibling.innerText=this.value">
+                <span class="ruler-val">5</span>
+            </div>
+            <button id="btnSendUx" class="btn btn-secondary" onclick="submitPilotFeedback()">Enviar Avaliação Opcional</button>
         </div>
 
         <button class="btn" onclick="location.reload()">Concluir</button>
@@ -303,46 +329,54 @@
                 <h3>🛡️ Canal de Escuta Segura & Denúncias (NR-05 / Lei 14.457)</h3>
                 <button class="modal-close" onclick="closeModal('whistleModal')">&times;</button>
             </div>
-            <p style="font-size:11px; color:var(--text-sub); margin-bottom:12px; line-height:1.45;">
-                Base totalmente isolada da telemetria, sem captura de IP ou identificação. Relatos envolvendo chefia são direcionados exclusivamente ao Comitê de Ética.
-            </p>
+            <div class="tab-pills">
+                <button class="tab-pill active" id="tabBtnReport" onclick="switchWhistleTab('report')">📝 Novo Relato</button>
+                <button class="tab-pill" id="tabBtnCheck" onclick="switchWhistleTab('check')">🔍 Consultar Protocolo</button>
+            </div>
 
-            <div class="form-group">
-                <label>Setor relacionado:</label>
-                <input type="text" id="denSector" placeholder="Ex.: Operações, Comercial, TI">
-            </div>
-            <div class="form-group">
-                <label>Categoria:</label>
-                <select id="denCategory">
-                    <option value="PRESSAO_ABUSIVA_METAS">Pressão Abusiva / Metas Inexequíveis</option>
-                    <option value="ASSEDIO_MORAL">Assédio Moral</option>
-                    <option value="ASSEDIO_SEXUAL">Assédio Sexual</option>
-                    <option value="DISCRIMINACAO">Discriminação</option>
-                    <option value="CONFLITO_LIDERANCA">Conflito com Liderança</option>
-                    <option value="ERGONOMIA_CONDICAO_INSEGURA">Ergonomia / Condição Insegura</option>
-                    <option value="OUTRO">Outro motivo</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Envolve liderança? (Opcional — bloqueia visualização da chefia local)</label>
-                <input type="text" id="denLeaderRole" placeholder="Ex.: Coordenação / Gerência (deixe em branco se não houver)">
-            </div>
-            <div class="form-group">
-                <label>Relato confidencial:</label>
-                <textarea id="denDesc" rows="3" placeholder="Descreva os fatos sem precisar se identificar..."></textarea>
-            </div>
-            <button class="btn btn-ethics" onclick="sendWhistleblowerReport()">Enviar Relato Sigiloso & Gerar Protocolo 🔒</button>
-            <div id="denResultBox" style="margin-top:10px; font-size:12px; display:none;"></div>
-
-            <hr style="border-color:var(--panel-border); margin:16px 0;">
-            <div class="form-group">
-                <label>Consultar Andamento pelo Protocolo (sem login):</label>
-                <div style="display:flex; gap:8px;">
-                    <input type="text" id="denLookupCode" placeholder="Ex.: DEN-4821-A">
-                    <button class="btn" style="width:auto; padding:0 16px;" onclick="lookupProtocol()">Consultar</button>
+            <div id="whistleTabReport">
+                <p style="font-size:11px; color:var(--text-sub); margin-bottom:12px; line-height:1.45;">
+                    Base isolada da telemetria, sem captura de IP ou identificação. Relatos envolvendo chefia são direcionados exclusivamente ao Comitê de Ética.
+                </p>
+                <div class="form-group">
+                    <label>Setor relacionado:</label>
+                    <input type="text" id="denSector" placeholder="Ex.: Operações, Comercial, TI">
                 </div>
+                <div class="form-group">
+                    <label>Categoria:</label>
+                    <select id="denCategory">
+                        <option value="PRESSAO_ABUSIVA_METAS">Pressão Abusiva / Metas Inexequíveis</option>
+                        <option value="ASSEDIO_MORAL">Assédio Moral</option>
+                        <option value="ASSEDIO_SEXUAL">Assédio Sexual</option>
+                        <option value="DISCRIMINACAO">Discriminação</option>
+                        <option value="CONFLITO_LIDERANCA">Conflito com Liderança</option>
+                        <option value="ERGONOMIA_CONDICAO_INSEGURA">Ergonomia / Condição Insegura</option>
+                        <option value="DESCONFORTO_FERRAMENTA_APP">Desconforto / Pressão de Uso da Ferramenta</option>
+                        <option value="OUTRO">Outro motivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Envolve liderança? (Opcional — bloqueia chefia local)</label>
+                    <input type="text" id="denLeaderRole" placeholder="Ex.: Coordenação / Gerência (deixe em branco se não houver)">
+                </div>
+                <div class="form-group">
+                    <label>Relato confidencial:</label>
+                    <textarea id="denDesc" rows="3" placeholder="Descreva os fatos sem precisar se identificar..."></textarea>
+                </div>
+                <button class="btn btn-ethics" id="btnSubmitWhistle" onclick="sendWhistleblowerReport()">Enviar Relato Sigiloso & Gerar Protocolo 🔒</button>
+                <div id="denResultBox" style="margin-top:10px; font-size:12px; display:none;"></div>
             </div>
-            <div id="denLookupResult" style="font-size:12px; color:var(--text-sub);"></div>
+
+            <div id="whistleTabCheck" style="display:none;">
+                <div class="form-group">
+                    <label>Consultar Andamento pelo Protocolo (sem login):</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="denLookupCode" placeholder="Ex.: DEN-4821-A">
+                        <button class="btn" style="width:auto; padding:0 16px;" onclick="lookupProtocol()">Consultar</button>
+                    </div>
+                </div>
+                <div id="denLookupResult" style="font-size:12px; color:var(--text-sub); line-height:1.5;"></div>
+            </div>
         </div>
     </div>
 
@@ -358,7 +392,7 @@
                     <li><b>Zero Câmera e Zero Identificação:</b> Não há foto, nome, CPF ou gravação persistente de áudio.</li>
                     <li><b>Quórum Mínimo N ≥ 5:</b> O RH só vê médias do setor quando houver pelo menos 5 participações.</li>
                     <li><b>Participação Facultativa:</b> Não há registro de recusa nem uso para controle de ponto, metas ou punições.</li>
-                    <li><b>Sem Diagnóstico Médico:</b> A ferramenta apenas mede atenção/voz agregada para prevenção e melhoria de ambiente.</li>
+                    <li><b>Sem Diagnóstico Médico:</b> A ferramenta mede apenas atenção/voz agregada para prevenção e melhoria de ambiente.</li>
                 </ul>
             </div>
         </div>
@@ -383,25 +417,30 @@
     let showWeeklyQuestions = envMode === 'SANDBOX' || forceWeekly;
     let detectedShiftWindow = 'AVULSO';
 
+    let roundPlan = [];
     let reactionTimes = [];
     let greenLapses = 0;
     let vetoErrors = 0;
     let currentRound = 0;
-    const totalRounds = 12;
+    const totalRounds = 16;
     let ballTimer = null;
     let ballSpawnTime = 0;
     let isRoundProcessing = false;
     let checkinSubmitted = false;
 
+    let sessionStartMs = performance.now();
+    let audioRetryCount = 0;
     let audioQualityOk = false;
     let vsiScoreVal = null;
     let canImproveChoice = null;
     let computedRt = 480;
+    let lastBand = 'GREEN';
 
     window.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('lblHeaderCompany').innerText = `${companyParam} • Check-in Anônimo & Escuta NR-05`;
         if (envMode === 'SANDBOX') {
             document.getElementById('sandboxBanner').style.display = 'block';
+            document.getElementById('sandboxWindowGroup').style.display = 'block';
         }
         const savedDept = sectorParam || localStorage.getItem('srt_rh_dept');
         if (savedDept) {
@@ -474,6 +513,10 @@
         if (!document.getElementById('chkAuth').checked) { alert('Confirme o termo de participação facultativa e anônima.'); return; }
         localStorage.setItem('srt_rh_dept', dept);
         document.getElementById('denSector').value = dept;
+        sessionStartMs = performance.now();
+        if (envMode === 'SANDBOX') {
+            detectedShiftWindow = document.getElementById('selSandboxWindow').value || 'AVULSO';
+        }
 
         if (document.getElementById('chkAccessExempt').checked) {
             audioQualityOk = false;
@@ -503,8 +546,7 @@
             });
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const analyser = audioCtx.createAnalyser();
-            const source = audioCtx.createMediaStreamSource(audioStream);
-            source.connect(analyser);
+            audioCtx.createMediaStreamSource(audioStream).connect(analyser);
             analyser.fftSize = 1024;
             const timeData = new Float32Array(analyser.fftSize);
             const freqData = new Uint8Array(analyser.frequencyBinCount);
@@ -560,11 +602,12 @@
                     audioCtx.close();
 
                     if (rmsFrames.length < 10) {
+                        audioRetryCount++;
                         audioQualityOk = false;
                         vsiScoreVal = null;
                         btn.disabled = false;
                         btn.innerText = '🔄 Áudio insuficiente — Tentar novamente (7s)';
-                        hint.innerText = 'Não detectamos voz suficiente (silêncio ou microfone muito baixo). Você pode tentar de novo ou seguir sem voz.';
+                        hint.innerText = 'Silêncio ou volume baixo detectado. Nenhum número foi inventado — repita ou siga sem voz.';
                         skipBtn.style.display = 'flex';
                         return;
                     }
@@ -589,6 +632,7 @@
                 }
             }, 1000);
         } catch (err) {
+            audioRetryCount++;
             audioQualityOk = false;
             vsiScoreVal = null;
             btn.disabled = false;
@@ -604,6 +648,17 @@
         showStep('stepInstruction');
     }
 
+    function buildBalancedRounds() {
+        const arr = [];
+        for (let i = 0; i < 11; i++) arr.push(true);
+        for (let i = 0; i < 5; i++) arr.push(false);
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
     function startGame() {
         checkinSubmitted = false;
         isRoundProcessing = false;
@@ -611,7 +666,9 @@
         greenLapses = 0;
         vetoErrors = 0;
         currentRound = 0;
+        roundPlan = buildBalancedRounds();
         if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+        document.getElementById('lblErrors').innerText = '0';
         showStep('stepBolinhas');
         nextRound();
     }
@@ -622,13 +679,13 @@
             finishVisuomotor();
             return;
         }
+        const isGo = roundPlan[currentRound];
         currentRound++;
         isRoundProcessing = false;
         document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
         const area = document.getElementById('gameArea');
         area.innerHTML = '';
 
-        const isGo = Math.random() > 0.30;
         const el = document.createElement('div');
         el.className = 'target-shape ' + (isGo ? 'shape-go' : 'shape-nogo');
         el.innerHTML = isGo ? '<span>✓</span><span>GO!</span>' : '<span>✕</span><span>NO-GO!</span>';
@@ -642,16 +699,17 @@
         function handleHit(e) {
             if (e) { try { e.preventDefault(); e.stopPropagation(); } catch (_) {} }
             if (isRoundProcessing) return;
+            const rt = Math.round(performance.now() - ballSpawnTime);
+            if (rt < 100) return;
             isRoundProcessing = true;
             if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
-            const rt = Math.max(110, Math.round(performance.now() - ballSpawnTime));
             if (isGo) reactionTimes.push(rt);
             else {
                 vetoErrors++;
-                document.getElementById('lblErrors').innerText = vetoErrors;
+                document.getElementById('lblErrors').innerText = vetoErrors + greenLapses;
             }
             area.innerHTML = '';
-            setTimeout(nextRound, 280);
+            setTimeout(nextRound, 260);
         }
 
         el.addEventListener('pointerdown', handleHit, { passive: false });
@@ -663,9 +721,10 @@
             area.innerHTML = '';
             if (isGo) {
                 greenLapses++;
-                reactionTimes.push(950); // Cômputo integral de omissão
+                reactionTimes.push(1050);
+                document.getElementById('lblErrors').innerText = vetoErrors + greenLapses;
             }
-            setTimeout(nextRound, 280);
+            setTimeout(nextRound, 260);
         }, 1050);
     }
 
@@ -718,7 +777,6 @@
 
         const syncEl = document.getElementById('syncStatus');
 
-        // 1. Tenta Edge Function autenticada (ingest-telemetry)
         try {
             const efRes = await fetch(`${SUPABASE_URL}/functions/v1/ingest-telemetry`, {
                 method: 'POST',
@@ -750,16 +808,16 @@
                 return;
             }
         } catch (e) {
-            console.warn('Edge Function indisponível, tentando RPC protegido v5.1:', e);
+            console.warn('Edge Function indisponível, usando RPC protegido v5.1:', e);
         }
 
-        // 2. Fallback direto para RPC blindado v5.1 no Supabase (também valida horário em PRODUCAO)
         try {
             const vsiSt = audioQualityOk && vsiScoreVal !== null ? `Captação vocal válida (VSI ${vsiScoreVal})` : 'Sem medição vocal válida';
             let status = 'GREEN';
             if (vetoErrors >= 2 || computedRt >= 800 || greenLapses >= 3 || (audioQualityOk && vsiScoreVal >= 4.4)) status = 'RED';
             else if (audioQualityOk && vsiScoreVal >= 3.41) status = 'PURPLE';
             else if (computedRt >= 650 || vetoErrors === 1 || greenLapses >= 1 || (audioQualityOk && vsiScoreVal >= 2.8)) status = 'YELLOW';
+            lastBand = status;
 
             const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_srt_rh_telemetry_v51`, {
                 method: 'POST',
@@ -807,6 +865,21 @@
         }
     }
 
+    function openWhistleModal() {
+        const currentDept = document.getElementById('txtDept').value.trim();
+        if (currentDept && !document.getElementById('denSector').value) {
+            document.getElementById('denSector').value = currentDept;
+        }
+        openModal('whistleModal');
+    }
+
+    function switchWhistleTab(tab) {
+        document.getElementById('tabBtnReport').classList.toggle('active', tab === 'report');
+        document.getElementById('tabBtnCheck').classList.toggle('active', tab === 'check');
+        document.getElementById('whistleTabReport').style.display = tab === 'report' ? 'block' : 'none';
+        document.getElementById('whistleTabCheck').style.display = tab === 'check' ? 'block' : 'none';
+    }
+
     async function sendWhistleblowerReport() {
         const sec = document.getElementById('denSector').value.trim() || document.getElementById('txtDept').value || 'Geral';
         const cat = document.getElementById('denCategory').value;
@@ -832,7 +905,8 @@
                 box.style.display = 'block';
                 box.innerHTML = `<div style="padding:10px; border-radius:8px; background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#bbf7d0;">
                     ✅ Relato registrado em sigilo absoluto!<br>
-                    <b>Guarde seu protocolo anônimo: <span style="font-size:15px; color:#fff;">${code}</span></b>
+                    <b>Protocolo anônimo: <span id="lblProtoCode" style="font-size:15px; color:#fff;">${code}</span></b><br>
+                    <button type="button" class="benefit-btn" onclick="navigator.clipboard && navigator.clipboard.writeText('${code}'); alert('Protocolo ${code} copiado!')">📋 Copiar Protocolo</button>
                 </div>`;
                 document.getElementById('denDesc').value = '';
             }
@@ -867,18 +941,68 @@
         box.style.display = 'block';
         box.innerHTML = '⏳ Carregando programas...';
         try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/company_benefits?company=eq.${encodeURIComponent(companyParam)}&is_active=eq.true`, {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/company_benefits?is_active=eq.true&or=(company.eq.${encodeURIComponent(companyParam)},company.eq.EXCELSILIENCE)&select=*`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const data = res.ok ? await res.json() : [];
             if (!data.length) { box.innerHTML = 'Consulte o RH para os programas ativos da sua unidade.'; return; }
-            box.innerHTML = data.map(b => `
-                <div style="padding:8px; border:1px solid var(--input-border); border-radius:8px; margin-bottom:6px; font-size:11px;">
-                    <b style="color:var(--accent-cyan);">${b.benefit_name}</b> (${b.provider_name || 'Interno'})<br>${b.description}
-                </div>
-            `).join('');
+            box.innerHTML = '';
+            data.forEach(b => {
+                const div = document.createElement('div');
+                div.className = 'benefit-item';
+                div.innerHTML = `<b style="color:var(--accent-cyan);">${b.benefit_name}</b> (${b.provider_name || 'Interno'})<br>${b.description}<br><button type="button" class="benefit-btn">Acessar com Sigilo 🔗</button>`;
+                div.querySelector('button').onclick = () => logBenefitEngagement(b.id, b.access_url);
+                box.appendChild(div);
+            });
         } catch (e) {
             box.innerHTML = 'Programas temporariamente indisponíveis.';
+        }
+    }
+
+    async function logBenefitEngagement(benefitId, accessUrl) {
+        const dept = document.getElementById('txtDept').value.trim() || 'Geral';
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/benefit_engagement_logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+                body: JSON.stringify({
+                    company: companyParam,
+                    benefit_id: benefitId,
+                    sector: dept,
+                    shift_window: detectedShiftWindow,
+                    trigger_band: lastBand
+                })
+            });
+        } catch (e) {}
+        if (accessUrl && accessUrl.startsWith('http')) window.open(accessUrl, '_blank', 'noopener,noreferrer');
+        else alert('Acesso sigiloso registrado! Consulte o portal de benefícios do RH para agendamento.');
+    }
+
+    async function submitPilotFeedback() {
+        const btn = document.getElementById('btnSendUx');
+        btn.disabled = true;
+        btn.innerText = 'Enviando...';
+        const dept = document.getElementById('txtDept').value.trim() || 'Geral';
+        const dur = Math.max(10, Math.round((performance.now() - sessionStartMs) / 1000));
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/rh_pilot_ux_metrics`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+                body: JSON.stringify({
+                    company: companyParam,
+                    sector: dept,
+                    completed: true,
+                    duration_sec: dur,
+                    audio_retry_count: audioRetryCount,
+                    audio_failed: !audioQualityOk,
+                    clarity_rating: Number(document.getElementById('rngUxClarity').value),
+                    trust_rating: Number(document.getElementById('rngUxTrust').value)
+                })
+            });
+            btn.innerText = '✅ Obrigado pela avaliação!';
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerText = 'Tentar novamente';
         }
     }
 </script>
