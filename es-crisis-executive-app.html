@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES-Crise Executivo — Readiness Telemetry v11.0 Master</title>
+    <title>ExcelSilience ES-CRISIS — Telemetria Executiva & 360°</title>
     <style>
         :root {
             --bg: #030712;
@@ -11,725 +11,212 @@
             --card-inner: #111c38;
             --border: #1e293b;
             --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.3);
             --green: #34d399;
-            --green-glow: rgba(52, 211, 153, 0.3);
             --yellow: #fbbf24;
             --purple: #c084fc;
             --red: #f87171;
-            --red-glow: rgba(248, 113, 113, 0.3);
             --text: #f8fafc;
             --muted: #94a3b8;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 14px; }
+        .app-container { width: 100%; max-width: 560px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85); margin: auto 0; }
+        .header-brand { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .brand-title { font-size: 16px; font-weight: 800; color: var(--accent); }
+        .brand-subtitle { font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+        .badge-mode { background: rgba(56, 189, 248, 0.14); border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; }
+        .screen { display: none; animation: fadeIn 0.25s ease-in-out forwards; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+        .card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+        .card h3 { font-size: 13px; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; font-weight: 800; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+        input[type="text"], select, textarea { width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--border); background: #070d19; color: #fff; font-size: 13px; outline: none; }
+        .chk-box { display: flex; gap: 10px; align-items: flex-start; background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 11px; color: var(--muted); line-height: 1.45; }
+        .chk-box input { margin-top: 2px; width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
 
-        html, body {
-            width: 100%;
-            min-height: 100vh;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 16px 8px;
-        }
+        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; background: #0284c7; color: #fff; text-transform: uppercase; margin-top: 6px; }
+        .btn-secondary { background: #1e293b; border: 1px solid var(--border); color: var(--text); }
+        .btn-purple { background: #7e22ce; }
+        .btn-green { background: #059669; }
 
-        .app-container {
-            width: 100%;
-            max-width: 580px;
-            min-height: 92vh;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
-            margin: auto 0;
-            overflow: hidden;
-            position: relative;
-        }
+        .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .context-btn { background: #070d19; border: 1px solid var(--border); color: var(--muted); padding: 11px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .context-btn.selected { background: rgba(56, 189, 248, 0.16); border-color: var(--accent); color: #fff; }
 
-        .screen {
-            display: none;
-            flex-direction: column;
-            padding: 24px 20px;
-            flex: 1;
-            animation: fadeIn 0.3s ease-in-out forwards;
-        }
+        .camera-box { width: 100%; height: 220px; background: #000; border-radius: 14px; overflow: hidden; border: 2px solid var(--border); margin-bottom: 12px; position: relative; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        .screen.active {
-            display: flex;
-        }
+        .audio-box { width: 100%; height: 84px; background: #070d19; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; }
+        canvas#canvasWave { width: 100%; height: 100%; display: block; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .game-area { position: relative; width: 100%; height: 255px; background: #070d19; border: 2px dashed var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; touch-action: none; user-select: none; }
+        .target-shape { position: absolute; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #fff; user-select: none; touch-action: none; }
+        .shape-go { width: 66px; height: 66px; border-radius: 50%; background: #10b981; border: 3px solid #a7f3d0; }
+        .shape-nogo { width: 64px; height: 64px; border-radius: 12px; background: #ef4444; border: 3px solid #fecaca; }
 
-        .header-brand {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
+        .cir-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; text-align: center; }
+        .cir-stat { background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 10px 4px; }
+        .cir-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; }
+        .cir-stat .val { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 2px; }
 
-        .brand-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: 0.5px;
-        }
-
-        .brand-subtitle {
-            font-size: 10px;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin-top: 2px;
-            font-weight: 700;
-        }
-
-        .badge-v60 {
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .badge-status-top {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-
-        .badge-green { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: var(--green); }
-        .badge-yellow { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
-        .badge-purple { background: rgba(168, 85, 247, 0.2); border: 1px solid var(--purple); color: var(--purple); }
-        .badge-red { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--red); color: var(--red); }
-
-        .card {
-            background: var(--card-inner);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 18px;
-        }
-
-        .card h3 {
-            font-size: 14px;
-            color: var(--accent);
-            margin-bottom: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .form-group { margin-bottom: 14px; }
-        .form-group label {
-            display: block;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-
-        input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: #070d19;
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .form-row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .chk-box {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            background: #070d19;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            margin-bottom: 18px;
-        }
-
-        .chk-box input[type="checkbox"] {
-            margin-top: 3px;
-            accent-color: var(--accent);
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .chk-box label {
-            font-size: 11px;
-            color: var(--muted);
-            line-height: 1.45;
-            margin: 0;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .context-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .context-btn {
-            background: #070d19;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 12px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .context-btn.selected {
-            background: rgba(56, 189, 248, 0.15);
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-
-        .btn-btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 800;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-transform: uppercase;
-            transition: transform 0.1s, box-shadow 0.2s;
-        }
-
-        .btn-btn:active { transform: scale(0.98); }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: #fff;
-            border: 1px solid var(--accent);
-            box-shadow: 0 4px 16px var(--accent-glow);
-        }
-
-        .btn-pdf {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            box-shadow: 0 4px 16px var(--green-glow);
-            margin-bottom: 12px;
-        }
-
-        .camera-box-large {
-            position: relative;
-            width: 100%;
-            height: 280px;
-            background: #000;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
-        }
-
-        .hud-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 14px;
-            box-sizing: border-box;
-            background: radial-gradient(circle, transparent 55%, rgba(0, 0, 0, 0.75) 100%);
-        }
-
-        .hud-frame-rect {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 170px; height: 200px;
-            border: 2px dashed var(--accent);
-            border-radius: 20px;
-            box-shadow: 0 0 25px var(--accent-glow);
-        }
-
-        .hud-scanline {
-            width: 100%; height: 3px;
-            background: var(--accent);
-            position: absolute;
-            top: 0; left: 0;
-            animation: scan 2.2s infinite linear;
-        }
-
-        @keyframes scan {
-            0% { top: 0%; }
-            50% { top: 100%; }
-            100% { top: 0%; }
-        }
-
-        .progress-bar-container {
-            width: 100%; height: 8px;
-            background: #1e293b;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.2s linear;
-        }
-
-        .audio-wave-box {
-            width: 100%; height: 90px;
-            background: #070d19;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        canvas#canvasWave { width: 100%; height: 100%; }
-
-        .game-canvas-area {
-            position: relative;
-            width: 100%; height: 260px;
-            background: #070d19;
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 16px;
-            touch-action: manipulation;
-        }
-
-        .target-ball {
-            position: absolute;
-            width: 64px; height: 64px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 800; color: #fff;
-            cursor: pointer;
-            user-select: none;
-            touch-action: manipulation;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
-            transition: transform 0.05s ease;
-        }
-
-        .target-ball:active { transform: scale(0.90); }
-        .ball-go { background: radial-gradient(circle, #34d399, #059669); border: 2.5px solid #6ee7b7; }
-        .ball-nogo { background: radial-gradient(circle, #f87171, #dc2626); border: 2.5px solid #fca5a5; }
-
-        .dossier-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .dossier-stat {
-            background: #070d19;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 4px;
-        }
-
-        .dossier-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
-        .dossier-stat .val { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 2px; }
-
-        .easy-box-master {
-            background: #070d19;
-            border: 1px solid var(--accent);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 18px;
-        }
-
-        .easy-box-master h4 {
-            color: var(--accent);
-            font-size: 13px;
-            margin-bottom: 14px;
-            text-transform: uppercase;
-            font-weight: 800;
-            border-bottom: 1px solid rgba(56, 189, 248, 0.25);
-            padding-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .easy-block {
-            font-size: 12px;
-            line-height: 1.6;
-            margin-bottom: 14px;
-            color: #e2e8f0;
-            background: #0f172a;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 14px;
-        }
-
-        .easy-block:last-child { margin-bottom: 0; }
-        .easy-block b { color: var(--accent); font-weight: 800; }
-
-        .sync-banner {
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 16px;
-            background: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
-            border: 1px solid #0284c7;
-        }
-
-        .company-badge-banner {
-            background: rgba(2, 132, 199, 0.2);
-            border-bottom: 1px solid var(--accent);
-            padding: 8px 16px;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--accent);
-            text-align: center;
-            letter-spacing: 0.5px;
-        }
-
-        .var-explanation-box {
-            background: #070d19;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 16px;
-        }
-
-        .var-explanation-title {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .var-item {
-            font-size: 11px;
-            color: var(--muted);
-            margin-bottom: 6px;
-            line-height: 1.4;
-        }
-
-        .var-item b {
-            color: var(--text);
-        }
-
-        @media print {
-            body { background: #fff; color: #000; padding: 0; }
-            .app-container { border: none; box-shadow: none; max-width: 100%; width: 100%; }
-            .btn-btn, .header-brand .badge-v60, #syncStatus { display: none !important; }
-            .card, .easy-box-master, .dossier-stat { background: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: #0f172a !important; }
-            .easy-block { background: #fff !important; color: #0f172a !important; border: 1px solid #e2e8f0 !important; }
-            .brand-title, .card h3, .easy-box-master h4, .dossier-stat .val { color: #0284c7 !important; }
-        }
+        .ruler-card { background: #070d19; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+        .ruler-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+        .ruler-wrap { display: flex; align-items: center; gap: 10px; }
+        .ruler-wrap input[type="range"] { flex: 1; accent-color: var(--accent); }
+        .ruler-val { min-width: 32px; text-align: center; font-weight: 800; color: var(--accent); background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
     </style>
 </head>
 <body>
 <div class="app-container">
-    <div id="companyBadgeContainer"></div>
-
-    <!-- TELA 0: CADASTRO NOMINAL, IDADE & CONTEXTO C-SUITE -->
-    <div class="screen active" id="scr-0">
-        <div class="header-brand">
-            <div>
-                <div class="brand-title">EXCELSILIENCE ES-CRISE</div>
-                <div class="brand-subtitle">Readiness Telemetry v11.0 Master</div>
-            </div>
-            <div class="badge-v60">C-SUITE GOVERNANCE</div>
+    <div class="header-brand">
+        <div>
+            <div class="brand-title">ExcelSilience ES-CRISIS</div>
+            <div class="brand-subtitle" id="lblHeaderSub">Prontidão Executiva C-I-R & Auditoria 360°</div>
         </div>
+        <span class="badge-mode" id="lblEnvBadge">PRODUÇÃO</span>
+    </div>
 
+    <!-- TELA 0: IDENTIFICAÇÃO + TERMO LGPD -->
+    <div id="scr-0" class="screen active">
         <div class="card">
-            <h3>👤 Identificação Executiva C-Level</h3>
+            <h3>Check-in Executivo (C, I, R)</h3>
             <div class="form-group">
-                <label for="txtName">Nome Completo do Executivo / Líder:</label>
-                <input type="text" id="txtName" placeholder="Ex: Dr. Flavio Verissimo" required>
-            </div>
-            <div class="form-row-2">
-                <div class="form-group">
-                    <label for="txtRole">Cargo / Função:</label>
-                    <select id="txtRole" required>
-                        <option value="">-- Cargo --</option>
-                        <option value="CEO / Presidente Executivo">CEO / Presidente</option>
-                        <option value="CFO / Diretor Financeiro">CFO / Finanças</option>
-                        <option value="COO / Diretor de Operações">COO / Operações</option>
-                        <option value="CHRO / Diretor de Pessoas">CHRO / DHO</option>
-                        <option value="CMO / CTO / VP Executivo">CMO / CTO / VP</option>
-                        <option value="Membro do Conselho">Conselheiro(a)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="numAge">Idade (Calibração VFC):</label>
-                    <input type="number" id="numAge" placeholder="Ex: 52" min="18" max="90" value="50">
-                </div>
+                <label>Nome Completo</label>
+                <input type="text" id="txtName" placeholder="Ex.: Nome do Executivo">
             </div>
             <div class="form-group">
-                <label for="txtDept">Business Unit / Diretoria Sincronizada:</label>
-                <input type="text" id="txtDept" placeholder="Ex: Presidência / Operações Globais">
+                <label>Cargo / Função</label>
+                <select id="txtRole">
+                    <option value="CEO / Presidente">CEO / Presidente</option>
+                    <option value="CFO / Diretor Financeiro">CFO / Diretor Financeiro</option>
+                    <option value="COO / Diretor de Operações">COO / Diretor de Operações</option>
+                    <option value="CHRO / Diretor de RH">CHRO / Diretor de RH</option>
+                    <option value="Diretor / Conselheiro">Diretor / Conselheiro</option>
+                </select>
             </div>
-        </div>
+            <div class="form-group">
+                <label>Área / Setor Liderado</label>
+                <input type="text" id="txtDept" value="Presidência" placeholder="Ex.: Operações / Logística">
+            </div>
 
-        <div class="card">
-            <h3>🎯 Contexto da Aferição</h3>
             <div class="context-grid">
-                <div class="context-btn selected" id="btnCtxRoutine" onclick="selectCheckinContext('ROUTINE')">
-                    ☀️ Rotina Matinal / Prontidão
-                </div>
-                <div class="context-btn" id="btnCtxMeeting" onclick="selectCheckinContext('PRE_MEETING')">
-                    ⚡ Pré-Reunião Decisória
-                </div>
+                <button type="button" class="context-btn selected" id="btnCtxRoutine" onclick="selectContext('ROUTINE')">📅 Rotina Diária</button>
+                <button type="button" class="context-btn" id="btnCtxMeeting" onclick="selectContext('PRE_MEETING')">⚡ Pré-Reunião Crítica</button>
             </div>
             <div class="form-group" id="boxMeetingTopic" style="display:none;">
-                <label for="txtMeetingTopic">Pauta da Reunião Decisória:</label>
-                <input type="text" id="txtMeetingTopic" placeholder="Ex: Comitê M&A / Aprovação de Capex">
+                <label>Pauta da Reunião</label>
+                <input type="text" id="txtMeetingTopic" placeholder="Ex.: Comitê Capex / Conselho">
             </div>
-        </div>
 
-        <div class="chk-box">
-            <input type="checkbox" id="chkAuth" checked>
-            <label for="chkAuth">
-                <b>Autorização LGPD (Art. 7º e 11):</b> Autorizo a captura de biometria facial e a aferição não-invasiva dos meus parâmetros de prontidão cognitiva para geração do laudo de governança e proteção do processo decisório.
-            </label>
-        </div>
+            <div class="chk-box">
+                <input type="checkbox" id="chkAuth" checked>
+                <label for="chkAuth">
+                    <b>Termo Voluntário & LGPD (Art. 11, II, "e"):</b> Participação voluntária, sem registro de recusa no Conselho e sem caráter diagnóstico/médico. Caso capture foto opcional, ela destina-se exclusivamente à conferência visual pelo CEO e será <b>excluída automaticamente após 30 dias</b>.
+                </label>
+            </div>
 
-        <div style="margin-top:auto;">
-            <button class="btn-btn btn-primary" onclick="requestPermissionAndStart()">
-                📷 Permitir Câmera & Iniciar Telemetria (30s) 🚀
-            </button>
+            <button class="btn" onclick="startFlow(true)">Iniciar com Foto Visual (Opcional) + Voz + Go/No-Go</button>
+            <button class="btn btn-secondary" onclick="startFlow(false)">Iniciar Sem Câmera (Apenas Voz + Go/No-Go)</button>
+            <button class="btn btn-purple" onclick="open360Screen()">🧭 Responder Avaliação 360° (Réguas 1-5)</button>
         </div>
     </div>
 
-    <!-- TELA 1: CÂMERA & PUPILOMETRIA (5s) -->
-    <div class="screen" id="scr-1">
-        <div class="header-brand">
-            <div>
-                <div class="brand-title">1/3. VERIFICAÇÃO ÓPTICA & PUPILAR</div>
-                <div class="brand-subtitle">Fixação Saccádica & Locus Coeruleus</div>
+    <!-- TELA 1: FOTO VISUAL OPCIONAL (SEM PUPILOMETRIA) -->
+    <div id="scr-1" class="screen">
+        <div class="card">
+            <h3>📷 Conferência Visual Opcional (Expira em 30d)</h3>
+            <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Uso exclusivo para identificação visual no painel executivo (sem leitura pupilar).</p>
+            <div class="camera-box">
+                <video id="webcamVideo" autoplay playsinline muted></video>
+                <canvas id="photoCanvas" style="display:none;"></canvas>
             </div>
-            <div class="badge-v60">5 SEGUNDOS</div>
-        </div>
-
-        <div class="camera-box-large">
-            <video id="webcamVideo" autoplay playsinline muted></video>
-            <div class="hud-overlay">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--accent); font-weight:800;">
-                    <span>CÂMERA: ATIVA</span>
-                    <span id="lblScanText">VARRENDO CÓRTEX & PUPILA...</span>
-                </div>
-                <div class="hud-frame-rect"></div>
-                <div class="hud-scanline"></div>
-                <div style="text-align:center; font-size:11px; color:#34d399; font-weight:800; background:rgba(0,0,0,0.7); padding:6px; border-radius:6px;" id="lblPupilStatus">
-                    👁️ Aferindo Oscilação Pupilar & Diâmetro...
-                </div>
-            </div>
-        </div>
-
-        <div class="progress-bar-container">
-            <div class="progress-bar-fill" id="pb-1"></div>
-        </div>
-        <canvas id="photoCanvas" width="200" height="200" style="display:none;"></canvas>
-    </div>
-
-    <!-- TELA 2: ÁUDIO & VOZ (7s) -->
-    <div class="screen" id="scr-2">
-        <div class="header-brand">
-            <div>
-                <div class="brand-title">2/3. ENERGIA BIOACÚSTICA VOCAL</div>
-                <div class="brand-subtitle">Modulação do Nervo Vago Laríngeo (NC X)</div>
-            </div>
-            <div class="badge-v60">7 SEGUNDOS</div>
-        </div>
-
-        <div class="card" style="text-align:center; padding:20px;">
-            <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Leia a frase em voz alta e firme ao clicar no botão:</p>
-            <h2 style="color:var(--accent); font-size:15px; font-weight:800; margin-bottom:16px;">"DECLARO PRONTIDÃO PARA A TOMADA DE DECISÃO"</h2>
-
-            <div class="audio-wave-box">
-                <canvas id="canvasWave"></canvas>
-            </div>
-
-            <button class="btn-btn btn-primary" id="btnStartVoice" onclick="recordVoice7s()">
-                🎙️ Gravar Voz e Analisar Onda Sonora (7s)
-            </button>
-            <div style="font-size:12px; font-weight:800; color:#34d399; margin-top:10px; display:none;" id="lblVoiceStatus">
-                🎙️ Gravando áudio... Mantenha o tom constante!
-            </div>
-        </div>
-
-        <div class="progress-bar-container">
-            <div class="progress-bar-fill" id="pb-2"></div>
+            <button class="btn btn-green" onclick="captureVisualPhotoAndNext()">📸 Registrar Foto Visual & Avançar</button>
+            <button class="btn btn-secondary" onclick="skipPhotoAndNext()">Pular Foto →</button>
         </div>
     </div>
 
-    <!-- TELA 3-INTRO -->
-    <div class="screen" id="scr-3-intro">
-        <div class="header-brand">
-            <div>
-                <div class="brand-title">3/3. DESAFIO VISUOMOTOR</div>
-                <div class="brand-subtitle">Controle Inibitório Pré-Frontal (12 Rodadas)</div>
+    <!-- TELA 2: VOZ BRUTA (VETOR R) -->
+    <div id="scr-2" class="screen">
+        <div class="card">
+            <h3>🎙️ Vetor R — Captação Vocal (7s)</h3>
+            <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Leia em voz firme e natural:</p>
+            <div style="background:#070d19; padding:12px; border-radius:10px; text-align:center; color:var(--yellow); font-weight:700; font-size:13px; margin-bottom:12px;">
+                "Decisão executiva exige clareza, controle e ritmo sustentável."
             </div>
-            <div class="badge-v60">800ms / RODADA</div>
-        </div>
-
-        <div class="card" style="padding:20px;">
-            <h3 style="margin-bottom:14px; color:var(--accent);">🎯 Regras do Desafio Tático Visuomotor</h3>
-            <div style="margin-bottom:12px; display:flex; align-items:center; gap:12px;">
-                <span style="background:rgba(52,211,153,0.2); border:1px solid #10b981; color:#34d399; padding:8px 12px; border-radius:50%; font-weight:800; font-size:14px;">⚡</span>
-                <span style="font-size:13px; color:#e2e8f0;"><b>Bolinha VERDE:</b> Toque o mais rápido possível!</span>
-            </div>
-            <div style="margin-bottom:16px; display:flex; align-items:center; gap:12px;">
-                <span style="background:rgba(248,113,113,0.2); border:1px solid #ef4444; color:#f87171; padding:8px 12px; border-radius:50%; font-weight:800; font-size:14px;">🛑</span>
-                <span style="font-size:13px; color:#e2e8f0;"><b>Bolinha VERMELHA:</b> NÃO TOQUE! Contenha o impulso reflexo.</span>
-            </div>
-        </div>
-
-        <div style="margin-top:auto;">
-            <button class="btn-btn btn-primary" onclick="startVisuomotorGame()">
-                Start no Desafio (12 Rodadas Táticas) 🎯
-            </button>
+            <div class="audio-box"><canvas id="canvasWave"></canvas></div>
+            <p id="lblVoiceStatus" style="font-size:11px; color:var(--muted); margin-bottom:8px;"></p>
+            <button class="btn" id="btnStartVoice" onclick="recordVoice7s()">🔴 Gravar Voz (7s)</button>
+            <button class="btn btn-secondary" id="btnSkipVoice" style="display:none;" onclick="showScreen('scr-3-intro')">Seguir apenas com Go/No-Go →</button>
         </div>
     </div>
 
-    <!-- TELA 3: ARENA DAS BOLINHAS -->
-    <div class="screen" id="scr-3">
-        <div class="header-brand">
-            <div>
-                <div class="brand-title">DESAFIO GO/NO-GO</div>
-                <div class="brand-subtitle">Veto Motor Visuomotor (DLPFC)</div>
-            </div>
-            <div class="badge-v60" id="lblRoundBadge">RODADA 1 / 12</div>
+    <!-- TELA 3: GO/NO-GO (VETORES C e I) -->
+    <div id="scr-3-intro" class="screen">
+        <div class="card">
+            <h3>🎯 Vetores C & I — Desafio Visuomotor (12 Rodadas)</h3>
+            <p style="font-size:12px; color:var(--green); margin-bottom:8px;">● <b>CÍRCULO VERDE (✓ GO!):</b> Toque o mais rápido possível.</p>
+            <p style="font-size:12px; color:var(--red); margin-bottom:12px;">■ <b>QUADRADO VERMELHO (✕ NO-GO!):</b> Contenha o impulso e NÃO toque.</p>
+            <button class="btn" onclick="startVisuomotorGame()">Iniciar Desafio 🎯</button>
         </div>
-
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:8px; font-weight:700;">
-            <span>🟢 VERDE: TOQUE RÁPIDO</span>
-            <span style="color:#f87171;">🛑 VERMELHO: NÃO TOQUE!</span>
-        </div>
-
-        <div class="game-canvas-area" id="gameArea"></div>
     </div>
 
-    <!-- TELA 4: DOSSIÊ INDIVIDUAL -->
-    <div class="screen" id="scr-4">
-        <div id="syncStatus" class="sync-banner">⏳ Registrando laudo no Cockpit de Governança...</div>
-
-        <div class="header-brand">
-            <div>
-                <div class="brand-title">LAUDO NEUROEXECUTIVO C-SUITE</div>
-                <div class="brand-subtitle">Diagnóstico de Soberania Biométrica</div>
-            </div>
-            <div id="lblTopBadgeContainer">
-                <span class="badge-status-top badge-green" id="lblFinalStatusBadge">🟢 PRONTIDÃO EXCELENTE</span>
-            </div>
+    <div id="scr-3" class="screen">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:8px; font-weight:700;">
+            <span id="lblRoundBadge">RODADA 1 / 12</span>
+            <span>Erros Veto: <b id="lblVetoErr" style="color:var(--red);">0</b></span>
         </div>
+        <div class="game-area" id="gameArea"></div>
+    </div>
 
-        <div id="printDossierArea">
-            <div class="card" style="text-align:center; padding:18px;">
-                <img id="resPhoto" src="" style="width:76px; height:76px; border-radius:50%; object-fit:cover; border:3px solid var(--accent); display:none; margin:0 auto 10px auto; background:#1e293b;">
-                <h3 style="color:var(--accent); font-size:16px; margin-bottom:2px;" id="resExecName">--</h3>
-                <p style="font-size:11px; color:var(--muted); margin-bottom:12px;" id="resExecRole">--</p>
-
-                <div style="font-size:10px; color:var(--muted); text-transform:uppercase; font-weight:800;">Índice de Prontidão Executiva (ES-Crise)</div>
-                <div style="font-size:42px; font-weight:800; color:var(--accent); margin:4px 0;" id="lblFinalScore">0.00</div>
-                <div style="font-size:13px; font-weight:800;" id="lblFinalStatusText">🟢 SOBERANIA DECISÓRIA PRESERVADA</div>
+    <!-- TELA 4: RESULTADO C-I-R -->
+    <div id="scr-4" class="screen">
+        <div id="syncStatus" class="card" style="text-align:center; font-weight:700; font-size:12px;">⏳ Registrando no servidor...</div>
+        <div class="card">
+            <h3 id="resExecName">Executivo</h3>
+            <p id="resExecRole" style="font-size:11px; color:var(--muted); margin-bottom:12px;"></p>
+            <div class="cir-grid">
+                <div class="cir-stat"><div class="lbl">ES-CRISIS</div><div class="val" id="lblFinalScore">--</div></div>
+                <div class="cir-stat"><div class="lbl">CONTROLE (C)</div><div class="val" id="lblValC">--</div></div>
+                <div class="cir-stat"><div class="lbl">CLAREZA (I)</div><div class="val" id="lblValI">--</div></div>
+                <div class="cir-stat"><div class="lbl">ENERGIA (R)</div><div class="val" id="lblValR">--</div></div>
             </div>
-
-            <div class="dossier-grid">
-                <div class="dossier-stat"><div class="lbl">Autocontrole (C)</div><div class="val" id="lblValC">0.0</div></div>
-                <div class="dossier-stat"><div class="lbl">Clareza (I)</div><div class="val" id="lblValI">0.0</div></div>
-                <div class="dossier-stat"><div class="lbl">Energia (R)</div><div class="val" id="lblValR">0.0</div></div>
-                <div class="dossier-stat"><div class="lbl">VFC (rMSSD)</div><div class="val" id="lblValVFC" style="color:#38bdf8;">-- ms</div></div>
-            </div>
-
-            <div class="var-explanation-box">
-                <div class="var-explanation-title">📘 GUIA TÁTICO DAS VARIÁVEIS BIOMÉTRICAS</div>
-                <div class="var-item"><b>🧠 Autocontrole (Vetor C):</b> Índice compósito de controle inibitório pré-frontal (DLPFC), ritmo de hesitação visuomotora (PVT Jitter) e modulação vocal.</div>
-                <div class="var-item"><b>⚡ Clareza (Vetor I):</b> Agilidade de processamento neural e velocidade de reação visuomotora em milissegundos (PVT).</div>
-                <div class="var-item"><b>🎙️ Energia (Vetor R):</b> Resiliência bioacústica vocal (VSI) e micro-tensão laríngea modulada pelo Nervo Vago (NC X).</div>
-                <div class="var-item"><b>🫀 VFC Normalizada por Idade:</b> Variabilidade da Frequência Cardíaca (tônus vagal). <span id="lblVfcAgeNote" style="color:#38bdf8; font-weight:bold;">Ajustada para a curva etária.</span></div>
-                <div class="var-item"><b>🛡️ Regra do Elo Mais Fraco:</b> O vetor de menor valor trava a nota final de soberania para impedir pontos cegos de prontidão.</div>
-            </div>
-
-            <div id="boxMainAlert"></div>
-
-            <div class="easy-box-master">
-                <h4>
-                    <span>🏛️ DOSSIÊ NEUROEXECUTIVO MOTOR E.A.S.Y. (GOVERNANÇA)</span>
-                    <span id="lblBottleneckTag" style="font-size:10px; color:var(--accent);">GARGALO: --</span>
-                </h4>
-                <div id="easyDynamicContainer"></div>
-            </div>
+            <p style="font-size:12px; line-height:1.5;" id="resBottleneckNote"></p>
         </div>
+        <button class="btn" onclick="location.reload()">Novo Check-in</button>
+    </div>
 
-        <div style="display:flex; flex-direction:column; gap:10px; margin-top:auto;">
-            <button class="btn-btn btn-pdf" onclick="exportMobileNativePDF()">
-                📄 Baixar Dossiê Neuroexecutivo em PDF (Mobile-Friendly)
-            </button>
-            <button class="btn-btn" style="background:#1e293b; color:var(--muted); border:1px solid var(--border);" onclick="location.reload()">
-                🔄 Iniciar Novo Check-in
-            </button>
+    <!-- TELA 360: AVALIAÇÃO 360° PROJETO ARISTÓTELES COM RÉGUAS 1 A 5 -->
+    <div id="scr-360" class="screen">
+        <div class="card">
+            <h3>🧭 Avaliação 360° Anti-Viés (Projeto Aristóteles)</h3>
+            <div class="form-group">
+                <label>Ciclo / Líder Avaliado:</label>
+                <select id="selCycle360"></select>
+            </div>
+            <div class="form-group">
+                <label>Seu Vínculo:</label>
+                <select id="selRaterType">
+                    <option value="EQUIPE_ANONIMA">Equipe Direta (100% Anônimo — Trava N ≥ 5)</option>
+                    <option value="PAR_LIDER">Par / Outro Diretor</option>
+                    <option value="AUTOAVALIACAO">Autoavaliação do Líder</option>
+                </select>
+            </div>
+
+            <div class="ruler-card"><div class="ruler-title">1. [C] Previsibilidade e rotina sob pressão (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Pred" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">2. [C] Autocontrole emocional sem reatividade (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Imp" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">3. [C • Aristóteles] Segurança Psicológica para discordar e errar (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Safety" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">4. [I • Aristóteles] Estrutura e clareza de prioridades (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Clarity" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">5. [I] Capacidade de eliminar burocracia / reuniões inúteis (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Unlearn" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">6. [I • Aristóteles] Impacto percebido das decisões da área (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Impact" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">7. [R • Aristóteles] Ritmo sustentável e significado do trabalho (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Sust" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">8. [R • Aristóteles] Confiabilidade nas entregas da equipe (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Reliab" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">9. [Controle] Com frequência ocorrem mudanças abruptas sem explicação? (1 = Nunca / 5 = Sempre):</div><div class="ruler-wrap"><input type="range" id="r360Ctrl" min="1" max="5" value="2" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">2</span></div></div>
+
+            <button class="btn btn-green" onclick="submit360Response()">Enviar Avaliação 360° ✅</button>
+            <button class="btn btn-secondary" onclick="showScreen('scr-0')">Voltar</button>
         </div>
     </div>
 </div>
@@ -737,580 +224,330 @@
 <script>
     const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
-
     const urlParams = new URLSearchParams(window.location.search);
     const companyParam = (urlParams.get('company') || 'GROU').toUpperCase();
+    const envMode = (urlParams.get('env') || '').toUpperCase() === 'SANDBOX' ? 'SANDBOX' : 'PRODUCAO';
 
-    let checkinSubmitted = false;
-    let isRoundProcessing = false;
+    let selectedContext = 'ROUTINE';
     let mediaStream = null;
     let photoBase64 = null;
-    let vsiScoreVal = 1.80;
-    let vsiStatusText = "🟢 Voz Estável (VSI 1.80)";
-
+    let audioQualityOk = false;
+    let vsiScoreVal = null;
     let reactionTimes = [];
+    let greenLapses = 0;
     let vetoErrors = 0;
     let currentRound = 0;
     const totalRounds = 12;
     let ballTimer = null;
     let ballSpawnTime = 0;
-    let selectedContext = 'ROUTINE';
+    let isRoundProcessing = false;
+    let t0360 = Date.now();
 
     window.addEventListener('DOMContentLoaded', () => {
-        try {
-            const savedName = localStorage.getItem('es_exec_name');
-            const savedRole = localStorage.getItem('es_exec_role');
-            const savedDept = localStorage.getItem('es_exec_dept');
-            const savedAge = localStorage.getItem('es_exec_age');
-            if (savedName) document.getElementById('txtName').value = savedName;
-            if (savedRole) document.getElementById('txtRole').value = savedRole;
-            if (savedDept) document.getElementById('txtDept').value = savedDept;
-            if (savedAge) document.getElementById('numAge').value = savedAge;
-        } catch(e) {}
-
-        if (companyParam && companyParam !== 'GROU') {
-            const banner = document.getElementById('companyBadgeContainer');
-            if (banner) {
-                banner.className = 'company-badge-banner';
-                banner.innerText = `🏢 UNIDADE INTEGRADA: ${companyParam}`;
-            }
-        }
+        document.getElementById('lblEnvBadge').innerText = envMode === 'SANDBOX' ? '🧪 SANDBOX' : 'PRODUÇÃO';
+        document.getElementById('lblHeaderSub').innerText = `${companyParam} • Vetores C-I-R & Projeto Aristóteles`;
+        if (urlParams.get('mode') === '360') open360Screen();
     });
 
-    function showScreen(scrId) {
+    function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(scrId).classList.add('active');
+        document.getElementById(id).classList.add('active');
     }
 
-    function selectCheckinContext(ctx) {
+    function selectContext(ctx) {
         selectedContext = ctx;
-        document.getElementById('btnCtxRoutine').classList.remove('selected');
-        document.getElementById('btnCtxMeeting').classList.remove('selected');
-        if (ctx === 'ROUTINE') {
-            document.getElementById('btnCtxRoutine').classList.add('selected');
-            document.getElementById('boxMeetingTopic').style.display = 'none';
-        } else {
-            document.getElementById('btnCtxMeeting').classList.add('selected');
-            document.getElementById('boxMeetingTopic').style.display = 'block';
-        }
+        document.getElementById('btnCtxRoutine').classList.toggle('selected', ctx === 'ROUTINE');
+        document.getElementById('btnCtxMeeting').classList.toggle('selected', ctx === 'PRE_MEETING');
+        document.getElementById('boxMeetingTopic').style.display = ctx === 'PRE_MEETING' ? 'block' : 'none';
     }
 
-    async function requestPermissionAndStart() {
+    async function startFlow(withCamera) {
         const name = document.getElementById('txtName').value.trim();
-        const role = document.getElementById('txtRole').value;
-        const age = parseInt(document.getElementById('numAge').value) || 50;
-        const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
-        const auth = document.getElementById('chkAuth').checked;
+        if (!name) { alert('Informe seu nome.'); return; }
+        if (!document.getElementById('chkAuth').checked) { alert('Confirme o termo de participação.'); return; }
+        photoBase64 = null;
 
-        if (!name || !role) {
-            alert("Por favor, preencha seu nome e cargo executivo.");
+        if (!withCamera) {
+            showScreen('scr-2');
             return;
         }
-
-        if (!auth) {
-            alert("É necessário aceitar os termos de autorização LGPD.");
-            return;
-        }
-
-        try {
-            localStorage.setItem('es_exec_name', name);
-            localStorage.setItem('es_exec_role', role);
-            localStorage.setItem('es_exec_dept', dept);
-            localStorage.setItem('es_exec_age', age);
-        } catch(e) {}
-
         showScreen('scr-1');
-        startCameraAndPupilometer();
-    }
-
-    async function startCameraAndPupilometer() {
-        const video = document.getElementById('webcamVideo');
-        const lblPupil = document.getElementById('lblPupilStatus');
-        const progress = document.getElementById('pb-1');
-
         try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
-                audio: false
-            });
-            video.srcObject = mediaStream;
-            try { await video.play(); } catch(e) {}
-
-            let p = 0;
-            const timer = setInterval(() => {
-                p += 20;
-                progress.style.width = p + '%';
-                if (p >= 100) {
-                    clearInterval(timer);
-                    captureCompressedPhoto();
-                    if (mediaStream) {
-                        mediaStream.getVideoTracks().forEach(t => t.stop());
-                    }
-                    showScreen('scr-2');
-                }
-            }, 500);
-
-        } catch (err) {
-            console.warn("Câmera indisponível:", err);
-            lblPupil.innerText = "⚠️ Câmera ausente. Prosseguindo com Avatar Seguro...";
-            lblPupil.style.color = "#fbbf24";
-            setTimeout(() => { showScreen('scr-2'); }, 1200);
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 480 } }, audio: false });
+            document.getElementById('webcamVideo').srcObject = mediaStream;
+        } catch (e) {
+            showScreen('scr-2');
         }
     }
 
-    function captureCompressedPhoto() {
+    function captureVisualPhotoAndNext() {
         const video = document.getElementById('webcamVideo');
         const canvas = document.getElementById('photoCanvas');
-        if (!video || !video.videoWidth) return;
+        if (video && video.videoWidth) {
+            canvas.width = 160;
+            canvas.height = 160;
+            canvas.getContext('2d').drawImage(video, 0, 0, 160, 160);
+            photoBase64 = canvas.toDataURL('image/jpeg', 0.45);
+        }
+        stopCamera();
+        showScreen('scr-2');
+    }
 
-        canvas.width = 120;
-        canvas.height = 120;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, 120, 120);
-        photoBase64 = canvas.toDataURL('image/jpeg', 0.35);
+    function skipPhotoAndNext() {
+        photoBase64 = null;
+        stopCamera();
+        showScreen('scr-2');
+    }
+
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(t => t.stop());
+            mediaStream = null;
+        }
     }
 
     async function recordVoice7s() {
         const btn = document.getElementById('btnStartVoice');
+        const skip = document.getElementById('btnSkipVoice');
         const lbl = document.getElementById('lblVoiceStatus');
-        const progress = document.getElementById('pb-2');
         const canvas = document.getElementById('canvasWave');
-
         btn.disabled = true;
-        lbl.style.display = 'block';
-        lbl.innerText = "🎙️ Analisando voz em tempo real (7s)... Mantenha o tom constante!";
+        lbl.innerText = '🎙️ Captando voz (7s)...';
 
-        let audioCtx, analyser, microphone, stream;
         try {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            microphone = audioCtx.createMediaStreamSource(stream);
-            microphone.connect(analyser);
-            analyser.fftSize = 256;
-        } catch (err) {
-            console.warn("Microfone não autorizado:", err);
-            lbl.innerText = "⚠️ Microfone indisponível. Usando calibração vocal neutra...";
-        }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            audioCtx.createMediaStreamSource(stream).connect(analyser);
+            analyser.fftSize = 1024;
+            const timeBuf = new Float32Array(analyser.fftSize);
+            const freqBuf = new Uint8Array(analyser.frequencyBinCount);
+            const rmsFrames = [];
+            let animId = null;
 
-        let elapsed = 0;
-        let pitchVariations = [];
-        const ctxWave = canvas.getContext('2d');
+            const ctxWave = canvas.getContext('2d');
+            function draw() {
+                animId = requestAnimationFrame(draw);
+                analyser.getFloatTimeDomainData(timeBuf);
+                analyser.getByteFrequencyData(freqBuf);
+                let rms = 0;
+                for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i];
+                rms = Math.sqrt(rms / timeBuf.length);
+                if (rms >= 0.015) rmsFrames.push(rms);
 
-        const interval = setInterval(() => {
-            elapsed += 0.5;
-            progress.style.width = Math.min(100, Math.round((elapsed / 7) * 100)) + '%';
-
-            if (analyser) {
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                analyser.getByteFrequencyData(dataArray);
-
-                let sum = 0;
-                for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-                let avg = sum / bufferLength;
-                if (avg > 10) pitchVariations.push(avg);
-
-                if (canvas) {
-                    ctxWave.clearRect(0, 0, canvas.width, canvas.height);
-                    const barWidth = (canvas.width / bufferLength) * 1.5;
-                    let x = 0;
-                    for (let i = 0; i < bufferLength; i++) {
-                        const barHeight = (dataArray[i] / 255) * canvas.height * 0.9;
-                        ctxWave.fillStyle = '#38bdf8';
-                        ctxWave.fillRect(x, canvas.height - barHeight, barWidth - 3, barHeight);
-                        x += barWidth + 1;
-                    }
+                ctxWave.clearRect(0, 0, canvas.width, canvas.height);
+                const bw = canvas.width / 32;
+                for (let i = 0; i < 32; i++) {
+                    const bh = (freqBuf[i] / 255) * canvas.height * 0.9;
+                    ctxWave.fillStyle = '#38bdf8';
+                    ctxWave.fillRect(i * bw, canvas.height - bh, bw - 2, bh);
                 }
             }
+            draw();
 
-            if (elapsed >= 7) {
-                clearInterval(interval);
-                if (stream) stream.getTracks().forEach(t => t.stop());
-                if (audioCtx) audioCtx.close();
+            setTimeout(() => {
+                if (animId) cancelAnimationFrame(animId);
+                stream.getTracks().forEach(t => t.stop());
+                audioCtx.close();
 
-                if (pitchVariations.length > 5) {
-                    let mean = pitchVariations.reduce((a, b) => a + b, 0) / pitchVariations.length;
-                    let variance = pitchVariations.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / pitchVariations.length;
-                    let stdDev = Math.sqrt(variance);
-
-                    vsiScoreVal = Math.min(5.0, Math.max(1.1, (stdDev / 12) + 1.2)).toFixed(2);
-                } else {
-                    vsiScoreVal = (1.50 + Math.random() * 0.8).toFixed(2);
+                if (rmsFrames.length < 10) {
+                    audioQualityOk = false;
+                    vsiScoreVal = null;
+                    btn.disabled = false;
+                    btn.innerText = '🔄 Tentar Voz Novamente';
+                    lbl.innerText = 'Áudio insuficiente. Sem nota simulada — tente de novo ou siga para o desafio visuomotor.';
+                    skip.style.display = 'block';
+                    return;
                 }
-
-                if (vsiScoreVal < 2.30) {
-                    vsiStatusText = `🟢 Voz Estável (VSI ${vsiScoreVal})`;
-                } else if (vsiScoreVal <= 3.40) {
-                    vsiStatusText = `🟡 Tensão Modulada (VSI ${vsiScoreVal})`;
-                } else if (vsiScoreVal <= 4.40) {
-                    vsiStatusText = `ROXO Exaustão Vocal (VSI ${vsiScoreVal})`;
-                } else {
-                    vsiStatusText = `🔴 Tensão Crítica (VSI ${vsiScoreVal})`;
-                }
-
+                const meanRms = rmsFrames.reduce((a, b) => a + b, 0) / rmsFrames.length;
+                let diff = 0;
+                for (let i = 1; i < rmsFrames.length; i++) diff += Math.abs(rmsFrames[i] - rmsFrames[i - 1]);
+                const relVar = (diff / rmsFrames.length) / Math.max(0.001, meanRms);
+                audioQualityOk = true;
+                vsiScoreVal = Number(Math.min(5.0, Math.max(1.0, 1.45 + relVar * 3.2)).toFixed(2));
                 showScreen('scr-3-intro');
-            }
-        }, 500);
+            }, 7000);
+        } catch (e) {
+            audioQualityOk = false;
+            vsiScoreVal = null;
+            btn.disabled = false;
+            lbl.innerText = 'Microfone indisponível. Siga para o desafio visuomotor.';
+            skip.style.display = 'block';
+        }
     }
 
     function startVisuomotorGame() {
-        checkinSubmitted = false;
-        isRoundProcessing = false;
-        currentRound = 0;
         reactionTimes = [];
+        greenLapses = 0;
         vetoErrors = 0;
-        if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+        currentRound = 0;
         showScreen('scr-3');
         nextRound();
     }
 
     function nextRound() {
         if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
-
+        if (currentRound >= totalRounds) { finishCheckin(); return; }
         currentRound++;
-        if (currentRound > totalRounds) {
-            finishCheckin();
-            return;
-        }
-
         isRoundProcessing = false;
-        const roundBadge = document.getElementById('lblRoundBadge');
-        if (roundBadge) roundBadge.innerText = "RODADA " + currentRound + " / " + totalRounds;
-
+        document.getElementById('lblRoundBadge').innerText = `RODADA ${currentRound} / ${totalRounds}`;
         const area = document.getElementById('gameArea');
-        if (!area) return;
         area.innerHTML = '';
 
-        const isGreen = Math.random() > 0.3;
-        const ball = document.createElement('div');
-        ball.className = "target-ball " + (isGreen ? "ball-go" : "ball-nogo");
-        ball.innerText = isGreen ? 'GO!' : 'NO-GO!';
+        const isGo = Math.random() > 0.3;
+        const el = document.createElement('div');
+        el.className = 'target-shape ' + (isGo ? 'shape-go' : 'shape-nogo');
+        el.innerHTML = isGo ? '<span>✓</span><span>GO!</span>' : '<span>✕</span><span>NO-GO!</span>';
+        el.style.left = Math.max(10, Math.floor(Math.random() * Math.max(40, area.clientWidth - 76))) + 'px';
+        el.style.top = Math.max(10, Math.floor(Math.random() * Math.max(40, area.clientHeight - 76))) + 'px';
+        ballSpawnTime = performance.now();
 
-        const maxX = Math.max(40, (area.clientWidth || 300) - 70);
-        const maxY = Math.max(40, (area.clientHeight || 200) - 70);
-        const posX = Math.max(10, Math.floor(Math.random() * maxX));
-        const posY = Math.max(10, Math.floor(Math.random() * maxY));
-
-        ball.style.left = posX + 'px';
-        ball.style.top = posY + 'px';
-
-        ballSpawnTime = Date.now();
-
-        function handleBallHit(e) {
-            if (e) {
-                try { e.preventDefault(); e.stopPropagation(); } catch(err){}
-            }
+        function hit(e) {
+            if (e) { try { e.preventDefault(); e.stopPropagation(); } catch (_) {} }
             if (isRoundProcessing) return;
             isRoundProcessing = true;
-
-            if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
-
-            const rt = Date.now() - ballSpawnTime;
-            const finalRt = Math.max(100, rt);
-
-            if (isGreen) {
-                reactionTimes.push(finalRt);
-            } else {
+            clearTimeout(ballTimer);
+            const rt = Math.max(110, Math.round(performance.now() - ballSpawnTime));
+            if (isGo) reactionTimes.push(rt);
+            else {
                 vetoErrors++;
+                document.getElementById('lblVetoErr').innerText = vetoErrors;
             }
-
             area.innerHTML = '';
-            setTimeout(nextRound, 300);
+            setTimeout(nextRound, 260);
         }
 
-        ball.addEventListener('pointerdown', handleBallHit, { passive: false });
-        ball.addEventListener('touchstart', handleBallHit, { passive: false });
-        ball.onclick = handleBallHit;
-
-        area.appendChild(ball);
-
+        el.addEventListener('pointerdown', hit, { passive: false });
+        area.appendChild(el);
         ballTimer = setTimeout(() => {
             if (isRoundProcessing) return;
             isRoundProcessing = true;
             area.innerHTML = '';
-            if (isGreen) {
-                reactionTimes.push(750);
-            }
-            setTimeout(nextRound, 300);
-        }, 850);
+            if (isGo) { greenLapses++; reactionTimes.push(950); }
+            setTimeout(nextRound, 260);
+        }, 950);
     }
 
     async function finishCheckin() {
-        if (checkinSubmitted) return;
-        checkinSubmitted = true;
         showScreen('scr-4');
-
-        const name = document.getElementById('txtName').value.trim() || 'Dr. Flavio Verissimo';
-        const role = document.getElementById('txtRole').value || 'CEO / Presidente Executivo';
-        const userAge = parseInt(document.getElementById('numAge').value) || 50;
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
         const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
-        const meetingTopic = document.getElementById('txtMeetingTopic').value.trim() || '';
+        const meetingTopic = document.getElementById('txtMeetingTopic').value.trim();
 
-        const validTimes = reactionTimes.filter(t => t < 750);
-        const avgRt = validTimes.length > 0 ? Math.round(validTimes.reduce((a, b) => a + b, 0) / validTimes.length) : 450;
-
-        // CÁLCULO DO DESVIO PADRÃO DO TEMPO DE REAÇÃO (PVT JITTER)
-        let rtJitter = 0;
-        if (validTimes.length > 1) {
-            const meanRt = validTimes.reduce((a, b) => a + b, 0) / validTimes.length;
-            const variance = validTimes.reduce((a, b) => a + Math.pow(b - meanRt, 2), 0) / validTimes.length;
-            rtJitter = Math.sqrt(variance);
+        const avgRt = reactionTimes.length ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 450;
+        let jitter = 0;
+        if (reactionTimes.length > 1) {
+            const v = reactionTimes.reduce((a, b) => a + Math.pow(b - avgRt, 2), 0) / reactionTimes.length;
+            jitter = Math.sqrt(v);
         }
 
-        const numVsi = Number(vsiScoreVal) || 1.80;
+        const valC = Number(Math.max(1.0, Math.min(5.0, 5.0 - vetoErrors * 1.15 - jitter / 55)).toFixed(2));
+        const valI = Number(Math.max(1.0, Math.min(5.0, 5.0 - (avgRt - 320) / 115 - greenLapses * 0.45)).toFixed(2));
+        const valR = audioQualityOk && vsiScoreVal !== null ? Number(Math.max(1.0, Math.min(5.0, 5.0 - (vsiScoreVal - 1.45) * 1.15)).toFixed(2)) : 3.5;
+        const esScore = Number((((valC + valI + valR) + Math.min(valC, valI, valR)) / 4.0).toFixed(2));
+        let weakest = 'C';
+        if (valI < valC && valI <= valR) weakest = 'I';
+        if (valR < valC && valR < valI) weakest = 'R';
 
-        // 🧠 CÁLCULO COMPÓSITO DO VETOR C (AUTOCONTROLE / DLPFC)
-        let jitterPen = (rtJitter / 45);
-        let vsiPen = (numVsi > 2.5) ? (numVsi - 2.5) * 0.4 : 0;
-        let valC = Number(Math.max(1.0, Math.min(5.0, 5.0 - (vetoErrors * 1.2) - jitterPen - vsiPen)).toFixed(1));
-
-        let valI = Number(Math.max(1.0, 5.0 - ((avgRt - 300) / 110)).toFixed(1));
-        let valR = Number(Math.max(1.0, 5.0 - ((numVsi - 1.50) * 1.1)).toFixed(1));
-
-        // 🫀 CÁLCULO DA VFC (rMSSD ms)
-        let vfcRmssd = Math.round(Math.max(12, 82 - (numVsi * 9) - ((avgRt - 300) / 16) - (vetoErrors * 6)));
-
-        // 📐 CALIBRAÇÃO E NORMALIZAÇÃO DA VFC PELA IDADE (CURVA FISIOLÓGICA DE DECRÉSCIMO ATUARIAL)
-        // VFC de 40ms aos 60 anos = Percentil 85+ (Excelente), enquanto aos 25 anos = Médio
-        let ageVfcThresholdGreen = 42;
-        let ageVfcThresholdYellow = 30;
-
-        if (userAge >= 55) {
-            ageVfcThresholdGreen = 28;
-            ageVfcThresholdYellow = 20;
-        } else if (userAge >= 45) {
-            ageVfcThresholdGreen = 34;
-            ageVfcThresholdYellow = 24;
-        } else if (userAge >= 35) {
-            ageVfcThresholdGreen = 38;
-            ageVfcThresholdYellow = 27;
-        }
-
-        let isVfcGreen = vfcRmssd >= ageVfcThresholdGreen;
-        let isVfcYellow = !isVfcGreen && vfcRmssd >= ageVfcThresholdYellow;
-        let isVfcRed = vfcRmssd < ageVfcThresholdYellow;
-
-        // REGRA DO ELO MAIS FRACO
-        const minVector = Math.min(valC, valI, valR);
-        let weightedAvg = (valC * 0.4 + valI * 0.3 + valR * 0.3);
-        let finalScoreNum = Math.min(weightedAvg, minVector + 0.8).toFixed(2);
-
-        let lowestVector = 'C';
-        if (valI < valC && valI <= valR) lowestVector = 'I';
-        if (valR < valC && valR < valI) lowestVector = 'R';
-
-        // CLASSIFICAÇÃO JUSTA & NORMALIZADA DE PRONTIDÃO
-        let status = 'GREEN';
-        let badgeClass = 'badge-green';
-        let badgeText = '🟢 SOBERANIA DECISÓRIA PRESERVADA';
-        let mainStatusMsg = `🟢 Sistema neurovegetativo em homeostase. VFC de ${vfcRmssd} ms está EXCELENTE para a faixa etária de ${userAge} anos. Aprovado para deliberações de alto risco e conselho.`;
-
-        if (vetoErrors >= 2 || avgRt > 780 || numVsi >= 4.41 || minVector < 2.0 || Number(finalScoreNum) < 2.30 || isVfcRed) {
-            status = 'RED';
-            badgeClass = 'badge-red';
-            badgeText = '🔴 ALERTA DE EXAUSTÃO CRÍTICA';
-            mainStatusMsg = '🔴 Risco elevado de Estol Cognitivo. Recomendamos congelar ou delegar deliberações M&A e Capex nas próximas 2 horas.';
-        } else if (numVsi >= 3.41 || (minVector < 2.30 && lowestVector === 'R')) {
-            status = 'PURPLE';
-            badgeClass = 'badge-purple';
-            badgeText = 'ROXO TRAVA POR EXAUSTÃO (CHASSI QUEIMADO)';
-            mainStatusMsg = 'ROXO Sobrecarga Autonômica Severa. Ativar protocolo E.A.S.Y. de desaceleração compulsória antes do próximo comitê.';
-        } else if (minVector < 3.20 || avgRt > 620 || vetoErrors === 1 || numVsi >= 2.80 || isVfcYellow) {
-            status = 'YELLOW';
-            badgeClass = 'badge-yellow';
-            badgeText = '🟡 ATENÇÃO: TENSÃO DE GOVERNANÇA';
-
-            if (lowestVector === 'I') {
-                mainStatusMsg = `🟡 Tensão de Processamento Cognitivo: Carga de trabalho acumulada no vetor I (Clareza = ${valI} / ${avgRt} ms / VFC = ${vfcRmssd} ms). Recomenda-se simplificar a pauta.`;
-            } else if (lowestVector === 'C') {
-                mainStatusMsg = `🟡 Tensão no Controle de Veto: Oscilação atencional no vetor C (Autocontrole = ${valC} / Jitter = ${Math.round(rtJitter)}ms). Recomenda-se dupla checagem em aprovações.`;
-            } else {
-                mainStatusMsg = `🟡 Tensão Autonômica Modulada: Alteração bioacústica no vetor R (Energia = ${valR} / VFC = ${vfcRmssd} ms). Ativação simpática moderada. Recomenda-se pausa de descompressão.`;
-            }
-        }
-
-        document.getElementById('resExecName').innerText = `${name} (${userAge} anos)`;
-        document.getElementById('resExecRole').innerText = role + ' • ' + dept + (selectedContext === 'PRE_MEETING' ? ` [⚡ Pré-Reunião: ${meetingTopic || 'Geral'}]` : '');
-        document.getElementById('lblFinalScore').innerText = finalScoreNum;
-        document.getElementById('lblFinalStatusText').innerText = badgeText;
-        document.getElementById('lblTopBadgeContainer').innerHTML = `<span class="badge-status-top ${badgeClass}">${badgeText}</span>`;
-
+        document.getElementById('resExecName').innerText = name;
+        document.getElementById('resExecRole').innerText = `${role} • ${dept}`;
+        document.getElementById('lblFinalScore').innerText = esScore;
         document.getElementById('lblValC').innerText = valC;
         document.getElementById('lblValI').innerText = valI;
         document.getElementById('lblValR').innerText = valR;
-        document.getElementById('lblValVFC').innerText = `${vfcRmssd} ms`;
-
-        document.getElementById('lblVfcAgeNote').innerText = `Ajustada para ${userAge} anos (Corte Verde >= ${ageVfcThresholdGreen} ms).`;
-
-        if (photoBase64) {
-            const img = document.getElementById('resPhoto');
-            img.src = photoBase64;
-            img.style.display = 'block';
-        }
-
-        document.getElementById('boxMainAlert').innerHTML = `
-            <div class="card" style="border-color:var(--accent);">
-                <h3>💡 Diagnóstico Tático de Prontidão Executiva (${userAge} Anos):</h3>
-                <p style="font-size:12px; line-height:1.5; color:#f8fafc;">${mainStatusMsg}</p>
-            </div>
-        `;
-
-        document.getElementById('lblBottleneckTag').innerText = `GARGALO: VETOR ${lowestVector} | VFC: ${vfcRmssd}ms`;
-
-        let eMsg = `VFC registrada em <b>${vfcRmssd} ms</b> para a faixa etária de <b>${userAge} anos</b> (Corte Verde >= ${ageVfcThresholdGreen} ms). `;
-        if (isVfcGreen) {
-            eMsg += `Reserva autonômica em excelente nível atuarial. Gargalo principal no vetor <b>${lowestVector}</b>.`;
-        } else if (isVfcYellow) {
-            eMsg += `Reserva autonômica com sobrecarga moderada. Tensão concentrada no vetor <b>${lowestVector}</b>.`;
-        } else {
-            eMsg += `Reserva autonômica em nível crítico de exaustão (< ${ageVfcThresholdYellow} ms). Disfunção no vetor <b>${lowestVector}</b>.`;
-        }
-
-        let aMsg = '';
-        if (status === 'GREEN') {
-            aMsg = `Conduzir pautas estratégicas de alta densidade analítica e deliberações de M&A e Capex nos primeiros 20 a 30 minutos de reunião, aproveitando a homeostase decisória.`;
-        } else if (status === 'YELLOW') {
-            if (lowestVector === 'I') {
-                aMsg = `Tensão no vetor I (Clareza/Processamento): Reduzir a densidade da pauta. Focar em apenas 1 decisão principal e delegar análises operacionais à equipe.`;
-            } else if (lowestVector === 'C') {
-                aMsg = `Tensão no vetor C (Autocontrole/Veto): Risco de impulsividade ou atrito. Fazer pausa de 5 minutos antes do voto final e requerer dupla checagem.`;
-            } else {
-                aMsg = `Tensão no vetor R (Energia Vocal/Simpática): Fazer pausa tática de 10-15 minutos com hidratação (300ml de água) antes de iniciar a sessão decisória.`;
-            }
-        } else if (status === 'PURPLE') {
-            aMsg = `Sobrecarga Severa / Exaustão: Ativar protocolo de desaceleração compulsória. Pausa de 45 minutos. Reagendar comitês de alta densidade para o turno seguinte.`;
-        } else { // RED
-            aMsg = `<b>ESTOL COGNITIVO IMINENTE:</b> CONGELAR ou DELEGAR deliberações de Capex, M&A e reestruturação pelas próximas 2 a 4 horas. Não assinar atos de governança neste estado.`;
-        }
-
-        let sMsg = '';
-        if (status === 'GREEN') {
-            sMsg = `Alçada de deliberação autônoma mantida. Duração máxima do comitê recomendada: 60 minutos.`;
-        } else if (status === 'YELLOW') {
-            sMsg = `Alçada condicionada: Exigir co-assinatura/validação conjunta do CFO ou COO em aprovações de contratos e limitar o comitê a 30-45 minutos.`;
-        } else if (status === 'PURPLE') {
-            sMsg = `Alçada sob restrição temporária: Limitar reuniões a 20 minutos com foco único em alinhamento de emergência, transferindo voto final para o conselho.`;
-        } else { // RED
-            sMsg = `<b>TRAVA DE ALÇADA ATIVADA:</b> Desativação temporária da alçada individual de aprovação. Toda deliberação exige validação colegiada presencial do Conselho.`;
-        }
-
-        let yMsg = `Realizar nova aferição telemétrica de 30s após o comitê/reunião para mensurar a taxa de consumo da reserva de VFC e validar a recuperação autonômica.`;
-
-        let easyHtml = `
-            <div class="easy-block"><b>E — EXAMINE (Diagnóstico Biométrico):</b> ${eMsg}</div>
-            <div class="easy-block"><b>A — ADAPT (Diretriz Tática no Comitê):</b> ${aMsg}</div>
-            <div class="easy-block"><b>S — SYSTEMATIZE (Governança & Alçada):</b> ${sMsg}</div>
-            <div class="easy-block"><b>Y — YARDSTICK (Métrica Pós-Comitê):</b> ${yMsg}</div>
-        `;
-
-        document.getElementById('easyDynamicContainer').innerHTML = easyHtml;
-
-        const vsiStatusWithVfc = `${vsiStatusText} | VFC: ${vfcRmssd}ms [${userAge}a]`;
-
-        const payload = {
-            name: `${name} (${userAge}a)`,
-            role: role,
-            department: dept,
-            company: 'ES_CRISIS_EXEC',
-            reaction_time_ms: avgRt,
-            veto_errors: vetoErrors,
-            vsi_score: Number(vsiScoreVal),
-            vsi_status: vsiStatusWithVfc,
-            status: status,
-            action: `[ES-CRISE C-SUITE] ${mainStatusMsg}`,
-            photo_url: photoBase64 || null
-        };
-
-
-    async function sendBackupCopy(moduleType, payloadData) {
-        try {
-            const backupPayload = {
-                module_type: moduleType,
-                name: payloadData.name || null,
-                role: payloadData.role || null,
-                department: payloadData.department || payloadData.dept || null,
-                company: payloadData.company || null,
-                reaction_time_ms: payloadData.reaction_time_ms || payloadData.latency_ms || null,
-                veto_errors: payloadData.veto_errors !== undefined ? payloadData.veto_errors : null,
-                vsi_score: payloadData.vsi_score || null,
-                vsi_status: payloadData.vsi_status || null,
-                status: payloadData.status || null,
-                action: payloadData.action || null,
-                photo_url: payloadData.photo_url || null,
-                raw_payload: payloadData
-            };
-            fetch(`${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(backupPayload)
-            }).catch(e => console.warn("Espelho de Segurança (Backup) aviso:", e));
-        } catch(e) {
-            console.warn("Espelho de Segurança falha:", e);
-        }
-    }
+        document.getElementById('resBottleneckNote').innerText = `Gargalo atual pelo Elo Mais Fraco: Vetor ${weakest}. Fórmula: ((C+I+R)+MIN(C,I,R))/4. Indicadores de apoio comportamental (sem ato médico).`;
 
         const syncEl = document.getElementById('syncStatus');
-        sendBackupCopy('ES_CRISIS_EXEC', payload);
-
-        syncEl.innerText = '⏳ Sincronizando Dossiê com o Cockpit de Governança...';
-
-        const headers = {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Prefer': 'return=minimal'
-        };
-
         try {
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
+            const efRes = await fetch(`${SUPABASE_URL}/functions/v1/ingest-telemetry`, {
                 method: 'POST',
-                headers: headers,
-                body: JSON.stringify(payload)
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    module_type: 'ES_CRISIS_EXEC',
+                    company: companyParam,
+                    exec_name: name,
+                    exec_role: role,
+                    managed_sector: dept,
+                    context_type: selectedContext,
+                    meeting_topic: meetingTopic || null,
+                    reaction_time_ms: avgRt,
+                    veto_errors: vetoErrors,
+                    green_lapses: greenLapses,
+                    rt_jitter_ms: Math.round(jitter),
+                    audio_quality_ok: audioQualityOk,
+                    vsi_score: vsiScoreVal,
+                    photo_url: photoBase64,
+                    tcle_accepted: true,
+                    environment_mode: envMode
+                })
             });
+            if (efRes.ok) { syncEl.innerText = '✅ Registro executivo sincronizado com segurança!'; return; }
+        } catch (e) {}
 
-            if (res.ok) {
-                syncEl.innerText = '✅ DOSSIÊ NEUROEXECUTIVO REGISTRADO COM SUCESSO NO COCKPIT!';
-                syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
-                syncEl.style.color = '#34d399';
-                return;
-            }
-        } catch (err) {
-            console.warn("Tentativa 1 falhou. Tentando fallback sem foto em srt_checkins...", err);
-        }
+        // Fallback direto na tabela es_crisis_exec_checkins
+        let status = 'GREEN';
+        if (vetoErrors >= 2 || avgRt >= 800 || greenLapses >= 3) status = 'RED';
+        else if (audioQualityOk && vsiScoreVal >= 3.41) status = 'PURPLE';
+        else if (avgRt >= 650 || vetoErrors === 1 || greenLapses >= 1) status = 'YELLOW';
 
-        try {
-            const lightPayload = { ...payload };
-            delete lightPayload.photo_url;
-
-            let res2 = await fetch(`${SUPABASE_URL}/rest/v1/srt_checkins`, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(lightPayload)
-            });
-
-            if (res2.ok) {
-                syncEl.innerText = '✅ DOSSIÊ NEUROEXECUTIVO REGISTRADO NO COCKPIT (MODO LIGHT)!';
-                syncEl.style.background = 'rgba(16, 185, 129, 0.15)';
-                syncEl.style.color = '#34d399';
-                return;
-            }
-        } catch (err2) {
-            console.warn("Fallback em srt_checkins falhou:", err2);
-        }
-
-        syncEl.innerText = '✅ Dossiê concluído e armazenado no dispositivo (Soberania Local).';
-        syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
-        syncEl.style.color = '#fbbf24';
+        const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+            body: JSON.stringify({
+                company: companyParam, exec_name: name, exec_role: role, managed_sector: dept,
+                context_type: selectedContext, meeting_topic: meetingTopic || null,
+                reaction_time_ms: avgRt, veto_errors: vetoErrors, green_lapses: greenLapses,
+                audio_quality_ok: audioQualityOk, vsi_score: vsiScoreVal,
+                score_c: valC, score_i: valI, score_r: valR, es_crisis_score: esScore, weakest_vector: weakest,
+                status, face_verification_mode: photoBase64 ? 'FOTO_VISUAL_CEO_30D' : 'SEM_FOTO',
+                photo_url: photoBase64, tcle_accepted: true, environment_mode: envMode
+            })
+        });
+        syncEl.innerText = dbRes.ok ? '✅ Registro executivo salvo!' : '⚠️ Falha ao salvar no banco.';
     }
 
-    function exportMobileNativePDF() {
-        window.print();
+    async function open360Screen() {
+        t0360 = Date.now();
+        showScreen('scr-360');
+        const sel = document.getElementById('selCycle360');
+        sel.innerHTML = '<option value="">Carregando ciclos abertos...</option>';
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_360_cycles?company=eq.${encodeURIComponent(companyParam)}&status=eq.ABERTO`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const rows = res.ok ? await res.json() : [];
+            sel.innerHTML = rows.length
+                ? rows.map(c => `<option value="${c.id}">${c.leader_name} — ${c.managed_sector} (${c.cycle_label})</option>`).join('')
+                : '<option value="">Nenhum ciclo aberto (crie no Dashboard ES-CRISIS)</option>';
+        } catch (e) {}
+    }
+
+    async function submit360Response() {
+        const cycleId = document.getElementById('selCycle360').value;
+        if (!cycleId) { alert('Selecione um ciclo 360° aberto.'); return; }
+        const sec = Math.max(1, Math.round((Date.now() - t0360) / 1000));
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_360_responses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+            body: JSON.stringify({
+                cycle_id: cycleId,
+                company: companyParam,
+                rater_type: document.getElementById('selRaterType').value,
+                q_c_predictability: Number(document.getElementById('r360Pred').value),
+                q_c_impulse_control: Number(document.getElementById('r360Imp').value),
+                q_psych_safety: Number(document.getElementById('r360Safety').value),
+                q_i_clarity: Number(document.getElementById('r360Clarity').value),
+                q_i_unlearning: Number(document.getElementById('r360Unlearn').value),
+                q_i_impact: Number(document.getElementById('r360Impact').value),
+                q_r_sustainability: Number(document.getElementById('r360Sust').value),
+                q_r_reliability: Number(document.getElementById('r360Reliab').value),
+                q_control_inverted: Number(document.getElementById('r360Ctrl').value),
+                completion_time_sec: sec
+            })
+        });
+        if (res.ok) { alert('Avaliação 360° registrada!'); showScreen('scr-0'); }
+        else alert('Erro ao enviar avaliação 360°.');
     }
 </script>
 </body>
