@@ -74,6 +74,9 @@
         .ruler-wrap { display: flex; align-items: center; gap: 10px; }
         .ruler-wrap input[type="range"] { flex: 1; accent-color: var(--accent); }
         .ruler-val { min-width: 32px; text-align: center; font-weight: 800; color: var(--accent); background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+        .window-banner { padding: 10px 12px; border-radius: 10px; font-size: 11px; margin-bottom: 12px; border: 1px solid var(--border); background: #070d19; color: var(--muted); }
+        .window-banner.open { border-color: var(--green); color: #bbf7d0; background: rgba(16,185,129,0.12); }
+        .window-banner.blocked { border-color: var(--red); color: #fecaca; background: rgba(239,68,68,0.12); }
         @media print { .no-print { display: none !important; } body { background: #fff; color: #000; } .app-container { border: none; box-shadow: none; } }
     </style>
 </head>
@@ -84,13 +87,14 @@
             <div class="brand-title">ExcelSilience ES-CRISIS</div>
             <div class="brand-subtitle" id="lblHeaderSub">Prontidão Executiva C-I-R & Auditoria 360°</div>
         </div>
-        <span class="badge-mode" id="lblEnvBadge">PRODUÇÃO</span>
+        <span class="badge-mode">08H–18H • SEG–SEX</span>
     </div>
 
     <!-- TELA 0: IDENTIFICAÇÃO + TERMO LGPD -->
     <div id="scr-0" class="screen active">
         <div class="card">
             <h3>Check-in Executivo (C, I, R)</h3>
+            <div id="esWindowBanner" class="window-banner">⏳ Validando janela corporativa (08:00–18:00, Seg–Sex)...</div>
             <div class="form-group">
                 <label>Nome Completo</label>
                 <input type="text" id="txtName" placeholder="Ex.: Nome do Executivo">
@@ -126,8 +130,8 @@
                 </label>
             </div>
 
-            <button class="btn" onclick="startFlow(true)">Iniciar com Foto Visual (Opcional) + Voz + Go/No-Go</button>
-            <button class="btn btn-secondary" onclick="startFlow(false)">Iniciar Sem Câmera (Apenas Voz + Go/No-Go)</button>
+            <button class="btn" id="btnStartCam" onclick="startFlow(true)">Iniciar com Foto Visual (Opcional) + Voz + Go/No-Go</button>
+            <button class="btn btn-secondary" id="btnStartNoCam" onclick="startFlow(false)">Iniciar Sem Câmera (Apenas Voz + Go/No-Go)</button>
             <button class="btn btn-purple" onclick="open360Screen()">🧭 Responder Avaliação 360° (Réguas 1-5)</button>
         </div>
     </div>
@@ -241,7 +245,40 @@
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
     const urlParams = new URLSearchParams(window.location.search);
     const companyParam = (urlParams.get('company') || 'GROU').toUpperCase();
-    const envMode = (urlParams.get('env') || '').toUpperCase() === 'SANDBOX' ? 'SANDBOX' : 'PRODUCAO';
+    const envMode = 'PRODUCAO';
+    let esWindowAllowed = false;
+
+    async function checkEsCrisisServerWindow() {
+        const banner = document.getElementById('esWindowBanner');
+        const b1 = document.getElementById('btnStartCam');
+        const b2 = document.getElementById('btnStartNoCam');
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_es_crisis_window`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({ p_company: companyParam, p_env: 'PRODUCAO' })
+            });
+            if (res.ok) {
+                const rows = await res.json();
+                const row = Array.isArray(rows) ? rows[0] : rows;
+                if (row) {
+                    esWindowAllowed = Boolean(row.allowed);
+                    banner.className = 'window-banner ' + (esWindowAllowed ? 'open' : 'blocked');
+                    banner.innerHTML = esWindowAllowed
+                        ? `🟢 ${row.next_window_hint}`
+                        : `⛔ ${row.next_window_hint}`;
+                    b1.disabled = !esWindowAllowed;
+                    b2.disabled = !esWindowAllowed;
+                    return;
+                }
+            }
+        } catch (e) {}
+        esWindowAllowed = false;
+        banner.className = 'window-banner blocked';
+        banner.innerText = '⚠️ Não foi possível validar o horário corporativo no servidor.';
+        b1.disabled = true;
+        b2.disabled = true;
+    }
 
     let selectedContext = 'ROUTINE';
     let mediaStream = null;
@@ -260,8 +297,8 @@
     let t0360 = Date.now();
 
     window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('lblEnvBadge').innerText = envMode === 'SANDBOX' ? '🧪 SANDBOX' : 'PRODUÇÃO';
         document.getElementById('lblHeaderSub').innerText = `${companyParam} • Vetores C-I-R & Projeto Aristóteles`;
+        checkEsCrisisServerWindow();
         try {
             if (localStorage.getItem('es_exec_name')) document.getElementById('txtName').value = localStorage.getItem('es_exec_name');
             if (localStorage.getItem('es_exec_role')) document.getElementById('txtRole').value = localStorage.getItem('es_exec_role');
@@ -283,6 +320,7 @@
     }
 
     async function startFlow(withCamera) {
+        if (!esWindowAllowed) { alert('Check-in executivo disponível apenas de segunda a sexta, das 08:00 às 18:00.'); return; }
         const name = document.getElementById('txtName').value.trim();
         const role = document.getElementById('txtRole').value;
         const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
@@ -543,6 +581,11 @@
                 })
             });
             if (efRes.ok) { syncEl.innerText = '✅ Registro executivo sincronizado com segurança!'; return; }
+            if (efRes.status === 403) {
+                const blockedJson = await efRes.json();
+                syncEl.innerText = `⛔ ${blockedJson.reason || 'Fora do horário permitido (08:00–18:00 Seg–Sex).'}`;
+                return;
+            }
         } catch (e) {}
 
         let status = 'GREEN';
@@ -550,20 +593,27 @@
         else if (audioQualityOk && vsiScoreVal >= 3.41) status = 'PURPLE';
         else if (avgRt >= 650 || vetoErrors === 1 || greenLapses >= 1) status = 'YELLOW';
 
-        const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins`, {
+        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_es_crisis_exec_v54`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
             body: JSON.stringify({
-                company: companyParam, exec_name: name, exec_role: role, managed_sector: dept,
-                context_type: selectedContext, meeting_topic: meetingTopic || null,
-                reaction_time_ms: avgRt, veto_errors: vetoErrors, green_lapses: greenLapses,
-                audio_quality_ok: audioQualityOk, vsi_score: vsiScoreVal,
-                score_c: valC, score_i: valI, score_r: valR, es_crisis_score: esScore, weakest_vector: weakest,
-                status, face_verification_mode: photoBase64 ? 'FOTO_VISUAL_CEO_30D' : 'SEM_FOTO',
-                photo_url: photoBase64, tcle_accepted: true, environment_mode: envMode
+                p_company: companyParam, p_exec_name: name, p_exec_role: role, p_managed_sector: dept,
+                p_context_type: selectedContext, p_meeting_topic: meetingTopic || null,
+                p_reaction_time_ms: avgRt, p_veto_errors: vetoErrors, p_green_lapses: greenLapses,
+                p_audio_quality_ok: audioQualityOk, p_vsi_score: vsiScoreVal,
+                p_score_c: valC, p_score_i: valI, p_score_r: valR, p_es_crisis_score: esScore, p_weakest_vector: weakest,
+                p_status: status, p_face_verification_mode: photoBase64 ? 'FOTO_VISUAL_CEO_30D' : 'SEM_FOTO',
+                p_photo_url: photoBase64, p_tcle_accepted: true, p_environment_mode: envMode
             })
         });
-        syncEl.innerText = dbRes.ok ? '✅ Registro executivo salvo!' : '⚠️ Falha ao salvar no banco.';
+        if (rpcRes.ok) {
+            syncEl.innerText = '✅ Registro executivo salvo!';
+        } else {
+            const errTxt = await rpcRes.text();
+            syncEl.innerText = errTxt.includes('ES_CRISIS_BLOQUEADO_HORARIO')
+                ? '⛔ Check-in executivo bloqueado fora do horário corporativo (08:00 às 18:00, Seg-Sex).'
+                : '⚠️ Falha ao salvar no banco.';
+        }
     }
 
     async function open360Screen() {
