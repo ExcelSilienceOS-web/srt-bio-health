@@ -660,8 +660,13 @@
         if (sbPanel) sbPanel.style.display = isSb ? 'block' : 'none';
     }
 
+    function getTestIndexRhFile() {
+        const fname = (window.location.pathname.split('/').pop() || '');
+        return fname.startsWith('teste_') ? 'teste_index-rh.html' : 'index-rh.html';
+    }
+
     function openAppInSandbox() {
-        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-rh.html');
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, getTestIndexRhFile());
         const comp = (currentCompany === 'TODAS' || currentCompany === 'ALL') ? 'EXCELSILIENCE' : currentCompany;
         window.open(`${base}?company=${encodeURIComponent(comp.toLowerCase())}`, '_blank');
     }
@@ -1418,7 +1423,7 @@ ${docsCache.filter(d => targetSec === 'GERAL' || d.target_sector.toUpperCase() =
 
     function renderLinksGenerator() {
         const box = document.getElementById('link-generator-list');
-        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-rh.html');
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, getTestIndexRhFile());
         box.innerHTML = setoresCadastrados.map(s => {
             const slug = s.toLowerCase().replace(/[^a-z0-9]/g, '_');
             const linkTest = `${base}?company=${encodeURIComponent(currentCompany.toLowerCase())}&sector=${slug}`;
