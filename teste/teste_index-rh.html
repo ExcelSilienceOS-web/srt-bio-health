@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ExcelSilience SRT-RH — Check-in Anônimo de Prontidão</title>
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --panel-bg: #151c2c;
+            --panel-border: #2a364f;
+            --input-bg: #0b0f19;
+            --input-border: #334155;
+            --text-main: #e2e8f0;
+            --text-sub: #cbd5e1;
+            --text-muted: #94a3b8;
+            --accent-cyan: #38bdf8;
+            --accent-cyan-hover: #0284c7;
+            --accent-green: #10b981;
+            --accent-green-bright: #34d399;
+            --accent-yellow: #f59e0b;
+            --accent-yellow-bright: #fbbf24;
+            --accent-red: #ef4444;
+            --accent-red-bright: #f87171;
+            --accent-purple: #a855f7;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 16px; }
+        .container { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; width: 100%; max-width: 540px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); margin: auto 0; }
+        .header-box { text-align: center; margin-bottom: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 14px; }
+        .header-box h1 { font-size: 1.3rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .badge-gov { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 8px 12px; border-radius: 14px; font-size: 11px; font-weight: 700; display: block; margin-bottom: 14px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
+        .badge-sandbox { background: rgba(168, 85, 247, 0.16); color: #e9d5ff; border: 1px solid var(--accent-purple); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; text-align: center; margin-bottom: 14px; display: none; }
+        .window-banner { padding: 12px 14px; border-radius: 12px; font-size: 12px; margin-bottom: 14px; line-height: 1.45; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-sub); }
+        .window-banner.blocked { background: rgba(239, 68, 68, 0.12); border-color: var(--accent-red); color: #fecaca; }
+        .window-banner.open { background: rgba(16, 185, 129, 0.12); border-color: var(--accent-green); color: #bbf7d0; }
+
+        .step { display: none; animation: fadeIn 0.25s ease-in-out forwards; }
+        .step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-group { margin-bottom: 14px; }
+        label { font-size: 11px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        select, input[type="text"], textarea { width: 100%; padding: 12px 14px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: #ffffff; font-size: 13px; outline: none; }
+        select:focus, input[type="text"]:focus, textarea:focus { border-color: var(--accent-cyan); }
+
+        .chk-box { display: flex; align-items: flex-start; gap: 10px; background: var(--input-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--input-border); margin-bottom: 14px; }
+        .chk-box input[type="checkbox"] { margin-top: 2px; accent-color: var(--accent-cyan-hover); width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+        .chk-box label { font-size: 11px; color: var(--text-sub); text-transform: none; line-height: 1.45; margin: 0; font-weight: 400; cursor: pointer; }
+
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; background: var(--accent-cyan-hover); color: #ffffff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
+        .btn:hover:not(:disabled) { background: #0369a1; }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-secondary { background: #1e293b; color: var(--text-sub); border: 1px solid var(--input-border); margin-top: 8px; }
+        .btn-ethics { background: rgba(168, 85, 247, 0.18); color: #e9d5ff; border: 1px solid var(--accent-purple); margin-top: 8px; }
+        .btn-green { background: #059669; color: #fff; }
+
+        .ruler-card { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .ruler-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.4; }
+        .ruler-wrap { display: flex; align-items: center; gap: 10px; }
+        .ruler-wrap input[type="range"] { flex: 1; accent-color: var(--accent-cyan); height: 6px; cursor: pointer; }
+        .ruler-val { min-width: 34px; text-align: center; font-weight: 800; font-size: 14px; color: var(--accent-cyan); background: #151c2c; border: 1px solid var(--panel-border); border-radius: 8px; padding: 4px 6px; }
+        .ruler-scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        .yn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+        .yn-btn { padding: 10px; border-radius: 10px; border: 1px solid var(--input-border); background: #151c2c; color: var(--text-sub); font-weight: 800; font-size: 12px; cursor: pointer; }
+        .yn-btn.selected { background: rgba(56, 189, 248, 0.18); border-color: var(--accent-cyan); color: #fff; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .opt-chip { display: flex; align-items: flex-start; gap: 8px; background: #151c2c; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px 10px; font-size: 11px; color: var(--text-sub); cursor: pointer; }
+        .opt-chip input { margin-top: 2px; accent-color: var(--accent-cyan); }
+
+        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+        .meter-fill { height: 100%; background: var(--accent-cyan); width: 0%; transition: width 0.2s linear; }
+        .audio-vis-box { width: 100%; height: 86px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; padding: 8px; }
+        canvas.audio-canvas { width: 100%; height: 100%; display: block; }
+
+        .game-box { width: 100%; height: 255px; background: var(--input-bg); border: 2px dashed var(--input-border); border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 14px; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .target-shape { position: absolute; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #ffffff; user-select: none; touch-action: none; box-shadow: 0 0 18px rgba(255, 255, 255, 0.3); }
+        .shape-go { width: 68px; height: 68px; border-radius: 50%; background: var(--accent-green); border: 3px solid #a7f3d0; }
+        .shape-nogo { width: 66px; height: 66px; border-radius: 12px; background: var(--accent-red); border: 3px solid #fecaca; }
+
+        .sync-banner { padding: 12px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 14px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green-bright); border: 1px solid var(--accent-green); }
+        .info-card { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 14px; margin-bottom: 12px; font-size: 12px; color: var(--text-sub); line-height: 1.5; }
+        .info-card h4 { color: var(--accent-cyan); font-size: 13px; margin-bottom: 6px; font-weight: 700; }
+
+        .benefit-item { background: #151c2c; border: 1px solid var(--input-border); border-radius: 10px; padding: 10px; margin-bottom: 8px; font-size: 11px; }
+        .benefit-btn { margin-top: 6px; background: rgba(56, 189, 248, 0.16); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.4); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
+
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 999; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
+        .modal-backdrop.active { display: flex; }
+        .modal-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; max-width: 500px; width: 100%; padding: 20px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 14px; }
+        .modal-header h3 { font-size: 15px; color: var(--accent-cyan); }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; }
+        .tab-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+        .tab-pill { padding: 9px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-muted); font-size: 11px; font-weight: 800; cursor: pointer; text-align: center; }
+        .tab-pill.active { background: #0284c7; color: #fff; border-color: var(--accent-cyan); }
+        .footer-brand { margin-top: 16px; text-align: center; font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--panel-border); padding-top: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-box">
+        <h1>ExcelSilience SRT-RH</h1>
+        <p id="lblHeaderCompany">Telemetria Preventiva Anônima & Escuta NR-05</p>
+    </div>
+
+    <div id="sandboxBanner" class="badge-sandbox">
+        🧪 <b>PASTA TESTE / HOMOLOGAÇÃO (SEM TRAVAS 24H | N ≥ 1)</b> — Ambiente exclusivo para demos (não usar em clientes)
+    </div>
+    <span class="badge-gov">🔒 100% ANÔNIMO • ZERO CÂMERA • QUÓRUM LGPD (N ≥ 5) • PARTICIPAÇÃO FACULTATIVA</span>
+
+    <div id="windowBanner" class="window-banner">⏳ Verificando janela de horário permitida no servidor...</div>
+
+    <!-- PASSO 1: INÍCIO & TERMO TRABALHISTA / LGPD -->
+    <div id="stepForm" class="step active">
+        <div class="form-group">
+            <label for="txtDept">Seu Setor / Departamento (GHE):</label>
+            <select id="txtDept">
+                <option value="">-- Selecione o setor --</option>
+                <option value="TI">TI / Tecnologia & Sistemas</option>
+                <option value="Comercial / Vendas">Comercial / Vendas</option>
+                <option value="Financeiro">Financeiro & Contabilidade</option>
+                <option value="Operações / Logística">Operações / Logística</option>
+                <option value="Recursos Humanos">Recursos Humanos / DHO</option>
+                <option value="Atendimento">Atendimento & Suporte</option>
+                <option value="Produção">Produção & Fábrica</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="txtShiftName">Turno:</label>
+            <select id="txtShiftName">
+                <option value="Comercial">Comercial (8h / 17h)</option>
+                <option value="Manhã">Turno 1 — Manhã</option>
+                <option value="Tarde">Turno 2 — Tarde</option>
+                <option value="Noite">Turno 3 — Noite</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="sandboxWindowGroup" style="display:none;">
+            <label for="selSandboxWindow">🧪 Janela Simulada (exclusivo Sandbox para testar Delta 8h→17h):</label>
+            <select id="selSandboxWindow">
+                <option value="ENTRADA_8H">☀️ Simular Entrada (8h)</option>
+                <option value="SAIDA_17H">🌇 Simular Saída (17h)</option>
+                <option value="AVULSO">⏱️ Avulso</option>
+            </select>
+        </div>
+
+        <div class="chk-box">
+            <input type="checkbox" id="chkAuth" checked>
+            <label for="chkAuth">
+                <b>Termo Trabalhista & LGPD:</b> Participação <b>100% facultativa</b>, sem registro de recusa e sem qualquer reflexo disciplinar, salarial ou de ponto. Realizada dentro do expediente normal. Não há captura de foto, nome ou CPF; os indicadores agregados (N ≥ 5) apoiam ações preventivas da NR-01 e NR-17, sem finalidade clínica ou diagnóstica.
+            </label>
+        </div>
+
+        <div class="chk-box">
+            <input type="checkbox" id="chkAccessExempt">
+            <label for="chkAccessExempt">
+                <b>Acessibilidade / Isenção Motora ou Vocal:</b> Caso tenha limitação de fala, visão ou mobilidade, marque aqui para pular testes físicos com isenção total (ou optar por não participar sem qualquer registro).
+            </label>
+        </div>
+
+        <button id="btnStartCheckin" class="btn" onclick="startCheckinFlow()">Iniciar Checagem Anônima (30s) 🚀</button>
+        <button class="btn btn-ethics" onclick="openWhistleModal()">🛡️ Canal de Denúncias & Escuta Segura (NR-05) — 24h</button>
+        <button class="btn btn-secondary" onclick="openModal('helpModal')">❓ Como funciona o anonimato e seus direitos?</button>
+    </div>
+
+    <!-- PASSO 2: VOZ BRUTA (SEM AGC/SUPRESSÃO) -->
+    <div id="stepVoz" class="step">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:8px; font-size:15px;">🎙️ Captação Vocal (7 segundos)</h3>
+        <p style="font-size:12px; text-align:center; color:var(--text-muted); margin-bottom:10px;">
+            Leia em voz natural no microfone (sem filtros automáticos de ganho):
+        </p>
+        <div style="background:var(--input-bg); padding:14px; border-radius:12px; text-align:center; font-weight:700; color:var(--accent-yellow-bright); margin-bottom:14px; border:1px solid var(--input-border); font-size:13px;">
+            "Iniciando atividade hoje com foco, clareza e atenção."
+        </div>
+        <div class="audio-vis-box"><canvas id="audioCanvas" class="audio-canvas"></canvas></div>
+        <p id="audioHint" style="font-size:11px; text-align:center; color:var(--text-muted); margin-bottom:10px;"></p>
+        <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz (7s)</button>
+        <button id="btnSkipAudio" class="btn btn-secondary" style="display:none;" onclick="skipAudioAndContinue()">⏭️ Pular Áudio / Seguir com teste visuomotor →</button>
+        <div class="meter-bar"><div class="meter-fill" id="progressAudio"></div></div>
+    </div>
+
+    <!-- PASSO 3: GO/NO-GO ACESSÍVEL (16 RODADAS BALANCEADAS) -->
+    <div id="stepInstruction" class="step">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Teste de Atenção e Controle de Impulso</h3>
+        <div class="info-card">
+            <p style="color:var(--accent-green-bright); margin-bottom:8px;">● <b>CÍRCULO VERDE (✓ GO!):</b> Toque o mais rápido possível.</p>
+            <p style="color:var(--accent-red-bright);">■ <b>QUADRADO VERMELHO (✕ NO-GO!):</b> NÃO toque! Aguarde desaparecer.</p>
+        </div>
+        <button class="btn" onclick="startGame()">Iniciar 16 Rodadas 🎯</button>
+    </div>
+
+    <div id="stepBolinhas" class="step">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 16</b></span>
+            <span>Erros / Omissões: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
+        </div>
+        <div class="game-box" id="gameArea"></div>
+    </div>
+
+    <!-- PASSO 4 (SEXTA-FEIRA SEMANAL OU SANDBOX): RÉGUAS 1 A 5 + 12 OPÇÕES -->
+    <div id="stepWeeklyQuestions" class="step">
+        <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📏 Pulso Semanal de Condições de Trabalho</h3>
+        <p style="font-size:11px; text-align:center; color:var(--text-muted); margin-bottom:14px;">
+            Aparece apenas 1x por semana (Sexta-feira). Responda usando as réguas de 1 a 5 — sem digitação aberta para proteger seu anonimato.
+        </p>
+
+        <div class="ruler-card">
+            <div class="ruler-title">1. Você sentiu que conseguiu descansar o suficiente antes de iniciar esta semana de trabalho?</div>
+            <div class="ruler-wrap">
+                <input type="range" id="rngPreWeekRest" min="1" max="5" step="1" value="3" oninput="document.getElementById('valPreWeekRest').innerText=this.value">
+                <span class="ruler-val" id="valPreWeekRest">3</span>
+            </div>
+            <div class="ruler-scale-labels"><span>1 • Quase nada</span><span>3 • Razoável</span><span>5 • Totalmente</span></div>
+        </div>
+
+        <div class="ruler-card">
+            <div class="ruler-title">2. Esse local de trabalho pode ser melhor?</div>
+            <div class="yn-row">
+                <button type="button" class="yn-btn" id="btnImproveYes" onclick="setImproveChoice(true)">Sim, pode melhorar</button>
+                <button type="button" class="yn-btn" id="btnImproveNo" onclick="setImproveChoice(false)">Não, está adequado</button>
+            </div>
+            <div id="improveOptionsBox" style="display:none; margin-top:10px;">
+                <div style="font-size:11px; color:var(--accent-cyan); font-weight:700;">Marque uma ou mais opções que precisam de melhoria:</div>
+                <div class="options-grid" id="improvementGrid">
+                    <label class="opt-chip"><input type="checkbox" value="CHEFIA"> Chefia / Liderança</label>
+                    <label class="opt-chip"><input type="checkbox" value="SALARIO"> Salário / Remuneração</label>
+                    <label class="opt-chip"><input type="checkbox" value="BENEFICIOS"> Benefícios</label>
+                    <label class="opt-chip"><input type="checkbox" value="CONFORTO"> Conforto / Mobiliário</label>
+                    <label class="opt-chip"><input type="checkbox" value="TEMPERATURA"> Temperatura / Ventilação</label>
+                    <label class="opt-chip"><input type="checkbox" value="COLEGAS"> Relacionamento com colegas</label>
+                    <label class="opt-chip"><input type="checkbox" value="VOLUME_METAS"> Volume de trabalho / Metas</label>
+                    <label class="opt-chip"><input type="checkbox" value="AUTONOMIA_PAUSAS"> Autonomia ou pausas</label>
+                    <label class="opt-chip"><input type="checkbox" value="CLAREZA_TAREFAS"> Clareza nas tarefas</label>
+                    <label class="opt-chip"><input type="checkbox" value="RUIDO_ILUMINACAO_EQUIP"> Ruído / Iluminação / Equip.</label>
+                    <label class="opt-chip"><input type="checkbox" value="COMUNICACAO_APOIO"> Comunicação / Treinamento</label>
+                    <label class="opt-chip"><input type="checkbox" value="OUTRO_OUVIDORIA" onchange="if(this.checked) document.getElementById('btnOutroOuvidoria').style.display='flex';"> Outro (Canal NR-05)</label>
+                </div>
+                <button type="button" id="btnOutroOuvidoria" class="btn btn-ethics" style="display:none; margin-top:10px; font-size:11px; padding:10px;" onclick="openWhistleModal()">
+                    🛡️ Abrir Canal de Escuta Segura (NR-05) para relatar em sigilo
+                </button>
+            </div>
+        </div>
+
+        <div class="ruler-card">
+            <div class="ruler-title">3. Ritmo e volume de demandas desta semana (1 = Excessivo / 5 = Equilibrado):</div>
+            <div class="ruler-wrap">
+                <input type="range" id="rngDemands" min="1" max="5" step="1" value="3" oninput="document.getElementById('valDemands').innerText=this.value">
+                <span class="ruler-val" id="valDemands">3</span>
+            </div>
+            <div class="ruler-scale-labels"><span>1 • Sobrecarregado</span><span>5 • Equilibrado</span></div>
+        </div>
+
+        <div class="ruler-card">
+            <div class="ruler-title">4. Autonomia para organizar tarefas e fazer pausas (1 = Nenhuma / 5 = Plena):</div>
+            <div class="ruler-wrap">
+                <input type="range" id="rngAutonomy" min="1" max="5" step="1" value="3" oninput="document.getElementById('valAutonomy').innerText=this.value">
+                <span class="ruler-val" id="valAutonomy">3</span>
+            </div>
+            <div class="ruler-scale-labels"><span>1 • Sem autonomia</span><span>5 • Plena</span></div>
+        </div>
+
+        <div class="ruler-card">
+            <div class="ruler-title">5. Clareza sobre prioridades e o que se espera do seu trabalho (1 a 5):</div>
+            <div class="ruler-wrap">
+                <input type="range" id="rngClarity" min="1" max="5" step="1" value="3" oninput="document.getElementById('valClarity').innerText=this.value">
+                <span class="ruler-val" id="valClarity">3</span>
+            </div>
+            <div class="ruler-scale-labels"><span>1 • Confuso</span><span>5 • Total clareza</span></div>
+        </div>
+
+        <div class="ruler-card">
+            <div class="ruler-title">6. Apoio prático da liderança e equipe quando há gargalos (1 a 5):</div>
+            <div class="ruler-wrap">
+                <input type="range" id="rngSupport" min="1" max="5" step="1" value="3" oninput="document.getElementById('valSupport').innerText=this.value">
+                <span class="ruler-val" id="valSupport">3</span>
+            </div>
+            <div class="ruler-scale-labels"><span>1 • Sem apoio</span><span>5 • Forte apoio</span></div>
+        </div>
+
+        <button class="btn btn-green" onclick="submitWeeklyAndFinish()">Concluir e Enviar Anonimamente ✅</button>
+    </div>
+
+    <!-- PASSO 5: CONFIRMAÇÃO NEUTRA (ZERO PRESCRIÇÃO DE PAUSAS / ZERO ATO MÉDICO) -->
+    <div id="stepResult" class="step">
+        <div id="syncStatus" class="sync-banner">⏳ Enviando participação anônima...</div>
+
+        <div class="info-card" style="border-color: var(--accent-green);">
+            <h4>✅ Participação Anônima Registrada</h4>
+            <p id="resNeutralMsg">
+                Obrigado por participar. Seus indicadores não identificam você e serão exibidos ao RH apenas de forma agregada por setor quando houver quórum mínimo (N ≥ 5), para apoiar melhorias na organização do trabalho.
+            </p>
+            <p style="margin-top:8px; font-size:11px; color:var(--text-muted);" id="resDept">Setor: --</p>
+        </div>
+
+        <div class="info-card">
+            <h4>🛡️ Canais Confidenciais & Programas de Apoio</h4>
+            <p style="margin-bottom:8px;">Caso queira registrar uma situação específica em sigilo ou acessar os benefícios corporativos:</p>
+            <button class="btn btn-ethics" onclick="openWhistleModal()">🛡️ Abrir Canal de Denúncias / Escuta NR-05</button>
+            <button class="btn btn-secondary" onclick="loadCompanyBenefits()">🎁 Ver Programas & Benefícios de Apoio</button>
+            <div id="benefitsListBox" style="margin-top:10px; display:none;"></div>
+        </div>
+
+        <div class="info-card">
+            <h4>📏 Avaliação Rápida de Experiência (Opcional — Melhora do App)</h4>
+            <div class="ruler-title" style="font-size:11px;">Clareza e facilidade de uso (1 a 5):</div>
+            <div class="ruler-wrap" style="margin-bottom:8px;">
+                <input type="range" id="rngUxClarity" min="1" max="5" value="5" oninput="this.nextElementSibling.innerText=this.value">
+                <span class="ruler-val">5</span>
+            </div>
+            <div class="ruler-title" style="font-size:11px;">Confiança no anonimato da ferramenta (1 a 5):</div>
+            <div class="ruler-wrap" style="margin-bottom:10px;">
+                <input type="range" id="rngUxTrust" min="1" max="5" value="5" oninput="this.nextElementSibling.innerText=this.value">
+                <span class="ruler-val">5</span>
+            </div>
+            <button id="btnSendUx" class="btn btn-secondary" onclick="submitPilotFeedback()">Enviar Avaliação Opcional</button>
+        </div>
+
+        <button class="btn" onclick="location.reload()">Concluir</button>
+    </div>
+
+    <!-- MODAL CANAL DE DENÚNCIAS & ESCUTA NR-05 -->
+    <div id="whistleModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>🛡️ Canal de Escuta Segura & Denúncias (NR-05 / Lei 14.457)</h3>
+                <button class="modal-close" onclick="closeModal('whistleModal')">&times;</button>
+            </div>
+            <div class="tab-pills">
+                <button class="tab-pill active" id="tabBtnReport" onclick="switchWhistleTab('report')">📝 Novo Relato</button>
+                <button class="tab-pill" id="tabBtnCheck" onclick="switchWhistleTab('check')">🔍 Consultar Protocolo</button>
+            </div>
+
+            <div id="whistleTabReport">
+                <p style="font-size:11px; color:var(--text-sub); margin-bottom:12px; line-height:1.45;">
+                    Base isolada da telemetria, sem captura de IP ou identificação. Relatos envolvendo chefia são direcionados exclusivamente ao Comitê de Ética.
+                </p>
+                <div class="form-group">
+                    <label>Setor relacionado:</label>
+                    <input type="text" id="denSector" placeholder="Ex.: Operações, Comercial, TI">
+                </div>
+                <div class="form-group">
+                    <label>Categoria:</label>
+                    <select id="denCategory">
+                        <option value="PRESSAO_ABUSIVA_METAS">Pressão Abusiva / Metas Inexequíveis</option>
+                        <option value="ASSEDIO_MORAL">Assédio Moral</option>
+                        <option value="ASSEDIO_SEXUAL">Assédio Sexual</option>
+                        <option value="DISCRIMINACAO">Discriminação</option>
+                        <option value="CONFLITO_LIDERANCA">Conflito com Liderança</option>
+                        <option value="ERGONOMIA_CONDICAO_INSEGURA">Ergonomia / Condição Insegura</option>
+                        <option value="DESCONFORTO_FERRAMENTA_APP">Desconforto / Pressão de Uso da Ferramenta</option>
+                        <option value="OUTRO">Outro motivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Envolve liderança? (Opcional — bloqueia chefia local)</label>
+                    <input type="text" id="denLeaderRole" placeholder="Ex.: Coordenação / Gerência (deixe em branco se não houver)">
+                </div>
+                <div class="form-group">
+                    <label>Relato confidencial:</label>
+                    <textarea id="denDesc" rows="3" placeholder="Descreva os fatos sem precisar se identificar..."></textarea>
+                </div>
+                <button class="btn btn-ethics" id="btnSubmitWhistle" onclick="sendWhistleblowerReport()">Enviar Relato Sigiloso & Gerar Protocolo 🔒</button>
+                <div id="denResultBox" style="margin-top:10px; font-size:12px; display:none;"></div>
+            </div>
+
+            <div id="whistleTabCheck" style="display:none;">
+                <div class="form-group">
+                    <label>Consultar Andamento pelo Protocolo (sem login):</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="denLookupCode" placeholder="Ex.: DEN-4821-A">
+                        <button class="btn" style="width:auto; padding:0 16px;" onclick="lookupProtocol()">Consultar</button>
+                    </div>
+                </div>
+                <div id="denLookupResult" style="font-size:12px; color:var(--text-sub); line-height:1.5;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE AJUDA LGPD & DIREITOS -->
+    <div id="helpModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>❓ Privacidade, Direitos Trabalhistas & LGPD</h3>
+                <button class="modal-close" onclick="closeModal('helpModal')">&times;</button>
+            </div>
+            <div style="font-size:12px; color:var(--text-sub); line-height:1.55;">
+                <ul style="padding-left:18px;">
+                    <li><b>Zero Câmera e Zero Identificação:</b> Não há foto, nome, CPF ou gravação persistente de áudio.</li>
+                    <li><b>Quórum Mínimo N ≥ 5:</b> O RH só vê médias do setor quando houver pelo menos 5 participações.</li>
+                    <li><b>Participação Facultativa:</b> Não há registro de recusa nem uso para controle de ponto, metas ou punições.</li>
+                    <li><b>Sem Diagnóstico Médico:</b> A ferramenta mede apenas atenção/voz agregada para prevenção e melhoria de ambiente.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-brand">
+        <b>ExcelSilience SRT-RH</b> • Ferramenta Complementar de Prevenção e Escuta (NR-01 / NR-17 / NR-05)
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
+    const sectorParam = urlParams.get('sector') || '';
+    const envMode = 'SANDBOX';
+
+    let windowAllowed = true;
+    let showWeeklyQuestions = true;
+    let detectedShiftWindow = 'AVULSO';
+
+    let roundPlan = [];
+    let reactionTimes = [];
+    let greenLapses = 0;
+    let vetoErrors = 0;
+    let currentRound = 0;
+    const totalRounds = 16;
+    let ballTimer = null;
+    let ballSpawnTime = 0;
+    let isRoundProcessing = false;
+    let checkinSubmitted = false;
+
+    let sessionStartMs = performance.now();
+    let audioRetryCount = 0;
+    let audioQualityOk = false;
+    let vsiScoreVal = null;
+    let canImproveChoice = null;
+    let computedRt = 480;
+    let lastBand = 'GREEN';
+
+    function applyEnvUi() {
+        document.getElementById('sandboxBanner').style.display = 'block';
+        document.getElementById('sandboxWindowGroup').style.display = 'block';
+        document.getElementById('btnSkipAudio').style.display = 'flex';
+    }
+    window.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('lblHeaderCompany').innerText = `${companyParam} • Check-in Anônimo & Escuta NR-05`;
+        applyEnvUi();
+        const savedDept = sectorParam || localStorage.getItem('srt_rh_dept');
+        if (savedDept) {
+            const sel = document.getElementById('txtDept');
+            for (const opt of sel.options) {
+                if (opt.value.toLowerCase().replace(/[^a-z0-9]/g, '_') === savedDept.toLowerCase() || opt.value.toLowerCase() === savedDept.toLowerCase()) {
+                    sel.value = opt.value;
+                    break;
+                }
+            }
+            document.getElementById('denSector').value = sel.value || savedDept;
+        }
+        await checkServerWindow();
+    });
+
+    async function checkServerWindow() {
+        const banner = document.getElementById('windowBanner');
+        const btn = document.getElementById('btnStartCheckin');
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_checkin_window`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({ p_company: companyParam, p_env: envMode })
+            });
+            if (res.ok) {
+                const rows = await res.json();
+                const row = Array.isArray(rows) ? rows[0] : rows;
+                if (row) {
+                    windowAllowed = Boolean(row.allowed);
+                    detectedShiftWindow = row.detected_window || 'AVULSO';
+                    showWeeklyQuestions = Boolean(row.show_weekly_questions) || envMode === 'SANDBOX' || forceWeekly;
+
+                    if (windowAllowed) {
+                        banner.className = 'window-banner open';
+                        banner.innerHTML = `🟢 <b>Janela aberta (${detectedShiftWindow}):</b> ${row.next_window_hint}` +
+                            (showWeeklyQuestions ? ' <br>📏 Inclui as réguas semanais de melhoria (1x/semana).' : '');
+                        btn.disabled = false;
+                    } else {
+                        banner.className = 'window-banner blocked';
+                        banner.innerHTML = `⛔ <b>Produção fora do horário permitido:</b> ${row.next_window_hint}` +
+                            `<div style="margin-top:8px;"><button type="button" onclick="unlockSandboxWithPin()" style="background:#7e22ce; color:#fff; border:none; border-radius:8px; padding:7px 12px; font-size:11px; font-weight:800; cursor:pointer;">🧪 Entrar no Modo Teste Sem Travas (PIN)</button></div>`;
+                        btn.disabled = true;
+                    }
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('Falha ao consultar janela no servidor:', e);
+        }
+        if (envMode === 'SANDBOX') {
+            banner.className = 'window-banner open';
+            banner.innerText = '🧪 Modo Teste Sem Travas ativo: testes liberados 24h.';
+            btn.disabled = false;
+        } else {
+            banner.className = 'window-banner blocked';
+            banner.innerHTML = `⚠️ Não foi possível validar a janela no servidor.` +
+                `<div style="margin-top:8px;"><button type="button" onclick="unlockSandboxWithPin()" style="background:#7e22ce; color:#fff; border:none; border-radius:8px; padding:7px 12px; font-size:11px; font-weight:800; cursor:pointer;">🧪 Entrar no Modo Teste Sem Travas (PIN)</button></div>`;
+            btn.disabled = true;
+        }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function showStep(stepId) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById(stepId).classList.add('active');
+    }
+
+    function startCheckinFlow() {
+        if (!windowAllowed && envMode === 'PRODUCAO') {
+            alert('Check-in indisponível fora do horário do turno.');
+            return;
+        }
+        const dept = document.getElementById('txtDept').value.trim();
+        if (!dept) { alert('Por favor, selecione seu setor.'); return; }
+        if (!document.getElementById('chkAuth').checked) { alert('Confirme o termo de participação facultativa e anônima.'); return; }
+        localStorage.setItem('srt_rh_dept', dept);
+        document.getElementById('denSector').value = dept;
+        sessionStartMs = performance.now();
+        if (envMode === 'SANDBOX') {
+            detectedShiftWindow = document.getElementById('selSandboxWindow').value || 'AVULSO';
+        }
+
+        if (document.getElementById('chkAccessExempt').checked) {
+            audioQualityOk = false;
+            vsiScoreVal = null;
+            computedRt = 480;
+            if (showWeeklyQuestions) showStep('stepWeeklyQuestions');
+            else submitTelemetryFinal();
+            return;
+        }
+        showStep('stepVoz');
+    }
+
+    async function runAudioTest() {
+        const btn = document.getElementById('btnRec');
+        const skipBtn = document.getElementById('btnSkipAudio');
+        const hint = document.getElementById('audioHint');
+        const progress = document.getElementById('progressAudio');
+        const canvas = document.getElementById('audioCanvas');
+        btn.disabled = true;
+        btn.innerText = '🎙️ Captando voz (7s)... Fale em tom natural';
+        hint.innerText = '';
+        skipBtn.style.display = (envMode === 'SANDBOX') ? 'flex' : 'none';
+
+        try {
+            const audioStream = await navigator.mediaDevices.getUserMedia({
+                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+            });
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            audioCtx.createMediaStreamSource(audioStream).connect(analyser);
+            analyser.fftSize = 1024;
+            const timeData = new Float32Array(analyser.fftSize);
+            const freqData = new Uint8Array(analyser.frequencyBinCount);
+
+            const rmsFrames = [];
+            const f0Frames = [];
+            let animId = null;
+
+            function estimatePitchHz(buf, sampleRate) {
+                let rms = 0;
+                for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+                rms = Math.sqrt(rms / buf.length);
+                if (rms < 0.015) return { rms, f0: null };
+                let bestOffset = -1, bestCorr = 0;
+                const minLag = Math.floor(sampleRate / 350);
+                const maxLag = Math.floor(sampleRate / 70);
+                for (let lag = minLag; lag <= maxLag; lag++) {
+                    let corr = 0;
+                    for (let i = 0; i < buf.length - lag; i++) corr += buf[i] * buf[i + lag];
+                    if (corr > bestCorr) { bestCorr = corr; bestOffset = lag; }
+                }
+                return { rms, f0: bestOffset > 0 ? sampleRate / bestOffset : null };
+            }
+
+            const ctx = canvas.getContext('2d');
+            function drawEq() {
+                animId = requestAnimationFrame(drawEq);
+                analyser.getFloatTimeDomainData(timeData);
+                analyser.getByteFrequencyData(freqData);
+                const est = estimatePitchHz(timeData, audioCtx.sampleRate);
+                if (est.rms >= 0.015) {
+                    rmsFrames.push(est.rms);
+                    if (est.f0) f0Frames.push(est.f0);
+                }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const barWidth = (canvas.width / 32);
+                for (let i = 0; i < 32; i++) {
+                    const barHeight = (freqData[i] / 255) * canvas.height * 0.9;
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth - 2, barHeight);
+                }
+            }
+            drawEq();
+
+            let p = 0;
+            const timer = setInterval(() => {
+                p += 14.3;
+                progress.style.width = Math.min(100, p) + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    if (animId) cancelAnimationFrame(animId);
+                    audioStream.getTracks().forEach(t => t.stop());
+                    audioCtx.close();
+
+                    if (rmsFrames.length < 10) {
+                        audioRetryCount++;
+                        audioQualityOk = false;
+                        vsiScoreVal = null;
+                        btn.disabled = false;
+                        btn.innerText = '🔄 Áudio insuficiente — Tentar novamente (7s)';
+                        hint.innerText = 'Silêncio ou volume baixo detectado. Nenhum número foi inventado — repita ou siga sem voz.';
+                        skipBtn.style.display = 'flex';
+                        return;
+                    }
+
+                    const meanRms = rmsFrames.reduce((a, b) => a + b, 0) / rmsFrames.length;
+                    let ampDiff = 0;
+                    for (let i = 1; i < rmsFrames.length; i++) ampDiff += Math.abs(rmsFrames[i] - rmsFrames[i - 1]);
+                    const relShimmer = (ampDiff / rmsFrames.length) / Math.max(0.001, meanRms);
+
+                    let relJitter = 0.05;
+                    if (f0Frames.length >= 5) {
+                        const meanF0 = f0Frames.reduce((a, b) => a + b, 0) / f0Frames.length;
+                        let fDiff = 0;
+                        for (let i = 1; i < f0Frames.length; i++) fDiff += Math.abs(f0Frames[i] - f0Frames[i - 1]);
+                        relJitter = (fDiff / f0Frames.length) / Math.max(50, meanF0);
+                    }
+
+                    audioQualityOk = true;
+                    vsiScoreVal = Number(Math.min(5.0, Math.max(1.0, 1.40 + relJitter * 3.5 + relShimmer * 1.9)).toFixed(2));
+                    btn.innerText = '✅ Captação Vocal Concluída';
+                    setTimeout(() => showStep('stepInstruction'), 700);
+                }
+            }, 1000);
+        } catch (err) {
+            audioRetryCount++;
+            audioQualityOk = false;
+            vsiScoreVal = null;
+            btn.disabled = false;
+            btn.innerText = '🔄 Microfone bloqueado — Tentar novamente';
+            hint.innerText = 'Microfone indisponível. Nenhuma nota simulada será gerada.';
+            skipBtn.style.display = 'flex';
+        }
+    }
+
+    function skipAudioAndContinue() {
+        audioQualityOk = false;
+        vsiScoreVal = null;
+        showStep('stepInstruction');
+    }
+
+    function buildBalancedRounds() {
+        const arr = [];
+        for (let i = 0; i < 11; i++) arr.push(true);
+        for (let i = 0; i < 5; i++) arr.push(false);
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function startGame() {
+        checkinSubmitted = false;
+        isRoundProcessing = false;
+        reactionTimes = [];
+        greenLapses = 0;
+        vetoErrors = 0;
+        currentRound = 0;
+        roundPlan = buildBalancedRounds();
+        if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+        document.getElementById('lblErrors').innerText = '0';
+        showStep('stepBolinhas');
+        nextRound();
+    }
+
+    function nextRound() {
+        if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+        if (currentRound >= totalRounds) {
+            finishVisuomotor();
+            return;
+        }
+        const isGo = roundPlan[currentRound];
+        currentRound++;
+        isRoundProcessing = false;
+        document.getElementById('lblRound').innerText = `${currentRound} / ${totalRounds}`;
+        const area = document.getElementById('gameArea');
+        area.innerHTML = '';
+
+        const el = document.createElement('div');
+        el.className = 'target-shape ' + (isGo ? 'shape-go' : 'shape-nogo');
+        el.innerHTML = isGo ? '<span>✓</span><span>GO!</span>' : '<span>✕</span><span>NO-GO!</span>';
+
+        const maxX = Math.max(40, (area.clientWidth || 300) - 76);
+        const maxY = Math.max(40, (area.clientHeight || 200) - 76);
+        el.style.left = Math.max(10, Math.floor(Math.random() * maxX)) + 'px';
+        el.style.top = Math.max(10, Math.floor(Math.random() * maxY)) + 'px';
+        ballSpawnTime = performance.now();
+
+        function handleHit(e) {
+            if (e) { try { e.preventDefault(); e.stopPropagation(); } catch (_) {} }
+            if (isRoundProcessing) return;
+            const rt = Math.round(performance.now() - ballSpawnTime);
+            if (rt < 100) return;
+            isRoundProcessing = true;
+            if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+            if (isGo) reactionTimes.push(rt);
+            else {
+                vetoErrors++;
+                document.getElementById('lblErrors').innerText = vetoErrors + greenLapses;
+            }
+            area.innerHTML = '';
+            setTimeout(nextRound, 260);
+        }
+
+        el.addEventListener('pointerdown', handleHit, { passive: false });
+        area.appendChild(el);
+
+        ballTimer = setTimeout(() => {
+            if (isRoundProcessing) return;
+            isRoundProcessing = true;
+            area.innerHTML = '';
+            if (isGo) {
+                greenLapses++;
+                reactionTimes.push(1050);
+                document.getElementById('lblErrors').innerText = vetoErrors + greenLapses;
+            }
+            setTimeout(nextRound, 260);
+        }, 1050);
+    }
+
+    function finishVisuomotor() {
+        computedRt = reactionTimes.length > 0
+            ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
+            : 480;
+
+        if (showWeeklyQuestions) {
+            showStep('stepWeeklyQuestions');
+        } else {
+            submitTelemetryFinal();
+        }
+    }
+
+    function setImproveChoice(canImprove) {
+        canImproveChoice = canImprove;
+        document.getElementById('btnImproveYes').classList.toggle('selected', canImprove === true);
+        document.getElementById('btnImproveNo').classList.toggle('selected', canImprove === false);
+        document.getElementById('improveOptionsBox').style.display = canImprove ? 'block' : 'none';
+    }
+
+    function submitWeeklyAndFinish() {
+        submitTelemetryFinal();
+    }
+
+    async function submitTelemetryFinal() {
+        if (checkinSubmitted) return;
+        checkinSubmitted = true;
+        showStep('stepResult');
+
+        const dept = document.getElementById('txtDept').value.trim() || 'Geral';
+        const shiftName = document.getElementById('txtShiftName').value;
+        document.getElementById('resDept').innerText = `Setor: ${dept} • Empresa: ${companyParam} • Ambiente: ${envMode}`;
+
+        let weeklyPayload = {};
+        if (showWeeklyQuestions) {
+            const tags = [];
+            document.querySelectorAll('#improvementGrid input[type="checkbox"]:checked').forEach(cb => tags.push(cb.value));
+            weeklyPayload = {
+                pre_week_rest_score: Number(document.getElementById('rngPreWeekRest').value),
+                can_improve_workplace: canImproveChoice,
+                improvement_tags: canImproveChoice ? tags : [],
+                org_demands_score: Number(document.getElementById('rngDemands').value),
+                org_autonomy_score: Number(document.getElementById('rngAutonomy').value),
+                org_clarity_score: Number(document.getElementById('rngClarity').value),
+                org_support_score: Number(document.getElementById('rngSupport').value),
+            };
+        }
+
+        const syncEl = document.getElementById('syncStatus');
+
+        try {
+            const efRes = await fetch(`${SUPABASE_URL}/functions/v1/ingest-telemetry`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    module_type: 'SRT_RH',
+                    company: companyParam,
+                    sector: dept,
+                    shift_name: shiftName,
+                    shift_window: detectedShiftWindow,
+                    reaction_time_ms: computedRt,
+                    veto_errors: vetoErrors,
+                    green_lapses: greenLapses,
+                    audio_quality_ok: audioQualityOk,
+                    vsi_score: vsiScoreVal,
+                    environment_mode: envMode,
+                    ...weeklyPayload
+                })
+            });
+            if (efRes.ok) {
+                syncEl.innerText = '✅ Participação anônima registrada com segurança no servidor!';
+                return;
+            }
+            if (efRes.status === 403) {
+                const blockedJson = await efRes.json();
+                syncEl.innerText = `⛔ ${blockedJson.reason || 'Fora da janela permitida.'}`;
+                syncEl.style.background = 'rgba(239, 68, 68, 0.15)';
+                syncEl.style.color = '#fca5a5';
+                return;
+            }
+        } catch (e) {
+            console.warn('Edge Function indisponível, usando RPC protegido v5.1:', e);
+        }
+
+        try {
+            const vsiSt = audioQualityOk && vsiScoreVal !== null ? `Captação vocal válida (VSI ${vsiScoreVal})` : 'Sem medição vocal válida';
+            let status = 'GREEN';
+            if (vetoErrors >= 2 || computedRt >= 800 || greenLapses >= 3 || (audioQualityOk && vsiScoreVal >= 4.4)) status = 'RED';
+            else if (audioQualityOk && vsiScoreVal >= 3.41) status = 'PURPLE';
+            else if (computedRt >= 650 || vetoErrors === 1 || greenLapses >= 1 || (audioQualityOk && vsiScoreVal >= 2.8)) status = 'YELLOW';
+            lastBand = status;
+
+            const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_srt_rh_telemetry_v51`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    p_company: companyParam,
+                    p_sector: dept,
+                    p_shift_name: shiftName,
+                    p_shift_window: detectedShiftWindow,
+                    p_reaction_time_ms: computedRt,
+                    p_veto_errors: vetoErrors,
+                    p_green_lapses: greenLapses,
+                    p_audio_quality_ok: audioQualityOk,
+                    p_vsi_score: vsiScoreVal,
+                    p_vsi_status: vsiSt,
+                    p_status: status,
+                    p_action: 'Participação anônima registrada para análise agregada (N >= 5).',
+                    p_org_demands: weeklyPayload.org_demands_score ?? null,
+                    p_org_autonomy: weeklyPayload.org_autonomy_score ?? null,
+                    p_org_clarity: weeklyPayload.org_clarity_score ?? null,
+                    p_org_support: weeklyPayload.org_support_score ?? null,
+                    p_pre_week_rest_score: weeklyPayload.pre_week_rest_score ?? null,
+                    p_can_improve_workplace: weeklyPayload.can_improve_workplace ?? null,
+                    p_improvement_tags: weeklyPayload.improvement_tags ?? null,
+                    p_environment_mode: envMode,
+                    p_is_demo_test: envMode === 'SANDBOX',
+                    p_demo_session_tag: envMode === 'SANDBOX' ? 'SANDBOX' : null
+                })
+            });
+
+            if (rpcRes.ok) {
+                syncEl.innerText = '✅ Participação anônima registrada com sucesso!';
+            } else {
+                const errTxt = await rpcRes.text();
+                syncEl.innerText = errTxt.includes('CHECKIN_BLOQUEADO_HORARIO')
+                    ? '⛔ Envio bloqueado: fora do horário permitido pela empresa.'
+                    : '⚠️ Não foi possível sincronizar agora.';
+                syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
+                syncEl.style.color = '#fbbf24';
+            }
+        } catch (err) {
+            syncEl.innerText = '⚠️ Falha de rede ao enviar.';
+            syncEl.style.background = 'rgba(245, 158, 11, 0.15)';
+            syncEl.style.color = '#fbbf24';
+        }
+    }
+
+    function openWhistleModal() {
+        const currentDept = document.getElementById('txtDept').value.trim();
+        if (currentDept && !document.getElementById('denSector').value) {
+            document.getElementById('denSector').value = currentDept;
+        }
+        openModal('whistleModal');
+    }
+
+    function switchWhistleTab(tab) {
+        document.getElementById('tabBtnReport').classList.toggle('active', tab === 'report');
+        document.getElementById('tabBtnCheck').classList.toggle('active', tab === 'check');
+        document.getElementById('whistleTabReport').style.display = tab === 'report' ? 'block' : 'none';
+        document.getElementById('whistleTabCheck').style.display = tab === 'check' ? 'block' : 'none';
+    }
+
+    async function sendWhistleblowerReport() {
+        const sec = document.getElementById('denSector').value.trim() || document.getElementById('txtDept').value || 'Geral';
+        const cat = document.getElementById('denCategory').value;
+        const leader = document.getElementById('denLeaderRole').value.trim();
+        const desc = document.getElementById('denDesc').value.trim();
+        const box = document.getElementById('denResultBox');
+        if (desc.length < 10) { alert('Descreva o relato com pelo menos 10 caracteres.'); return; }
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_whistleblower_report`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    p_company: companyParam,
+                    p_target_sector: sec,
+                    p_category: cat,
+                    p_reported_leader_role: leader || null,
+                    p_description: desc
+                })
+            });
+            if (res.ok) {
+                const code = await res.json();
+                box.style.display = 'block';
+                box.innerHTML = `<div style="padding:10px; border-radius:8px; background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#bbf7d0;">
+                    ✅ Relato registrado em sigilo absoluto!<br>
+                    <b>Protocolo anônimo: <span id="lblProtoCode" style="font-size:15px; color:#fff;">${code}</span></b><br>
+                    <button type="button" class="benefit-btn" onclick="navigator.clipboard && navigator.clipboard.writeText('${code}'); alert('Protocolo ${code} copiado!')">📋 Copiar Protocolo</button>
+                </div>`;
+                document.getElementById('denDesc').value = '';
+            }
+        } catch (e) {
+            alert('Erro ao enviar relato sigiloso.');
+        }
+    }
+
+    async function lookupProtocol() {
+        const code = document.getElementById('denLookupCode').value.trim();
+        const out = document.getElementById('denLookupResult');
+        if (!code) return;
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_whistleblower_protocol`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({ p_protocol_code: code })
+            });
+            if (res.ok) {
+                const rows = await res.json();
+                const row = Array.isArray(rows) ? rows[0] : rows;
+                if (!row) { out.innerText = 'Protocolo não encontrado.'; return; }
+                out.innerHTML = `<b>Status:</b> ${row.status}<br><b>Resposta do Comitê:</b> ${row.committee_public_reply || 'Em análise pelo Comitê de Ética.'}<br><b>Medida:</b> ${row.resolution_action || 'Aguardando conclusão.'}`;
+            }
+        } catch (e) {
+            out.innerText = 'Erro ao consultar protocolo.';
+        }
+    }
+
+    async function loadCompanyBenefits() {
+        const box = document.getElementById('benefitsListBox');
+        box.style.display = 'block';
+        box.innerHTML = '⏳ Carregando programas...';
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/company_benefits?is_active=eq.true&or=(company.eq.${encodeURIComponent(companyParam)},company.eq.EXCELSILIENCE)&select=*`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = res.ok ? await res.json() : [];
+            if (!data.length) { box.innerHTML = 'Consulte o RH para os programas ativos da sua unidade.'; return; }
+            box.innerHTML = '';
+            data.forEach(b => {
+                const div = document.createElement('div');
+                div.className = 'benefit-item';
+                div.innerHTML = `<b style="color:var(--accent-cyan);">${b.benefit_name}</b> (${b.provider_name || 'Interno'})<br>${b.description}<br><button type="button" class="benefit-btn">Acessar com Sigilo 🔗</button>`;
+                div.querySelector('button').onclick = () => logBenefitEngagement(b.id, b.access_url);
+                box.appendChild(div);
+            });
+        } catch (e) {
+            box.innerHTML = 'Programas temporariamente indisponíveis.';
+        }
+    }
+
+    async function logBenefitEngagement(benefitId, accessUrl) {
+        const dept = document.getElementById('txtDept').value.trim() || 'Geral';
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/benefit_engagement_logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+                body: JSON.stringify({
+                    company: companyParam,
+                    benefit_id: benefitId,
+                    sector: dept,
+                    shift_window: detectedShiftWindow,
+                    trigger_band: lastBand,
+                    environment_mode: envMode
+                })
+            });
+        } catch (e) {}
+        if (accessUrl && accessUrl.startsWith('http')) window.open(accessUrl, '_blank', 'noopener,noreferrer');
+        else alert('Acesso sigiloso registrado! Consulte o portal de benefícios do RH para agendamento.');
+    }
+
+    async function submitPilotFeedback() {
+        const btn = document.getElementById('btnSendUx');
+        btn.disabled = true;
+        btn.innerText = 'Enviando...';
+        const dept = document.getElementById('txtDept').value.trim() || 'Geral';
+        const dur = Math.max(10, Math.round((performance.now() - sessionStartMs) / 1000));
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/rh_pilot_ux_metrics`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+                body: JSON.stringify({
+                    company: companyParam,
+                    sector: dept,
+                    completed: true,
+                    duration_sec: dur,
+                    audio_retry_count: audioRetryCount,
+                    audio_failed: !audioQualityOk,
+                    clarity_rating: Number(document.getElementById('rngUxClarity').value),
+                    trust_rating: Number(document.getElementById('rngUxTrust').value)
+                })
+            });
+            btn.innerText = '✅ Obrigado pela avaliação!';
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerText = 'Tentar novamente';
+        }
+    }
+</script>
+</body>
+</html>
