@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT-RH — Cockpit Corporativo v5.1</title>
+    <title>ExcelSilience SRT-RH — Cockpit Corporativo v5.2</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -75,7 +75,7 @@
         .b-lock { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid #475569; }
 
         .input-box, .select-box, textarea { background: var(--card-inner); border: 1px solid var(--border); color: #fff; padding: 9px 12px; border-radius: 8px; font-size: 12px; outline: none; width: 100%; }
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 10px; }
         .report-preview-box { background: #070c16; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: monospace; font-size: 11.5px; line-height: 1.55; white-space: pre-wrap; max-height: 360px; overflow-y: auto; color: #e2e8f0; }
 
         .heatmap-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
@@ -115,31 +115,11 @@
 
 <!-- CARDS GERAIS -->
 <div class="cards-grid no-print">
-    <div class="card-metric">
-        <div class="lbl">Check-ins no Período</div>
-        <div class="val" style="color:var(--accent);" id="mTotal">0</div>
-        <div class="subtext">Agregados no servidor</div>
-    </div>
-    <div class="card-metric">
-        <div class="lbl">Setores com Quórum (N ≥ 5)</div>
-        <div class="val" style="color:var(--green);" id="mQuorumOk">0</div>
-        <div class="subtext">Blindagem LGPD ativa</div>
-    </div>
-    <div class="card-metric">
-        <div class="lbl">Alerta Médio Setorial</div>
-        <div class="val" style="color:var(--yellow);" id="mAvgAlert">--</div>
-        <div class="subtext">% fora de equilíbrio</div>
-    </div>
-    <div class="card-metric">
-        <div class="lbl">Planos 5W2H Pendentes/Vencidos</div>
-        <div class="val" style="color:var(--red);" id="mOverdue">0</div>
-        <div class="subtext">Cobrança semanal ativa</div>
-    </div>
-    <div class="card-metric">
-        <div class="lbl">Relatos NR-05 Abertos</div>
-        <div class="val" style="color:var(--purple);" id="mOpenWhistle">0</div>
-        <div class="subtext">Base isolada Comitê</div>
-    </div>
+    <div class="card-metric"><div class="lbl">Check-ins no Período</div><div class="val" style="color:var(--accent);" id="mTotal">0</div><div class="subtext">Agregados no servidor</div></div>
+    <div class="card-metric"><div class="lbl">Setores com Quórum (N ≥ 5)</div><div class="val" style="color:var(--green);" id="mQuorumOk">0</div><div class="subtext">Blindagem LGPD ativa</div></div>
+    <div class="card-metric"><div class="lbl">Alerta Médio Setorial</div><div class="val" style="color:var(--yellow);" id="mAvgAlert">--</div><div class="subtext">% fora de equilíbrio</div></div>
+    <div class="card-metric"><div class="lbl">Planos 5W2H Pendentes/Vencidos</div><div class="val" style="color:var(--red);" id="mOverdue">0</div><div class="subtext">Cobrança semanal ativa</div></div>
+    <div class="card-metric"><div class="lbl">Relatos NR-05 Abertos</div><div class="val" style="color:var(--purple);" id="mOpenWhistle">0</div><div class="subtext">Base isolada Comitê</div></div>
 </div>
 
 <!-- NAVEGAÇÃO -->
@@ -148,12 +128,12 @@
     <button class="tab-btn" onclick="switchTab('saude-ocupacional', this)">🛡️ Telemetria Preventiva & PCMSO</button>
     <button class="tab-btn" onclick="switchTab('mapa-calor', this)">🔥 Mapa de Calor (Dia Anterior) & Tendência</button>
     <button class="tab-btn" onclick="switchTab('matriz-contagio', this)">👑 Matriz Contágio C-Level (360°)</button>
-    <button class="tab-btn" onclick="switchTab('hub-easy', this)">🧠 Hub E.A.S.Y. (IA), 5W2H, Ouvidoria & ROI</button>
+    <button class="tab-btn" onclick="switchTab('hub-easy', this)">🧠 Hub E.A.S.Y., 5W2H, Ouvidoria, ROI & Benefícios</button>
     <button class="tab-btn" onclick="switchTab('laudos', this)">📄 Central de Relatórios & Compliance</button>
     <button class="tab-btn" onclick="switchTab('gerenciador-setores', this)">⚙️ Setores, Horários, WhatsApp & Links</button>
 </div>
 
-<!-- ABA 1: PEOPLE ANALYTICS, DELTA 8H->17H E RÉGUAS SEMANAIS -->
+<!-- ABA 1: PEOPLE ANALYTICS, DELTA 8H->17H, RÉGUAS SEMANAIS E UX PILOTO -->
 <div id="tab-visao-geral" class="tab-content active">
     <div class="panel">
         <div class="panel-header">
@@ -221,6 +201,13 @@
                 <tbody id="tblOrgRulersBody"></tbody>
             </table>
         </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">🧪 Indicadores de Usabilidade e Confiança do Piloto (Agregado)</div>
+        </div>
+        <div id="pilotUxBox" style="font-size:12px; color:var(--muted);">Carregando métricas de experiência...</div>
     </div>
 </div>
 
@@ -304,9 +291,8 @@
     </div>
 </div>
 
-<!-- ABA 5: HUB MOTOR E.A.S.Y. (GEMINI), COBRANÇA SEMANAL, 5W2H, OUVIDORIA & ROI -->
+<!-- ABA 5: HUB MOTOR E.A.S.Y., COBRANÇA SEMANAL, 5W2H, OUVIDORIA, ROI & BENEFÍCIOS -->
 <div id="tab-hub-easy" class="tab-content">
-    <!-- MOTOR EASY IA -->
     <div class="panel">
         <div class="panel-header">
             <div>
@@ -328,12 +314,12 @@
             </div>
         </div>
         <div id="easyAiOutputBox">
-            <div class="easy-card">Clique em <b>Rodar E.A.S.Y. (IA Gemini)</b> ou consulte as rodadas automáticas de Segunda, Sexta, Semanal e Mensal salvas abaixo.</div>
+            <div class="easy-card">Clique em <b>Rodar E.A.S.Y. (IA Gemini)</b> ou consulte as rodadas automáticas salvas abaixo.</div>
         </div>
         <div id="easyHistoryBox" style="margin-top:12px;"></div>
     </div>
 
-    <!-- COBRANÇA DA SEMANA PASSADA + PLANOS 5W2H DENTRO DA PLATAFORMA -->
+    <!-- COBRANÇA DA SEMANA PASSADA + CRIAR PLANO 5W2H -->
     <div class="grid-two">
         <div class="panel">
             <div class="panel-header">
@@ -343,23 +329,13 @@
                 </div>
             </div>
             <table>
-                <thead>
-                    <tr>
-                        <th>Setor</th>
-                        <th>Ação 5W2H</th>
-                        <th>Responsável</th>
-                        <th>Vencimento</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Setor</th><th>Ação 5W2H</th><th>Responsável</th><th>Vencimento</th><th>Status</th></tr></thead>
                 <tbody id="tblOverdueBody"></tbody>
             </table>
         </div>
 
         <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">📋 Criar Plano de Ação 5W2H Interno</div>
-            </div>
+            <div class="panel-header"><div class="panel-title">📋 Criar Plano de Ação 5W2H Interno</div></div>
             <div class="form-row">
                 <input class="input-box" id="planSector" placeholder="Setor / GHE">
                 <input class="input-box" id="planWho" placeholder="Gestor responsável">
@@ -377,30 +353,17 @@
     </div>
 
     <div class="panel">
-        <div class="panel-header">
-            <div class="panel-title">📌 Todos os Planos 5W2H, Anuência do Gestor & Yardstick (30 dias)</div>
-        </div>
+        <div class="panel-header"><div class="panel-title">📌 Planos 5W2H, Anuência / Contraproposta do Gestor & Yardstick (30 dias)</div></div>
         <table>
-            <thead>
-                <tr>
-                    <th>Setor</th>
-                    <th>Ação (What)</th>
-                    <th>Responsável & Prazo</th>
-                    <th>Anuência Gestor</th>
-                    <th>Yardstick</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Setor</th><th>Ação & Contraproposta / Evidência</th><th>Responsável & Prazo</th><th>Anuência</th><th>Yardstick</th><th>Ações</th></tr></thead>
             <tbody id="tblAllPlansBody"></tbody>
         </table>
     </div>
 
-    <!-- DOCUMENTOS EXTERNOS + OUVIDORIA NR-05 + ROI REAL -->
+    <!-- DOCUMENTOS SST + OUVIDORIA NR-05 COMPLETA -->
     <div class="grid-two">
         <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">📎 Cadastrar Documento SST (PCMSO / AEP / PGR)</div>
-            </div>
+            <div class="panel-header"><div class="panel-title">📎 Cadastrar Documento SST (PCMSO / AEP / PGR)</div></div>
             <div class="form-row">
                 <select class="select-box" id="docType">
                     <option value="PCMSO_ANALITICO_NR07">PCMSO Analítico (NR-07)</option>
@@ -420,24 +383,94 @@
         </div>
 
         <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">🛡️ Ouvidoria / Canal de Denúncias NR-05 (Comitê de Ética)</div>
-            </div>
+            <div class="panel-header"><div class="panel-title">🛡️ Ouvidoria / Canal de Denúncias NR-05 (Comitê de Ética)</div></div>
             <div id="whistleSummaryBox" style="font-size:11px; margin-bottom:10px;"></div>
             <div style="display:flex; gap:8px; margin-bottom:10px;">
-                <input class="input-box" type="password" id="inpCommitteePin" placeholder="PIN do Comitê de Ética (para tratar relatos)">
-                <button class="btn btn-purple" style="white-space:nowrap;" onclick="unlockCommitteeReports()">🔓 Abrir Fila</button>
+                <input class="input-box" type="password" id="inpCommitteePin" placeholder="PIN do Comitê de Ética (padrão inicial: EXCELSILIENCE2026)">
+                <button class="btn btn-purple" style="white-space:nowrap;" onclick="unlockCommitteeReports()">🔓 Abrir & Tratar Fila</button>
             </div>
             <div id="committeeQueueBox" style="font-size:11px;"></div>
         </div>
     </div>
 
+    <!-- ROI REAL (CADASTRO HISTÓRICO PASSADO VS ATUAL + DEFESAS TRABALHISTAS) -->
     <div class="panel">
         <div class="panel-header">
-            <div class="panel-title">💰 ROI Real (Passado vs. Atual + Defesas Trabalhistas & Autuações)</div>
+            <div class="panel-title">💰 ROI Real (Passado vs. Atual em R$ e % + Defesas Trabalhistas & Autuações)</div>
             <span class="panel-subtitle">Sem multas hipotéticas: apenas economia operacional medida e defesas reais registradas</span>
         </div>
-        <div id="roiSummaryBox" style="font-size:12px;"></div>
+        <div id="roiSummaryBox" style="font-size:12px; margin-bottom:14px;"></div>
+        <div class="grid-two">
+            <div class="easy-card">
+                <b>📊 Lançar Histórico (Baseline Passado ou Fechamento Mensal):</b>
+                <div class="form-row" style="margin-top:8px;">
+                    <input class="input-box" id="roiSector" placeholder="Setor">
+                    <select class="select-box" id="roiType">
+                        <option value="BASELINE_PASSADO">BASELINE_PASSADO</option>
+                        <option value="FECHAMENTO_MENSAL">FECHAMENTO_MENSAL</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input class="input-box" id="roiMonth" type="date">
+                    <input class="input-box" id="roiHeadcount" type="number" placeholder="Headcount (ex: 40)">
+                    <input class="input-box" id="roiAbs" type="number" step="0.1" placeholder="Absenteísmo %">
+                </div>
+                <div class="form-row">
+                    <input class="input-box" id="roiDaysLost" type="number" placeholder="Dias perdidos">
+                    <input class="input-box" id="roiHourly" type="number" step="0.1" placeholder="Custo hora R$">
+                    <input class="input-box" id="roiInvest" type="number" step="0.1" placeholder="Investimento ações R$">
+                </div>
+                <button class="btn btn-green" onclick="saveRoiHistory()">💾 Salvar Histórico ROI</button>
+            </div>
+            <div class="easy-card">
+                <b>⚖️ Registrar Autuação / Ação Trabalhista Real:</b>
+                <div class="form-row" style="margin-top:8px;">
+                    <select class="select-box" id="legType">
+                        <option value="ACAO_TRABALHISTA_ESTRESSE">Ação Trabalhista (Estresse/Sobrecarga)</option>
+                        <option value="AUTUACAO_FISCALIZACAO">Autuação / Fiscalização MTE</option>
+                    </select>
+                    <input class="input-box" id="legRef" placeholder="Nº Processo / Auto">
+                </div>
+                <div class="form-row">
+                    <input class="input-box" id="legClaim" type="number" placeholder="Valor pedido/autuado R$">
+                    <input class="input-box" id="legSettled" type="number" placeholder="Valor pago/condenado R$">
+                    <select class="select-box" id="legStatus">
+                        <option value="GANHO_CONTABILIZADO">GANHO_CONTABILIZADO</option>
+                        <option value="ENCERRADO">ENCERRADO</option>
+                        <option value="EM_ANDAMENTO">EM_ANDAMENTO</option>
+                    </select>
+                </div>
+                <input class="input-box" id="legSummary" placeholder="Resumo da defesa / prova usada" style="margin-bottom:8px;">
+                <button class="btn btn-accent" onclick="saveLegalDefense()">💾 Registrar Defesa Real</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BENEFÍCIOS CORPORATIVOS (CADASTRO + ADOÇÃO ANÔNIMA N >= 5) -->
+    <div class="panel">
+        <div class="panel-header"><div class="panel-title">🎁 Benefícios Corporativos & Adoção Anônima (N ≥ 5)</div></div>
+        <div class="grid-two">
+            <div>
+                <div class="form-row">
+                    <input class="input-box" id="benName" placeholder="Nome do benefício (ex: Apoio Psicológico)">
+                    <input class="input-box" id="benProvider" placeholder="Parceiro / Provedor">
+                </div>
+                <div class="form-row">
+                    <select class="select-box" id="benCategory">
+                        <option value="SAUDE_MENTAL_EAP">SAUDE_MENTAL_EAP</option>
+                        <option value="SONO_RECUPERACAO">SONO_RECUPERACAO</option>
+                        <option value="ATIVIDADE_FISICA">ATIVIDADE_FISICA</option>
+                        <option value="TELEMEDICINA">TELEMEDICINA</option>
+                        <option value="NUTRICAO">NUTRICAO</option>
+                        <option value="FLEXIBILIDADE_PAUSAS">FLEXIBILIDADE_PAUSAS</option>
+                    </select>
+                    <input class="input-box" id="benUrl" placeholder="URL de acesso (opcional)">
+                </div>
+                <input class="input-box" id="benDesc" placeholder="Descrição breve para o colaborador" style="margin-bottom:8px;">
+                <button class="btn btn-green" onclick="saveCompanyBenefit()">➕ Cadastrar Benefício</button>
+            </div>
+            <div id="benefitsAdoptionBox" style="font-size:12px;">Carregando adoção...</div>
+        </div>
     </div>
 </div>
 
@@ -452,6 +485,9 @@
         </div>
         <div class="grid-two">
             <div style="display:flex; flex-direction:column; gap:10px;">
+                <select class="select-box" id="selReportSector" onchange="buildSupportReport(currentReportType)">
+                    <option value="GERAL">Escopo: Todos os Setores (GERAL)</option>
+                </select>
                 <button class="btn btn-green" onclick="buildSupportReport('RELATORIO_APOIO_NR01_PGR')">📄 Relatório de Apoio NR-01 (PGR — Fatores Organizacionais)</button>
                 <button class="btn btn-accent" onclick="buildSupportReport('RELATORIO_APOIO_NR17_AEP')">📋 Relatório de Apoio NR-17 (AEP — Carga Cognitiva)</button>
                 <button class="btn btn-purple" onclick="buildSupportReport('RELATORIO_APOIO_PCMSO_NR07')">🛡️ Subsídio Agregado ao PCMSO (NR-07 — Sem Ato Médico)</button>
@@ -504,9 +540,10 @@
             </div>
 
             <hr style="border-color:var(--border); margin:12px 0;">
-            <label style="font-size:11px; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <label style="font-size:11px; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                 <input type="checkbox" id="cfgWaEnabled"> Ativar Disparo Automático pelo WhatsApp do Cliente
             </label>
+            <div id="waSavedHint" style="font-size:11px; color:var(--muted); margin-bottom:8px;"></div>
             <div class="form-row">
                 <select class="select-box" id="cfgWaProvider">
                     <option value="NONE">Manual / QR Code</option>
@@ -518,7 +555,7 @@
             </div>
             <div class="form-row">
                 <input class="input-box" id="cfgWaUrl" placeholder="Endpoint / Instance URL da API do cliente">
-                <input class="input-box" type="password" id="cfgWaToken" placeholder="Token / Secret do cliente">
+                <input class="input-box" type="password" id="cfgWaToken" placeholder="Token / Secret (preencha apenas para alterar)">
             </div>
             <small style="color:var(--muted);">Grupos / Destinos por Setor (JSON — link genérico do setor, nunca individual):</small>
             <textarea id="cfgWaTargets" rows="3" style="margin-top:4px;">[{"sector":"TI","phone":"5511999999999"}]</textarea>
@@ -529,9 +566,7 @@
         </div>
 
         <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">🏢 Setores & Links Genéricos (Produção vs. Sandbox)</div>
-            </div>
+            <div class="panel-header"><div class="panel-title">🏢 Setores & Links Genéricos (Produção vs. Sandbox)</div></div>
             <div style="display:flex; gap:8px; margin-bottom:12px;">
                 <input class="input-box" id="inpNovoSetor" placeholder="Novo setor (ex.: Operações, Vendas)">
                 <button class="btn btn-accent" onclick="cadastrarNovoSetor()">+ Adicionar</button>
@@ -560,23 +595,16 @@
     let trendChartInstance = null;
 
     const TAG_LABELS = {
-        CHEFIA: 'Chefia',
-        SALARIO: 'Salário',
-        BENEFICIOS: 'Benefícios',
-        CONFORTO: 'Conforto',
-        TEMPERATURA: 'Temperatura',
-        COLEGAS: 'Colegas',
-        VOLUME_METAS: 'Volume/Metas',
-        AUTONOMIA_PAUSAS: 'Autonomia/Pausas',
-        CLAREZA_TAREFAS: 'Clareza',
-        RUIDO_ILUMINACAO_EQUIP: 'Ruído/Ilum./Equip.',
-        COMUNICACAO_APOIO: 'Comunicação',
-        OUTRO_OUVIDORIA: 'Outro (NR-05)'
+        CHEFIA: 'Chefia', SALARIO: 'Salário', BENEFICIOS: 'Benefícios', CONFORTO: 'Conforto',
+        TEMPERATURA: 'Temperatura', COLEGAS: 'Colegas', VOLUME_METAS: 'Volume/Metas',
+        AUTONOMIA_PAUSAS: 'Autonomia/Pausas', CLAREZA_TAREFAS: 'Clareza',
+        RUIDO_ILUMINACAO_EQUIP: 'Ruído/Ilum./Equip.', COMUNICACAO_APOIO: 'Comunicação', OUTRO_OUVIDORIA: 'Outro (NR-05)'
     };
 
     window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('companyBadgeLabel').innerText = currentCompany;
         updateEnvBadge();
+        populateSectorSelectors();
         renderLinksGenerator();
         refreshAll();
     });
@@ -622,9 +650,20 @@
         if (tabId === 'mapa-calor') setTimeout(loadTrendChart, 80);
     }
 
+    function populateSectorSelectors() {
+        const selC = document.getElementById('selChartSector');
+        const selR = document.getElementById('selReportSector');
+        selC.innerHTML = '<option value="ALL">Todos os Setores</option>';
+        selR.innerHTML = '<option value="GERAL">Escopo: Todos os Setores (GERAL)</option>';
+        setoresCadastrados.forEach(s => {
+            selC.innerHTML += `<option value="${s}">${s}</option>`;
+            selR.innerHTML += `<option value="${s}">${s}</option>`;
+        });
+    }
+
     async function refreshAll() {
         try {
-            const [ov, dl, ym, ovd, wSum, docsRes, plansRes, easyRes, roiRes, schedRes, audit360, logsRes] = await Promise.allSettled([
+            const [ov, dl, ym, ovd, wSum, docsRes, plansRes, easyRes, roiRes, schedRes, audit360, logsRes, uxRes, benAdRes] = await Promise.allSettled([
                 callRpc('get_rh_sector_overview_v51', { p_company: currentCompany, p_days: currentDays, p_env: envMode }),
                 callRpc('get_rh_delta_8h_17h_v51', { p_company: currentCompany, p_days: currentDays, p_env: envMode }),
                 callRpc('get_rh_heatmap_yesterday', { p_company: currentCompany, p_env: envMode }),
@@ -636,7 +675,9 @@
                 fetch(`${SUPABASE_URL}/rest/v1/vw_rh_company_roi_summary?company=eq.${encodeURIComponent(currentCompany)}`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
                 callRpc('get_company_schedule_public', { p_company: currentCompany }),
                 callRpc('get_es_crisis_360_audit', { p_company: currentCompany }),
-                fetch(`${SUPABASE_URL}/rest/v1/rh_report_revision_logs?company=eq.${encodeURIComponent(currentCompany)}&order=created_at.desc&limit=10`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : [])
+                fetch(`${SUPABASE_URL}/rest/v1/rh_report_revision_logs?company=eq.${encodeURIComponent(currentCompany)}&order=created_at.desc&limit=10`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
+                callRpc('get_rh_pilot_ux_summary', { p_company: currentCompany, p_days: currentDays }),
+                callRpc('get_rh_benefits_adoption', { p_company: currentCompany, p_days: currentDays })
             ]);
 
             overviewCache = ov.status === 'fulfilled' && Array.isArray(ov.value) ? ov.value : [];
@@ -652,9 +693,12 @@
             const schedRows = schedRes.status === 'fulfilled' && Array.isArray(schedRes.value) ? schedRes.value : [];
             const list360 = audit360.status === 'fulfilled' && Array.isArray(audit360.value) ? audit360.value : [];
             const revLogs = logsRes.status === 'fulfilled' && Array.isArray(logsRes.value) ? logsRes.value : [];
+            const uxRows = uxRes.status === 'fulfilled' && Array.isArray(uxRes.value) ? uxRes.value : [];
+            const benAd = benAdRes.status === 'fulfilled' && Array.isArray(benAdRes.value) ? benAdRes.value : [];
 
             renderHeaderMetrics(overviewCache, overdueCache, wList);
             renderOverviewTables(overviewCache, deltaCache);
+            renderPilotUx(uxRows[0]);
             renderPreventiveTelemetry(overviewCache, docsCache);
             renderYesterdayHeatmap(yesterdayCache);
             render360Matrix(list360);
@@ -664,6 +708,7 @@
             renderDocsList(docsCache);
             renderWhistleSummary(wList);
             renderRoi(roiList);
+            renderBenefitsAdoption(benAd);
             populateScheduleForm(schedRows[0]);
             renderRevisionLogs(revLogs);
             buildSupportReport(currentReportType);
@@ -685,6 +730,15 @@
         document.getElementById('mAvgAlert').innerText = avgAlert;
         document.getElementById('mOverdue').innerText = overdue.length;
         document.getElementById('mOpenWhistle').innerText = openWhistle;
+    }
+
+    function renderPilotUx(u) {
+        const box = document.getElementById('pilotUxBox');
+        if (!u || !Number(u.total_respostas)) {
+            box.innerText = 'Nenhuma avaliação de experiência registrada no período.';
+            return;
+        }
+        box.innerHTML = `<b>Avaliações:</b> ${u.total_respostas} • <b>Tempo médio real:</b> ${u.avg_duration_sec ?? '--'}s • <b>Falhas de áudio:</b> ${u.pct_audio_failed ?? 0}% • <b>Clareza (1-5):</b> ${u.avg_clarity_rating ?? '--'} • <b>Confiança no anonimato (1-5):</b> ${u.avg_trust_rating ?? '--'}`;
     }
 
     function renderOverviewTables(ov, dl) {
@@ -797,10 +851,6 @@
 
     async function loadTrendChart() {
         const sec = document.getElementById('selChartSector').value || 'ALL';
-        const sel = document.getElementById('selChartSector');
-        if (sel.options.length <= 1) {
-            setoresCadastrados.forEach(s => { const o = document.createElement('option'); o.value = s; o.text = s; sel.add(o); });
-        }
         let rows = [];
         try {
             rows = await callRpc('get_rh_daily_trend_v51', { p_company: currentCompany, p_sector: sec, p_days: currentDays, p_env: envMode });
@@ -879,7 +929,7 @@
             `;
             refreshAll();
         } catch (err) {
-            out.innerHTML = `<div class="easy-card" style="border-color:var(--yellow);">⚠️ <b>Edge Function <code>easy-gemini-engine</code> ainda não publicada ou sem <code>GEMINI_API_KEY</code>:</b> ${err.message}</div>`;
+            out.innerHTML = `<div class="easy-card" style="border-color:var(--yellow);">⚠️ <b>Edge Function <code>easy-gemini-engine</code>:</b> ${err.message}</div>`;
         } finally {
             btn.disabled = false;
             btn.innerText = '⚡ Rodar E.A.S.Y. (IA Gemini)';
@@ -939,22 +989,45 @@
         plans.forEach(p => {
             tb.innerHTML += `<tr>
                 <td><b>${p.target_sector}</b></td>
-                <td>${p.what_action}</td>
+                <td>
+                    ${p.what_action}
+                    ${p.manager_counterproposal ? `<br><small style="color:var(--yellow);">Contraproposta: ${p.manager_counterproposal}</small>` : ''}
+                    ${p.evidence_note ? `<br><small style="color:var(--green);">Evidência: ${p.evidence_note}</small>` : ''}
+                </td>
                 <td>${p.who_manager_name}<br><small>${p.when_due_date}</small></td>
                 <td><span class="badge ${p.consent_status === 'ACEITO_COM_ANUENCIA' ? 'b-green' : 'b-yellow'}">${p.consent_status}</span></td>
                 <td><span class="badge b-purple">${p.yardstick_status}</span></td>
                 <td>
-                    <button class="btn btn-green" style="padding:4px 8px; font-size:10px;" onclick="updatePlanConsent('${p.id}','ACEITO_COM_ANUENCIA','EM_EXECUCAO')">Anuência</button>
-                    <button class="btn btn-accent" style="padding:4px 8px; font-size:10px;" onclick="updatePlanConsent('${p.id}','ACEITO_COM_ANUENCIA','EFICACIA_VALIDADA')">Validar 30d</button>
+                    <button class="btn btn-green" style="padding:4px 8px; font-size:10px;" onclick="registerPlanConsent('${p.id}')">Anuência/Evidência</button>
+                    <button class="btn btn-accent" style="padding:4px 8px; font-size:10px;" onclick="validatePlan30d('${p.id}')">Validar 30d</button>
                 </td>
             </tr>`;
         });
     }
 
-    async function updatePlanConsent(id, consent, yardstick) {
+    async function registerPlanConsent(id) {
+        const sig = prompt('Nome/assinatura do gestor que assume a anuência:') || '';
+        const counter = prompt('Contraproposta ou ajuste do gestor (deixe vazio se aceito integralmente):') || null;
+        const ev = prompt('Nota de evidência já executada (opcional):') || null;
         await fetch(`${SUPABASE_URL}/rest/v1/easy_action_plans?id=eq.${id}`, {
             method: 'PATCH', headers: sbHeaders(),
-            body: JSON.stringify({ consent_status: consent, yardstick_status: yardstick, consented_at: new Date().toISOString() })
+            body: JSON.stringify({
+                consent_status: counter ? 'EM_AJUSTE_GESTOR' : 'ACEITO_COM_ANUENCIA',
+                manager_consent_signature: sig || undefined,
+                manager_counterproposal: counter,
+                evidence_note: ev,
+                yardstick_status: 'EM_EXECUCAO',
+                consented_at: new Date().toISOString()
+            })
+        });
+        refreshAll();
+    }
+
+    async function validatePlan30d(id) {
+        const eff = confirm('A telemetria do setor melhorou após 30 dias? OK = Eficácia Validada | Cancelar = Reabrir por Ineficácia');
+        await fetch(`${SUPABASE_URL}/rest/v1/easy_action_plans?id=eq.${id}`, {
+            method: 'PATCH', headers: sbHeaders(),
+            body: JSON.stringify({ yardstick_status: eff ? 'EFICACIA_VALIDADA' : 'REABERTO_POR_INEFICACIA' })
         });
         refreshAll();
     }
@@ -992,36 +1065,130 @@
         const box = document.getElementById('committeeQueueBox');
         try {
             const rows = await callRpc('committee_list_whistleblower_reports', { p_company: currentCompany, p_pin: pin });
+            if (!rows.length) { box.innerHTML = 'Sem relatos pendentes.'; return; }
             box.innerHTML = rows.map(r => `
                 <div class="easy-card">
                     <b>${r.protocol_code}</b> • ${r.target_sector} • ${r.category} [${r.status}]<br>
-                    ${r.description}
+                    <div style="margin:6px 0; color:#cbd5e1;">${r.description}</div>
+                    <div class="form-row">
+                        <select class="select-box" id="wst-${r.id}">
+                            <option value="EM_APURACAO" ${r.status === 'EM_APURACAO' ? 'selected' : ''}>EM_APURACAO</option>
+                            <option value="MEDIDA_APLICADA" ${r.status === 'MEDIDA_APLICADA' ? 'selected' : ''}>MEDIDA_APLICADA</option>
+                            <option value="ENCERRADA" ${r.status === 'ENCERRADA' ? 'selected' : ''}>ENCERRADA</option>
+                        </select>
+                        <input class="input-box" id="wrep-${r.id}" value="${r.committee_public_reply || ''}" placeholder="Parecer público ao protocolo">
+                        <input class="input-box" id="wres-${r.id}" value="${r.resolution_action || ''}" placeholder="Medida aplicada">
+                    </div>
+                    <button class="btn btn-green" onclick="updateWhistleReport('${r.id}')">💾 Salvar Tratativa Comitê</button>
                 </div>
-            `).join('') || 'Sem relatos pendentes.';
+            `).join('');
         } catch (e) {
             box.innerHTML = `<span style="color:var(--red);">PIN inválido do Comitê de Ética.</span>`;
         }
     }
 
+    async function updateWhistleReport(reportId) {
+        const pin = document.getElementById('inpCommitteePin').value;
+        await callRpc('committee_update_whistleblower_report', {
+            p_company: currentCompany,
+            p_pin: pin,
+            p_report_id: reportId,
+            p_new_status: document.getElementById(`wst-${reportId}`).value,
+            p_public_reply: document.getElementById(`wrep-${reportId}`).value.trim() || null,
+            p_resolution_action: document.getElementById(`wres-${reportId}`).value.trim() || null
+        });
+        alert('Tratativa salva no protocolo sigiloso!');
+        unlockCommitteeReports();
+        refreshAll();
+    }
+
     function renderRoi(list) {
         const box = document.getElementById('roiSummaryBox');
         if (!list.length) {
-            box.innerHTML = 'Cadastre um Baseline (Passado) e um Fechamento Mensal em <code>rh_sector_impact_history</code> ou defesas trabalhistas reais em <code>rh_legal_defense_gains</code> para exibir economia em R$ e %.';
+            box.innerHTML = 'Cadastre abaixo um Baseline (Passado) e um Fechamento Mensal ou Defesas Trabalhistas reais para calcular a economia em R$ e %.';
             return;
         }
         const r = list[0];
         box.innerHTML = `<b>Economia Operacional:</b> R$ ${r.economia_acoes_operacionais_brl} (${r.reducao_custo_operacional_pct ?? 0}%) | <b>Economia Autuações/Ações Reais:</b> R$ ${Number(r.ganho_real_autuacoes_brl) + Number(r.ganho_real_acoes_trabalhistas_brl)} | <b>Total:</b> R$ ${r.economia_total_empresa_brl} (ROI ${r.roi_consolidado_pct ?? '--'}%)`;
     }
 
+    async function saveRoiHistory() {
+        const sec = document.getElementById('roiSector').value.trim() || 'Geral';
+        const dt = document.getElementById('roiMonth').value || new Date().toISOString().slice(0, 10);
+        await fetch(`${SUPABASE_URL}/rest/v1/rh_sector_impact_history`, {
+            method: 'POST', headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates' },
+            body: JSON.stringify({
+                company: currentCompany,
+                sector: sec,
+                record_type: document.getElementById('roiType').value,
+                reference_month: dt,
+                headcount: Number(document.getElementById('roiHeadcount').value || 10),
+                absenteeism_rate_pct: Number(document.getElementById('roiAbs').value || 0),
+                lost_workdays: Number(document.getElementById('roiDaysLost').value || 0),
+                avg_hourly_cost_brl: Number(document.getElementById('roiHourly').value || 0),
+                actions_investment_brl: Number(document.getElementById('roiInvest').value || 0)
+            })
+        });
+        alert('Histórico de impacto salvo!');
+        refreshAll();
+    }
+
+    async function saveLegalDefense() {
+        const ref = document.getElementById('legRef').value.trim();
+        if (!ref) { alert('Informe o Nº do Processo ou Auto.'); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/rh_legal_defense_gains`, {
+            method: 'POST', headers: sbHeaders(),
+            body: JSON.stringify({
+                company: currentCompany,
+                sector: 'GERAL',
+                event_type: document.getElementById('legType').value,
+                case_reference: ref,
+                claim_summary: document.getElementById('legSummary').value.trim() || 'Defesa com registros rastreáveis',
+                claimed_amount_brl: Number(document.getElementById('legClaim').value || 0),
+                settled_amount_brl: Number(document.getElementById('legSettled').value || 0),
+                status: document.getElementById('legStatus').value
+            })
+        });
+        alert('Defesa real registrada!');
+        refreshAll();
+    }
+
+    async function saveCompanyBenefit() {
+        const name = document.getElementById('benName').value.trim();
+        if (!name) { alert('Informe o nome do benefício.'); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/company_benefits`, {
+            method: 'POST', headers: sbHeaders(),
+            body: JSON.stringify({
+                company: currentCompany,
+                benefit_name: name,
+                provider_name: document.getElementById('benProvider').value.trim(),
+                category: document.getElementById('benCategory').value,
+                access_url: document.getElementById('benUrl').value.trim() || '#beneficio',
+                description: document.getElementById('benDesc').value.trim() || 'Programa corporativo de apoio.'
+            })
+        });
+        document.getElementById('benName').value = '';
+        refreshAll();
+    }
+
+    function renderBenefitsAdoption(rows) {
+        const box = document.getElementById('benefitsAdoptionBox');
+        if (!rows.length) { box.innerText = 'Nenhum benefício ativo para esta unidade.'; return; }
+        box.innerHTML = '<b>Adoção Anônima por Setor (N ≥ 5):</b>' + rows.map(b =>
+            `<div style="padding:5px 0; border-bottom:1px solid var(--border);">• <b>${b.benefit_name}</b> (${b.sector}): ${b.quorum_lgpd_ok ? b.total_acessos_anonimos + ' acessos' : '🔒 N < 5'}</div>`
+        ).join('');
+    }
+
     function buildSupportReport(reportType) {
         currentReportType = reportType;
+        const targetSec = document.getElementById('selReportSector').value || 'GERAL';
         const dt = new Date().toLocaleDateString('pt-BR');
-        const valid = overviewCache.filter(r => r.quorum_lgpd_ok);
+        const valid = overviewCache.filter(r => r.quorum_lgpd_ok && (targetSec === 'GERAL' || r.sector.toUpperCase() === targetSec.toUpperCase()));
         const lines = valid.map(r => `- ${r.sector}: N=${r.total_checkins}, Lat=${r.avg_latency_ms}ms, Alerta=${r.pct_alerta_total}%, Demandas=${r.avg_org_demands ?? '-'}/5, Autonomia=${r.avg_org_autonomy ?? '-'}/5`).join('\n')
             || '- Aguardando setores atingirem quórum mínimo N >= 5.';
 
         const body = `EXCELSILIENCE CORPORATE OS — ${reportType}
-EMPRESA: ${currentCompany} | AMBIENTE: ${envMode} | DATA: ${dt}
+EMPRESA: ${currentCompany} | SETOR: ${targetSec} | AMBIENTE: ${envMode} | DATA: ${dt}
 
 AVISO OBRIGATÓRIO:
 Relatório de apoio gerado pelo cruzamento de dados telemétricos agregados (N >= 5),
@@ -1033,10 +1200,10 @@ deve ser obrigatoriamente avaliado, revisado e assinado por profissional habilit
 ${lines}
 
 2. PLANOS 5W2H PENDENTES / COBRANÇA SEMANAL:
-${overdueCache.map(o => `- ${o.target_sector}: ${o.what_action} (Resp: ${o.who_manager_name}, Venc: ${o.when_due_date})`).join('\n') || '- Sem pendências vencidas.'}
+${overdueCache.filter(o => targetSec === 'GERAL' || o.target_sector.toUpperCase() === targetSec.toUpperCase()).map(o => `- ${o.target_sector}: ${o.what_action} (Resp: ${o.who_manager_name}, Venc: ${o.when_due_date})`).join('\n') || '- Sem pendências vencidas.'}
 
 3. DOCUMENTOS SST CRUZADOS (PCMSO / AEP / PGR):
-${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('\n') || '- Nenhum documento externo cadastrado.'}
+${docsCache.filter(d => targetSec === 'GERAL' || d.target_sector.toUpperCase() === targetSec.toUpperCase() || d.target_sector === 'GERAL').map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('\n') || '- Nenhum documento externo cadastrado.'}
 `;
         document.getElementById('laudoPreviewText').innerText = body;
     }
@@ -1045,7 +1212,8 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
         const name = document.getElementById('profName').value.trim();
         const council = document.getElementById('profCouncil').value.trim();
         const reg = document.getElementById('profReg').value.trim();
-        const reason = document.getElementById('profReason').value.trim() || 'Validação técnica inicial';
+        const reason = document.getElementById('profReason').value.trim() || 'Validação técnica';
+        const targetSec = document.getElementById('selReportSector').value || 'GERAL';
         const body = document.getElementById('laudoPreviewText').innerText;
 
         if (!name || !council || !reg) {
@@ -1053,14 +1221,18 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
             return;
         }
 
+        const prevRes = await fetch(`${SUPABASE_URL}/rest/v1/rh_report_revision_logs?company=eq.${encodeURIComponent(currentCompany)}&select=revision_number&order=revision_number.desc&limit=1`, { headers: sbHeaders() });
+        const prevRows = prevRes.ok ? await prevRes.json() : [];
+        const nextRev = prevRows.length ? Number(prevRows[0].revision_number || 0) + 1 : 1;
+
         const repRes = await fetch(`${SUPABASE_URL}/rest/v1/rh_generated_reports`, {
             method: 'POST',
             headers: { ...sbHeaders(), 'Prefer': 'return=representation' },
             body: JSON.stringify({
                 company: currentCompany,
-                target_sector: 'GERAL',
+                target_sector: targetSec,
                 report_type: currentReportType,
-                title: `${currentReportType} — ${currentCompany}`,
+                title: `${currentReportType} — ${currentCompany} (${targetSec})`,
                 report_body_markdown: body,
                 review_status: 'AVALIADO_E_VALIDADO_PROFISSIONAL',
                 regulated_professional_name: name,
@@ -1078,7 +1250,7 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
                 body: JSON.stringify({
                     report_id: repId,
                     company: currentCompany,
-                    revision_number: 1,
+                    revision_number: nextRev,
                     action_type: 'VALIDACAO_PROFISSIONAL',
                     editor_name: name,
                     professional_registry: `${council} ${reg}`,
@@ -1086,7 +1258,7 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
                     body_snapshot: body
                 })
             });
-            alert('Relatório validado e gravado no log imutável!');
+            alert(`Relatório validado (Revisão #${nextRev}) e gravado no log imutável!`);
             refreshAll();
         }
     }
@@ -1094,7 +1266,7 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
     function renderRevisionLogs(logs) {
         const box = document.getElementById('revisionLogsBox');
         box.innerHTML = logs.length
-            ? '<b>Histórico Imutável de Versões:</b>' + logs.map(l => `<div>• ${new Date(l.created_at).toLocaleString('pt-BR')} — ${l.action_type} por ${l.editor_name} (${l.professional_registry || '-'}): ${l.change_reason}</div>`).join('')
+            ? '<b>Histórico Imutável de Versões:</b>' + logs.map(l => `<div>• Rev #${l.revision_number} (${new Date(l.created_at).toLocaleString('pt-BR')}) — ${l.action_type} por ${l.editor_name} (${l.professional_registry || '-'}): ${l.change_reason}</div>`).join('')
             : '';
     }
 
@@ -1119,6 +1291,10 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
         if (s.whatsapp_provider) document.getElementById('cfgWaProvider').value = s.whatsapp_provider;
         if (s.whatsapp_sender_number) document.getElementById('cfgWaSender').value = s.whatsapp_sender_number;
         if (s.whatsapp_targets_json) document.getElementById('cfgWaTargets').value = JSON.stringify(s.whatsapp_targets_json);
+        const hint = document.getElementById('waSavedHint');
+        hint.innerHTML = s.whatsapp_configured
+            ? '<span style="color:var(--green);">✅ Credenciais (URL + Token) já salvas com segurança no servidor. Deixe em branco se não quiser alterar.</span>'
+            : '<span style="color:var(--yellow);">⚠️ Nenhuma URL/Token de WhatsApp configurada ainda para esta empresa.</span>';
     }
 
     async function saveScheduleAndWhatsapp() {
@@ -1142,6 +1318,7 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
             p_whatsapp_targets_json: targets
         });
         alert('Horários e configuração de WhatsApp salvos no Supabase!');
+        refreshAll();
     }
 
     async function triggerWhatsappNow(win) {
@@ -1162,6 +1339,7 @@ ${docsCache.map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('
         if (v && !setoresCadastrados.includes(v)) {
             setoresCadastrados.push(v);
             document.getElementById('inpNovoSetor').value = '';
+            populateSectorSelectors();
             renderLinksGenerator();
         }
     }
