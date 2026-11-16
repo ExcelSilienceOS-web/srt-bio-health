@@ -31,7 +31,6 @@
         .header-box h1 { font-size: 1.3rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .header-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
         .badge-gov { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); padding: 8px 12px; border-radius: 14px; font-size: 11px; font-weight: 700; display: block; margin-bottom: 14px; text-align: center; border: 1px solid rgba(56, 189, 248, 0.25); }
-        .badge-sandbox { background: rgba(168, 85, 247, 0.16); color: #e9d5ff; border: 1px solid var(--accent-purple); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; text-align: center; margin-bottom: 14px; display: none; }
         .window-banner { padding: 12px 14px; border-radius: 12px; font-size: 12px; margin-bottom: 14px; line-height: 1.45; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-sub); }
         .window-banner.blocked { background: rgba(239, 68, 68, 0.12); border-color: var(--accent-red); color: #fecaca; }
         .window-banner.open { background: rgba(16, 185, 129, 0.12); border-color: var(--accent-green); color: #bbf7d0; }
@@ -107,8 +106,6 @@
         <h1>ExcelSilience SRT-RH</h1>
         <p id="lblHeaderCompany">Telemetria Preventiva Anônima & Escuta NR-05</p>
     </div>
-
-    <div id="sandboxBanner" class="badge-sandbox">🧪 MODO SANDBOX / TESTE ISOLADO — Horário liberado (dados separados dos clientes)</div>
     <span class="badge-gov">🔒 100% ANÔNIMO • ZERO CÂMERA • QUÓRUM LGPD (N ≥ 5) • PARTICIPAÇÃO FACULTATIVA</span>
 
     <div id="windowBanner" class="window-banner">⏳ Verificando janela de horário permitida no servidor...</div>
@@ -138,16 +135,6 @@
                 <option value="Noite">Turno 3 — Noite</option>
             </select>
         </div>
-
-        <div class="form-group" id="sandboxWindowGroup" style="display:none;">
-            <label for="selSandboxWindow">🧪 Janela Simulada (exclusivo Sandbox para testar Delta 8h→17h):</label>
-            <select id="selSandboxWindow">
-                <option value="ENTRADA_8H">☀️ Simular Entrada (8h)</option>
-                <option value="SAIDA_17H">🌇 Simular Saída (17h)</option>
-                <option value="AVULSO">⏱️ Avulso</option>
-            </select>
-        </div>
-
         <div class="chk-box">
             <input type="checkbox" id="chkAuth" checked>
             <label for="chkAuth">
@@ -179,7 +166,7 @@
         <div class="audio-vis-box"><canvas id="audioCanvas" class="audio-canvas"></canvas></div>
         <p id="audioHint" style="font-size:11px; text-align:center; color:var(--text-muted); margin-bottom:10px;"></p>
         <button id="btnRec" class="btn" onclick="runAudioTest()">🔴 Gravar Voz (7s)</button>
-        <button id="btnSkipAudio" class="btn btn-secondary" style="display:none;" onclick="skipAudioAndContinue()">Seguir apenas com teste visuomotor →</button>
+        <button id="btnSkipAudio" class="btn btn-secondary" style="display:none;" onclick="skipAudioAndContinue()">⏭️ Pular Áudio / Seguir com teste visuomotor →</button>
         <div class="meter-bar"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
@@ -201,7 +188,7 @@
         <div class="game-box" id="gameArea"></div>
     </div>
 
-    <!-- PASSO 4 (SEXTA-FEIRA SEMANAL OU SANDBOX): RÉGUAS 1 A 5 + 12 OPÇÕES -->
+    <!-- PASSO 4 (SEXTA-FEIRA SEMANAL): RÉGUAS 1 A 5 + 12 OPÇÕES -->
     <div id="stepWeeklyQuestions" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:6px; font-size:15px;">📏 Pulso Semanal de Condições de Trabalho</h3>
         <p style="font-size:11px; text-align:center; color:var(--text-muted); margin-bottom:14px;">
@@ -410,11 +397,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
     const sectorParam = urlParams.get('sector') || '';
-    const envMode = (urlParams.get('env') || '').toUpperCase() === 'SANDBOX' ? 'SANDBOX' : 'PRODUCAO';
-    const forceWeekly = urlParams.get('weekly') === 'true';
+    const envMode = 'PRODUCAO';
 
-    let windowAllowed = envMode === 'SANDBOX';
-    let showWeeklyQuestions = envMode === 'SANDBOX' || forceWeekly;
+    let windowAllowed = false;
+    let showWeeklyQuestions = false;
     let detectedShiftWindow = 'AVULSO';
 
     let roundPlan = [];
@@ -436,12 +422,12 @@
     let computedRt = 480;
     let lastBand = 'GREEN';
 
+    function applyEnvUi() {
+        document.getElementById('btnSkipAudio').style.display = 'none';
+    }
     window.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('lblHeaderCompany').innerText = `${companyParam} • Check-in Anônimo & Escuta NR-05`;
-        if (envMode === 'SANDBOX') {
-            document.getElementById('sandboxBanner').style.display = 'block';
-            document.getElementById('sandboxWindowGroup').style.display = 'block';
-        }
+        applyEnvUi();
         const savedDept = sectorParam || localStorage.getItem('srt_rh_dept');
         if (savedDept) {
             const sel = document.getElementById('txtDept');
@@ -471,7 +457,7 @@
                 if (row) {
                     windowAllowed = Boolean(row.allowed);
                     detectedShiftWindow = row.detected_window || 'AVULSO';
-                    showWeeklyQuestions = Boolean(row.show_weekly_questions) || envMode === 'SANDBOX' || forceWeekly;
+                    showWeeklyQuestions = Boolean(row.show_weekly_questions);
 
                     if (windowAllowed) {
                         banner.className = 'window-banner open';
@@ -489,11 +475,9 @@
         } catch (e) {
             console.warn('Falha ao consultar janela no servidor:', e);
         }
-        if (envMode === 'SANDBOX') {
-            banner.className = 'window-banner open';
-            banner.innerText = '🧪 Sandbox ativo: testes liberados a qualquer horário.';
-            btn.disabled = false;
-        }
+        banner.className = 'window-banner blocked';
+        banner.innerHTML = '⚠️ Não foi possível validar o horário do turno no servidor. Tente novamente em instantes.';
+        btn.disabled = true;
     }
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -514,9 +498,6 @@
         localStorage.setItem('srt_rh_dept', dept);
         document.getElementById('denSector').value = dept;
         sessionStartMs = performance.now();
-        if (envMode === 'SANDBOX') {
-            detectedShiftWindow = document.getElementById('selSandboxWindow').value || 'AVULSO';
-        }
 
         if (document.getElementById('chkAccessExempt').checked) {
             audioQualityOk = false;
@@ -758,7 +739,7 @@
 
         const dept = document.getElementById('txtDept').value.trim() || 'Geral';
         const shiftName = document.getElementById('txtShiftName').value;
-        document.getElementById('resDept').innerText = `Setor: ${dept} • Empresa: ${companyParam} • Ambiente: ${envMode}`;
+        document.getElementById('resDept').innerText = `Setor: ${dept} • Empresa: ${companyParam}`;
 
         let weeklyPayload = {};
         if (showWeeklyQuestions) {
@@ -842,9 +823,7 @@
                     p_pre_week_rest_score: weeklyPayload.pre_week_rest_score ?? null,
                     p_can_improve_workplace: weeklyPayload.can_improve_workplace ?? null,
                     p_improvement_tags: weeklyPayload.improvement_tags ?? null,
-                    p_environment_mode: envMode,
-                    p_is_demo_test: envMode === 'SANDBOX',
-                    p_demo_session_tag: envMode === 'SANDBOX' ? 'SANDBOX' : null
+                    p_environment_mode: envMode
                 })
             });
 
@@ -970,7 +949,8 @@
                     benefit_id: benefitId,
                     sector: dept,
                     shift_window: detectedShiftWindow,
-                    trigger_band: lastBand
+                    trigger_band: lastBand,
+                    environment_mode: envMode
                 })
             });
         } catch (e) {}
