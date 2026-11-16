@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExcelSilience ES-CRISIS — Cockpit de Governança Executiva v5.2</title>
+    <style>
+        :root {
+            --bg: #030712;
+            --card: #0b1329;
+            --card-inner: #111c38;
+            --border: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --green: #34d399;
+            --yellow: #fbbf24;
+            --purple: #c084fc;
+            --red: #f87171;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .header h1 { font-size: 20px; font-weight: 800; color: var(--accent); }
+        .header p { font-size: 11px; color: var(--muted); }
+        .btn { background: #1e293b; color: #fff; border: 1px solid var(--border); padding: 8px 13px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .btn.active { background: #0284c7; border-color: var(--accent); }
+        .btn-accent { background: #0284c7; border-color: var(--accent); }
+        .btn-purple { background: #7e22ce; border: none; }
+        .btn-green { background: #059669; border: none; }
+        .btn-red { background: #b91c1c; border: none; }
+
+        .explanation-panel { background: var(--card); border: 1px solid #0284c7; border-radius: 14px; padding: 16px; margin-bottom: 18px; }
+        .exp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; }
+        .exp-card { background: #070d19; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 11px; color: var(--muted); line-height: 1.45; }
+        .exp-card b { color: #fff; display: block; margin-bottom: 4px; }
+
+        .filter-panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; }
+        .filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        input[type="date"], .input-box { background: #070d19; border: 1px solid var(--border); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 12px; outline: none; }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 18px; }
+        .card-metric { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: center; }
+        .card-metric .lbl { font-size: 10px; color: var(--muted); font-weight: 800; text-transform: uppercase; }
+        .card-metric .val { font-size: 22px; font-weight: 800; margin-top: 4px; color: var(--accent); }
+
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 18px; overflow-x: auto; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .panel-title { font-size: 14px; font-weight: 800; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 720px; }
+        th { text-align: left; padding: 10px 8px; color: var(--muted); font-size: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 10px 8px; border-bottom: 1px solid rgba(30, 41, 59, 0.7); vertical-align: middle; }
+
+        .user-photo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); cursor: pointer; }
+        .avatar-fallback { width: 42px; height: 42px; border-radius: 50%; background: #1e293b; color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; }
+        .b-GREEN { background: rgba(52, 211, 153, 0.16); color: var(--green); border: 1px solid var(--green); }
+        .b-YELLOW { background: rgba(251, 191, 36, 0.16); color: var(--yellow); border: 1px solid var(--yellow); }
+        .b-PURPLE { background: rgba(192, 132, 252, 0.16); color: var(--purple); border: 1px solid var(--purple); }
+        .b-RED { background: rgba(248, 113, 113, 0.16); color: var(--red); border: 1px solid var(--red); }
+
+        .easy-card { background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; font-size: 12px; line-height: 1.5; }
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+        .modal-backdrop.active { display: flex; }
+        .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; max-width: 360px; width: 100%; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h1>ExcelSilience ES-CRISIS — Cockpit de Governança C-Suite</h1>
+        <p id="lblSub">Fórmula ((C+I+R)+MIN(C,I,R))/4 • Conferência Visual (30d) • Auditoria 360° Projeto Aristóteles</p>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="btn" style="background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">🧪 PASTA TESTE (N ≥ 1 • 24H)</span>
+        <button class="btn btn-green" id="btnOpenExecTest" onclick="openExecTestApp()">🚀 Abrir App Executivo Sem Travas</button>
+        <button class="btn" onclick="copy360Link()">🔗 Copiar Link 360°</button>
+        <button class="btn btn-purple" onclick="runEasy360()">⚡ Motor E.A.S.Y. (Gemini)</button>
+        <button class="btn btn-accent" onclick="loadAll()">🔄 Atualizar</button>
+    </div>
+</div>
+
+<!-- GUIA TÁTICO DAS VARIÁVEIS (SEM VFC SIMULADA / SEM PUPILOMETRIA) -->
+<div class="explanation-panel">
+    <div style="font-size:12px; font-weight:800; color:var(--accent);">📘 GUIA DE TELEMETRIA EXECUTIVA & PROJETO ARISTÓTELES</div>
+    <div class="exp-grid">
+        <div class="exp-card"><b>🧠 Controle (Vetor C)</b>Controle inibitório pré-frontal (NO-GO), estabilidade de latência (jitter) e Segurança Psicológica no 360°.</div>
+        <div class="exp-card"><b>⚡ Intencionalidade (Vetor I)</b>Agilidade e clareza cognitiva (GO!), cômputo integral de omissões e clareza/impacto no 360°.</div>
+        <div class="exp-card"><b>🎙️ Resiliência (Vetor R)</b>Estabilidade bioacústica vocal (VSI válido) e ritmo sustentável/confiabilidade no 360°.</div>
+        <div class="exp-card"><b>🛡️ Regra do Elo Mais Fraco</b>Score = ((C + I + R) + MIN(C, I, R)) / 4. O menor vetor limita a prontidão e define a prioridade E.A.S.Y.</div>
+        <div class="exp-card"><b>📷 Conferência Visual (30d)</b>Foto opcional exclusiva para identificação visual pelo CEO, com descarte automático em 30 dias (LGPD Art. 11, II, "e").</div>
+    </div>
+</div>
+
+<!-- FILTROS -->
+<div class="filter-panel">
+    <div class="filter-row">
+        <input type="date" id="startDate" onchange="applyFilters()">
+        <input type="date" id="endDate" onchange="applyFilters()">
+        <button class="btn" id="pToday" onclick="setQuickPeriod('today', this)">Hoje</button>
+        <button class="btn" id="p7d" onclick="setQuickPeriod('7d', this)">7 Dias</button>
+        <button class="btn" id="p30d" onclick="setQuickPeriod('30d', this)">30 Dias</button>
+        <button class="btn active" id="pAll" onclick="setQuickPeriod('all', this)">Todo Histórico</button>
+    </div>
+    <div class="filter-row">
+        <span style="font-size:11px; color:var(--muted); font-weight:700;">STATUS:</span>
+        <button class="btn active" id="stALL" onclick="setStatusFilter('ALL', this)">Todos</button>
+        <button class="btn" id="stGREEN" onclick="setStatusFilter('GREEN', this)">🟢 Verde</button>
+        <button class="btn" id="stYELLOW" onclick="setStatusFilter('YELLOW', this)">🟡 Amarelo</button>
+        <button class="btn" id="stPURPLE" onclick="setStatusFilter('PURPLE', this)">🟣 Roxo</button>
+        <button class="btn" id="stRED" onclick="setStatusFilter('RED', this)">🔴 Vermelho</button>
+    </div>
+</div>
+
+<div class="metrics-grid">
+    <div class="card-metric"><div class="lbl">Aferições</div><div class="val" id="mTotal">0</div></div>
+    <div class="card-metric"><div class="lbl">🟢 Verde</div><div class="val" style="color:var(--green);" id="mGreen">0</div></div>
+    <div class="card-metric"><div class="lbl">🟡 Amarelo</div><div class="val" style="color:var(--yellow);" id="mYellow">0</div></div>
+    <div class="card-metric"><div class="lbl">🟣 Roxo</div><div class="val" style="color:var(--purple);" id="mPurple">0</div></div>
+    <div class="card-metric"><div class="lbl">🔴 Vermelho</div><div class="val" style="color:var(--red);" id="mRed">0</div></div>
+    <div class="card-metric"><div class="lbl">Média ES-Crisis</div><div class="val" id="mAvgEs">--</div></div>
+    <div class="card-metric"><div class="lbl">Média Latência</div><div class="val" id="mAvgLat">--</div></div>
+    <div class="card-metric"><div class="lbl">Ciclos 360°</div><div class="val" id="mCycles">0</div></div>
+</div>
+
+<div class="panel">
+    <div class="panel-header"><div class="panel-title">🧠 Análise Dinâmica E.A.S.Y. (Gemini + Livro ExcelSilience Corporate OS)</div></div>
+    <div id="easyOutBox"><div class="easy-card">Clique em <b>Motor E.A.S.Y. (Gemini)</b> para cruzar C, I, R, 360° e desgaste da área liderada.</div></div>
+    <div id="easyHistoryExec" style="margin-top:10px;"></div>
+</div>
+
+<div class="panel">
+    <div class="panel-header"><div class="panel-title">Aferições Executivas (Vetores C, I, R • Sem VFC Simulada)</div></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Data / Empresa</th>
+                <th>Executivo</th>
+                <th>Conferência Visual (30d)</th>
+                <th>Área / Contexto</th>
+                <th>Voz VSI</th>
+                <th>Latência / Veto</th>
+                <th>C / I / R (ES-Crisis)</th>
+                <th>Gargalo & Status</th>
+            </tr>
+        </thead>
+        <tbody id="tblExecBody"></tbody>
+    </table>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <div class="panel-title">🧭 Auditoria 360° Anti-Viés (Projeto Aristóteles)</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <input class="input-box" id="cLabel" placeholder="Ciclo (ex: Q4-2026)">
+            <input class="input-box" id="cLeader" placeholder="Nome do Líder">
+            <input class="input-box" id="cRole" placeholder="Cargo">
+            <input class="input-box" id="cSector" placeholder="Setor Liderado">
+            <button class="btn btn-green" onclick="createCycle360()">+ Abrir Ciclo 360°</button>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Ciclo / Líder</th>
+                <th>Setor</th>
+                <th>ES-360° (C/I/R)</th>
+                <th>Equipe (N≥5) / Pares / Auto</th>
+                <th>Seg. Psicológica / Confiabilidade</th>
+                <th>Alerta 17h Setor</th>
+                <th>Contradições & Ação</th>
+            </tr>
+        </thead>
+        <tbody id="tbl360Body"></tbody>
+    </table>
+</div>
+
+<div id="photoModal" class="modal-backdrop" onclick="this.classList.remove('active')">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <h3 style="color:var(--accent); font-size:14px; margin-bottom:10px;" id="pmTitle">Conferência Visual</h3>
+        <img id="pmImg" src="" style="width:220px; height:220px; border-radius:14px; object-fit:cover; border:2px solid var(--accent); margin-bottom:10px;">
+        <p id="pmExpiry" style="font-size:11px; color:var(--muted); margin-bottom:10px;"></p>
+        <button class="btn" onclick="document.getElementById('photoModal').classList.remove('active')">Fechar</button>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentCompany = (urlParams.get('company') || 'TODAS').toUpperCase();
+    const envMode = 'SANDBOX';
+    let allExecs = [];
+    let selectedStatus = 'ALL';
+
+    function sbHeaders() {
+        return { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+    }
+
+    function isAllCompanies() {
+        return currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany;
+    }
+
+    function openExecTestApp() {
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-es-crisis.html');
+        const comp = isAllCompanies() ? 'GROU' : currentCompany;
+        window.open(`${base}?company=${encodeURIComponent(comp)}`, '_blank');
+    }
+
+    function copy360Link() {
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-es-crisis.html');
+        const comp = isAllCompanies() ? 'GROU' : currentCompany;
+        const link = `${base}?company=${encodeURIComponent(comp)}&mode=360`;
+        if (navigator.clipboard) navigator.clipboard.writeText(link);
+        alert('Link da Avaliação 360° copiado:\n' + link);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('lblSub').innerText = `${currentCompany} • Fórmula ((C+I+R)+MIN)/4 • Conferência Visual (30d)`;
+        loadAll();
+    });
+
+    async function loadAll() {
+        const execUrl = isAllCompanies()
+            ? `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?environment_mode=eq.${envMode}&order=created_at.desc&limit=100`
+            : `${SUPABASE_URL}/rest/v1/es_crisis_exec_checkins?company=eq.${encodeURIComponent(currentCompany)}&environment_mode=eq.${envMode}&order=created_at.desc&limit=100`;
+
+        const easyUrl = isAllCompanies()
+            ? `${SUPABASE_URL}/rest/v1/easy_ai_analyses?analysis_scope=in.(ES_CRISIS_360,ES_CRISIS_LIDER)&order=created_at.desc&limit=5`
+            : `${SUPABASE_URL}/rest/v1/easy_ai_analyses?company=eq.${encodeURIComponent(currentCompany)}&analysis_scope=in.(ES_CRISIS_360,ES_CRISIS_LIDER)&order=created_at.desc&limit=5`;
+
+        const [execRes, auditRes, easyRes] = await Promise.allSettled([
+            fetch(execUrl, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/get_es_crisis_360_audit`, { method: 'POST', headers: sbHeaders(), body: JSON.stringify({ p_company: isAllCompanies() ? 'ALL' : currentCompany, p_env: envMode }) }).then(r => r.ok ? r.json() : []),
+            fetch(easyUrl, { headers: sbHeaders() }).then(r => r.ok ? r.json() : [])
+        ]);
+
+        allExecs = execRes.status === 'fulfilled' && Array.isArray(execRes.value) ? execRes.value : [];
+        const audits = auditRes.status === 'fulfilled' && Array.isArray(auditRes.value) ? auditRes.value : [];
+        const easyHist = easyRes.status === 'fulfilled' && Array.isArray(easyRes.value) ? easyRes.value : [];
+
+        applyFilters();
+        renderAudits(audits);
+        renderEasyHistoryExec(easyHist);
+    }
+
+    function setQuickPeriod(p, btn) {
+        document.querySelectorAll('#pToday, #p7d, #p30d, #pAll').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        const today = new Date();
+        const fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        if (p === 'today') {
+            document.getElementById('startDate').value = fmt(today);
+            document.getElementById('endDate').value = fmt(today);
+        } else if (p === '7d') {
+            const d = new Date(); d.setDate(today.getDate() - 7);
+            document.getElementById('startDate').value = fmt(d);
+            document.getElementById('endDate').value = fmt(today);
+        } else if (p === '30d') {
+            const d = new Date(); d.setDate(today.getDate() - 30);
+            document.getElementById('startDate').value = fmt(d);
+            document.getElementById('endDate').value = fmt(today);
+        } else {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+        }
+        applyFilters();
+    }
+
+    function setStatusFilter(st, btn) {
+        selectedStatus = st;
+        document.querySelectorAll('#stALL, #stGREEN, #stYELLOW, #stPURPLE, #stRED').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const sVal = document.getElementById('startDate').value;
+        const eVal = document.getElementById('endDate').value;
+        const filtered = allExecs.filter(r => {
+            if (selectedStatus !== 'ALL' && (r.status || 'GREEN').toUpperCase() !== selectedStatus) return false;
+            if (sVal || eVal) {
+                const dt = new Date(r.created_at);
+                const dStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+                if (sVal && dStr < sVal) return false;
+                if (eVal && dStr > eVal) return false;
+            }
+            return true;
+        });
+        renderExecs(filtered);
+    }
+
+    function renderExecs(list) {
+        document.getElementById('mTotal').innerText = list.length;
+        document.getElementById('mGreen').innerText = list.filter(r => r.status === 'GREEN').length;
+        document.getElementById('mYellow').innerText = list.filter(r => r.status === 'YELLOW').length;
+        document.getElementById('mPurple').innerText = list.filter(r => r.status === 'PURPLE').length;
+        document.getElementById('mRed').innerText = list.filter(r => r.status === 'RED').length;
+        const validEs = list.filter(r => r.es_crisis_score != null);
+        document.getElementById('mAvgEs').innerText = validEs.length
+            ? (validEs.reduce((a, r) => a + Number(r.es_crisis_score), 0) / validEs.length).toFixed(2) : '--';
+        document.getElementById('mAvgLat').innerText = list.length
+            ? Math.round(list.reduce((a, r) => a + Number(r.reaction_time_ms || 0), 0) / list.length) + ' ms' : '--';
+
+        const tb = document.getElementById('tblExecBody');
+        tb.innerHTML = '';
+        if (!list.length) {
+            tb.innerHTML = `<tr><td colspan="8" style="color:var(--muted); text-align:center;">Nenhum check-in executivo encontrado no ambiente ${envMode}.</td></tr>`;
+            return;
+        }
+        list.forEach(r => {
+            const initial = (r.exec_name || 'E').charAt(0).toUpperCase();
+            const expStr = r.photo_expires_at ? new Date(r.photo_expires_at).toLocaleDateString('pt-BR') : '30 dias';
+            const photoHtml = r.photo_url
+                ? `<img src="${r.photo_url}" class="user-photo" alt="Foto visual" onclick="openPhotoModal('${r.exec_name}','${r.photo_url}','${expStr}')"><br><small style="color:var(--muted);">Expira: ${expStr}</small>`
+                : `<div class="avatar-fallback">${initial}</div><small style="color:var(--muted);">${r.face_verification_mode || 'Sem foto'}</small>`;
+            const ctxInfo = r.context_type === 'PRE_MEETING' ? `<br><small style="color:var(--yellow);">⚡ Pré-Reunião: ${r.meeting_topic || 'Geral'}</small>` : '';
+
+            tb.innerHTML += `<tr>
+                <td>${new Date(r.created_at).toLocaleString('pt-BR')}<br><small style="color:var(--accent);">${r.company}</small></td>
+                <td><b>${r.exec_name}</b><br><small style="color:var(--muted);">${r.exec_role}</small></td>
+                <td>${photoHtml}</td>
+                <td>${r.managed_sector}${ctxInfo}</td>
+                <td>${r.audio_quality_ok ? ('VSI ' + r.vsi_score) : 'Sem áudio válido'}</td>
+                <td>${r.reaction_time_ms ?? '--'} ms<br><small>Veto: ${r.veto_errors ?? 0} | Lapsos: ${r.green_lapses ?? 0}</small></td>
+                <td>C:${r.score_c ?? '-'} I:${r.score_i ?? '-'} R:${r.score_r ?? '-'}<br><b>ES: ${r.es_crisis_score ?? '--'}</b></td>
+                <td><span class="badge b-${r.status || 'GREEN'}">${r.status || 'GREEN'}</span><br><small>Elo: ${r.weakest_vector || '-'}</small></td>
+            </tr>`;
+        });
+    }
+
+    function openPhotoModal(name, src, exp) {
+        document.getElementById('pmTitle').innerText = `Conferência Visual — ${name}`;
+        document.getElementById('pmImg').src = src;
+        document.getElementById('pmExpiry').innerText = `Descarte automático LGPD (Art. 11, II, "e") programado para: ${exp}`;
+        document.getElementById('photoModal').classList.add('active');
+    }
+
+    function renderAudits(list) {
+        document.getElementById('mCycles').innerText = list.length;
+        const tb = document.getElementById('tbl360Body');
+        tb.innerHTML = '';
+        if (!list.length) {
+            tb.innerHTML = `<tr><td colspan="7" style="color:var(--muted); text-align:center;">Nenhum ciclo 360° aberto.</td></tr>`;
+            return;
+        }
+        list.forEach(c => {
+            const btnClose = c.status === 'ABERTO'
+                ? `<br><button class="btn btn-red" style="padding:3px 7px; font-size:10px; margin-top:4px;" onclick="closeCycle360('${c.cycle_id}')">Fechar Ciclo</button>`
+                : `<br><small style="color:var(--muted);">[FECHADO]</small>`;
+            tb.innerHTML += `<tr>
+                <td><b>${c.leader_name}</b><br><small>${c.cycle_label} • ${c.leader_role}</small></td>
+                <td>${c.managed_sector}</td>
+                <td><b>${c.es_360_score ?? '--'}</b> (C:${c.c_360 ?? '-'} I:${c.i_360 ?? '-'} R:${c.r_360 ?? '-'})</td>
+                <td>Eq: ${c.equipe_quorum_ok ? c.media_equipe_protegida : 'N<5'} | Par: ${c.media_pares ?? '--'} | Auto: ${c.media_auto ?? '--'}</td>
+                <td>Seg.Psic: ${c.media_psych_safety ?? 'N<5'} | Conf.: ${c.media_reliability ?? 'N<5'}</td>
+                <td>${c.area_pct_alerta_17h != null ? c.area_pct_alerta_17h + '%' : '--'}</td>
+                <td>${(c.detector_contradicoes || []).join(', ') || 'Sem alertas'}${btnClose}</td>
+            </tr>`;
+        });
+    }
+
+    async function createCycle360() {
+        const comp = isAllCompanies() ? 'GROU' : currentCompany;
+        const payload = {
+            company: comp,
+            cycle_label: document.getElementById('cLabel').value.trim() || 'Ciclo Atual',
+            leader_name: document.getElementById('cLeader').value.trim(),
+            leader_role: document.getElementById('cRole').value.trim() || 'Diretor',
+            managed_sector: document.getElementById('cSector').value.trim() || 'Geral'
+        };
+        if (!payload.leader_name) { alert('Informe o nome do líder.'); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_360_cycles`, { method: 'POST', headers: sbHeaders(), body: JSON.stringify(payload) });
+        document.getElementById('cLeader').value = '';
+        loadAll();
+    }
+
+    async function closeCycle360(cycleId) {
+        await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_360_cycles?id=eq.${cycleId}`, {
+            method: 'PATCH', headers: sbHeaders(),
+            body: JSON.stringify({ status: 'FECHADO', closed_at: new Date().toISOString() })
+        });
+        loadAll();
+    }
+
+    async function runEasy360() {
+        const box = document.getElementById('easyOutBox');
+        box.innerHTML = '<div class="easy-card">⏳ Consultando Motor E.A.S.Y. (Gemini)...</div>';
+        try {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/easy-gemini-engine`, {
+                method: 'POST', headers: sbHeaders(),
+                body: JSON.stringify({
+                    company: isAllCompanies() ? 'ALL' : currentCompany,
+                    cadence_type: 'SOB_DEMANDA',
+                    analysis_scope: 'ES_CRISIS_360',
+                    environment_mode: envMode,
+                    days: 30
+                })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || 'Edge Function não publicada');
+            const a = data.analysis;
+            box.innerHTML = `
+                <div class="easy-card"><b>E — Examine:</b> ${a.easy_e_examination}</div>
+                <div class="easy-card"><b>A — Adapt:</b> ${a.easy_a_adaptation}</div>
+                <div class="easy-card"><b>S — Systematize:</b> ${a.easy_s_systematization}</div>
+                <div class="easy-card"><b>Y — Yardstick:</b> ${a.easy_y_yardstick}</div>
+            `;
+            loadAll();
+        } catch (err) {
+            box.innerHTML = `<div class="easy-card" style="border-color:var(--yellow);">⚠️ ${err.message}</div>`;
+        }
+    }
+
+    function renderEasyHistoryExec(list) {
+        const box = document.getElementById('easyHistoryExec');
+        if (!list.length) { box.innerHTML = ''; return; }
+        box.innerHTML = '<div style="font-size:11px; color:var(--muted); margin-bottom:6px;">Últimas análises E.A.S.Y. executivas arquivadas:</div>' +
+            list.map(a => `<div class="easy-card"><b>${new Date(a.created_at).toLocaleString('pt-BR')} (${a.company})</b><br><b>E:</b> ${a.easy_e_examination}<br><b>A:</b> ${a.easy_a_adaptation}</div>`).join('');
+    }
+</script>
+</body>
+</html>
