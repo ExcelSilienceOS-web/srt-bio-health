@@ -74,7 +74,6 @@
         <p id="lblSub">Fórmula ((C+I+R)+MIN(C,I,R))/4 • Conferência Visual (30d) • Auditoria 360° Projeto Aristóteles</p>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn" id="btnEnv" onclick="toggleEnv()">PRODUÇÃO</button>
         <button class="btn" onclick="copy360Link()">🔗 Copiar Link 360°</button>
         <button class="btn btn-purple" onclick="runEasy360()">⚡ Motor E.A.S.Y. (Gemini)</button>
         <button class="btn btn-accent" onclick="loadAll()">🔄 Atualizar</button>
@@ -190,7 +189,7 @@
     const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
     const urlParams = new URLSearchParams(window.location.search);
     const currentCompany = (urlParams.get('company') || 'TODAS').toUpperCase();
-    let envMode = (urlParams.get('env') || '').toUpperCase() === 'SANDBOX' ? 'SANDBOX' : 'PRODUCAO';
+    const envMode = 'PRODUCAO';
     let allExecs = [];
     let selectedStatus = 'ALL';
 
@@ -202,22 +201,15 @@
         return currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany;
     }
 
-    function toggleEnv() {
-        envMode = envMode === 'PRODUCAO' ? 'SANDBOX' : 'PRODUCAO';
-        document.getElementById('btnEnv').innerText = envMode === 'SANDBOX' ? '🧪 SANDBOX' : 'PRODUÇÃO';
-        loadAll();
-    }
-
     function copy360Link() {
         const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-es-crisis.html');
         const comp = isAllCompanies() ? 'GROU' : currentCompany;
-        const link = `${base}?company=${encodeURIComponent(comp)}&mode=360${envMode === 'SANDBOX' ? '&env=SANDBOX' : ''}`;
+        const link = `${base}?company=${encodeURIComponent(comp)}&mode=360`;
         if (navigator.clipboard) navigator.clipboard.writeText(link);
         alert('Link da Avaliação 360° copiado:\n' + link);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('btnEnv').innerText = envMode === 'SANDBOX' ? '🧪 SANDBOX' : 'PRODUÇÃO';
         document.getElementById('lblSub').innerText = `${currentCompany} • Fórmula ((C+I+R)+MIN)/4 • Conferência Visual (30d)`;
         loadAll();
     });
@@ -233,7 +225,7 @@
 
         const [execRes, auditRes, easyRes] = await Promise.allSettled([
             fetch(execUrl, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
-            fetch(`${SUPABASE_URL}/rest/v1/rpc/get_es_crisis_360_audit`, { method: 'POST', headers: sbHeaders(), body: JSON.stringify({ p_company: isAllCompanies() ? 'ALL' : currentCompany }) }).then(r => r.ok ? r.json() : []),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/get_es_crisis_360_audit`, { method: 'POST', headers: sbHeaders(), body: JSON.stringify({ p_company: isAllCompanies() ? 'ALL' : currentCompany, p_env: envMode }) }).then(r => r.ok ? r.json() : []),
             fetch(easyUrl, { headers: sbHeaders() }).then(r => r.ok ? r.json() : [])
         ]);
 
