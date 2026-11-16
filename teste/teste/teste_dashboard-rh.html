@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExcelSilience SRT-RH — Cockpit Corporativo v5.2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --card: #151c2c;
+            --card-inner: #0d1527;
+            --border: #2a364f;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.25);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --green: #34d399;
+            --yellow: #fbbf24;
+            --purple: #c084fc;
+            --red: #f87171;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 18px; min-height: 100vh; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .title-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .company-badge { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .env-badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: #fff; }
+        .env-badge.sandbox { background: rgba(168, 85, 247, 0.2); border-color: var(--purple); color: #e9d5ff; }
+        .title-group h1 { font-size: 19px; font-weight: 800; color: #fff; }
+        .title-group p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .period-selector { display: flex; background: #0d1527; border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 3px; }
+        .period-btn { background: transparent; border: none; color: var(--muted); padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .period-btn.active { background: var(--accent); color: #000; }
+
+        .btn { background: var(--card-inner); color: #fff; border: 1px solid var(--border); padding: 8px 13px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn:hover { border-color: var(--accent); }
+        .btn-green { background: #059669; border: none; }
+        .btn-accent { background: #0284c7; border-color: var(--accent); }
+        .btn-purple { background: #7e22ce; border: none; }
+        .btn-red { background: #b91c1c; border: none; }
+
+        .nav-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .tab-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 9px 13px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .tab-btn.active { background: #0284c7; color: #fff; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .card-metric { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center; }
+        .card-metric .lbl { font-size: 10px; text-transform: uppercase; color: var(--muted); font-weight: 800; margin-bottom: 6px; }
+        .card-metric .val { font-size: 24px; font-weight: 800; }
+        .card-metric .subtext { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 20px; overflow-x: auto; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+        .panel-title { font-size: 14px; font-weight: 800; color: #fff; }
+        .panel-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+        .grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        @media (max-width: 900px) { .grid-two { grid-template-columns: 1fr; } }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 540px; }
+        th { text-align: left; padding: 10px 8px; color: var(--muted); font-size: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 10px 8px; border-bottom: 1px solid rgba(42, 54, 79, 0.55); vertical-align: middle; }
+
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; }
+        .b-green { background: rgba(52, 211, 153, 0.16); color: var(--green); border: 1px solid var(--green); }
+        .b-yellow { background: rgba(251, 191, 36, 0.16); color: var(--yellow); border: 1px solid var(--yellow); }
+        .b-purple { background: rgba(192, 132, 252, 0.16); color: var(--purple); border: 1px solid var(--purple); }
+        .b-red { background: rgba(248, 113, 113, 0.16); color: var(--red); border: 1px solid var(--red); }
+        .b-lock { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid #475569; }
+
+        .input-box, .select-box, textarea { background: var(--card-inner); border: 1px solid var(--border); color: #fff; padding: 9px 12px; border-radius: 8px; font-size: 12px; outline: none; width: 100%; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        .report-preview-box { background: #070c16; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: monospace; font-size: 11.5px; line-height: 1.55; white-space: pre-wrap; max-height: 360px; overflow-y: auto; color: #e2e8f0; }
+
+        .heatmap-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+        .hm-card { border-radius: 12px; padding: 14px; border: 1px solid var(--border); background: var(--card-inner); }
+        .hm-card.VERDE { border-color: var(--green); background: rgba(16, 185, 129, 0.08); }
+        .hm-card.AMARELO { border-color: var(--yellow); background: rgba(245, 158, 11, 0.08); }
+        .hm-card.ROXO { border-color: var(--purple); background: rgba(168, 85, 247, 0.08); }
+        .hm-card.VERMELHO { border-color: var(--red); background: rgba(239, 68, 68, 0.08); }
+
+        .easy-card { background: #070d19; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.55; }
+        .easy-card b { color: var(--accent); }
+        .tag-pill { display: inline-block; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); color: #bae6fd; padding: 3px 8px; border-radius: 12px; font-size: 10px; margin: 2px; font-weight: 700; }
+        @media print { .no-print { display: none !important; } body { background: #fff; color: #000; } }
+    </style>
+</head>
+<body>
+
+<div class="header no-print">
+    <div class="title-group">
+        <div>
+            <h1>ExcelSilience SRT-RH — Cockpit de Governança & People Analytics</h1>
+            <p>Agregação Estrita N ≥ 5 • Indicadores Telemétricos & Fatores NR-01 / NR-17 (Zero Ato Médico)</p>
+        </div>
+        <span class="company-badge" id="companyBadgeLabel">EXCELSILIENCE</span>
+        <span class="env-badge sandbox">🧪 PASTA TESTE (N ≥ 1 • 24H)</span>
+    </div>
+
+    <div class="header-actions">
+        <div class="period-selector">
+            <button class="period-btn" id="pBtnDay" onclick="setPeriod(1)">Dia</button>
+            <button class="period-btn active" id="pBtnWeek" onclick="setPeriod(7)">7 Dias</button>
+            <button class="period-btn" id="pBtnMonth" onclick="setPeriod(30)">30 Dias</button>
+        </div>
+        <button class="btn btn-accent" onclick="refreshAll()">🔄 Atualizar Dados</button>
+    </div>
+</div>
+
+<div id="sandboxTopBanner" class="no-print" style="display:none; background:rgba(168,85,247,0.16); border:1px solid #a855f7; border-radius:12px; padding:12px 16px; margin-bottom:16px; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+    <div style="font-size:12px; color:#f3e8ff; line-height:1.45;">
+        <b>🧪 PASTA DE TESTE / HOMOLOGAÇÃO (N ≥ 1 • 24H):</b> Quórum liberado a partir de <b>N ≥ 1</b> em todas as visões e links apontando para a pasta de teste.
+    </div>
+    <button class="btn btn-purple" onclick="openAppInSandbox()">🚀 Abrir App Colaborador Sem Travas</button>
+</div>
+
+<!-- CARDS GERAIS -->
+<div class="cards-grid no-print">
+    <div class="card-metric"><div class="lbl">Check-ins no Período</div><div class="val" style="color:var(--accent);" id="mTotal">0</div><div class="subtext">Agregados no servidor</div></div>
+    <div class="card-metric"><div class="lbl">Setores com Quórum (N ≥ 5)</div><div class="val" style="color:var(--green);" id="mQuorumOk">0</div><div class="subtext">Blindagem LGPD ativa</div></div>
+    <div class="card-metric"><div class="lbl">Alerta Médio Setorial</div><div class="val" style="color:var(--yellow);" id="mAvgAlert">--</div><div class="subtext">% fora de equilíbrio</div></div>
+    <div class="card-metric"><div class="lbl">Planos 5W2H Pendentes/Vencidos</div><div class="val" style="color:var(--red);" id="mOverdue">0</div><div class="subtext">Cobrança semanal ativa</div></div>
+    <div class="card-metric"><div class="lbl">Relatos NR-05 Abertos</div><div class="val" style="color:var(--purple);" id="mOpenWhistle">0</div><div class="subtext">Base isolada Comitê</div></div>
+</div>
+
+<!-- NAVEGAÇÃO -->
+<div class="nav-tabs no-print">
+    <button class="tab-btn active" onclick="switchTab('visao-geral', this)">📊 People Analytics & Réguas</button>
+    <button class="tab-btn" onclick="switchTab('saude-ocupacional', this)">🛡️ Telemetria Preventiva & PCMSO</button>
+    <button class="tab-btn" onclick="switchTab('mapa-calor', this)">🔥 Mapa de Calor (Dia Anterior) & Tendência</button>
+    <button class="tab-btn" onclick="switchTab('matriz-contagio', this)">👑 Matriz Contágio C-Level (360°)</button>
+    <button class="tab-btn" onclick="switchTab('hub-easy', this)">🧠 Hub E.A.S.Y., 5W2H, Ouvidoria, ROI & Benefícios</button>
+    <button class="tab-btn" onclick="switchTab('laudos', this)">📄 Central de Relatórios & Compliance</button>
+    <button class="tab-btn" onclick="switchTab('gerenciador-setores', this)">⚙️ Setores, Horários, WhatsApp & Links</button>
+</div>
+
+<!-- ABA 1: PEOPLE ANALYTICS, DELTA 8H->17H, RÉGUAS SEMANAIS E UX PILOTO -->
+<div id="tab-visao-geral" class="tab-content active">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">Visão Setorial Agregada (Trava LGPD N ≥ 5 no Servidor)</div>
+                <div class="panel-subtitle">Métricas organizacionais e recomendações exclusivas para decisão do RH (colaborador não recebe sugestões no celular)</div>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Setor (GHE)</th>
+                    <th>Participações</th>
+                    <th>Latência Média</th>
+                    <th>VSI Válido</th>
+                    <th>% Alerta</th>
+                    <th>Descanso Pré-Semana (1-5)</th>
+                    <th>% Pede Melhoria</th>
+                    <th>Principais Motivos Marcados (12 opções)</th>
+                </tr>
+            </thead>
+            <tbody id="tblRhSectorsBody"></tbody>
+        </table>
+    </div>
+
+    <div class="grid-two">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Comparativo Entrada 8h vs. Saída 17h (Origem da Carga)</div>
+                    <div class="panel-subtitle">Separa carga pré-jornada de desgaste gerado durante o trabalho</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setor / Turno</th>
+                        <th>N (8h / 17h)</th>
+                        <th>Latência Δ</th>
+                        <th>Alerta 8h → 17h</th>
+                        <th>Classificação</th>
+                    </tr>
+                </thead>
+                <tbody id="tblDeltaBody"></tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Média das 4 Réguas Organizacionais (NR-1 / MTE)</div>
+                    <div class="panel-subtitle">Escala de 1 (crítico) a 5 (equilibrado) • Somente setores com N ≥ 5</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setor</th>
+                        <th>Demandas</th>
+                        <th>Autonomia</th>
+                        <th>Clareza</th>
+                        <th>Apoio Liderança</th>
+                    </tr>
+                </thead>
+                <tbody id="tblOrgRulersBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">🧪 Indicadores de Usabilidade e Confiança do Piloto (Agregado)</div>
+        </div>
+        <div id="pilotUxBox" style="font-size:12px; color:var(--muted);">Carregando métricas de experiência...</div>
+    </div>
+
+    <div class="panel" id="sandboxLogPanel" style="display:none; border-color:#a855f7;">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title" style="color:#e9d5ff;">🧪 Conferência Direta dos Testes em Sandbox (Exclusivo Modo Teste — N ≥ 1)</div>
+                <div class="panel-subtitle">Exibe exclusivamente registros de teste (<code>SANDBOX</code>) para validar imediatamente suas aferições, réguas e tags. Nunca exibe dados reais de Produção.</div>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data / Empresa</th>
+                    <th>Setor / Janela</th>
+                    <th>Latência / Erros</th>
+                    <th>Voz (VSI)</th>
+                    <th>Status</th>
+                    <th>Réguas (Descanso / NR-1)</th>
+                    <th>Melhoria &amp; Tags</th>
+                </tr>
+            </thead>
+            <tbody id="tblSandboxLogsBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ABA 2: INDICADORES TELEMÉTRICOS PREVENTIVOS + PCMSO (ZERO ATO MÉDICO) -->
+<div id="tab-saude-ocupacional" class="tab-content">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">Indicadores Telemétricos Preventivos & Cruzamento com PCMSO / AEP (N ≥ 5)</div>
+                <div class="panel-subtitle">Acompanhamento estritamente agregado por setor. Sem prontuário individual, sem diagnóstico médico e sem atos privativos da NR-07.</div>
+            </div>
+            <span class="badge b-purple">🛡️ Apenas Telemetria Agregada</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Setor / GHE</th>
+                    <th>Check-ins</th>
+                    <th>Estabilidade Vocal (VSI Válido)</th>
+                    <th>Carga Visuomotora (ms)</th>
+                    <th>Documentos SST Vinculados (PCMSO/AEP/PGR)</th>
+                    <th>Apoio Preventivo Sugerido ao RH</th>
+                </tr>
+            </thead>
+            <tbody id="tblPreventiveBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ABA 3: MAPA DE CALOR (MÉDIA DO DIA ANTERIOR) + TENDÊNCIA TEMPORAL -->
+<div id="tab-mapa-calor" class="tab-content">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">🔥 Mapa de Calor Setorial — Média Consolidada do Dia Anterior (N ≥ 5)</div>
+                <div class="panel-subtitle">Resumo fechado do expediente de ontem para ação imediata do RH na abertura de hoje</div>
+            </div>
+            <span style="font-size:11px; color:var(--accent); font-weight:800;">🟢 ≥ 4.2 | 🟡 3.0-4.1 | 🟣 2.0-2.9 | 🔴 &lt; 2.0</span>
+        </div>
+        <div class="heatmap-cards" id="heatmapYesterdayGrid"></div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">📈 Tendência Temporal Diária (Apenas Dias com N ≥ 5)</div>
+                <div class="panel-subtitle">Evolução da latência média de reação por dia consolidado</div>
+            </div>
+            <select class="select-box" style="width:auto;" id="selChartSector" onchange="loadTrendChart()">
+                <option value="ALL">Todos os Setores</option>
+            </select>
+        </div>
+        <div style="height:260px; position:relative;">
+            <canvas id="trendChartCanvas"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ABA 4: MATRIZ DE CONTÁGIO C-LEVEL (360° PROJETO ARISTÓTELES) -->
+<div id="tab-matriz-contagio" class="tab-content">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">👑 Matriz de Contágio C-Level & Auditoria 360° (Projeto Aristóteles)</div>
+                <div class="panel-subtitle">Cruza liderança (C, I, R), equipe anônima (N ≥ 5), pares, autoavaliação e desgaste 17h do setor gerenciado</div>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Líder / Cargo</th>
+                    <th>Setor Liderado</th>
+                    <th>ES-360° (C/I/R)</th>
+                    <th>Seg. Psicológica / Confiabilidade</th>
+                    <th>Alerta 17h da Área</th>
+                    <th>Detector de Contradições</th>
+                </tr>
+            </thead>
+            <tbody id="tblContagioBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ABA 5: HUB MOTOR E.A.S.Y., COBRANÇA SEMANAL, 5W2H, OUVIDORIA, ROI & BENEFÍCIOS -->
+<div id="tab-hub-easy" class="tab-content">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">🧠 Motor E.A.S.Y. com IA Viva (Gemini + Livro ExcelSilience Corporate OS)</div>
+                <div class="panel-subtitle">Cruza telemetria 8h→17h, dia anterior, réguas semanais, Ouvidoria NR-05 e PCMSO/AEP/PGR, cobrando ações da semana passada</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <select class="select-box" id="selEasyCadence" style="width:auto;">
+                    <option value="SEXTA">Fechamento Sexta-feira</option>
+                    <option value="SEGUNDA">Abertura Segunda-feira</option>
+                    <option value="SEMANAL">Consolidado Semanal</option>
+                    <option value="MENSAL">Fechamento Mensal</option>
+                    <option value="SOB_DEMANDA">Análise Sob Demanda</option>
+                </select>
+                <label style="font-size:11px; display:flex; align-items:center; gap:5px;">
+                    <input type="checkbox" id="chkAutoPlans" checked> Gerar rascunhos 5W2H
+                </label>
+                <button class="btn btn-purple" id="btnRunEasyGemini" onclick="runEasyGemini()">⚡ Rodar E.A.S.Y. (IA Gemini)</button>
+            </div>
+        </div>
+        <div id="easyAiOutputBox">
+            <div class="easy-card">Clique em <b>Rodar E.A.S.Y. (IA Gemini)</b> ou consulte as rodadas automáticas salvas abaixo.</div>
+        </div>
+        <div id="easyHistoryBox" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- COBRANÇA DA SEMANA PASSADA + CRIAR PLANO 5W2H -->
+    <div class="grid-two">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">⏰ Cobrança Semanal — Planos Pendentes / Vencidos</div>
+                    <div class="panel-subtitle">Auditados automaticamente toda sexta-feira no fechamento E.A.S.Y.</div>
+                </div>
+            </div>
+            <table>
+                <thead><tr><th>Setor</th><th>Ação 5W2H</th><th>Responsável</th><th>Vencimento</th><th>Status</th></tr></thead>
+                <tbody id="tblOverdueBody"></tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><div class="panel-title">📋 Criar Plano de Ação 5W2H Interno</div></div>
+            <div class="form-row">
+                <input class="input-box" id="planSector" placeholder="Setor / GHE">
+                <input class="input-box" id="planWho" placeholder="Gestor responsável">
+            </div>
+            <div class="form-row">
+                <input class="input-box" id="planWhat" placeholder="O que será feito (What)">
+                <input class="input-box" id="planWhy" placeholder="Causa-raiz (Why)">
+            </div>
+            <div class="form-row">
+                <input class="input-box" id="planHow" placeholder="Metodologia (How)">
+                <input class="input-box" id="planDue" type="date">
+            </div>
+            <button class="btn btn-green" onclick="createActionPlan5W2H()">➕ Salvar Plano 5W2H na Plataforma</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header"><div class="panel-title">📌 Planos 5W2H, Anuência / Contraproposta do Gestor & Yardstick (30 dias)</div></div>
+        <table>
+            <thead><tr><th>Setor</th><th>Ação & Contraproposta / Evidência</th><th>Responsável & Prazo</th><th>Anuência</th><th>Yardstick</th><th>Ações</th></tr></thead>
+            <tbody id="tblAllPlansBody"></tbody>
+        </table>
+    </div>
+
+    <!-- DOCUMENTOS SST + OUVIDORIA NR-05 COMPLETA -->
+    <div class="grid-two">
+        <div class="panel">
+            <div class="panel-header"><div class="panel-title">📎 Cadastrar Documento SST (PCMSO / AEP / PGR)</div></div>
+            <div class="form-row">
+                <select class="select-box" id="docType">
+                    <option value="PCMSO_ANALITICO_NR07">PCMSO Analítico (NR-07)</option>
+                    <option value="AEP_NR17">AEP (NR-17)</option>
+                    <option value="AET_NR17">AET (NR-17)</option>
+                    <option value="PGR_NR01">PGR (NR-01)</option>
+                </select>
+                <input class="input-box" id="docSector" placeholder="Setor ou GERAL">
+            </div>
+            <div class="form-row">
+                <input class="input-box" id="docTitle" placeholder="Título do documento">
+                <input class="input-box" id="docOwner" placeholder="Responsável Técnico (CRM/CREA/CRP)">
+            </div>
+            <textarea id="docSummary" rows="2" placeholder="Principais achados ou riscos para cruzar no Motor E.A.S.Y."></textarea>
+            <button class="btn btn-accent" style="margin-top:8px;" onclick="saveComplianceDoc()">💾 Salvar Documento no Hub</button>
+            <div id="docsListBox" style="margin-top:10px; font-size:11px;"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><div class="panel-title">🛡️ Ouvidoria / Canal de Denúncias NR-05 (Comitê de Ética)</div></div>
+            <div id="whistleSummaryBox" style="font-size:11px; margin-bottom:10px;"></div>
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <input class="input-box" type="password" id="inpCommitteePin" placeholder="PIN do Comitê de Ética (padrão inicial: EXCELSILIENCE2026)">
+                <button class="btn btn-purple" style="white-space:nowrap;" onclick="unlockCommitteeReports()">🔓 Abrir & Tratar Fila</button>
+            </div>
+            <div id="committeeQueueBox" style="font-size:11px;"></div>
+        </div>
+    </div>
+
+    <!-- ROI REAL (CADASTRO HISTÓRICO PASSADO VS ATUAL + DEFESAS TRABALHISTAS) -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">💰 ROI Real (Passado vs. Atual em R$ e % + Defesas Trabalhistas & Autuações)</div>
+            <span class="panel-subtitle">Sem multas hipotéticas: apenas economia operacional medida e defesas reais registradas</span>
+        </div>
+        <div id="roiSummaryBox" style="font-size:12px; margin-bottom:14px;"></div>
+        <div class="grid-two">
+            <div class="easy-card">
+                <b>📊 Lançar Histórico (Baseline Passado ou Fechamento Mensal):</b>
+                <div class="form-row" style="margin-top:8px;">
+                    <input class="input-box" id="roiSector" placeholder="Setor">
+                    <select class="select-box" id="roiType">
+                        <option value="BASELINE_PASSADO">BASELINE_PASSADO</option>
+                        <option value="FECHAMENTO_MENSAL">FECHAMENTO_MENSAL</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input class="input-box" id="roiMonth" type="date">
+                    <input class="input-box" id="roiHeadcount" type="number" placeholder="Headcount (ex: 40)">
+                    <input class="input-box" id="roiAbs" type="number" step="0.1" placeholder="Absenteísmo %">
+                </div>
+                <div class="form-row">
+                    <input class="input-box" id="roiDaysLost" type="number" placeholder="Dias perdidos">
+                    <input class="input-box" id="roiHourly" type="number" step="0.1" placeholder="Custo hora R$">
+                    <input class="input-box" id="roiInvest" type="number" step="0.1" placeholder="Investimento ações R$">
+                </div>
+                <button class="btn btn-green" onclick="saveRoiHistory()">💾 Salvar Histórico ROI</button>
+            </div>
+            <div class="easy-card">
+                <b>⚖️ Registrar Autuação / Ação Trabalhista Real:</b>
+                <div class="form-row" style="margin-top:8px;">
+                    <select class="select-box" id="legType">
+                        <option value="ACAO_TRABALHISTA_ESTRESSE">Ação Trabalhista (Estresse/Sobrecarga)</option>
+                        <option value="AUTUACAO_FISCALIZACAO">Autuação / Fiscalização MTE</option>
+                    </select>
+                    <input class="input-box" id="legRef" placeholder="Nº Processo / Auto">
+                </div>
+                <div class="form-row">
+                    <input class="input-box" id="legClaim" type="number" placeholder="Valor pedido/autuado R$">
+                    <input class="input-box" id="legSettled" type="number" placeholder="Valor pago/condenado R$">
+                    <select class="select-box" id="legStatus">
+                        <option value="GANHO_CONTABILIZADO">GANHO_CONTABILIZADO</option>
+                        <option value="ENCERRADO">ENCERRADO</option>
+                        <option value="EM_ANDAMENTO">EM_ANDAMENTO</option>
+                    </select>
+                </div>
+                <input class="input-box" id="legSummary" placeholder="Resumo da defesa / prova usada" style="margin-bottom:8px;">
+                <button class="btn btn-accent" onclick="saveLegalDefense()">💾 Registrar Defesa Real</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BENEFÍCIOS CORPORATIVOS (CADASTRO + ADOÇÃO ANÔNIMA N >= 5) -->
+    <div class="panel">
+        <div class="panel-header"><div class="panel-title">🎁 Benefícios Corporativos & Adoção Anônima (N ≥ 5)</div></div>
+        <div class="grid-two">
+            <div>
+                <div class="form-row">
+                    <input class="input-box" id="benName" placeholder="Nome do benefício (ex: Apoio Psicológico)">
+                    <input class="input-box" id="benProvider" placeholder="Parceiro / Provedor">
+                </div>
+                <div class="form-row">
+                    <select class="select-box" id="benCategory">
+                        <option value="SAUDE_MENTAL_EAP">SAUDE_MENTAL_EAP</option>
+                        <option value="SONO_RECUPERACAO">SONO_RECUPERACAO</option>
+                        <option value="ATIVIDADE_FISICA">ATIVIDADE_FISICA</option>
+                        <option value="TELEMEDICINA">TELEMEDICINA</option>
+                        <option value="NUTRICAO">NUTRICAO</option>
+                        <option value="FLEXIBILIDADE_PAUSAS">FLEXIBILIDADE_PAUSAS</option>
+                    </select>
+                    <input class="input-box" id="benUrl" placeholder="URL de acesso (opcional)">
+                </div>
+                <input class="input-box" id="benDesc" placeholder="Descrição breve para o colaborador" style="margin-bottom:8px;">
+                <button class="btn btn-green" onclick="saveCompanyBenefit()">➕ Cadastrar Benefício</button>
+            </div>
+            <div id="benefitsAdoptionBox" style="font-size:12px;">Carregando adoção...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ABA 6: CENTRAL DE RELATÓRIOS & COMPLIANCE (NR-01, NR-17 E APOIO AO PCMSO) -->
+<div id="tab-laudos" class="tab-content">
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-title">📄 Central de Relatórios de Apoio & Compliance Trabalhista</div>
+                <div class="panel-subtitle">Cruza dados da plataforma + Motor E.A.S.Y. Exige avaliação e assinatura de profissional habilitado, com log imutável de revisões.</div>
+            </div>
+        </div>
+        <div class="grid-two">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <select class="select-box" id="selReportSector" onchange="buildSupportReport(currentReportType)">
+                    <option value="GERAL">Escopo: Todos os Setores (GERAL)</option>
+                </select>
+                <button class="btn btn-green" onclick="buildSupportReport('RELATORIO_APOIO_NR01_PGR')">📄 Relatório de Apoio NR-01 (PGR — Fatores Organizacionais)</button>
+                <button class="btn btn-accent" onclick="buildSupportReport('RELATORIO_APOIO_NR17_AEP')">📋 Relatório de Apoio NR-17 (AEP — Carga Cognitiva)</button>
+                <button class="btn btn-purple" onclick="buildSupportReport('RELATORIO_APOIO_PCMSO_NR07')">🛡️ Subsídio Agregado ao PCMSO (NR-07 — Sem Ato Médico)</button>
+                <button class="btn" onclick="buildSupportReport('RELATORIO_EXECUTIVO_EASY')">📊 Relatório Executivo E.A.S.Y. (Decisão RH)</button>
+
+                <hr style="border-color:var(--border); margin:6px 0;">
+                <div class="panel-title" style="font-size:12px;">✍️ Validação Obrigatória de Profissional Regularizado</div>
+                <input class="input-box" id="profName" placeholder="Nome completo do profissional (CRM / CRP / CREA / SST)">
+                <div class="form-row">
+                    <input class="input-box" id="profCouncil" placeholder="Conselho (ex.: CRM-SP, CRP-06, CREA)">
+                    <input class="input-box" id="profReg" placeholder="Nº Registro">
+                </div>
+                <input class="input-box" id="profReason" placeholder="Motivo da criação / revisão (gravado no log imutável)">
+                <button class="btn btn-green" onclick="saveAndValidateReport()">✅ Registrar & Validar no Log Imutável</button>
+            </div>
+            <div>
+                <div class="report-preview-box" id="laudoPreviewText">Selecione um relatório à esquerda para cruzar os dados vivos do setor...</div>
+                <button class="btn btn-accent no-print" style="margin-top:10px; width:100%; justify-content:center;" onclick="printReportPdf()">🖨️ Imprimir / Salvar PDF Limpo</button>
+                <div id="revisionLogsBox" style="margin-top:10px; font-size:11px; color:var(--muted);"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ABA 7: GERADOR DE SETORES, HORÁRIOS, WHATSAPP DO CLIENTE & LINKS -->
+<div id="tab-gerenciador-setores" class="tab-content">
+    <div class="grid-two">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">⏰ Regras de Horário (Bloqueio no Servidor) & WhatsApp do Cliente</div>
+            </div>
+            <label style="font-size:11px; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                <input type="checkbox" id="cfgEnforceWindow" checked> Bloquear check-in fora dos horários em Produção
+            </label>
+            <div class="form-row">
+                <div><small style="color:var(--muted);">Janela Manhã Início</small><input class="input-box" type="time" id="cfgMornStart" value="07:30"></div>
+                <div><small style="color:var(--muted);">Janela Manhã Fim</small><input class="input-box" type="time" id="cfgMornEnd" value="09:30"></div>
+                <div><small style="color:var(--muted);">Janela Tarde Início</small><input class="input-box" type="time" id="cfgEveStart" value="16:30"></div>
+                <div><small style="color:var(--muted);">Janela Tarde Fim</small><input class="input-box" type="time" id="cfgEveEnd" value="18:30"></div>
+            </div>
+            <div class="form-row">
+                <div><small style="color:var(--muted);">Dia das Réguas Semanais</small>
+                    <select class="select-box" id="cfgWeeklyDow">
+                        <option value="5" selected>Sexta-feira</option>
+                        <option value="1">Segunda-feira</option>
+                    </select>
+                </div>
+                <div><small style="color:var(--muted);">Janela Semanal Início</small><input class="input-box" type="time" id="cfgWeekStart" value="16:30"></div>
+                <div><small style="color:var(--muted);">Janela Semanal Fim</small><input class="input-box" type="time" id="cfgWeekEnd" value="18:30"></div>
+            </div>
+
+            <hr style="border-color:var(--border); margin:12px 0;">
+            <label style="font-size:11px; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <input type="checkbox" id="cfgWaEnabled"> Ativar Disparo Automático pelo WhatsApp do Cliente
+            </label>
+            <div id="waSavedHint" style="font-size:11px; color:var(--muted); margin-bottom:8px;"></div>
+            <div class="form-row">
+                <select class="select-box" id="cfgWaProvider">
+                    <option value="NONE">Manual / QR Code</option>
+                    <option value="ZAPI">Z-API (WhatsApp do Cliente)</option>
+                    <option value="META_CLOUD">Meta Cloud API Oficial</option>
+                    <option value="TWILIO">Twilio WhatsApp</option>
+                </select>
+                <input class="input-box" id="cfgWaSender" placeholder="Número remetente (DDI+DDD+Num)">
+            </div>
+            <div class="form-row">
+                <input class="input-box" id="cfgWaUrl" placeholder="Endpoint / Instance URL da API do cliente">
+                <input class="input-box" type="password" id="cfgWaToken" placeholder="Token / Secret (preencha apenas para alterar)">
+            </div>
+            <small style="color:var(--muted);">Grupos / Destinos por Setor (JSON — link genérico do setor, nunca individual):</small>
+            <textarea id="cfgWaTargets" rows="3" style="margin-top:4px;">[{"sector":"TI","phone":"5511999999999"}]</textarea>
+            <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                <button class="btn btn-green" onclick="saveScheduleAndWhatsapp()">💾 Salvar Horários & WhatsApp</button>
+                <button class="btn btn-accent" onclick="triggerWhatsappNow('ENTRADA_8H')">📲 Testar Disparo 8h Agora</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><div class="panel-title">🏢 Setores & Links Genéricos (Produção vs. Sandbox)</div></div>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <input class="input-box" id="inpNovoSetor" placeholder="Novo setor (ex.: Operações, Vendas)">
+                <button class="btn btn-accent" onclick="cadastrarNovoSetor()">+ Adicionar</button>
+            </div>
+            <div id="link-generator-list" style="max-height:380px; overflow-y:auto;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentCompany = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
+    const envMode = 'SANDBOX';
+    let currentDays = 7;
+    let setoresCadastrados = ["TI", "Comercial / Vendas", "Financeiro", "Operações / Logística", "Recursos Humanos"];
+
+    let overviewCache = [];
+    let deltaCache = [];
+    let yesterdayCache = [];
+    let docsCache = [];
+    let overdueCache = [];
+    let currentReportType = 'RELATORIO_APOIO_NR01_PGR';
+    let trendChartInstance = null;
+
+    const TAG_LABELS = {
+        CHEFIA: 'Chefia', SALARIO: 'Salário', BENEFICIOS: 'Benefícios', CONFORTO: 'Conforto',
+        TEMPERATURA: 'Temperatura', COLEGAS: 'Colegas', VOLUME_METAS: 'Volume/Metas',
+        AUTONOMIA_PAUSAS: 'Autonomia/Pausas', CLAREZA_TAREFAS: 'Clareza',
+        RUIDO_ILUMINACAO_EQUIP: 'Ruído/Ilum./Equip.', COMUNICACAO_APOIO: 'Comunicação', OUTRO_OUVIDORIA: 'Outro (NR-05)'
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('companyBadgeLabel').innerText = currentCompany;
+        updateEnvBadge();
+        populateSectorSelectors();
+        renderLinksGenerator();
+        refreshAll();
+    });
+
+    function sbHeaders() {
+        return { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+    }
+
+    async function callRpc(fn, payload) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+            method: 'POST', headers: sbHeaders(), body: JSON.stringify(payload || {})
+        });
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+    }
+
+    function updateEnvBadge() {
+        const isSb = envMode === 'SANDBOX';
+
+        const topB = document.getElementById('sandboxTopBanner');
+        if (topB) topB.style.display = isSb ? 'flex' : 'none';
+        const sbPanel = document.getElementById('sandboxLogPanel');
+        if (sbPanel) sbPanel.style.display = isSb ? 'block' : 'none';
+    }
+
+    function openAppInSandbox() {
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-rh.html');
+        const comp = (currentCompany === 'TODAS' || currentCompany === 'ALL') ? 'EXCELSILIENCE' : currentCompany;
+        window.open(`${base}?company=${encodeURIComponent(comp.toLowerCase())}`, '_blank');
+    }
+
+    function toggleEnvironmentMode() {
+        envMode = envMode === 'PRODUCAO' ? 'SANDBOX' : 'PRODUCAO';
+        updateEnvBadge();
+        renderLinksGenerator();
+        refreshAll();
+    }
+
+    function setPeriod(days) {
+        currentDays = days;
+        document.getElementById('pBtnDay').classList.toggle('active', days === 1);
+        document.getElementById('pBtnWeek').classList.toggle('active', days === 7);
+        document.getElementById('pBtnMonth').classList.toggle('active', days === 30);
+        refreshAll();
+    }
+
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        document.getElementById('tab-' + tabId).classList.add('active');
+        if (tabId === 'mapa-calor') setTimeout(loadTrendChart, 80);
+    }
+
+    function populateSectorSelectors() {
+        const selC = document.getElementById('selChartSector');
+        const selR = document.getElementById('selReportSector');
+        selC.innerHTML = '<option value="ALL">Todos os Setores</option>';
+        selR.innerHTML = '<option value="GERAL">Escopo: Todos os Setores (GERAL)</option>';
+        setoresCadastrados.forEach(s => {
+            selC.innerHTML += `<option value="${s}">${s}</option>`;
+            selR.innerHTML += `<option value="${s}">${s}</option>`;
+        });
+    }
+
+    async function refreshAll() {
+        try {
+            const compFilter = (currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany)
+                ? '' : `company=eq.${encodeURIComponent(currentCompany)}&`;
+            const [ov, dl, ym, ovd, wSum, docsRes, plansRes, easyRes, roiRes, schedRes, audit360, logsRes, uxRes, benAdRes, sbLogsRes] = await Promise.allSettled([
+                callRpc('get_rh_sector_overview_v51', { p_company: currentCompany, p_days: currentDays, p_env: envMode }),
+                callRpc('get_rh_delta_8h_17h_v51', { p_company: currentCompany, p_days: currentDays, p_env: envMode }),
+                callRpc('get_rh_heatmap_yesterday', { p_company: currentCompany, p_env: envMode }),
+                callRpc('get_overdue_action_plans', { p_company: currentCompany }),
+                callRpc('get_whistleblower_sector_summary', { p_company: currentCompany }),
+                fetch(`${SUPABASE_URL}/rest/v1/rh_compliance_documents?${compFilter}order=created_at.desc`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
+                fetch(`${SUPABASE_URL}/rest/v1/easy_action_plans?${compFilter}order=created_at.desc`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
+                fetch(`${SUPABASE_URL}/rest/v1/easy_ai_analyses?${compFilter}order=created_at.desc&limit=5`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
+                fetch(`${SUPABASE_URL}/rest/v1/vw_rh_company_roi_summary?${compFilter}`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
+                callRpc('get_company_schedule_public', { p_company: currentCompany }),
+                callRpc('get_es_crisis_360_audit', { p_company: currentCompany, p_env: envMode }),
+                fetch(`${SUPABASE_URL}/rest/v1/rh_report_revision_logs?${compFilter}order=created_at.desc&limit=10`, { headers: sbHeaders() }).then(r => r.ok ? r.json() : []),
+                callRpc('get_rh_pilot_ux_summary', { p_company: currentCompany, p_days: currentDays }),
+                callRpc('get_rh_benefits_adoption', { p_company: currentCompany, p_days: currentDays, p_env: envMode }),
+                envMode === 'SANDBOX' ? callRpc('get_rh_sandbox_checkins', { p_company: currentCompany, p_limit: 30 }) : Promise.resolve([])
+            ]);
+
+            overviewCache = ov.status === 'fulfilled' && Array.isArray(ov.value) ? ov.value : [];
+            deltaCache = dl.status === 'fulfilled' && Array.isArray(dl.value) ? dl.value : [];
+            yesterdayCache = ym.status === 'fulfilled' && Array.isArray(ym.value) ? ym.value : [];
+            overdueCache = ovd.status === 'fulfilled' && Array.isArray(ovd.value) ? ovd.value : [];
+            docsCache = docsRes.status === 'fulfilled' && Array.isArray(docsRes.value) ? docsRes.value : [];
+
+            const wList = wSum.status === 'fulfilled' && Array.isArray(wSum.value) ? wSum.value : [];
+            const plans = plansRes.status === 'fulfilled' && Array.isArray(plansRes.value) ? plansRes.value : [];
+            const easyHist = easyRes.status === 'fulfilled' && Array.isArray(easyRes.value) ? easyRes.value : [];
+            const roiList = roiRes.status === 'fulfilled' && Array.isArray(roiRes.value) ? roiRes.value : [];
+            const schedRows = schedRes.status === 'fulfilled' && Array.isArray(schedRes.value) ? schedRes.value : [];
+            const list360 = audit360.status === 'fulfilled' && Array.isArray(audit360.value) ? audit360.value : [];
+            const revLogs = logsRes.status === 'fulfilled' && Array.isArray(logsRes.value) ? logsRes.value : [];
+            const uxRows = uxRes.status === 'fulfilled' && Array.isArray(uxRes.value) ? uxRes.value : [];
+            const benAd = benAdRes.status === 'fulfilled' && Array.isArray(benAdRes.value) ? benAdRes.value : [];
+
+            renderHeaderMetrics(overviewCache, overdueCache, wList);
+            renderOverviewTables(overviewCache, deltaCache);
+            const sbLogs = sbLogsRes.status === 'fulfilled' && Array.isArray(sbLogsRes.value) ? sbLogsRes.value : [];
+            renderSandboxLogs(sbLogs);
+            renderPilotUx(uxRows[0]);
+            renderPreventiveTelemetry(overviewCache, docsCache);
+            renderYesterdayHeatmap(yesterdayCache);
+            render360Matrix(list360);
+            renderEasyHistory(easyHist);
+            renderOverduePlans(overdueCache);
+            renderAllPlans(plans);
+            renderDocsList(docsCache);
+            renderWhistleSummary(wList);
+            renderRoi(roiList);
+            renderBenefitsAdoption(benAd);
+            populateScheduleForm(schedRows[0]);
+            renderRevisionLogs(revLogs);
+            buildSupportReport(currentReportType);
+            loadTrendChart();
+        } catch (err) {
+            console.warn('Erro ao atualizar painel:', err);
+        }
+    }
+
+    function renderHeaderMetrics(ov, overdue, wList) {
+        const total = ov.reduce((a, r) => a + Number(r.total_checkins || 0), 0);
+        const quorumOk = ov.filter(r => r.quorum_lgpd_ok).length;
+        const validOv = ov.filter(r => r.quorum_lgpd_ok && r.pct_alerta_total != null);
+        const avgAlert = validOv.length ? (validOv.reduce((a, r) => a + Number(r.pct_alerta_total), 0) / validOv.length).toFixed(1) + '%' : '--';
+        const openWhistle = wList.reduce((a, r) => a + Number(r.open_reports || 0), 0);
+
+        document.getElementById('mTotal').innerText = total;
+        document.getElementById('mQuorumOk').innerText = quorumOk;
+        document.getElementById('mAvgAlert').innerText = avgAlert;
+        document.getElementById('mOverdue').innerText = overdue.length;
+        document.getElementById('mOpenWhistle').innerText = openWhistle;
+    }
+
+
+    function renderSandboxLogs(rows) {
+        const tb = document.getElementById('tblSandboxLogsBody');
+        if (!tb) return;
+        tb.innerHTML = '';
+        if (!rows.length) {
+            tb.innerHTML = '<tr><td colspan="7" style="color:var(--muted); text-align:center;">Nenhum teste gravado em SANDBOX ainda. Clique em "Abrir App Colaborador Sem Travas" acima para testar.</td></tr>';
+            return;
+        }
+        rows.forEach(r => {
+            const tags = Array.isArray(r.improvement_tags) && r.improvement_tags.length
+                ? r.improvement_tags.map(t => `<span class="tag-pill">${TAG_LABELS[t] || t}</span>`).join('')
+                : '—';
+            const rulers = r.org_demands_score != null
+                ? `Desc:${r.pre_week_rest_score ?? '-'} | D:${r.org_demands_score} A:${r.org_autonomy_score} C:${r.org_clarity_score} S:${r.org_support_score}`
+                : 'Sem pulso semanal';
+            tb.innerHTML += `<tr>
+                <td>${r.checkin_date}<br><small style="color:var(--muted);">${r.company}</small></td>
+                <td><b>${r.sector}</b><br><small>${r.shift_window} (${r.shift_name})</small></td>
+                <td>${r.reaction_time_ms ?? '--'} ms<br><small>Veto:${r.veto_errors ?? 0} | Omissões:${r.green_lapses ?? 0}</small></td>
+                <td>${r.audio_quality_ok ? ('VSI ' + r.vsi_score) : 'Áudio pulado/N/A'}</td>
+                <td><span class="badge ${r.status === 'GREEN' ? 'b-green' : (r.status === 'RED' ? 'b-red' : 'b-yellow')}">${r.status}</span></td>
+                <td><small>${rulers}</small></td>
+                <td>${r.can_improve_workplace === true ? 'Sim: ' : (r.can_improve_workplace === false ? 'Não ' : '')}${tags}</td>
+            </tr>`;
+        });
+    }
+
+    function renderPilotUx(u) {
+        const box = document.getElementById('pilotUxBox');
+        if (!u || !Number(u.total_respostas)) {
+            box.innerText = 'Nenhuma avaliação de experiência registrada no período.';
+            return;
+        }
+        box.innerHTML = `<b>Avaliações:</b> ${u.total_respostas} • <b>Tempo médio real:</b> ${u.avg_duration_sec ?? '--'}s • <b>Falhas de áudio:</b> ${u.pct_audio_failed ?? 0}% • <b>Clareza (1-5):</b> ${u.avg_clarity_rating ?? '--'} • <b>Confiança no anonimato (1-5):</b> ${u.avg_trust_rating ?? '--'}`;
+    }
+
+    function renderOverviewTables(ov, dl) {
+        const tb = document.getElementById('tblRhSectorsBody');
+        const tbOrg = document.getElementById('tblOrgRulersBody');
+        tb.innerHTML = '';
+        tbOrg.innerHTML = '';
+
+        if (!ov.length) {
+            tb.innerHTML = `<tr><td colspan="8" style="color:var(--muted); text-align:center;">Nenhum check-in encontrado no ambiente ${envMode}.</td></tr>`;
+            tbOrg.innerHTML = `<tr><td colspan="5" style="color:var(--muted); text-align:center;">Aguardando quórum N ≥ 5.</td></tr>`;
+        } else {
+            ov.forEach(r => {
+                if (!r.quorum_lgpd_ok) {
+                    tb.innerHTML += `<tr><td><b>${r.sector}</b></td><td>${r.total_checkins}</td><td colspan="6"><span class="badge b-lock">🔒 Coleta em andamento (N &lt; 5)</span></td></tr>`;
+                    return;
+                }
+                const tagsMap = r.improvement_tags_counts || {};
+                const tagsHtml = Object.keys(tagsMap).length
+                    ? Object.entries(tagsMap).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, v]) => `<span class="tag-pill">${TAG_LABELS[k] || k}: ${v}</span>`).join('')
+                    : '<span style="color:var(--muted);">Sem marcações</span>';
+
+                tb.innerHTML += `<tr>
+                    <td><b>${r.sector}</b></td>
+                    <td><span class="badge b-green">${r.total_checkins}</span></td>
+                    <td>${r.avg_latency_ms ?? '--'} ms</td>
+                    <td>${r.avg_vsi_valid ?? '--'}</td>
+                    <td><b>${r.pct_alerta_total ?? 0}%</b></td>
+                    <td>${r.avg_pre_week_rest ?? '--'} / 5</td>
+                    <td>${r.pct_can_improve != null ? r.pct_can_improve + '%' : '--'}</td>
+                    <td>${tagsHtml}</td>
+                </tr>`;
+
+                tbOrg.innerHTML += `<tr>
+                    <td><b>${r.sector}</b></td>
+                    <td>${r.avg_org_demands ?? '--'}</td>
+                    <td>${r.avg_org_autonomy ?? '--'}</td>
+                    <td>${r.avg_org_clarity ?? '--'}</td>
+                    <td>${r.avg_org_support ?? '--'}</td>
+                </tr>`;
+            });
+        }
+
+        const tbDl = document.getElementById('tblDeltaBody');
+        tbDl.innerHTML = '';
+        if (!dl.length) {
+            tbDl.innerHTML = `<tr><td colspan="5" style="color:var(--muted); text-align:center;">Aguardando pares 8h / 17h.</td></tr>`;
+        } else {
+            dl.forEach(d => {
+                tbDl.innerHTML += `<tr>
+                    <td><b>${d.sector}</b> (${d.shift_name})</td>
+                    <td>${d.n_8h} / ${d.n_17h}</td>
+                    <td>${d.quorum_lgpd_ok ? (d.delta_latency_ms + ' ms') : '🔒 N < 5'}</td>
+                    <td>${d.quorum_lgpd_ok ? (d.pct_alerta_8h + '% → ' + d.pct_alerta_17h + '%') : '—'}</td>
+                    <td><span class="badge ${d.classificacao_origem_carga === 'DESGASTE_GERADO_NO_TRABALHO' ? 'b-red' : 'b-green'}">${d.classificacao_origem_carga}</span></td>
+                </tr>`;
+            });
+        }
+    }
+
+    function renderPreventiveTelemetry(ov, docs) {
+        const tb = document.getElementById('tblPreventiveBody');
+        tb.innerHTML = '';
+        if (!ov.length) {
+            tb.innerHTML = `<tr><td colspan="6" style="color:var(--muted); text-align:center;">Sem registros agregados.</td></tr>`;
+            return;
+        }
+        ov.forEach(r => {
+            if (!r.quorum_lgpd_ok) {
+                tb.innerHTML += `<tr><td><b>${r.sector}</b></td><td>${r.total_checkins}</td><td colspan="4"><span class="badge b-lock">🔒 Protegido até atingir N ≥ 5</span></td></tr>`;
+                return;
+            }
+            const relDocs = docs.filter(d => d.target_sector.toUpperCase() === r.sector.toUpperCase() || d.target_sector === 'GERAL');
+            const docsStr = relDocs.length ? relDocs.map(d => d.doc_type).join(', ') : 'Nenhum cadastrado';
+            const apoio = Number(r.pct_alerta_total || 0) >= 30
+                ? 'Revisar carga/metas do setor e acionar SESMT/NR-17 para avaliação organizacional.'
+                : 'Manter monitoramento telemétrico e revisão mensal.';
+
+            tb.innerHTML += `<tr>
+                <td><b>${r.sector}</b></td>
+                <td>${r.total_checkins}</td>
+                <td>${r.avg_vsi_valid ?? 'Sem áudio válido'}</td>
+                <td>${r.avg_latency_ms ?? '--'} ms</td>
+                <td>${docsStr}</td>
+                <td>${apoio}</td>
+            </tr>`;
+        });
+    }
+
+    function renderYesterdayHeatmap(ym) {
+        const grid = document.getElementById('heatmapYesterdayGrid');
+        grid.innerHTML = '';
+        if (!ym.length) {
+            grid.innerHTML = `<div class="hm-card">Sem dados do dia anterior no ambiente ${envMode}.</div>`;
+            return;
+        }
+        ym.forEach(y => {
+            if (!y.quorum_lgpd_ok) {
+                grid.innerHTML += `<div class="hm-card"><b>${y.sector}</b><br><small>Ontem (${y.yesterday_date}): ${y.yesterday_n} envios</small><br><span class="badge b-lock" style="margin-top:6px;">🔒 N &lt; 5</span></div>`;
+                return;
+            }
+            grid.innerHTML += `<div class="hm-card ${y.yesterday_band}">
+                <div style="font-weight:800; font-size:13px;">${y.sector}</div>
+                <div style="font-size:11px; color:var(--muted); margin:4px 0;">Ontem (${y.yesterday_date}) • N=${y.yesterday_n}</div>
+                <div style="font-size:20px; font-weight:800;">${y.yesterday_score_1_5} / 5.0</div>
+                <div style="font-size:11px;">Latência: ${y.yesterday_avg_latency_ms} ms • Alertas: ${y.yesterday_pct_alerta}%</div>
+            </div>`;
+        });
+    }
+
+    async function loadTrendChart() {
+        const sec = document.getElementById('selChartSector').value || 'ALL';
+        let rows = [];
+        try {
+            rows = await callRpc('get_rh_daily_trend_v51', { p_company: currentCompany, p_sector: sec, p_days: currentDays, p_env: envMode });
+        } catch (e) {}
+
+        const ctx = document.getElementById('trendChartCanvas').getContext('2d');
+        if (trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: rows.length ? rows.map(r => r.checkin_date) : ['Aguardando dias com N ≥ 5'],
+                datasets: [{
+                    label: 'Latência Média (ms)',
+                    data: rows.length ? rows.map(r => r.avg_latency_ms) : [0],
+                    borderColor: '#38bdf8',
+                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                    fill: true, tension: 0.3
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    function render360Matrix(list) {
+        const tb = document.getElementById('tblContagioBody');
+        tb.innerHTML = '';
+        if (!list.length) {
+            tb.innerHTML = `<tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhum ciclo 360° registrado ainda.</td></tr>`;
+            return;
+        }
+        list.forEach(c => {
+            const alerts = (c.detector_contradicoes || []).join(', ') || 'Sem contradições';
+            tb.innerHTML += `<tr>
+                <td><b>${c.leader_name}</b><br><small style="color:var(--muted);">${c.leader_role}</small></td>
+                <td>${c.managed_sector}</td>
+                <td><b>${c.es_360_score ?? '--'}</b> (C:${c.c_360 ?? '-'} I:${c.i_360 ?? '-'} R:${c.r_360 ?? '-'})</td>
+                <td>Seg.Psic: ${c.media_psych_safety ?? 'N<5'} | Conf.: ${c.media_reliability ?? 'N<5'}</td>
+                <td>${c.area_pct_alerta_17h != null ? c.area_pct_alerta_17h + '%' : '--'}</td>
+                <td>${alerts}</td>
+            </tr>`;
+        });
+    }
+
+    async function runEasyGemini() {
+        const btn = document.getElementById('btnRunEasyGemini');
+        const out = document.getElementById('easyAiOutputBox');
+        const cadence = document.getElementById('selEasyCadence').value;
+        const autoPlans = document.getElementById('chkAutoPlans').checked;
+        btn.disabled = true;
+        btn.innerText = '⏳ Gemini cruzando dados + livro...';
+        out.innerHTML = `<div class="easy-card">⏳ Executando Motor E.A.S.Y. (${cadence}) no Supabase...</div>`;
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/easy-gemini-engine`, {
+                method: 'POST', headers: sbHeaders(),
+                body: JSON.stringify({
+                    company: currentCompany,
+                    cadence_type: cadence,
+                    analysis_scope: 'SRT_RH_SETOR',
+                    environment_mode: envMode,
+                    days: cadence === 'MENSAL' ? 30 : 7,
+                    auto_create_plans: autoPlans
+                })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || 'Falha na Edge Function easy-gemini-engine');
+
+            const a = data.analysis;
+            const cobrancas = (data.overdue_followup_alerts || []).map(o => `<li><b>${o.sector}</b> (${o.who_manager_name}, ${o.days_overdue}d atraso): ${o.cobranca || o.what_action}</li>`).join('');
+            out.innerHTML = `
+                <div class="easy-card"><b>E — Examine (${a.cadence_type}):</b> ${a.easy_e_examination}</div>
+                <div class="easy-card"><b>A — Adapt + Cobrança Semana Passada:</b> ${a.easy_a_adaptation}${cobrancas ? '<ul style="margin-top:6px;padding-left:18px;">' + cobrancas + '</ul>' : ''}</div>
+                <div class="easy-card"><b>S — Systematize:</b> ${a.easy_s_systematization}</div>
+                <div class="easy-card"><b>Y — Yardstick:</b> ${a.easy_y_yardstick}</div>
+                <div class="easy-card">✅ Rascunhos 5W2H gerados na plataforma: <b>${data.created_plans_count || 0}</b></div>
+            `;
+            refreshAll();
+        } catch (err) {
+            out.innerHTML = `<div class="easy-card" style="border-color:var(--yellow);">⚠️ <b>Edge Function <code>easy-gemini-engine</code>:</b> ${err.message}</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerText = '⚡ Rodar E.A.S.Y. (IA Gemini)';
+        }
+    }
+
+    function renderEasyHistory(list) {
+        const box = document.getElementById('easyHistoryBox');
+        if (!list.length) { box.innerHTML = ''; return; }
+        box.innerHTML = '<div style="font-size:11px; color:var(--muted); margin-bottom:6px;">Últimas rodadas arquivadas (Segunda / Sexta / Semanal / Mensal):</div>' +
+            list.map(a => `<div class="easy-card"><b>[${a.cadence_type}] ${new Date(a.created_at).toLocaleString('pt-BR')}</b><br><b>E:</b> ${a.easy_e_examination}<br><b>A:</b> ${a.easy_a_adaptation}</div>`).join('');
+    }
+
+    function renderOverduePlans(list) {
+        const tb = document.getElementById('tblOverdueBody');
+        tb.innerHTML = '';
+        if (!list.length) {
+            tb.innerHTML = `<tr><td colspan="5" style="color:var(--green); text-align:center;">✅ Nenhum plano atrasado da semana passada.</td></tr>`;
+            return;
+        }
+        list.forEach(p => {
+            tb.innerHTML += `<tr>
+                <td><b>${p.target_sector}</b></td>
+                <td>${p.what_action}</td>
+                <td>${p.who_manager_name}</td>
+                <td>${p.when_due_date} (${p.days_overdue}d)</td>
+                <td><span class="badge b-red">${p.yardstick_status}</span></td>
+            </tr>`;
+        });
+    }
+
+    async function createActionPlan5W2H() {
+        const payload = {
+            company: currentCompany,
+            target_sector: document.getElementById('planSector').value.trim() || 'Geral',
+            origin_source: 'MOTOR_EASY_IA',
+            what_action: document.getElementById('planWhat').value.trim(),
+            why_root_cause: document.getElementById('planWhy').value.trim() || 'Fatores organizacionais NR-01 / Telemetria',
+            where_ghe: document.getElementById('planSector').value.trim() || 'Geral',
+            who_manager_name: document.getElementById('planWho').value.trim() || 'Gestor da Área',
+            how_methodology: document.getElementById('planHow').value.trim() || 'Execução interna acompanhada pelo RH',
+            when_due_date: document.getElementById('planDue').value || undefined
+        };
+        if (!payload.what_action) { alert('Descreva o campo "O que será feito".'); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/easy_action_plans`, { method: 'POST', headers: sbHeaders(), body: JSON.stringify(payload) });
+        document.getElementById('planWhat').value = '';
+        refreshAll();
+    }
+
+    function renderAllPlans(plans) {
+        const tb = document.getElementById('tblAllPlansBody');
+        tb.innerHTML = '';
+        if (!plans.length) {
+            tb.innerHTML = `<tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhum plano 5W2H cadastrado ainda.</td></tr>`;
+            return;
+        }
+        plans.forEach(p => {
+            tb.innerHTML += `<tr>
+                <td><b>${p.target_sector}</b></td>
+                <td>
+                    ${p.what_action}
+                    ${p.manager_counterproposal ? `<br><small style="color:var(--yellow);">Contraproposta: ${p.manager_counterproposal}</small>` : ''}
+                    ${p.evidence_note ? `<br><small style="color:var(--green);">Evidência: ${p.evidence_note}</small>` : ''}
+                </td>
+                <td>${p.who_manager_name}<br><small>${p.when_due_date}</small></td>
+                <td><span class="badge ${p.consent_status === 'ACEITO_COM_ANUENCIA' ? 'b-green' : 'b-yellow'}">${p.consent_status}</span></td>
+                <td><span class="badge b-purple">${p.yardstick_status}</span></td>
+                <td>
+                    <button class="btn btn-green" style="padding:4px 8px; font-size:10px;" onclick="registerPlanConsent('${p.id}')">Anuência/Evidência</button>
+                    <button class="btn btn-accent" style="padding:4px 8px; font-size:10px;" onclick="validatePlan30d('${p.id}')">Validar 30d</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    async function registerPlanConsent(id) {
+        const sig = prompt('Nome/assinatura do gestor que assume a anuência:') || '';
+        const counter = prompt('Contraproposta ou ajuste do gestor (deixe vazio se aceito integralmente):') || null;
+        const ev = prompt('Nota de evidência já executada (opcional):') || null;
+        await fetch(`${SUPABASE_URL}/rest/v1/easy_action_plans?id=eq.${id}`, {
+            method: 'PATCH', headers: sbHeaders(),
+            body: JSON.stringify({
+                consent_status: counter ? 'EM_AJUSTE_GESTOR' : 'ACEITO_COM_ANUENCIA',
+                manager_consent_signature: sig || undefined,
+                manager_counterproposal: counter,
+                evidence_note: ev,
+                yardstick_status: 'EM_EXECUCAO',
+                consented_at: new Date().toISOString()
+            })
+        });
+        refreshAll();
+    }
+
+    async function validatePlan30d(id) {
+        const eff = confirm('A telemetria do setor melhorou após 30 dias? OK = Eficácia Validada | Cancelar = Reabrir por Ineficácia');
+        await fetch(`${SUPABASE_URL}/rest/v1/easy_action_plans?id=eq.${id}`, {
+            method: 'PATCH', headers: sbHeaders(),
+            body: JSON.stringify({ yardstick_status: eff ? 'EFICACIA_VALIDADA' : 'REABERTO_POR_INEFICACIA' })
+        });
+        refreshAll();
+    }
+
+    async function saveComplianceDoc() {
+        const title = document.getElementById('docTitle').value.trim();
+        if (!title) { alert('Informe o título do documento.'); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/rh_compliance_documents`, {
+            method: 'POST', headers: sbHeaders(),
+            body: JSON.stringify({
+                company: currentCompany,
+                doc_type: document.getElementById('docType').value,
+                target_sector: document.getElementById('docSector').value.trim() || 'GERAL',
+                title,
+                technical_owner_name: document.getElementById('docOwner').value.trim(),
+                raw_summary: document.getElementById('docSummary').value.trim()
+            })
+        });
+        document.getElementById('docTitle').value = '';
+        refreshAll();
+    }
+
+    function renderDocsList(docs) {
+        const box = document.getElementById('docsListBox');
+        box.innerHTML = docs.map(d => `<div style="padding:6px; border-bottom:1px solid var(--border);"><b>[${d.doc_type}]</b> ${d.title} — Setor: ${d.target_sector} (${d.technical_owner_name || 'Sem RT'})</div>`).join('') || 'Nenhum documento cadastrado.';
+    }
+
+    function renderWhistleSummary(list) {
+        const box = document.getElementById('whistleSummaryBox');
+        box.innerHTML = list.map(w => `<div>• <b>${w.target_sector}</b> [${w.category}]: ${w.open_reports} abertos / ${w.closed_reports} concluídos</div>`).join('') || 'Nenhum relato na Ouvidoria NR-05.';
+    }
+
+    async function unlockCommitteeReports() {
+        const pin = document.getElementById('inpCommitteePin').value;
+        const box = document.getElementById('committeeQueueBox');
+        try {
+            const rows = await callRpc('committee_list_whistleblower_reports', { p_company: currentCompany, p_pin: pin });
+            if (!rows.length) { box.innerHTML = 'Sem relatos pendentes.'; return; }
+            box.innerHTML = rows.map(r => `
+                <div class="easy-card">
+                    <b>${r.protocol_code}</b> • ${r.target_sector} • ${r.category} [${r.status}]<br>
+                    <div style="margin:6px 0; color:#cbd5e1;">${r.description}</div>
+                    <div class="form-row">
+                        <select class="select-box" id="wst-${r.id}">
+                            <option value="EM_APURACAO" ${r.status === 'EM_APURACAO' ? 'selected' : ''}>EM_APURACAO</option>
+                            <option value="MEDIDA_APLICADA" ${r.status === 'MEDIDA_APLICADA' ? 'selected' : ''}>MEDIDA_APLICADA</option>
+                            <option value="ENCERRADA" ${r.status === 'ENCERRADA' ? 'selected' : ''}>ENCERRADA</option>
+                        </select>
+                        <input class="input-box" id="wrep-${r.id}" value="${r.committee_public_reply || ''}" placeholder="Parecer público ao protocolo">
+                        <input class="input-box" id="wres-${r.id}" value="${r.resolution_action || ''}" placeholder="Medida aplicada">
+                    </div>
+                    <button class="btn btn-green" onclick="updateWhistleReport('${r.id}')">💾 Salvar Tratativa Comitê</button>
+                </div>
+            `).join('');
+        } catch (e) {
+            box.innerHTML = `<span style="color:var(--red);">PIN inválido do Comitê de Ética.</span>`;
+        }
+    }
+
+    async function updateWhistleReport(reportId) {
+        const pin = document.getElementById('inpCommitteePin').value;
+        await callRpc('committee_update_whistleblower_report', {
+            p_company: currentCompany,
+            p_pin: pin,
+            p_report_id: reportId,
+            p_new_status: document.getElementById(`wst-${reportId}`).value,
+            p_public_reply: document.getElementById(`wrep-${reportId}`).value.trim() || null,
+            p_resolution_action: document.getElementById(`wres-${reportId}`).value.trim() || null
+        });
+        alert('Tratativa salva no protocolo sigiloso!');
+        unlockCommitteeReports();
+        refreshAll();
+    }
+
+    function renderRoi(list) {
+        const box = document.getElementById('roiSummaryBox');
+        if (!list.length) {
+            box.innerHTML = 'Cadastre abaixo um Baseline (Passado) e um Fechamento Mensal ou Defesas Trabalhistas reais para calcular a economia em R$ e %.';
+            return;
+        }
+        const r = list[0];
+        box.innerHTML = `<b>Economia Operacional:</b> R$ ${r.economia_acoes_operacionais_brl} (${r.reducao_custo_operacional_pct ?? 0}%) | <b>Economia Autuações/Ações Reais:</b> R$ ${Number(r.ganho_real_autuacoes_brl) + Number(r.ganho_real_acoes_trabalhistas_brl)} | <b>Total:</b> R$ ${r.economia_total_empresa_brl} (ROI ${r.roi_consolidado_pct ?? '--'}%)`;
+    }
+
+    async function saveRoiHistory() {
+        const sec = document.getElementById('roiSector').value.trim() || 'Geral';
+        const dt = document.getElementById('roiMonth').value || new Date().toISOString().slice(0, 10);
+        await fetch(`${SUPABASE_URL}/rest/v1/rh_sector_impact_history`, {
+            method: 'POST', headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates' },
+            body: JSON.stringify({
+                company: currentCompany,
+                sector: sec,
+                record_type: document.getElementById('roiType').value,
+                reference_month: dt,
+                headcount: Number(document.getElementById('roiHeadcount').value || 10),
+                absenteeism_rate_pct: Number(document.getElementById('roiAbs').value || 0),
+                lost_workdays: Number(document.getElementById('roiDaysLost').value || 0),
+                avg_hourly_cost_brl: Number(document.getElementById('roiHourly').value || 0),
+                actions_investment_brl: Number(document.getElementById('roiInvest').value || 0)
+            })
+        });
+        alert('Histórico de impacto salvo!');
+        refreshAll();
+    }
+
+    async function saveLegalDefense() {
+        const ref = document.getElementById('legRef').value.trim();
+        if (!ref) { alert('Informe o Nº do Processo ou Auto.'); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/rh_legal_defense_gains`, {
+            method: 'POST', headers: sbHeaders(),
+            body: JSON.stringify({
+                company: currentCompany,
+                sector: 'GERAL',
+                event_type: document.getElementById('legType').value,
+                case_reference: ref,
+                claim_summary: document.getElementById('legSummary').value.trim() || 'Defesa com registros rastreáveis',
+                claimed_amount_brl: Number(document.getElementById('legClaim').value || 0),
+                settled_amount_brl: Number(document.getElementById('legSettled').value || 0),
+                status: document.getElementById('legStatus').value
+            })
+        });
+        alert('Defesa real registrada!');
+        refreshAll();
+    }
+
+    async function saveCompanyBenefit() {
+        const name = document.getElementById('benName').value.trim();
+        if (!name) { alert('Informe o nome do benefício.'); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/company_benefits`, {
+            method: 'POST', headers: sbHeaders(),
+            body: JSON.stringify({
+                company: currentCompany,
+                benefit_name: name,
+                provider_name: document.getElementById('benProvider').value.trim(),
+                category: document.getElementById('benCategory').value,
+                access_url: document.getElementById('benUrl').value.trim() || '#beneficio',
+                description: document.getElementById('benDesc').value.trim() || 'Programa corporativo de apoio.'
+            })
+        });
+        document.getElementById('benName').value = '';
+        refreshAll();
+    }
+
+    function renderBenefitsAdoption(rows) {
+        const box = document.getElementById('benefitsAdoptionBox');
+        if (!rows.length) { box.innerText = 'Nenhum benefício ativo para esta unidade.'; return; }
+        box.innerHTML = '<b>Adoção Anônima por Setor (N ≥ 5):</b>' + rows.map(b =>
+            `<div style="padding:5px 0; border-bottom:1px solid var(--border);">• <b>${b.benefit_name}</b> (${b.sector}): ${b.quorum_lgpd_ok ? b.total_acessos_anonimos + ' acessos' : '🔒 N < 5'}</div>`
+        ).join('');
+    }
+
+    function buildSupportReport(reportType) {
+        currentReportType = reportType;
+        const targetSec = document.getElementById('selReportSector').value || 'GERAL';
+        const dt = new Date().toLocaleDateString('pt-BR');
+        const valid = overviewCache.filter(r => r.quorum_lgpd_ok && (targetSec === 'GERAL' || r.sector.toUpperCase() === targetSec.toUpperCase()));
+        const lines = valid.map(r => `- ${r.sector}: N=${r.total_checkins}, Lat=${r.avg_latency_ms}ms, Alerta=${r.pct_alerta_total}%, Demandas=${r.avg_org_demands ?? '-'}/5, Autonomia=${r.avg_org_autonomy ?? '-'}/5`).join('\n')
+            || '- Aguardando setores atingirem quórum mínimo N >= 5.';
+
+        const body = `EXCELSILIENCE CORPORATE OS — ${reportType}
+EMPRESA: ${currentCompany} | SETOR: ${targetSec} | AMBIENTE: ${envMode} | DATA: ${dt}
+
+AVISO OBRIGATÓRIO:
+Relatório de apoio gerado pelo cruzamento de dados telemétricos agregados (N >= 5),
+réguas organizacionais, documentos SST cadastrados e Motor E.A.S.Y.
+Este documento NÃO constitui ato médico nem substitui AEP/PGR/PCMSO formais;
+deve ser obrigatoriamente avaliado, revisado e assinado por profissional habilitado.
+
+1. SÍNTESE SETORIAL AGREGADA (N >= 5):
+${lines}
+
+2. PLANOS 5W2H PENDENTES / COBRANÇA SEMANAL:
+${overdueCache.filter(o => targetSec === 'GERAL' || o.target_sector.toUpperCase() === targetSec.toUpperCase()).map(o => `- ${o.target_sector}: ${o.what_action} (Resp: ${o.who_manager_name}, Venc: ${o.when_due_date})`).join('\n') || '- Sem pendências vencidas.'}
+
+3. DOCUMENTOS SST CRUZADOS (PCMSO / AEP / PGR):
+${docsCache.filter(d => targetSec === 'GERAL' || d.target_sector.toUpperCase() === targetSec.toUpperCase() || d.target_sector === 'GERAL').map(d => `- [${d.doc_type}] ${d.title} (${d.target_sector})`).join('\n') || '- Nenhum documento externo cadastrado.'}
+`;
+        document.getElementById('laudoPreviewText').innerText = body;
+    }
+
+    async function saveAndValidateReport() {
+        const name = document.getElementById('profName').value.trim();
+        const council = document.getElementById('profCouncil').value.trim();
+        const reg = document.getElementById('profReg').value.trim();
+        const reason = document.getElementById('profReason').value.trim() || 'Validação técnica';
+        const targetSec = document.getElementById('selReportSector').value || 'GERAL';
+        const body = document.getElementById('laudoPreviewText').innerText;
+
+        if (!name || !council || !reg) {
+            alert('Preencha Nome, Conselho (CRM/CRP/CREA) e Registro do profissional habilitado.');
+            return;
+        }
+
+        const prevRes = await fetch(`${SUPABASE_URL}/rest/v1/rh_report_revision_logs?company=eq.${encodeURIComponent(currentCompany)}&select=revision_number&order=revision_number.desc&limit=1`, { headers: sbHeaders() });
+        const prevRows = prevRes.ok ? await prevRes.json() : [];
+        const nextRev = prevRows.length ? Number(prevRows[0].revision_number || 0) + 1 : 1;
+
+        const repRes = await fetch(`${SUPABASE_URL}/rest/v1/rh_generated_reports`, {
+            method: 'POST',
+            headers: { ...sbHeaders(), 'Prefer': 'return=representation' },
+            body: JSON.stringify({
+                company: currentCompany,
+                target_sector: targetSec,
+                report_type: currentReportType,
+                title: `${currentReportType} — ${currentCompany} (${targetSec})`,
+                report_body_markdown: body,
+                review_status: 'AVALIADO_E_VALIDADO_PROFISSIONAL',
+                regulated_professional_name: name,
+                regulated_professional_council: council,
+                regulated_professional_registry: reg,
+                professional_evaluation_notes: reason,
+                professional_validated_at: new Date().toISOString()
+            })
+        });
+        const repRows = await repRes.json();
+        const repId = Array.isArray(repRows) ? repRows[0]?.id : repRows?.id;
+        if (repId) {
+            await fetch(`${SUPABASE_URL}/rest/v1/rh_report_revision_logs`, {
+                method: 'POST', headers: sbHeaders(),
+                body: JSON.stringify({
+                    report_id: repId,
+                    company: currentCompany,
+                    revision_number: nextRev,
+                    action_type: 'VALIDACAO_PROFISSIONAL',
+                    editor_name: name,
+                    professional_registry: `${council} ${reg}`,
+                    change_reason: reason,
+                    body_snapshot: body
+                })
+            });
+            alert(`Relatório validado (Revisão #${nextRev}) e gravado no log imutável!`);
+            refreshAll();
+        }
+    }
+
+    function renderRevisionLogs(logs) {
+        const box = document.getElementById('revisionLogsBox');
+        box.innerHTML = logs.length
+            ? '<b>Histórico Imutável de Versões:</b>' + logs.map(l => `<div>• Rev #${l.revision_number} (${new Date(l.created_at).toLocaleString('pt-BR')}) — ${l.action_type} por ${l.editor_name} (${l.professional_registry || '-'}): ${l.change_reason}</div>`).join('')
+            : '';
+    }
+
+    function printReportPdf() {
+        const txt = document.getElementById('laudoPreviewText').innerText;
+        const w = window.open('', '_blank');
+        w.document.write(`<html><head><title>Relatorio_${currentCompany}</title><style>body{font-family:monospace;padding:36px;white-space:pre-wrap;}</style></head><body>${txt}<script>window.onload=function(){window.print();};<\/script></body></html>`);
+        w.document.close();
+    }
+
+    function populateScheduleForm(s) {
+        if (!s) return;
+        document.getElementById('cfgEnforceWindow').checked = Boolean(s.enforce_time_window);
+        if (s.morning_start) document.getElementById('cfgMornStart').value = String(s.morning_start).slice(0, 5);
+        if (s.morning_end) document.getElementById('cfgMornEnd').value = String(s.morning_end).slice(0, 5);
+        if (s.evening_start) document.getElementById('cfgEveStart').value = String(s.evening_start).slice(0, 5);
+        if (s.evening_end) document.getElementById('cfgEveEnd').value = String(s.evening_end).slice(0, 5);
+        if (s.weekly_day_of_week != null) document.getElementById('cfgWeeklyDow').value = String(s.weekly_day_of_week);
+        if (s.weekly_start) document.getElementById('cfgWeekStart').value = String(s.weekly_start).slice(0, 5);
+        if (s.weekly_end) document.getElementById('cfgWeekEnd').value = String(s.weekly_end).slice(0, 5);
+        document.getElementById('cfgWaEnabled').checked = Boolean(s.whatsapp_enabled);
+        if (s.whatsapp_provider) document.getElementById('cfgWaProvider').value = s.whatsapp_provider;
+        if (s.whatsapp_sender_number) document.getElementById('cfgWaSender').value = s.whatsapp_sender_number;
+        if (s.whatsapp_targets_json) document.getElementById('cfgWaTargets').value = JSON.stringify(s.whatsapp_targets_json);
+        const hint = document.getElementById('waSavedHint');
+        hint.innerHTML = s.whatsapp_configured
+            ? '<span style="color:var(--green);">✅ Credenciais (URL + Token) já salvas com segurança no servidor. Deixe em branco se não quiser alterar.</span>'
+            : '<span style="color:var(--yellow);">⚠️ Nenhuma URL/Token de WhatsApp configurada ainda para esta empresa.</span>';
+    }
+
+    async function saveScheduleAndWhatsapp() {
+        let targets = [];
+        try { targets = JSON.parse(document.getElementById('cfgWaTargets').value || '[]'); } catch (e) { alert('JSON de destinos inválido.'); return; }
+        await callRpc('upsert_company_schedule', {
+            p_company: currentCompany,
+            p_enforce_time_window: document.getElementById('cfgEnforceWindow').checked,
+            p_morning_start: document.getElementById('cfgMornStart').value + ':00',
+            p_morning_end: document.getElementById('cfgMornEnd').value + ':00',
+            p_evening_start: document.getElementById('cfgEveStart').value + ':00',
+            p_evening_end: document.getElementById('cfgEveEnd').value + ':00',
+            p_weekly_day_of_week: Number(document.getElementById('cfgWeeklyDow').value),
+            p_weekly_start: document.getElementById('cfgWeekStart').value + ':00',
+            p_weekly_end: document.getElementById('cfgWeekEnd').value + ':00',
+            p_whatsapp_enabled: document.getElementById('cfgWaEnabled').checked,
+            p_whatsapp_provider: document.getElementById('cfgWaProvider').value,
+            p_whatsapp_instance_url: document.getElementById('cfgWaUrl').value.trim() || null,
+            p_whatsapp_token: document.getElementById('cfgWaToken').value.trim() || null,
+            p_whatsapp_sender_number: document.getElementById('cfgWaSender').value.trim() || null,
+            p_whatsapp_targets_json: targets
+        });
+        alert('Horários e configuração de WhatsApp salvos no Supabase!');
+        refreshAll();
+    }
+
+    async function triggerWhatsappNow(win) {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/whatsapp-dispatcher`, {
+                method: 'POST', headers: sbHeaders(),
+                body: JSON.stringify({ company: currentCompany, window: win })
+            });
+            const data = await res.json();
+            alert('Disparo processado: ' + JSON.stringify(data.dispatched || data));
+        } catch (e) {
+            alert('Publique a Edge Function whatsapp-dispatcher no Supabase para disparar.');
+        }
+    }
+
+    function cadastrarNovoSetor() {
+        const v = document.getElementById('inpNovoSetor').value.trim();
+        if (v && !setoresCadastrados.includes(v)) {
+            setoresCadastrados.push(v);
+            document.getElementById('inpNovoSetor').value = '';
+            populateSectorSelectors();
+            renderLinksGenerator();
+        }
+    }
+
+    function renderLinksGenerator() {
+        const box = document.getElementById('link-generator-list');
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-rh.html');
+        box.innerHTML = setoresCadastrados.map(s => {
+            const slug = s.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const linkTest = `${base}?company=${encodeURIComponent(currentCompany.toLowerCase())}&sector=${slug}`;
+            return `<div class="easy-card">
+                <b>${s}</b><br>
+                <small style="color:var(--purple);">Link da Pasta Teste (24h sem travas):</small>
+                <input class="input-box" readonly value="${linkTest}" style="margin:4px 0; font-size:10px;">
+                <button class="btn btn-purple" style="padding:4px 10px; font-size:10px;" onclick="navigator.clipboard.writeText('${linkTest}'); alert('Link de teste copiado!');">📋 Copiar Link de Teste</button>
+            </div>`;
+        }).join('');
+    }
+</script>
+</body>
+</html>
