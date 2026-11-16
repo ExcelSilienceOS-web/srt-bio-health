@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ExcelSilience ES-CRISIS — Telemetria Executiva & 360°</title>
+    <style>
+        :root {
+            --bg: #030712;
+            --card: #0b1329;
+            --card-inner: #111c38;
+            --border: #1e293b;
+            --accent: #38bdf8;
+            --green: #34d399;
+            --yellow: #fbbf24;
+            --purple: #c084fc;
+            --red: #f87171;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 14px; }
+        .app-container { width: 100%; max-width: 560px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85); margin: auto 0; }
+        .header-brand { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .brand-title { font-size: 16px; font-weight: 800; color: var(--accent); }
+        .brand-subtitle { font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+        .badge-mode { background: rgba(56, 189, 248, 0.14); border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; }
+        .screen { display: none; animation: fadeIn 0.25s ease-in-out forwards; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+        .card h3 { font-size: 13px; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; font-weight: 800; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+        input[type="text"], select, textarea { width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--border); background: #070d19; color: #fff; font-size: 13px; outline: none; }
+        .chk-box { display: flex; gap: 10px; align-items: flex-start; background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 11px; color: var(--muted); line-height: 1.45; }
+        .chk-box input { margin-top: 2px; width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
+
+        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; background: #0284c7; color: #fff; text-transform: uppercase; margin-top: 6px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: #1e293b; border: 1px solid var(--border); color: var(--text); }
+        .btn-purple { background: #7e22ce; }
+        .btn-green { background: #059669; }
+
+        .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .context-btn { background: #070d19; border: 1px solid var(--border); color: var(--muted); padding: 11px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .context-btn.selected { background: rgba(56, 189, 248, 0.16); border-color: var(--accent); color: #fff; }
+
+        .camera-box { width: 100%; height: 220px; background: #000; border-radius: 14px; overflow: hidden; border: 2px solid var(--border); margin-bottom: 12px; position: relative; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        .audio-box { width: 100%; height: 84px; background: #070d19; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+        canvas#canvasWave { width: 100%; height: 100%; display: block; }
+        .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+        .meter-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s linear; }
+
+        .game-area { position: relative; width: 100%; height: 255px; background: #070d19; border: 2px dashed var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; touch-action: none; user-select: none; }
+        .target-shape { position: absolute; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #fff; user-select: none; touch-action: none; }
+        .shape-go { width: 66px; height: 66px; border-radius: 50%; background: #10b981; border: 3px solid #a7f3d0; }
+        .shape-nogo { width: 64px; height: 64px; border-radius: 12px; background: #ef4444; border: 3px solid #fecaca; }
+
+        .cir-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; text-align: center; }
+        .cir-stat { background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 10px 4px; }
+        .cir-stat .lbl { font-size: 9px; color: var(--muted); font-weight: 800; }
+        .cir-stat .val { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 2px; }
+
+        .easy-block { font-size: 12px; line-height: 1.5; margin-bottom: 8px; background: #070d19; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+        .easy-block b { color: var(--accent); }
+        .res-photo { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); display: none; }
+
+        .ruler-card { background: #070d19; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+        .ruler-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+        .ruler-wrap { display: flex; align-items: center; gap: 10px; }
+        .ruler-wrap input[type="range"] { flex: 1; accent-color: var(--accent); }
+        .ruler-val { min-width: 32px; text-align: center; font-weight: 800; color: var(--accent); background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+        @media print { .no-print { display: none !important; } body { background: #fff; color: #000; } .app-container { border: none; box-shadow: none; } }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header-brand">
+        <div>
+            <div class="brand-title">ExcelSilience ES-CRISIS</div>
+            <div class="brand-subtitle" id="lblHeaderSub">Prontidão Executiva C-I-R & Auditoria 360°</div>
+        </div>
+        <span class="badge-mode" style="background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">🧪 PASTA TESTE (24H)</span>
+    </div>
+
+    <!-- TELA 0: IDENTIFICAÇÃO + TERMO LGPD -->
+    <div id="scr-0" class="screen active">
+        <div class="card">
+            <h3>Check-in Executivo (C, I, R)</h3>
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" id="txtName" placeholder="Ex.: Nome do Executivo">
+            </div>
+            <div class="form-group">
+                <label>Cargo / Função</label>
+                <select id="txtRole">
+                    <option value="CEO / Presidente">CEO / Presidente</option>
+                    <option value="CFO / Diretor Financeiro">CFO / Diretor Financeiro</option>
+                    <option value="COO / Diretor de Operações">COO / Diretor de Operações</option>
+                    <option value="CHRO / Diretor de RH">CHRO / Diretor de RH</option>
+                    <option value="Diretor / Conselheiro">Diretor / Conselheiro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Área / Setor Liderado</label>
+                <input type="text" id="txtDept" value="Presidência" placeholder="Ex.: Operações / Logística">
+            </div>
+
+            <div class="context-grid">
+                <button type="button" class="context-btn selected" id="btnCtxRoutine" onclick="selectContext('ROUTINE')">📅 Rotina Diária</button>
+                <button type="button" class="context-btn" id="btnCtxMeeting" onclick="selectContext('PRE_MEETING')">⚡ Pré-Reunião Crítica</button>
+            </div>
+            <div class="form-group" id="boxMeetingTopic" style="display:none;">
+                <label>Pauta da Reunião</label>
+                <input type="text" id="txtMeetingTopic" placeholder="Ex.: Comitê Capex / Conselho">
+            </div>
+
+            <div class="chk-box">
+                <input type="checkbox" id="chkAuth" checked>
+                <label for="chkAuth">
+                    <b>Termo Voluntário & LGPD (Art. 11, II, "e"):</b> Participação voluntária, sem registro de recusa no Conselho e sem caráter diagnóstico/médico. Caso capture foto opcional, ela destina-se exclusivamente à conferência visual pelo CEO e será <b>excluída automaticamente após 30 dias</b>.
+                </label>
+            </div>
+
+            <button class="btn" onclick="startFlow(true)">Iniciar com Foto Visual (Opcional) + Voz + Go/No-Go</button>
+            <button class="btn btn-secondary" onclick="startFlow(false)">Iniciar Sem Câmera (Apenas Voz + Go/No-Go)</button>
+            <button class="btn btn-purple" onclick="open360Screen()">🧭 Responder Avaliação 360° (Réguas 1-5)</button>
+        </div>
+    </div>
+
+    <!-- TELA 1: FOTO VISUAL OPCIONAL (SEM PUPILOMETRIA) -->
+    <div id="scr-1" class="screen">
+        <div class="card">
+            <h3>📷 Conferência Visual Opcional (Expira em 30d)</h3>
+            <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Uso exclusivo para identificação visual no painel executivo (sem leitura pupilar).</p>
+            <div class="camera-box">
+                <video id="webcamVideo" autoplay playsinline muted></video>
+                <canvas id="photoCanvas" style="display:none;"></canvas>
+            </div>
+            <button class="btn btn-green" onclick="captureVisualPhotoAndNext()">📸 Registrar Foto Visual & Avançar</button>
+            <button class="btn btn-secondary" onclick="skipPhotoAndNext()">Pular Foto →</button>
+        </div>
+    </div>
+
+    <!-- TELA 2: VOZ BRUTA (VETOR R) -->
+    <div id="scr-2" class="screen">
+        <div class="card">
+            <h3>🎙️ Vetor R — Captação Vocal (7s)</h3>
+            <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Leia em voz firme e natural:</p>
+            <div style="background:#070d19; padding:12px; border-radius:10px; text-align:center; color:var(--yellow); font-weight:700; font-size:13px; margin-bottom:12px;">
+                "Decisão executiva exige clareza, controle e ritmo sustentável."
+            </div>
+            <div class="audio-box"><canvas id="canvasWave"></canvas></div>
+            <div class="meter-bar"><div class="meter-fill" id="pbVoice"></div></div>
+            <p id="lblVoiceStatus" style="font-size:11px; color:var(--muted); margin-bottom:8px; text-align:center;"></p>
+            <button class="btn" id="btnStartVoice" onclick="recordVoice7s()">🔴 Gravar Voz (7s)</button>
+            <button class="btn btn-secondary" id="btnSkipVoice" style="display:none;" onclick="showScreen('scr-3-intro')">⏭️ Pular Voz / Seguir com Go/No-Go →</button>
+        </div>
+    </div>
+
+    <!-- TELA 3: GO/NO-GO (VETORES C e I — 16 RODADAS BALANCEADAS) -->
+    <div id="scr-3-intro" class="screen">
+        <div class="card">
+            <h3>🎯 Vetores C & I — Desafio Visuomotor (16 Rodadas)</h3>
+            <p style="font-size:12px; color:var(--green); margin-bottom:8px;">● <b>CÍRCULO VERDE (✓ GO!):</b> Toque o mais rápido possível.</p>
+            <p style="font-size:12px; color:var(--red); margin-bottom:12px;">■ <b>QUADRADO VERMELHO (✕ NO-GO!):</b> Contenha o impulso e NÃO toque.</p>
+            <button class="btn" onclick="startVisuomotorGame()">Iniciar Desafio 🎯</button>
+        </div>
+    </div>
+
+    <div id="scr-3" class="screen">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:8px; font-weight:700;">
+            <span id="lblRoundBadge">RODADA 1 / 16</span>
+            <span>Erros / Omissões: <b id="lblVetoErr" style="color:var(--red);">0</b></span>
+        </div>
+        <div class="game-area" id="gameArea"></div>
+    </div>
+
+    <!-- TELA 4: RESULTADO C-I-R + LEITURA TÁTICA E.A.S.Y. + PDF -->
+    <div id="scr-4" class="screen">
+        <div id="syncStatus" class="card no-print" style="text-align:center; font-weight:700; font-size:12px;">⏳ Registrando no servidor...</div>
+        <div class="card">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                <img id="resPhoto" class="res-photo" alt="Foto visual">
+                <div>
+                    <h3 id="resExecName" style="margin-bottom:2px;">Executivo</h3>
+                    <p id="resExecRole" style="font-size:11px; color:var(--muted);"></p>
+                </div>
+            </div>
+            <div class="cir-grid">
+                <div class="cir-stat"><div class="lbl">ES-CRISIS</div><div class="val" id="lblFinalScore">--</div></div>
+                <div class="cir-stat"><div class="lbl">CONTROLE (C)</div><div class="val" id="lblValC">--</div></div>
+                <div class="cir-stat"><div class="lbl">CLAREZA (I)</div><div class="val" id="lblValI">--</div></div>
+                <div class="cir-stat"><div class="lbl">ENERGIA (R)</div><div class="val" id="lblValR">--</div></div>
+            </div>
+            <p style="font-size:12px; line-height:1.5; margin-bottom:12px;" id="resBottleneckNote"></p>
+            <div id="easyTacticalBox"></div>
+        </div>
+        <button class="btn btn-green no-print" onclick="window.print()">📄 Salvar Dossiê em PDF</button>
+        <button class="btn no-print" onclick="location.reload()">Novo Check-in</button>
+    </div>
+
+    <!-- TELA 360: AVALIAÇÃO 360° PROJETO ARISTÓTELES COM RÉGUAS 1 A 5 + NOTA QUALITATIVA -->
+    <div id="scr-360" class="screen">
+        <div class="card">
+            <h3>🧭 Avaliação 360° Anti-Viés (Projeto Aristóteles)</h3>
+            <div class="form-group"><label>Ciclo / Líder Avaliado:</label><select id="selCycle360"></select></div>
+            <div class="form-group">
+                <label>Seu Vínculo:</label>
+                <select id="selRaterType">
+                    <option value="EQUIPE_ANONIMA">Equipe Direta (100% Anônimo — Trava N ≥ 5)</option>
+                    <option value="PAR_LIDER">Par / Outro Diretor</option>
+                    <option value="AUTOAVALIACAO">Autoavaliação do Líder</option>
+                </select>
+            </div>
+            <div class="ruler-card"><div class="ruler-title">1. [C] Previsibilidade e rotina sob pressão (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Pred" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">2. [C] Autocontrole emocional sem reatividade (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Imp" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">3. [C • Aristóteles] Segurança Psicológica para discordar e errar (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Safety" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">4. [I • Aristóteles] Estrutura e clareza de prioridades (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Clarity" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">5. [I] Capacidade de eliminar burocracia / reuniões inúteis (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Unlearn" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">6. [I • Aristóteles] Impacto percebido das decisões da área (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Impact" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">7. [R • Aristóteles] Ritmo sustentável e significado do trabalho (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Sust" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">8. [R • Aristóteles] Confiabilidade nas entregas da equipe (1-5):</div><div class="ruler-wrap"><input type="range" id="r360Reliab" min="1" max="5" value="3" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">3</span></div></div>
+            <div class="ruler-card"><div class="ruler-title">9. [Controle] Com frequência ocorrem mudanças abruptas sem explicação? (1 = Nunca / 5 = Sempre):</div><div class="ruler-wrap"><input type="range" id="r360Ctrl" min="1" max="5" value="2" oninput="this.nextElementSibling.innerText=this.value"><span class="ruler-val">2</span></div></div>
+            <div class="form-group">
+                <label>Observação Qualitativa Opcional (sem se identificar se Equipe):</label>
+                <textarea id="txt360Note" rows="2" placeholder="Sugestão prática para os próximos 30 dias..."></textarea>
+            </div>
+            <button class="btn btn-green" onclick="submit360Response()">Enviar Avaliação 360° ✅</button>
+            <button class="btn btn-secondary" onclick="showScreen('scr-0')">Voltar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyParam = (urlParams.get('company') || 'GROU').toUpperCase();
+    const envMode = 'SANDBOX';
+    function updateExecEnvUi() {
+        document.getElementById('btnSkipVoice').style.display = 'block';
+    }
+
+    let selectedContext = 'ROUTINE';
+    let mediaStream = null;
+    let photoBase64 = null;
+    let audioQualityOk = false;
+    let vsiScoreVal = null;
+    let roundPlan = [];
+    let reactionTimes = [];
+    let greenLapses = 0;
+    let vetoErrors = 0;
+    let currentRound = 0;
+    const totalRounds = 16;
+    let ballTimer = null;
+    let ballSpawnTime = 0;
+    let isRoundProcessing = false;
+    let t0360 = Date.now();
+
+    window.addEventListener('DOMContentLoaded', () => {
+        updateExecEnvUi();
+        document.getElementById('lblHeaderSub').innerText = `${companyParam} • Vetores C-I-R & Projeto Aristóteles`;
+        try {
+            if (localStorage.getItem('es_exec_name')) document.getElementById('txtName').value = localStorage.getItem('es_exec_name');
+            if (localStorage.getItem('es_exec_role')) document.getElementById('txtRole').value = localStorage.getItem('es_exec_role');
+            if (localStorage.getItem('es_exec_dept')) document.getElementById('txtDept').value = localStorage.getItem('es_exec_dept');
+        } catch (e) {}
+        if (urlParams.get('mode') === '360') open360Screen();
+    });
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function selectContext(ctx) {
+        selectedContext = ctx;
+        document.getElementById('btnCtxRoutine').classList.toggle('selected', ctx === 'ROUTINE');
+        document.getElementById('btnCtxMeeting').classList.toggle('selected', ctx === 'PRE_MEETING');
+        document.getElementById('boxMeetingTopic').style.display = ctx === 'PRE_MEETING' ? 'block' : 'none';
+    }
+
+    async function startFlow(withCamera) {
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
+        const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
+        if (!name) { alert('Informe seu nome.'); return; }
+        if (!document.getElementById('chkAuth').checked) { alert('Confirme o termo de participação.'); return; }
+        try {
+            localStorage.setItem('es_exec_name', name);
+            localStorage.setItem('es_exec_role', role);
+            localStorage.setItem('es_exec_dept', dept);
+        } catch (e) {}
+        photoBase64 = null;
+
+        if (!withCamera) { showScreen('scr-2'); return; }
+        showScreen('scr-1');
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 480 } }, audio: false });
+            document.getElementById('webcamVideo').srcObject = mediaStream;
+        } catch (e) {
+            showScreen('scr-2');
+        }
+    }
+
+    function captureVisualPhotoAndNext() {
+        const video = document.getElementById('webcamVideo');
+        const canvas = document.getElementById('photoCanvas');
+        if (video && video.videoWidth) {
+            canvas.width = 160;
+            canvas.height = 160;
+            canvas.getContext('2d').drawImage(video, 0, 0, 160, 160);
+            photoBase64 = canvas.toDataURL('image/jpeg', 0.45);
+        }
+        stopCamera();
+        showScreen('scr-2');
+    }
+
+    function skipPhotoAndNext() {
+        photoBase64 = null;
+        stopCamera();
+        showScreen('scr-2');
+    }
+
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(t => t.stop());
+            mediaStream = null;
+        }
+    }
+
+    async function recordVoice7s() {
+        const btn = document.getElementById('btnStartVoice');
+        const skip = document.getElementById('btnSkipVoice');
+        const lbl = document.getElementById('lblVoiceStatus');
+        const pb = document.getElementById('pbVoice');
+        const canvas = document.getElementById('canvasWave');
+        btn.disabled = true;
+        skip.style.display = (envMode === 'SANDBOX') ? 'block' : 'none';
+        let secLeft = 7;
+        lbl.innerText = `🎙️ Captando voz... ${secLeft}s restantes`;
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            audioCtx.createMediaStreamSource(stream).connect(analyser);
+            analyser.fftSize = 1024;
+            const timeBuf = new Float32Array(analyser.fftSize);
+            const freqBuf = new Uint8Array(analyser.frequencyBinCount);
+            const rmsFrames = [];
+            let animId = null;
+
+            const ctxWave = canvas.getContext('2d');
+            function draw() {
+                animId = requestAnimationFrame(draw);
+                analyser.getFloatTimeDomainData(timeBuf);
+                analyser.getByteFrequencyData(freqBuf);
+                let rms = 0;
+                for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i];
+                rms = Math.sqrt(rms / timeBuf.length);
+                if (rms >= 0.015) rmsFrames.push(rms);
+
+                ctxWave.clearRect(0, 0, canvas.width, canvas.height);
+                const bw = canvas.width / 32;
+                for (let i = 0; i < 32; i++) {
+                    const bh = (freqBuf[i] / 255) * canvas.height * 0.9;
+                    ctxWave.fillStyle = '#38bdf8';
+                    ctxWave.fillRect(i * bw, canvas.height - bh, bw - 2, bh);
+                }
+            }
+            draw();
+
+            let pct = 0;
+            const countTimer = setInterval(() => {
+                secLeft = Math.max(0, secLeft - 1);
+                pct += 14.3;
+                pb.style.width = Math.min(100, pct) + '%';
+                lbl.innerText = secLeft > 0 ? `🎙️ Captando voz... ${secLeft}s restantes` : '✅ Processando áudio...';
+            }, 1000);
+
+            setTimeout(() => {
+                clearInterval(countTimer);
+                pb.style.width = '100%';
+                if (animId) cancelAnimationFrame(animId);
+                stream.getTracks().forEach(t => t.stop());
+                audioCtx.close();
+
+                if (rmsFrames.length < 10) {
+                    audioQualityOk = false;
+                    vsiScoreVal = null;
+                    btn.disabled = false;
+                    btn.innerText = '🔄 Tentar Voz Novamente (7s)';
+                    lbl.innerText = 'Áudio insuficiente. Sem nota simulada — repita ou siga para o desafio visuomotor.';
+                    skip.style.display = 'block';
+                    return;
+                }
+                const meanRms = rmsFrames.reduce((a, b) => a + b, 0) / rmsFrames.length;
+                let diff = 0;
+                for (let i = 1; i < rmsFrames.length; i++) diff += Math.abs(rmsFrames[i] - rmsFrames[i - 1]);
+                const relVar = (diff / rmsFrames.length) / Math.max(0.001, meanRms);
+                audioQualityOk = true;
+                vsiScoreVal = Number(Math.min(5.0, Math.max(1.0, 1.45 + relVar * 3.2)).toFixed(2));
+                showScreen('scr-3-intro');
+            }, 7000);
+        } catch (e) {
+            audioQualityOk = false;
+            vsiScoreVal = null;
+            btn.disabled = false;
+            lbl.innerText = 'Microfone indisponível. Siga para o desafio visuomotor.';
+            skip.style.display = 'block';
+        }
+    }
+
+    function buildBalancedRounds() {
+        const arr = [];
+        for (let i = 0; i < 11; i++) arr.push(true);
+        for (let i = 0; i < 5; i++) arr.push(false);
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function startVisuomotorGame() {
+        reactionTimes = [];
+        greenLapses = 0;
+        vetoErrors = 0;
+        currentRound = 0;
+        roundPlan = buildBalancedRounds();
+        document.getElementById('lblVetoErr').innerText = '0';
+        showScreen('scr-3');
+        nextRound();
+    }
+
+    function nextRound() {
+        if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
+        if (currentRound >= totalRounds) { finishCheckin(); return; }
+        const isGo = roundPlan[currentRound];
+        currentRound++;
+        isRoundProcessing = false;
+        document.getElementById('lblRoundBadge').innerText = `RODADA ${currentRound} / ${totalRounds}`;
+        const area = document.getElementById('gameArea');
+        area.innerHTML = '';
+
+        const el = document.createElement('div');
+        el.className = 'target-shape ' + (isGo ? 'shape-go' : 'shape-nogo');
+        el.innerHTML = isGo ? '<span>✓</span><span>GO!</span>' : '<span>✕</span><span>NO-GO!</span>';
+        el.style.left = Math.max(10, Math.floor(Math.random() * Math.max(40, area.clientWidth - 76))) + 'px';
+        el.style.top = Math.max(10, Math.floor(Math.random() * Math.max(40, area.clientHeight - 76))) + 'px';
+        ballSpawnTime = performance.now();
+
+        function hit(e) {
+            if (e) { try { e.preventDefault(); e.stopPropagation(); } catch (_) {} }
+            if (isRoundProcessing) return;
+            const rt = Math.round(performance.now() - ballSpawnTime);
+            if (rt < 100) return;
+            isRoundProcessing = true;
+            clearTimeout(ballTimer);
+            if (isGo) reactionTimes.push(rt);
+            else {
+                vetoErrors++;
+                document.getElementById('lblVetoErr').innerText = vetoErrors + greenLapses;
+            }
+            area.innerHTML = '';
+            setTimeout(nextRound, 260);
+        }
+
+        el.addEventListener('pointerdown', hit, { passive: false });
+        area.appendChild(el);
+        ballTimer = setTimeout(() => {
+            if (isRoundProcessing) return;
+            isRoundProcessing = true;
+            area.innerHTML = '';
+            if (isGo) {
+                greenLapses++;
+                reactionTimes.push(950);
+                document.getElementById('lblVetoErr').innerText = vetoErrors + greenLapses;
+            }
+            setTimeout(nextRound, 260);
+        }, 950);
+    }
+
+    async function finishCheckin() {
+        showScreen('scr-4');
+        const name = document.getElementById('txtName').value.trim();
+        const role = document.getElementById('txtRole').value;
+        const dept = document.getElementById('txtDept').value.trim() || 'Presidência';
+        const meetingTopic = document.getElementById('txtMeetingTopic').value.trim();
+
+        const avgRt = reactionTimes.length ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 450;
+        let jitter = 0;
+        if (reactionTimes.length > 1) {
+            const v = reactionTimes.reduce((a, b) => a + Math.pow(b - avgRt, 2), 0) / reactionTimes.length;
+            jitter = Math.sqrt(v);
+        }
+
+        const valC = Number(Math.max(1.0, Math.min(5.0, 5.0 - vetoErrors * 1.15 - jitter / 55)).toFixed(2));
+        const valI = Number(Math.max(1.0, Math.min(5.0, 5.0 - (avgRt - 320) / 115 - greenLapses * 0.45)).toFixed(2));
+        const valR = audioQualityOk && vsiScoreVal !== null ? Number(Math.max(1.0, Math.min(5.0, 5.0 - (vsiScoreVal - 1.45) * 1.15)).toFixed(2)) : 3.5;
+        const esScore = Number((((valC + valI + valR) + Math.min(valC, valI, valR)) / 4.0).toFixed(2));
+        let weakest = 'C';
+        if (valI < valC && valI <= valR) weakest = 'I';
+        if (valR < valC && valR < valI) weakest = 'R';
+
+        document.getElementById('resExecName').innerText = name;
+        document.getElementById('resExecRole').innerText = `${role} • ${dept}` + (selectedContext === 'PRE_MEETING' && meetingTopic ? ` • Pauta: ${meetingTopic}` : '');
+        document.getElementById('lblFinalScore').innerText = esScore;
+        document.getElementById('lblValC').innerText = valC;
+        document.getElementById('lblValI').innerText = valI;
+        document.getElementById('lblValR').innerText = valR;
+        if (photoBase64) {
+            const img = document.getElementById('resPhoto');
+            img.src = photoBase64;
+            img.style.display = 'block';
+        }
+        document.getElementById('resBottleneckNote').innerText = `Elo Mais Fraco: Vetor ${weakest} | Latência: ${avgRt} ms (Jitter ${Math.round(jitter)} ms) | Fórmula: ((C+I+R)+MIN(C,I,R))/4. Indicadores de apoio comportamental (sem ato médico).`;
+
+        const adaptMsg = weakest === 'C'
+            ? 'Priorizar dupla checagem e blocos decisórios curtos antes de votações críticas.'
+            : (weakest === 'I' ? 'Simplificar pauta para 1 decisão principal e eliminar itens acessórios (Via Negativa).' : 'Proteger janela de recuperação e redistribuir sobrecarga antes do próximo comitê.');
+        document.getElementById('easyTacticalBox').innerHTML = `
+            <div class="easy-block"><b>E — Examine:</b> C=${valC}, I=${valI}, R=${valR} (Elo: ${weakest}; ${audioQualityOk ? 'VSI ' + vsiScoreVal : 'sem áudio válido'}).</div>
+            <div class="easy-block"><b>A — Adapt:</b> ${adaptMsg}</div>
+            <div class="easy-block"><b>S — Systematize:</b> Registrar contexto no Cockpit C-Suite (decisão humana soberana, sem trava automática).</div>
+            <div class="easy-block"><b>Y — Yardstick:</b> Reavaliar vetores após a agenda crítica para medir recuperação.</div>
+        `;
+
+        const syncEl = document.getElementById('syncStatus');
+        try {
+            const efRes = await fetch(`${SUPABASE_URL}/functions/v1/ingest-telemetry`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({
+                    module_type: 'ES_CRISIS_EXEC', company: companyParam, exec_name: name, exec_role: role,
+                    managed_sector: dept, context_type: selectedContext, meeting_topic: meetingTopic || null,
+                    reaction_time_ms: avgRt, veto_errors: vetoErrors, green_lapses: greenLapses,
+                    rt_jitter_ms: Math.round(jitter), audio_quality_ok: audioQualityOk, vsi_score: vsiScoreVal,
+                    photo_url: photoBase64, tcle_accepted: true, environment_mode: envMode
+                })
+            });
+            if (efRes.ok) { syncEl.innerText = '✅ Registro executivo sincronizado com segurança!'; return; }
+            if (efRes.status === 403) {
+                const blockedJson = await efRes.json();
+                syncEl.innerText = `⛔ ${blockedJson.reason || 'Fora do horário permitido (08:00–18:00 Seg–Sex).'}`;
+                return;
+            }
+        } catch (e) {}
+
+        let status = 'GREEN';
+        if (vetoErrors >= 2 || avgRt >= 800 || greenLapses >= 3) status = 'RED';
+        else if (audioQualityOk && vsiScoreVal >= 3.41) status = 'PURPLE';
+        else if (avgRt >= 650 || vetoErrors === 1 || greenLapses >= 1) status = 'YELLOW';
+
+        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_es_crisis_exec_v54`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+            body: JSON.stringify({
+                p_company: companyParam, p_exec_name: name, p_exec_role: role, p_managed_sector: dept,
+                p_context_type: selectedContext, p_meeting_topic: meetingTopic || null,
+                p_reaction_time_ms: avgRt, p_veto_errors: vetoErrors, p_green_lapses: greenLapses,
+                p_audio_quality_ok: audioQualityOk, p_vsi_score: vsiScoreVal,
+                p_score_c: valC, p_score_i: valI, p_score_r: valR, p_es_crisis_score: esScore, p_weakest_vector: weakest,
+                p_status: status, p_face_verification_mode: photoBase64 ? 'FOTO_VISUAL_CEO_30D' : 'SEM_FOTO',
+                p_photo_url: photoBase64, p_tcle_accepted: true, p_environment_mode: envMode
+            })
+        });
+        if (rpcRes.ok) {
+            syncEl.innerText = '✅ Registro executivo salvo!';
+        } else {
+            const errTxt = await rpcRes.text();
+            syncEl.innerText = errTxt.includes('ES_CRISIS_BLOQUEADO_HORARIO')
+                ? '⛔ Check-in executivo bloqueado fora do horário corporativo (08:00 às 18:00, Seg-Sex).'
+                : '⚠️ Falha ao salvar no banco.';
+        }
+    }
+
+    async function open360Screen() {
+        t0360 = Date.now();
+        showScreen('scr-360');
+        const sel = document.getElementById('selCycle360');
+        sel.innerHTML = '<option value="">Carregando ciclos abertos...</option>';
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_360_cycles?company=eq.${encodeURIComponent(companyParam)}&status=eq.ABERTO`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const rows = res.ok ? await res.json() : [];
+            sel.innerHTML = rows.length
+                ? rows.map(c => `<option value="${c.id}">${c.leader_name} — ${c.managed_sector} (${c.cycle_label})</option>`).join('')
+                : '<option value="">Nenhum ciclo aberto (crie no Dashboard ES-CRISIS)</option>';
+        } catch (e) {}
+    }
+
+    async function submit360Response() {
+        const cycleId = document.getElementById('selCycle360').value;
+        if (!cycleId) { alert('Selecione um ciclo 360° aberto.'); return; }
+        const sec = Math.max(1, Math.round((Date.now() - t0360) / 1000));
+        const note = document.getElementById('txt360Note').value.trim();
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/es_crisis_360_responses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+            body: JSON.stringify({
+                cycle_id: cycleId, company: companyParam,
+                rater_type: document.getElementById('selRaterType').value,
+                q_c_predictability: Number(document.getElementById('r360Pred').value),
+                q_c_impulse_control: Number(document.getElementById('r360Imp').value),
+                q_psych_safety: Number(document.getElementById('r360Safety').value),
+                q_i_clarity: Number(document.getElementById('r360Clarity').value),
+                q_i_unlearning: Number(document.getElementById('r360Unlearn').value),
+                q_i_impact: Number(document.getElementById('r360Impact').value),
+                q_r_sustainability: Number(document.getElementById('r360Sust').value),
+                q_r_reliability: Number(document.getElementById('r360Reliab').value),
+                q_control_inverted: Number(document.getElementById('r360Ctrl').value),
+                completion_time_sec: sec,
+                qualitative_note: note || null
+            })
+        });
+        if (res.ok) {
+            document.getElementById('txt360Note').value = '';
+            alert('Avaliação 360° registrada!');
+            showScreen('scr-0');
+        } else alert('Erro ao enviar avaliação 360°.');
+    }
+</script>
+</body>
+</html>
