@@ -203,14 +203,19 @@
         return currentCompany === 'TODAS' || currentCompany === 'ALL' || !currentCompany;
     }
 
+    function getTestExecAppFile() {
+        const fname = (window.location.pathname.split('/').pop() || '');
+        return fname.startsWith('teste_') ? 'teste_index-es-crisis.html' : 'index-es-crisis.html';
+    }
+
     function openExecTestApp() {
-        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-es-crisis.html');
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, getTestExecAppFile());
         const comp = isAllCompanies() ? 'GROU' : currentCompany;
         window.open(`${base}?company=${encodeURIComponent(comp)}`, '_blank');
     }
 
     function copy360Link() {
-        const base = window.location.href.split('?')[0].replace(/[^/]*$/, 'index-es-crisis.html');
+        const base = window.location.href.split('?')[0].replace(/[^/]*$/, getTestExecAppFile());
         const comp = isAllCompanies() ? 'GROU' : currentCompany;
         const link = `${base}?company=${encodeURIComponent(comp)}&mode=360`;
         if (navigator.clipboard) navigator.clipboard.writeText(link);
