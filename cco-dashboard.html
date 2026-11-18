@@ -1,11 +1,9 @@
-const PROJECT_ENDPOINT = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-const PUBLIC_TOKEN = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelSilience SRT Mobility — Cockpit CCO v6.0</title>
+    <title>ExcelSilience SRT Mobility — Cockpit CCO v6.1</title>
     <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -79,7 +77,7 @@ const PUBLIC_TOKEN = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
             <h1>CENTRO DE CONTROLE OPERACIONAL (CCO) — SRT MOBILITY</h1>
             <p id="lblSub">Conferência Facial 1:1 Consultiva • Voz VSI sem Nota Inventada • Telemetria &amp; Trilha de Auditoria (LGPD Art. 20)</p>
         </div>
-        <div class="live-indicator"><div class="dot"></div><span>AUTO-REFRESH 10s</span></div>
+        <div class="live-indicator"><div class="dot"></div><span id="lblSyncState">AUTO-REFRESH 10s</span></div>
     </div>
     <div class="header-actions">
         <button class="btn-blue" onclick="openDriversModal()">👤 Motoristas &amp; Foto-Ref</button>
@@ -211,10 +209,11 @@ const PUBLIC_TOKEN = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
     </div>
 </div>
 <script>
-const PROJECT_ENDPOINT = "https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/";
+const PROJECT_ENDPOINT = "https://uywfcrhryrzmhrukxgaf.supabase.co";
 const PUBLIC_TOKEN = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
 const FACE_MODELS_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 
+const BASE_URL = PROJECT_ENDPOINT.replace(/\/rest\/v1\/?$/i, "").replace(/\/+$/, "");
 const urlParams = new URLSearchParams(window.location.search);
 const currentCompany = (urlParams.get("company") || "TODAS").toUpperCase();
 
@@ -228,11 +227,31 @@ let newDriverEmbedding = null;
 let faceApiReady = false;
 let autoRefreshTimer = null;
 
-function buildHeaders() {
+function buildHeaders(includeAuthBearer = false) {
     const h = new Headers({ "Content-Type": "application/json" });
     h.set("apikey", PUBLIC_TOKEN);
-    h.set("Authorization", `Bearer ${PUBLIC_TOKEN}`);
+    if (includeAuthBearer || PUBLIC_TOKEN.startsWith("eyJ")) {
+        h.set("Authorization", `Bearer ${PUBLIC_TOKEN}`);
+    }
     return h;
+}
+
+async function supabaseFetch(path, options = {}) {
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+    const url = `${BASE_URL}${cleanPath}`;
+    const isEdge = cleanPath.startsWith("/functions/v1/");
+    let res = await fetch(url, { ...options, headers: buildHeaders(isEdge) });
+    if (res.status === 401 && !PUBLIC_TOKEN.startsWith("eyJ")) {
+        res = await fetch(url, { ...options, headers: buildHeaders(!isEdge) });
+    }
+    const raw = await res.text();
+    let parsed = null;
+    try { parsed = raw ? JSON.parse(raw) : null; } catch (_) { parsed = raw; }
+    if (!res.ok) {
+        const detail = (parsed && (parsed.message || parsed.error || parsed.msg || parsed.hint)) || (typeof parsed === "string" && parsed) || `HTTP ${res.status}`;
+        throw new Error(`HTTP ${res.status}: ${detail}`);
+    }
+    return parsed;
 }
 
 function normalizeKey(str) {
@@ -272,11 +291,11 @@ async function ensureFaceApiLoaded() {
 
 function setPeriod(period, btn) {
     document.querySelectorAll(".filter-row .btn-quick").forEach((b) => {
-        if (!b.id.startsWith("st")) b.classList.remove("active");
+        if (!b.id.startsWith("st") && b.id !== "stFaceAlert") b.classList.remove("active");
     });
     if (btn) btn.classList.add("active");
     const today = new Date();
-    const fmt = (d) => d.toISOString().split("T")[0];
+    const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
     if (period === "today") {
         document.getElementById("startDate").value = fmt(today);
@@ -315,13 +334,24 @@ function toggleFaceAlertFilter(btn) {
 }
 
 async function fetchAndRenderData() {
+    const syncEl = document.getElementById("lblSyncState");
     const compFilter = currentCompany === "TODAS" || currentCompany === "ALL" ? "" : `company=eq.${encodeURIComponent(currentCompany)}&`;
     const [chkRes, drvRes] = await Promise.allSettled([
-        fetch(`${PROJECT_ENDPOINT}/rest/v1/srt_checkins?${compFilter}order=created_at.desc&limit=150`, { headers: buildHeaders() }).then((r) => (r.ok ? r.json() : [])),
-        fetch(`${PROJECT_ENDPOINT}/rest/v1/mobility_drivers?${compFilter}active=eq.true&order=driver_name.asc`, { headers: buildHeaders() }).then((r) => (r.ok ? r.json() : [])),
+        supabaseFetch(`/rest/v1/srt_checkins?${compFilter}order=created_at.desc&limit=150`),
+        supabaseFetch(`/rest/v1/mobility_drivers?${compFilter}active=eq.true&order=driver_name.asc`),
     ]);
 
-    const rawRows = chkRes.status === "fulfilled" && Array.isArray(chkRes.value) ? chkRes.value : [];
+    if (chkRes.status === "rejected") {
+        allRecords = [];
+        renderFilteredData();
+        if (syncEl) syncEl.innerText = "ERRO DE CONEXÃO";
+        document.getElementById("tableBody").innerHTML =
+            `<tr><td colspan="9" style="text-align:center; padding:22px; color:#f87171; font-weight:700;">⚠️ Erro ao carregar registros do Supabase (${escapeHtml(chkRes.reason?.message || "Falha de conexão")})</td></tr>`;
+        return;
+    }
+
+    if (syncEl) syncEl.innerText = `AUTO-REFRESH 10s • ${new Date().toLocaleTimeString("pt-BR")}`;
+    const rawRows = Array.isArray(chkRes.value) ? chkRes.value : [];
     const drvRows = drvRes.status === "fulfilled" && Array.isArray(drvRes.value) ? drvRes.value : [];
 
     driversMap = new Map();
@@ -419,6 +449,7 @@ function renderFilteredData() {
     tbody.innerHTML = "";
     if (!filtered.length) {
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:22px; color:#94a3b8;">Nenhum registro encontrado para os filtros aplicados.</td></tr>';
+        window._renderedRows = [];
         return;
     }
 
@@ -495,7 +526,7 @@ function renderFilteredData() {
                 <div>${escapeHtml(item.action || "--")}</div>
                 <div>
                     <button class="btn-decide" onclick="openDecisionModalByIdx(${idx})">⚖️ Decisão CCO</button>
-                    <button class="btn-dispatch" onclick="dispatchRouteLink('${escapeHtml(item.company || "EXCELSILIENCE")}', '${escapeHtml(driverName)}', '${escapeHtml(item.department || "")}')">📲 Link Rota</button>
+                    <button class="btn-dispatch" onclick="dispatchRouteLinkByIdx(${idx})">📲 Link Rota</button>
                 </div>
             </td>
         `;
@@ -533,12 +564,10 @@ async function promoteCurrentPhoto() {
     const sup = prompt("Nome do Supervisor do CCO que conferiu presencialmente o motorista:");
     if (!sup || !sup.trim()) return;
     try {
-        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/promote_checkin_photo_to_driver`, {
+        await supabaseFetch("/rest/v1/rpc/promote_checkin_photo_to_driver", {
             method: "POST",
-            headers: buildHeaders(),
             body: JSON.stringify({ p_checkin_id: String(activeCheckinForModal.id), p_supervisor_name: sup.trim() }),
         });
-        if (!res.ok) throw new Error(await res.text());
         alert("Foto promovida como referência oficial do motorista!");
         closeModal("faceCompareModal");
         fetchAndRenderData();
@@ -576,9 +605,8 @@ async function saveHumanDecision() {
     if (!note) { alert("Informe a justificativa operacional para registro na trilha imutável."); return; }
 
     try {
-        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/submit_mobility_decision`, {
+        await supabaseFetch("/rest/v1/rpc/submit_mobility_decision", {
             method: "POST",
-            headers: buildHeaders(),
             body: JSON.stringify({
                 p_checkin_id: String(activeCheckinForModal.id),
                 p_supervisor_name: sup,
@@ -587,7 +615,6 @@ async function saveHumanDecision() {
                 p_justification: note,
             }),
         });
-        if (!res.ok) throw new Error(await res.text());
         alert("Deliberação registrada na Trilha de Auditoria Imutável!");
         closeModal("decisionModal");
         fetchAndRenderData();
@@ -662,9 +689,8 @@ async function saveDriverRegistry() {
     if (!name) { alert("Informe o nome do motorista."); return; }
     const comp = currentCompany === "TODAS" || currentCompany === "ALL" ? "EXCELSILIENCE" : currentCompany;
     try {
-        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/upsert_mobility_driver`, {
+        await supabaseFetch("/rest/v1/rpc/upsert_mobility_driver", {
             method: "POST",
-            headers: buildHeaders(),
             body: JSON.stringify({
                 p_company: comp,
                 p_driver_name: name,
@@ -676,7 +702,6 @@ async function saveDriverRegistry() {
                 p_reference_embedding: newDriverEmbedding,
             }),
         });
-        if (!res.ok) throw new Error(await res.text());
         document.getElementById("drvName").value = "";
         newDriverPhotoB64 = null;
         newDriverEmbedding = null;
@@ -691,23 +716,23 @@ async function saveDriverRegistry() {
 async function openWebhookModal() {
     openModal("webhookModal");
     const comp = currentCompany === "TODAS" || currentCompany === "ALL" ? "EXCELSILIENCE" : currentCompany;
-    document.getElementById("whEndpointBox").innerText = `POST ${PROJECT_ENDPOINT}/functions/v1/mobility-telemetry-webhook`;
+    document.getElementById("whEndpointBox").innerText = `POST ${BASE_URL}/functions/v1/mobility-telemetry-webhook`;
+    const defaultAppBase = window.location.href.split("?")[0].replace(/[^/]*$/, "").replace(/\/$/, "");
 
     const [cfgRes, evRes] = await Promise.allSettled([
-        fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/get_mobility_webhook_public_status`, {
-            method: "POST", headers: buildHeaders(), body: JSON.stringify({ p_company: comp }),
-        }).then((r) => (r.ok ? r.json() : null)),
-        fetch(`${PROJECT_ENDPOINT}/rest/v1/mobility_telemetry_events?company=eq.${encodeURIComponent(comp)}&order=created_at.desc&limit=15`, {
-            headers: buildHeaders(),
-        }).then((r) => (r.ok ? r.json() : [])),
+        supabaseFetch("/rest/v1/rpc/get_mobility_webhook_public_status", {
+            method: "POST", body: JSON.stringify({ p_company: comp }),
+        }),
+        supabaseFetch(`/rest/v1/mobility_telemetry_events?company=eq.${encodeURIComponent(comp)}&order=created_at.desc&limit=15`),
     ]);
 
     const cfg = cfgRes.status === "fulfilled" ? cfgRes.value : null;
     if (cfg && cfg.configured) {
         document.getElementById("whCooldown").value = cfg.cooldown_minutes || 45;
-        document.getElementById("whBaseUrl").value = cfg.app_base_url || "";
+        document.getElementById("whBaseUrl").value = cfg.app_base_url || defaultAppBase;
         document.getElementById("whStatusHint").innerText = `✅ Webhook ativo (${cfg.company}) • Segredo configurado: ${cfg.secret_hint}`;
     } else {
+        document.getElementById("whBaseUrl").value = defaultAppBase;
         document.getElementById("whStatusHint").innerText = `ℹ️ Ainda não configurado para ${comp}. Clique em Salvar para gerar o segredo.`;
     }
 
@@ -720,9 +745,8 @@ async function openWebhookModal() {
 async function saveWebhookConfig() {
     const comp = currentCompany === "TODAS" || currentCompany === "ALL" ? "EXCELSILIENCE" : currentCompany;
     try {
-        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/upsert_mobility_webhook_config`, {
+        const data = await supabaseFetch("/rest/v1/rpc/upsert_mobility_webhook_config", {
             method: "POST",
-            headers: buildHeaders(),
             body: JSON.stringify({
                 p_company: comp,
                 p_webhook_secret: document.getElementById("whSecret").value.trim() || null,
@@ -730,9 +754,7 @@ async function saveWebhookConfig() {
                 p_app_base_url: document.getElementById("whBaseUrl").value.trim() || null,
             }),
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Erro ao salvar webhook");
-        if (data.generated_secret_if_new) {
+        if (data && data.generated_secret_if_new) {
             alert(`Webhook configurado! Anote o segredo gerado para o cliente:\n${data.generated_secret_if_new}`);
         } else {
             alert("Configuração de Webhook atualizada!");
@@ -743,11 +765,16 @@ async function saveWebhookConfig() {
     }
 }
 
+function dispatchRouteLinkByIdx(idx) {
+    const item = (window._renderedRows || [])[idx];
+    if (!item) return;
+    dispatchRouteLink(item.company || "EXCELSILIENCE", item.name || "Condutor", item.department || "");
+}
+
 async function dispatchRouteLink(company, driverName, dept) {
     try {
-        const res = await fetch(`${PROJECT_ENDPOINT}/functions/v1/mobility-telemetry-webhook`, {
+        const data = await supabaseFetch("/functions/v1/mobility-telemetry-webhook", {
             method: "POST",
-            headers: buildHeaders(),
             body: JSON.stringify({
                 company: (company || "EXCELSILIENCE").toUpperCase(),
                 driver_name: driverName,
@@ -755,11 +782,10 @@ async function dispatchRouteLink(company, driverName, dept) {
                 event_type: "SOLICITACAO_CCO",
                 source_system: "CCO_DASHBOARD",
                 force_dispatch: true,
-                app_base_url: window.location.href.split("?")[0].replace(/[^/]*$/, ""),
+                app_base_url: window.location.href.split("?")[0].replace(/[^/]*$/, "").replace(/\/$/, ""),
             }),
         });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.error || "Erro ao gerar link de rota");
+        if (!data || !data.ok) throw new Error((data && data.error) || "Erro ao gerar link de rota");
         if (navigator.clipboard && data.checkin_link) {
             try { await navigator.clipboard.writeText(data.checkin_link); } catch (_) {}
         }
@@ -779,4 +805,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
