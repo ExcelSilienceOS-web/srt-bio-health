@@ -80,10 +80,10 @@
         .btn-secondary { background: #1e293b; color: var(--text-sub); border: 1px solid var(--input-border); }
         .btn-green { background: #059669; }
 
-        .face-scanner { width: 100%; height: 245px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 14px; }
-        .camera-video { position: absolute; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .face-oval-guide { width: 132px; height: 168px; border-radius: 50%; border: 2px dashed var(--accent-cyan); position: relative; z-index: 2; box-shadow: 0 0 24px rgba(56, 189, 248, 0.35); }
-        .face-status-pill { position: relative; z-index: 4; margin-top: 10px; background: rgba(11, 15, 25, 0.85); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; color: var(--accent-cyan); text-align: center; }
+        .face-scanner { width: 100%; height: 360px; max-height: 55vh; background: var(--input-bg); border: 2px solid var(--panel-border); border-radius: 16px; position: relative; overflow: hidden; margin-bottom: 14px; }
+        .camera-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center center; transform: scaleX(-1); }
+        .face-oval-guide { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -55%); width: 205px; height: 255px; border-radius: 50%; border: 2.5px dashed var(--accent-cyan); box-shadow: 0 0 0 9999px rgba(11, 15, 25, 0.35), 0 0 24px rgba(56, 189, 248, 0.4); z-index: 2; pointer-events: none; }
+        .face-status-pill { position: absolute; bottom: 10px; left: 12px; right: 12px; z-index: 4; background: rgba(11, 15, 25, 0.88); padding: 6px 12px; border-radius: 10px; font-size: 11.5px; font-weight: 700; color: var(--accent-cyan); text-align: center; }
 
         .meter-bar { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
         .meter-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green-bright)); width: 0%; transition: width 0.15s linear; }
@@ -195,7 +195,7 @@
         <div class="meter-bar"><div class="meter-fill" id="progressCam"></div></div>
         <button type="button" id="btnCaptureFace" class="btn btn-green" style="display:none;" onclick="captureAndAnalyzeFace()">📸 Capturar Foto Agora</button>
         <button type="button" id="btnSkipFace" class="btn btn-secondary" style="display:none;" onclick="continueWithoutFace()">⏭️ Seguir e Avisar CCO (Sem Conferência Facial)</button>
-        <canvas id="photoCanvas" width="180" height="180" style="display:none;"></canvas>
+        <canvas id="photoCanvas" width="240" height="240" style="display:none;"></canvas>
     </div>
 
     <!-- PASSO 3: VOZ BRUTA (SEM FALLBACK 1.80) -->
@@ -291,6 +291,7 @@
         : "CHECKIN_1_PARTIDA";
 
     let mediaStream = null;
+    let camCountdownTimer = null;
     let faceModelsReady = false;
     let photoBase64 = null;
     let faceCaptureStatus = "NOT_CAPTURED";
@@ -398,9 +399,10 @@
         btnSkip.style.display = "none";
         bar.style.width = "0%";
 
+        if (camCountdownTimer) { clearInterval(camCountdownTimer); camCountdownTimer = null; }
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 480 }, height: { ideal: 480 }, facingMode: "user" },
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
                 audio: false,
             });
             video.srcObject = mediaStream;
@@ -408,21 +410,24 @@
             video.muted = true;
             try { await video.play(); } catch (_) {}
 
-            lbl.innerText = "Enquadre o rosto no centro... Capturando em 3s";
+            lbl.innerText = "Olhe de frente para a câmera dentro do oval... Captura em 4s";
             lbl.style.color = "#34d399";
+            btnCap.disabled = false;
+            btnCap.innerText = "📸 Capturar Foto Agora";
             btnCap.style.display = "flex";
 
             let pct = 0;
-            const t = setInterval(() => {
-                pct += 20;
+            camCountdownTimer = setInterval(() => {
+                pct += 10;
                 bar.style.width = Math.min(100, pct) + "%";
                 if (pct >= 100) {
-                    clearInterval(t);
+                    clearInterval(camCountdownTimer);
+                    camCountdownTimer = null;
                     if (document.getElementById("stepFace").classList.contains("active")) {
                         captureAndAnalyzeFace();
                     }
                 }
-            }, 600);
+            }, 420);
         } catch (err) {
             console.warn("Câmera indisponível:", err);
             faceCaptureStatus = "CAMERA_DENIED";
@@ -434,6 +439,10 @@
     }
 
     function stopCamera() {
+        if (camCountdownTimer) {
+            clearInterval(camCountdownTimer);
+            camCountdownTimer = null;
+        }
         if (mediaStream) {
             mediaStream.getTracks().forEach((tr) => tr.stop());
             mediaStream = null;
@@ -456,6 +465,7 @@
         const btnCap = document.getElementById("btnCaptureFace");
         const btnSkip = document.getElementById("btnSkipFace");
 
+        if (camCountdownTimer) { clearInterval(camCountdownTimer); camCountdownTimer = null; }
         btnCap.disabled = true;
         if (!video || !video.videoWidth) {
             faceCaptureStatus = "CAMERA_DENIED";
@@ -465,13 +475,24 @@
             return;
         }
 
-        canvas.width = 180;
-        canvas.height = 180;
+        const targetSize = 240;
+        canvas.width = targetSize;
+        canvas.height = targetSize;
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, 180, 180);
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        const cropSize = Math.min(vw, vh);
+        const sx = Math.floor((vw - cropSize) / 2);
+        const sy = Math.floor((vh - cropSize) / 2);
 
-        const avgLux = computeAverageBrightness(ctx, 180, 180);
-        photoBase64 = canvas.toDataURL("image/jpeg", 0.55);
+        ctx.save();
+        ctx.translate(targetSize, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, targetSize, targetSize);
+        ctx.restore();
+
+        const avgLux = computeAverageBrightness(ctx, targetSize, targetSize);
+        photoBase64 = canvas.toDataURL("image/jpeg", 0.6);
 
         if (avgLux < 25) {
             faceCaptureStatus = "POOR_LIGHTING";
@@ -488,7 +509,7 @@
             lbl.innerText = "Validando enquadramento facial...";
             try {
                 const det = await faceapi
-                    .detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.45 }))
+                    .detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.35 }))
                     .withFaceLandmarks()
                     .withFaceDescriptor();
 
@@ -808,8 +829,20 @@
                 headers: buildHeaders(),
                 body: JSON.stringify(payload),
             });
-            const data = await res.json();
-            if (!res.ok || !data.ok) throw new Error(data.error || "Falha na Edge Function mobility-checkin-engine");
+            const rawText = await res.text();
+            let data = {};
+            try { data = JSON.parse(rawText || "{}"); } catch (_) { data = { raw: rawText }; }
+
+            if (!res.ok || !data.ok) {
+                const detail = data.error || data.message || data.msg || data.raw || `HTTP ${res.status}`;
+                if (res.status === 401 || String(detail).toLowerCase().includes("jwt")) {
+                    throw new Error(`HTTP ${res.status} (${detail}) — Desative a opção "Verify JWT" na Edge Function mobility-checkin-engine no painel do Supabase.`);
+                }
+                if (res.status === 404) {
+                    throw new Error(`HTTP 404 — Edge Function "mobility-checkin-engine" não encontrada ou sem Deploy no Supabase.`);
+                }
+                throw new Error(`HTTP ${res.status}: ${detail}`);
+            }
 
             const badgeMap = {
                 GREEN: { cls: "b-verde", txt: "🟢 SUGESTÃO: PRONTIDÃO PRESERVADA" },
@@ -847,4 +880,5 @@
 </script>
 </body>
 </html>
+
 
