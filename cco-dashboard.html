@@ -3,589 +3,778 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCO Dashboard — ExcelSilience SRT Mobility</title>
+    <title>ExcelSilience SRT Mobility — Cockpit CCO v6.0</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #0b0f19; color: #e2e8f0; padding: 24px; min-height: 100vh; }
-
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 16px;
-            flex-wrap: wrap; gap: 14px;
-        }
-        .brand-group { display: flex; align-items: center; gap: 14px; }
-        .title-group h1 { font-size: 21px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; }
-        .title-group p { font-size: 13px; color: #64748b; margin-top: 4px; }
-
-        .live-indicator {
-            display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;
-            font-size: 12px; font-weight: 700; color: #34d399;
-        }
+        body { background-color: #0b0f19; color: #e2e8f0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 16px; flex-wrap: wrap; gap: 14px; }
+        .brand-group { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .title-group h1 { font-size: 20px; font-weight: 800; color: #38bdf8; letter-spacing: 0.4px; }
+        .title-group p { font-size: 12px; color: #64748b; margin-top: 3px; }
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .live-indicator { display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #34d399; }
         .dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
-
-        .gov-banner {
-            background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 10px; padding: 12px 18px; margin-bottom: 22px;
-            display: flex; align-items: center; gap: 12px; font-size: 12px; color: #38bdf8; line-height: 1.5;
-        }
-
-        .filter-panel {
-            background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px;
-            margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px;
-        }
-        .filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .gov-banner { background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: #bae6fd; line-height: 1.5; }
+        .filter-panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .filter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 6px; }
         .filter-group label { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
-
-        input[type="date"] {
-            background: #0b0f19; border: 1px solid #334155; color: #f8fafc;
-            padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none;
-        }
-        input[type="date"]:focus { border-color: #38bdf8; }
-
-        .btn-quick {
-            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
-            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
-        }
+        input[type="date"], input[type="text"], input[type="number"], select, textarea { background: #0b0f19; border: 1px solid #334155; color: #f8fafc; padding: 8px 11px; border-radius: 6px; font-size: 12.5px; outline: none; }
+        .btn-quick { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 7px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-quick:hover, .btn-quick.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; }
-
-        .btn-action {
-            background: #10b981; border: none; color: #ffffff; padding: 8px 18px;
-            border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-left: auto;
-        }
-        .btn-action:hover { background: #059669; }
-
-        .metrics-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 16px; margin-bottom: 28px;
-        }
-        .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; }
-        .card-metric .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 700; }
-        .card-metric .value { font-size: 26px; font-weight: 800; }
-        .val-total { color: #f8fafc; }
-        .val-verde { color: #34d399; }
-        .val-amarelo { color: #fbbf24; }
-        .val-roxo { color: #c084fc; }
-        .val-vermelho { color: #f87171; }
-        .val-tempo { color: #38bdf8; }
-
-        .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 20px; overflow-x: auto; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-        .panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
-
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 1050px; }
-        th { background: #1e293b; color: #94a3b8; padding: 12px 14px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
-        td { padding: 12px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
-        tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-        .user-photo {
-            width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
-            border: 2px solid #0284c7; background: #070d19; display: inline-block; vertical-align: middle;
-        }
-
-        .user-avatar-fallback {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: #ffffff; font-weight: 800; font-size: 18px;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid #38bdf8; text-transform: uppercase; flex-shrink: 0;
-        }
-
-        .photo-container { display: flex; align-items: center; gap: 12px; }
-
-        .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; }
+        .btn-action { background: #10b981; border: none; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-purple { background: #7e22ce; border: none; color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; }
+        .btn-blue { background: #0284c7; border: none; color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-bottom: 22px; }
+        .card-metric { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 14px; }
+        .card-metric .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.4px; color: #94a3b8; margin-bottom: 6px; font-weight: 700; }
+        .card-metric .value { font-size: 24px; font-weight: 800; }
+        .val-total { color: #f8fafc; } .val-verde { color: #34d399; } .val-amarelo { color: #fbbf24; } .val-roxo { color: #c084fc; } .val-vermelho { color: #f87171; } .val-tempo { color: #38bdf8; }
+        .panel { background: #151c2c; border: 1px solid #2a364f; border-radius: 12px; padding: 18px; overflow-x: auto; margin-bottom: 20px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+        .panel-title { font-size: 14.5px; font-weight: 700; color: #f1f5f9; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12.5px; min-width: 1120px; }
+        th { background: #1e293b; color: #94a3b8; padding: 11px 12px; font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
+        td { padding: 11px 12px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: middle; }
+        tr.row-face-alert { background: rgba(239, 68, 68, 0.06); }
+        .user-photo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #0284c7; background: #070d19; display: inline-block; cursor: pointer; flex-shrink: 0; }
+        .user-avatar-fallback { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; border: 2px solid #38bdf8; text-transform: uppercase; flex-shrink: 0; }
+        .photo-container { display: flex; align-items: center; gap: 10px; }
+        .badge-status { padding: 4px 10px; border-radius: 6px; font-size: 10.5px; font-weight: 800; display: inline-block; }
         .b-verde { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
         .b-amarelo { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
         .b-roxo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
         .b-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
-
-        .badge-type {
-            font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; display: inline-block; text-transform: uppercase;
-        }
+        .badge-type { font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 4px; display: inline-block; text-transform: uppercase; }
         .type-partida { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
         .type-rota { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
-
-        .badge-face {
-            font-size: 10px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.1);
-            padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-block; margin-top: 2px;
-        }
+        .badge-face { font-size: 10.5px; font-weight: 700; padding: 4px 8px; border-radius: 5px; display: inline-block; line-height: 1.35; cursor: pointer; }
+        .face-ok { color: #34d399; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); }
+        .face-warn { color: #fbbf24; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); }
+        .face-div { color: #f87171; background: rgba(239, 68, 68, 0.16); border: 1px solid rgba(239, 68, 68, 0.55); }
         .badge-voice { font-size: 11px; font-weight: 700; display: block; }
-
-        .btn-dispatch {
-            background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8;
-            padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;
-            cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
-        }
-        .btn-dispatch:hover { background: #0284c7; color: #ffffff; }
+        .btn-dispatch { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 5px 9px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; margin-top: 5px; margin-right: 4px; }
+        .btn-decide { background: #059669; border: none; color: #fff; padding: 5px 9px; border-radius: 6px; font-size: 10.5px; font-weight: 800; cursor: pointer; margin-top: 5px; }
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 999; align-items: center; justify-content: center; padding: 18px; }
+        .modal-backdrop.active { display: flex; }
+        .modal-box { background: #151c2c; border: 1px solid #2a364f; border-radius: 16px; max-width: 720px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 22px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-header h3 { font-size: 16px; color: #38bdf8; }
+        .modal-close { background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; }
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; text-align: center; }
+        .compare-card { background: #0b0f19; border: 1px solid #334155; border-radius: 12px; padding: 14px; }
+        .compare-card img { width: 140px; height: 140px; border-radius: 12px; object-fit: cover; border: 2px solid #38bdf8; margin: 8px auto; display: block; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        .code-box { background: #070d19; border: 1px solid #334155; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 11px; color: #bae6fd; white-space: pre-wrap; margin: 10px 0; }
     </style>
 </head>
 <body>
-
 <div class="header">
     <div class="brand-group">
-        <div style="display: inline-flex; align-items: center; justify-content: center; gap: 10px;">
-            <svg width="44" height="44" viewBox="0 0 100 100" fill="none" style="filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));">
-                <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" stroke="#38bdf8" stroke-width="3" fill="#151c2c" />
-                <polygon points="50,18 80,33 80,67 50,82 20,67 20,33" stroke="#0284c7" stroke-width="2" fill="#0b0f19" />
-                <circle cx="50" cy="50" r="16" stroke="#38bdf8" stroke-width="2.5" fill="rgba(56, 189, 248, 0.15)" />
-                <circle cx="50" cy="50" r="7" fill="#34d399" />
-            </svg>
-            <div style="text-align: left; display: flex; flex-direction: column;">
-                <span style="font-size: 19px; font-weight: 900; letter-spacing: 1px; color: #ffffff; line-height: 1.1;">EXCEL<span style="color: #38bdf8;">SILIENCE</span></span>
-                <span style="font-size: 9px; font-weight: 800; letter-spacing: 2px; color: #94a3b8; text-transform: uppercase;">Operating System</span>
-            </div>
-        </div>
         <div class="title-group">
-            <h1>CENTRO DE CONTROLE OPERACIONAL (CCO)</h1>
-            <p>Painel Telemétrico de Prontidão, Validação Facial &amp; Biometria Vocal — Frotas e Portaria</p>
+            <h1>CENTRO DE CONTROLE OPERACIONAL (CCO) — SRT MOBILITY</h1>
+            <p id="lblSub">Conferência Facial 1:1 Consultiva • Voz VSI sem Nota Inventada • Telemetria &amp; Trilha de Auditoria (LGPD Art. 20)</p>
         </div>
+        <div class="live-indicator"><div class="dot"></div><span>AUTO-REFRESH 10s</span></div>
     </div>
-    <div class="live-indicator">
-        <div class="dot"></div>
-        <span id="liveText">TEMPO REAL (AUTO-REFRESH 10s)</span>
+    <div class="header-actions">
+        <button class="btn-blue" onclick="openDriversModal()">👤 Motoristas &amp; Foto-Ref</button>
+        <button class="btn-purple" onclick="openWebhookModal()">🔗 Webhook Telemetria Cliente</button>
+        <button class="btn-action" onclick="fetchAndRenderData()">🔄 Atualizar</button>
     </div>
 </div>
-
 <div class="gov-banner">
-    <span style="font-size: 18px;">🏛️</span>
-    <span><b>DIRETRIZ DE GOVERNANÇA OPERACIONAL:</b> O sistema emite estritamente <i>sugestões técnicas de prontidão</i>. Toda e qualquer ação de liberação, pausa ou retenção é de <b>decisão privativa e soberana do Comando Humano (Supervisor / CCO)</b>.</span>
+    <span>🏛️</span>
+    <div><b>GOVERNANÇA &amp; DECISÃO HUMANA SOBERANA (ART. 20 LGPD):</b> O sistema <b>não</b> bloqueia veículos nem toma decisões punitivas automáticas. Divergências faciais ou alertas de prontidão são exibidos exclusivamente como <i>avisos consultivos</i> para conferência visual e deliberação registrada pelo Supervisor / CCO.</div>
 </div>
-
 <div class="filter-panel">
     <div class="filter-row">
-        <div class="filter-group">
-            <label for="startDate">Data Início:</label>
-            <input type="date" id="startDate" onchange="renderFilteredData()">
-        </div>
-        <div class="filter-group">
-            <label for="endDate">Data Fim:</label>
-            <input type="date" id="endDate" onchange="renderFilteredData()">
-        </div>
-
-        <button class="btn-quick" id="btnToday" onclick="setPeriod('today')">Hoje</button>
-        <button class="btn-quick" id="btn7Days" onclick="setPeriod('7days')">Últimos 7 Dias</button>
-        <button class="btn-quick" id="btn30Days" onclick="setPeriod('30days')">Últimos 30 Dias</button>
-        <button class="btn-quick active" id="btnAll" onclick="setPeriod('all')">🌐 Todo o Histórico</button>
-
-        <button class="btn-action" onclick="fetchAndRenderData()">🔄 Atualizar Agora</button>
+        <div class="filter-group"><label for="startDate">Início:</label><input type="date" id="startDate" onchange="renderFilteredData()"></div>
+        <div class="filter-group"><label for="endDate">Fim:</label><input type="date" id="endDate" onchange="renderFilteredData()"></div>
+        <button class="btn-quick" onclick="setPeriod('today', this)">Hoje</button>
+        <button class="btn-quick" onclick="setPeriod('7days', this)">7 Dias</button>
+        <button class="btn-quick" onclick="setPeriod('30days', this)">30 Dias</button>
+        <button class="btn-quick active" id="btnAll" onclick="setPeriod('all', this)">🌐 Todo o Histórico</button>
     </div>
-
-    <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 12px;">
+    <div class="filter-row" style="border-top: 1px solid #1e293b; padding-top: 10px;">
         <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Status Sugerido:</span>
         <button class="btn-quick active" id="stAll" onclick="setStatusFilter('ALL')">Todos</button>
         <button class="btn-quick" id="stVerde" onclick="setStatusFilter('GREEN')">🟢 Verde</button>
         <button class="btn-quick" id="stAmarelo" onclick="setStatusFilter('YELLOW')">🟡 Amarelo</button>
         <button class="btn-quick" id="stRoxo" onclick="setStatusFilter('PURPLE')">🟣 Roxo</button>
         <button class="btn-quick" id="stVermelho" onclick="setStatusFilter('RED')">🔴 Vermelho</button>
+        <button class="btn-quick" id="stFaceAlert" onclick="toggleFaceAlertFilter(this)" style="margin-left:auto; border-color:#f59e0b; color:#fbbf24;">⚠️ Somente Alertas Faciais</button>
     </div>
 </div>
-
 <div class="metrics-grid">
-    <div class="card-metric">
-        <div class="label">Check-ins no Período</div>
-        <div class="value val-total" id="mTotal">0</div>
-    </div>
-    <div class="card-metric">
-        <div class="label">🟢 Liberações (Verde)</div>
-        <div class="value val-verde" id="mVerde">0</div>
-    </div>
-    <div class="card-metric">
-        <div class="label">🟡 Pausa Tática (Amarelo)</div>
-        <div class="value val-amarelo" id="mAmarelo">0</div>
-    </div>
-    <div class="card-metric">
-        <div class="label">🟣 Exaustão/Sono (Roxo)</div>
-        <div class="value val-roxo" id="mRoxo">0</div>
-    </div>
-    <div class="card-metric">
-        <div class="label">🔴 Encaminhamento (Vermelho)</div>
-        <div class="value val-vermelho" id="mVermelho">0</div>
-    </div>
-    <div class="card-metric">
-        <div class="label">⚡ Média de Latência</div>
-        <div class="value val-tempo" id="mTempo">0 ms</div>
-    </div>
+    <div class="card-metric"><div class="label">Check-ins no Período</div><div class="value val-total" id="mTotal">0</div></div>
+    <div class="card-metric"><div class="label">🟢 Prontidão OK</div><div class="value val-verde" id="mVerde">0</div></div>
+    <div class="card-metric"><div class="label">🟡 Pausa 15m</div><div class="value val-amarelo" id="mAmarelo">0</div></div>
+    <div class="card-metric"><div class="label">🟣 Exaustão 45m</div><div class="value val-roxo" id="mRoxo">0</div></div>
+    <div class="card-metric"><div class="label">🔴 Atenção Crítica</div><div class="value val-vermelho" id="mVermelho">0</div></div>
+    <div class="card-metric"><div class="label">⚡ Latência Média</div><div class="value val-tempo" id="mTempo">0 ms</div></div>
+    <div class="card-metric"><div class="label">📷 Alertas Faciais</div><div class="value val-amarelo" id="mFaceAlerts">0</div></div>
 </div>
-
 <div class="panel">
     <div class="panel-header">
-        <div class="panel-title">Fila de Registro de Prontidão em Tempo Real (Decisão Privativa do Comando Humano)</div>
+        <div class="panel-title">Fila Operacional em Tempo Real (SRT Mobility)</div>
+        <span style="font-size:11px; color:#94a3b8;">Clique na foto ou no selo facial para comparar lado a lado com o cadastro</span>
     </div>
-
     <table>
-        <thead>
-            <tr>
-                <th>Horário / Data</th>
-                <th>Tipo de Aferição</th>
-                <th>Condutor / Operador (Foto &amp; Nome)</th>
-                <th>Validação Facial</th>
-                <th>Setor / Departamento</th>
-                <th>Conferência de Voz (VSI)</th>
-                <th>Latência / Veto Motor</th>
-                <th>Status Sugerido</th>
-                <th>Encaminhamento Técnico Sugerido (Decisão do Comando)</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Conectando ao banco de dados e buscando registros...</td></tr>
-        </tbody>
+        <thead><tr><th>Horário / Origem</th><th>Tipo de Aferição</th><th>Condutor (Foto &amp; Nome)</th><th>Conferência Facial (1:1)</th><th>Frota / Placa</th><th>Conferência de Voz (VSI)</th><th>Latência / Veto / Lapsos</th><th>Status Sugerido</th><th>Encaminhamento &amp; Decisão CCO</th></tr></thead>
+        <tbody id="tableBody"><tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">Carregando registros do CCO...</td></tr></tbody>
     </table>
 </div>
-
+<div id="faceCompareModal" class="modal-backdrop" onclick="if(event.target===this) closeModal('faceCompareModal')">
+    <div class="modal-box">
+        <div class="modal-header"><h3>📷 Conferência Facial Lado a Lado (Decisão CCO)</h3><button class="modal-close" onclick="closeModal('faceCompareModal')">&times;</button></div>
+        <div id="fcSummary" style="font-size:12px; margin-bottom:14px; line-height:1.5;"></div>
+        <div class="compare-grid">
+            <div class="compare-card"><b style="color:#38bdf8; font-size:12px;">FOTO DE REFERÊNCIA (CADASTRO)</b><div id="fcRefContainer"></div></div>
+            <div class="compare-card"><b style="color:#fbbf24; font-size:12px;">FOTO DO CHECK-IN ATUAL</b><div id="fcLiveContainer"></div></div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="btn-blue" id="btnPromotePhoto" onclick="promoteCurrentPhoto()">✅ Definir Foto Atual como Referência Oficial</button>
+            <button class="btn-action" onclick="openDecisionFromFace()">⚖️ Registrar Deliberação CCO</button>
+        </div>
+    </div>
+</div>
+<div id="decisionModal" class="modal-backdrop" onclick="if(event.target===this) closeModal('decisionModal')">
+    <div class="modal-box">
+        <div class="modal-header"><h3>⚖️ Deliberação Humana Soberana (Trilha Imutável LGPD Art. 20)</h3><button class="modal-close" onclick="closeModal('decisionModal')">&times;</button></div>
+        <p id="decTargetInfo" style="font-size:12px; color:#94a3b8; margin-bottom:12px;"></p>
+        <div class="form-grid">
+            <div><label style="font-size:11px; color:#38bdf8; display:block; margin-bottom:4px;">Supervisor / Operador CCO:</label><input type="text" id="decSupervisor" placeholder="Nome completo do responsável" style="width:100%;"></div>
+            <div><label style="font-size:11px; color:#38bdf8; display:block; margin-bottom:4px;">Deliberação Operacional:</label>
+                <select id="decStatus" style="width:100%;">
+                    <option value="LIBERADO_CCO">🟢 Liberar Viagem (Confirmado pelo CCO)</option>
+                    <option value="PAUSA_TATICA_15MIN">🟡 Aplicar Pausa Tática (15 min)</option>
+                    <option value="REPOUSO_PATIO_45MIN">🟣 Aplicar Repouso no Pátio (45 min)</option>
+                    <option value="RETENCAO_PREVENTIVA_CHAVE">🔴 Retenção Preventiva / Troca de Escala</option>
+                    <option value="DIVERGENCIA_FACIAL_CONFIRMADA">⚠️ Divergência Facial Confirmada (Substituição)</option>
+                    <option value="IDENTIDADE_CONFIRMADA_CCO">✅ Identidade Confirmada Presencialmente</option>
+                </select>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;"><label style="font-size:11px; color:#38bdf8; display:block; margin-bottom:4px;">Resultado da Conferência Facial:</label>
+            <select id="decFaceReview" style="width:100%;">
+                <option value="IDENTIDADE_CONFIRMADA">Identidade Confirmada (É o motorista cadastrado)</option>
+                <option value="DIVERGENCIA_CONFIRMADA">Divergência Confirmada (Pessoas diferentes)</option>
+                <option value="NAO_CONFERIDA">Não Conferida / Sem Foto</option>
+            </select>
+        </div>
+        <div style="margin-bottom:12px;"><label style="font-size:11px; color:#38bdf8; display:block; margin-bottom:4px;">Justificativa / Relato Presencial (gravado em log imutável):</label><textarea id="decNote" rows="3" placeholder="Ex.: Motorista acolhido em sala reservada; cansaço confirmado ou identidade validada na portaria." style="width:100%;"></textarea></div>
+        <button class="btn-action" style="width:100%;" onclick="saveHumanDecision()">💾 Gravar Deliberação na Trilha de Auditoria</button>
+    </div>
+</div>
+<div id="driversModal" class="modal-backdrop" onclick="if(event.target===this) closeModal('driversModal')">
+    <div class="modal-box">
+        <div class="modal-header"><h3>👤 Cadastro de Motoristas &amp; Foto-Referência (1:1)</h3><button class="modal-close" onclick="closeModal('driversModal')">&times;</button></div>
+        <div class="form-grid">
+            <input type="text" id="drvName" placeholder="Nome completo do motorista">
+            <input type="text" id="drvPlate" placeholder="Placa / Frota (ex: ABC-1234)">
+            <input type="text" id="drvPhone" placeholder="WhatsApp DDI+DDD+Num (ex: 5521999999999)">
+            <select id="drvRole">
+                <option value="Motorista de Carga Pesada (CNH C/E)">Motorista de Carga Pesada (CNH C/E)</option>
+                <option value="Motorista de Transporte Coletivo (CNH D)">Motorista de Transporte Coletivo (CNH D)</option>
+                <option value="Condutor de Veículo Leve / VUC">Condutor de Veículo Leve / VUC</option>
+            </select>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+            <label style="font-size:11px; color:#38bdf8;">Foto-Referência (rosto frontal):</label>
+            <input type="file" id="drvPhotoFile" accept="image/*" onchange="previewDriverPhoto(event)" style="font-size:11px;">
+            <img id="drvPreviewImg" src="" style="width:46px; height:46px; border-radius:50%; object-fit:cover; display:none; border:2px solid #34d399;">
+            <span id="drvEmbStatus" style="font-size:11px; color:#94a3b8;"></span>
+        </div>
+        <button class="btn-action" onclick="saveDriverRegistry()" style="margin-bottom:14px;">➕ Salvar Motorista no Cadastro</button>
+        <div id="driversListBox" style="max-height:240px; overflow-y:auto; font-size:12px; border-top:1px solid #1e293b; padding-top:10px;"></div>
+    </div>
+</div>
+<div id="webhookModal" class="modal-backdrop" onclick="if(event.target===this) closeModal('webhookModal')">
+    <div class="modal-box">
+        <div class="modal-header"><h3>🔗 Integração com Telemetria Veicular do Cliente</h3><button class="modal-close" onclick="closeModal('webhookModal')">&times;</button></div>
+        <p style="font-size:12px; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">Conecte o rastreador ou câmera de fadiga do cliente ao endpoint abaixo. Quando ocorrer frenagem brusca, aceleração anômala ou parada &gt; 60 min fora dos parâmetros do cliente, o sistema <b>não decide nem pune</b> — apenas dispara automaticamente o link do <b>Check-in 2</b> via WhatsApp ao condutor.</p>
+        <div class="code-box" id="whEndpointBox"></div>
+        <div class="form-grid">
+            <input type="text" id="whSecret" placeholder="Chave de autenticação do webhook">
+            <input type="number" id="whCooldown" value="45" min="5" max="240" placeholder="Cooldown anti-spam (min)">
+            <input type="text" id="whBaseUrl" placeholder="URL base do App">
+        </div>
+        <div id="whStatusHint" style="font-size:11px; color:#34d399; margin-bottom:8px;"></div>
+        <button class="btn-blue" onclick="saveWebhookConfig()">💾 Salvar Configuração do Webhook</button>
+        <h4 style="font-size:12px; color:#38bdf8; margin:12px 0 6px 0;">Últimos Eventos Recebidos / Disparos de Link:</h4>
+        <div id="whEventsList" style="max-height:180px; overflow-y:auto; font-size:11.5px;"></div>
+    </div>
+</div>
 <script>
-    const SUPABASE_URL = "https://uywfcrhryrzmhrukxgaf.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+const PROJECT_ENDPOINT = "https://uywfcrhryrzmhrukxgaf.supabase.co/rest/v1/";
+const PUBLIC_TOKEN = "sb_publishable_o9kI6CRx6XzKNABTVef4Bw_dgaSyl3b";
+const FACE_MODELS_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 
-    let allRecords = [];
-    let selectedStatus = 'ALL';
-    let autoRefreshTimer = null;
+const urlParams = new URLSearchParams(window.location.search);
+const currentCompany = (urlParams.get("company") || "TODAS").toUpperCase();
 
-    function formatLocalYMD(dateObj) {
-        const y = dateObj.getFullYear();
-        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const d = String(dateObj.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
+let allRecords = [];
+let driversMap = new Map();
+let selectedStatus = "ALL";
+let onlyFaceAlerts = false;
+let activeCheckinForModal = null;
+let newDriverPhotoB64 = null;
+let newDriverEmbedding = null;
+let faceApiReady = false;
+let autoRefreshTimer = null;
+
+function buildHeaders() {
+    const h = new Headers({ "Content-Type": "application/json" });
+    h.set("apikey", PUBLIC_TOKEN);
+    h.set("Authorization", `Bearer ${PUBLIC_TOKEN}`);
+    return h;
+}
+
+function normalizeKey(str) {
+    return (str || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toUpperCase()
+        .trim()
+        .replace(/\s+/g, " ");
+}
+
+function escapeHtml(s) {
+    return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function openModal(id) { document.getElementById(id).classList.add("active"); }
+function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+
+async function ensureFaceApiLoaded() {
+    if (faceApiReady || typeof faceapi === "undefined") return faceApiReady;
+    try {
+        await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODELS_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODELS_URL),
+            faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODELS_URL),
+        ]);
+        faceApiReady = true;
+    } catch (e) {
+        console.warn("face-api indisponível:", e);
     }
+    return faceApiReady;
+}
 
-    function resolvePhoto(item) {
-        if (!item) return null;
-        const rawObj = item.raw_payload || {};
-        const possible = [
-            item.photo_url, item.photo, item.photo_base64, item.foto, item.image_url,
-            item.avatar_url, item.user_photo, item.snapshot, item.face_image, item.image,
-            rawObj.photo_url, rawObj.photo_base64
-        ];
-        for (let raw of possible) {
-            if (!raw || raw === 'null' || raw === 'undefined') continue;
-            if (typeof raw === 'string') {
-                raw = raw.trim();
-                if (raw === '') continue;
-                if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:image/')) return raw;
-                if (raw.length > 50) return `data:image/jpeg;base64,${raw}`;
-            }
-        }
-        return null;
+function setPeriod(period, btn) {
+    document.querySelectorAll(".filter-row .btn-quick").forEach((b) => {
+        if (!b.id.startsWith("st")) b.classList.remove("active");
+    });
+    if (btn) btn.classList.add("active");
+    const today = new Date();
+    const fmt = (d) => d.toISOString().split("T")[0];
+
+    if (period === "today") {
+        document.getElementById("startDate").value = fmt(today);
+        document.getElementById("endDate").value = fmt(today);
+    } else if (period === "7days") {
+        const p = new Date(); p.setDate(today.getDate() - 7);
+        document.getElementById("startDate").value = fmt(p);
+        document.getElementById("endDate").value = fmt(today);
+    } else if (period === "30days") {
+        const p = new Date(); p.setDate(today.getDate() - 30);
+        document.getElementById("startDate").value = fmt(p);
+        document.getElementById("endDate").value = fmt(today);
+    } else {
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        document.getElementById("btnAll").classList.add("active");
     }
+    renderFilteredData();
+}
 
-    function resolveName(item) {
-        if (!item) return 'Condutor Profissional';
-        const possible = [
-            item.driver_name, item.condutor_nome, item.condutor, item.nome, item.name,
-            item.full_name, item.operator_name, item.exec_name, item.operador, item.user, item.usuario, item.user_name
-        ];
-        for (let val of possible) {
-            if (val && typeof val === 'string') {
-                const v = val.trim();
-                if (v && !v.toLowerCase().startsWith('sessão') && !v.toLowerCase().startsWith('session') && v !== 'OP' && v !== 'null' && v !== 'undefined') {
-                    return v;
-                }
-            }
-        }
-        const sess = item.session_count || item.session_id || item.id || '';
-        return sess ? `Condutor (#${sess})` : 'Condutor Profissional';
+function setStatusFilter(st) {
+    selectedStatus = st;
+    ["stAll", "stVerde", "stAmarelo", "stRoxo", "stVermelho"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("active");
+    });
+    const map = { ALL: "stAll", GREEN: "stVerde", YELLOW: "stAmarelo", PURPLE: "stRoxo", RED: "stVermelho" };
+    if (map[st]) document.getElementById(map[st]).classList.add("active");
+    renderFilteredData();
+}
+
+function toggleFaceAlertFilter(btn) {
+    onlyFaceAlerts = !onlyFaceAlerts;
+    btn.classList.toggle("active", onlyFaceAlerts);
+    renderFilteredData();
+}
+
+async function fetchAndRenderData() {
+    const compFilter = currentCompany === "TODAS" || currentCompany === "ALL" ? "" : `company=eq.${encodeURIComponent(currentCompany)}&`;
+    const [chkRes, drvRes] = await Promise.allSettled([
+        fetch(`${PROJECT_ENDPOINT}/rest/v1/srt_checkins?${compFilter}order=created_at.desc&limit=150`, { headers: buildHeaders() }).then((r) => (r.ok ? r.json() : [])),
+        fetch(`${PROJECT_ENDPOINT}/rest/v1/mobility_drivers?${compFilter}active=eq.true&order=driver_name.asc`, { headers: buildHeaders() }).then((r) => (r.ok ? r.json() : [])),
+    ]);
+
+    const rawRows = chkRes.status === "fulfilled" && Array.isArray(chkRes.value) ? chkRes.value : [];
+    const drvRows = drvRes.status === "fulfilled" && Array.isArray(drvRes.value) ? drvRes.value : [];
+
+    driversMap = new Map();
+    drvRows.forEach((d) => {
+        driversMap.set(`${(d.company || "").toUpperCase()}::${normalizeKey(d.driver_name)}`, d);
+    });
+
+    allRecords = rawRows.filter((item) => {
+        const mt = (item.module_type || "").toUpperCase();
+        const comp = (item.company || "").toUpperCase();
+        const name = (item.name || "").toLowerCase();
+        if (mt === "SRT_RH" || mt === "ES_CRISIS_EXEC") return false;
+        if (comp === "SRT_RH" || comp === "ES_CRISIS_EXEC") return false;
+        if (name.includes("anônimo") || name.includes("anonimo")) return false;
+        return true;
+    });
+
+    renderFilteredData();
+}
+
+function getStatusCategory(item) {
+    const st = (item.status || "").toUpperCase();
+    if (st.includes("RED") || st.includes("VERMELHO")) return "RED";
+    if (st.includes("PURPLE") || st.includes("ROXO")) return "PURPLE";
+    if (st.includes("YELLOW") || st.includes("AMARELO")) return "YELLOW";
+    return "GREEN";
+}
+
+function getFaceInfo(item) {
+    const fs = (item.face_status || "").toUpperCase();
+    const pct = item.face_similarity_pct != null ? ` (${Number(item.face_similarity_pct).toFixed(0)}%)` : "";
+
+    if (fs === "FACE_COMPATIVEL") {
+        return { cls: "face-ok", label: `🟢 Face compatível${pct}`, alert: false };
     }
-
-    function getStatusCategory(item) {
-        if (!item) return 'GREEN';
-        const st = (item.status || item.profile_key || item.weakest_link || '').toString().toUpperCase();
-        if (st.includes('ROXO') || st.includes('PURPLE') || st.includes('EXAUSTAO') || st.includes('EXAUSTÃO') || st.includes('BURNED_CHASSIS')) return 'PURPLE';
-        if (st.includes('VERMELHO') || st.includes('RED') || st.includes('INAPTO') || st.includes('IMPULSIVE_REACTOR') || st.includes('VETO')) return 'RED';
-        if (st.includes('AMARELO') || st.includes('YELLOW') || st.includes('ATENCAO') || st.includes('ATENÇÃO') || st.includes('PACK_MULE')) return 'YELLOW';
-        return 'GREEN';
+    if (fs === "CONFERENCIA_RECOMENDADA") {
+        return { cls: "face-warn", label: `🟡 Conferência visual${pct}`, alert: true };
     }
-
-    function resolveAction(item, category) {
-        const defaultActions = {
-            'GREEN': 'Sugestão Técnica: Liberação recomendada para viagem/turno normal. Decisão final do Comando.',
-            'YELLOW': 'Sugestão Técnica: Pausa Tática de 15 min recomendada para hidratação e descompressão. Ação privativa do Comando.',
-            'PURPLE': 'Sugestão Técnica: Pausa Compulsória de 45 min no pátio por Exaustão/Sono. Decisão do Comando.',
-            'RED': 'Sugestão Técnica: NÃO INICIAR VIAGEM. Encaminhar presencialmente ao Supervisor no CCO para deliberação soberana do Comando.'
+    if (fs === "POSSIVEL_DIVERGENCIA_FACIAL") {
+        return { cls: "face-div", label: `🔴⚠️ Possível divergência facial${pct}`, alert: true };
+    }
+    if (fs === "FOTO_EXPIRADA_LGPD_30D") {
+        return { cls: "face-warn", label: "⏳ Foto expirada (LGPD 30d)", alert: false };
+    }
+    if (fs === "NAO_FOI_POSSIVEL_CONFERIR") {
+        return {
+            cls: "face-warn",
+            label: "🟡⚠️ Não foi possível conferir a face",
+            sub: item.face_reason || "Sem conferência biométrica",
+            alert: true,
         };
-        const stdAction = defaultActions[category] || defaultActions['GREEN'];
-        if (!item) return stdAction;
-        const dbAction = item.action || item.easy_stage || '';
-        if (dbAction && typeof dbAction === 'string' && dbAction.trim().length > 5) return dbAction.trim();
-        return stdAction;
     }
+    if (item.photo_url) {
+        return { cls: "face-warn", label: "🟡 Foto registrada (legado s/ 1:1)", alert: false };
+    }
+    return { cls: "face-warn", label: "🟡⚠️ Não foi possível conferir a face", sub: "Sem foto enviada", alert: true };
+}
 
-    function dispatchRouteLink(encodedName) {
-        const driverName = decodeURIComponent(encodedName || 'Condutor');
-        const cleanUrl = window.location.href.split('?').at(0) || '';
-        const baseUrl = cleanUrl.match(/\.html?$/i)
-            ? cleanUrl.replace(/[^/]*$/, 'index.html')
-            : (cleanUrl.endsWith('/') ? `${cleanUrl}index.html` : `${cleanUrl.replace(/[^/]*$/, '')}index.html`);
-        const routeLink = `${baseUrl}?type=rota`;
-        const msg = `Olá, ${driverName}! A Torre CCO solicita o seu Check-in de Retorno de Rota (Regra de 60 minutos): ${routeLink}`;
+function renderFilteredData() {
+    const startVal = document.getElementById("startDate").value;
+    const endVal = document.getElementById("endDate").value;
 
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(routeLink).catch(() => {});
+    const filtered = allRecords.filter((row) => {
+        if (startVal || endVal) {
+            const dt = new Date(row.created_at || Date.now());
+            const rowDate = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+            if (startVal && rowDate < startVal) return false;
+            if (endVal && rowDate > endVal) return false;
         }
-        const waEndpoint = ['https://', 'wa.', 'me/', '?text='].join('') + encodeURIComponent(msg);
-        window.open(waEndpoint, '_blank');
+        if (selectedStatus !== "ALL" && getStatusCategory(row) !== selectedStatus) return false;
+        if (onlyFaceAlerts && !getFaceInfo(row).alert) return false;
+        return true;
+    });
+
+    let cG = 0, cY = 0, cP = 0, cR = 0, sumLat = 0, latN = 0, cFaceAlert = 0;
+    filtered.forEach((r) => {
+        const cat = getStatusCategory(r);
+        if (cat === "GREEN") cG++;
+        else if (cat === "YELLOW") cY++;
+        else if (cat === "PURPLE") cP++;
+        else if (cat === "RED") cR++;
+        if (r.reaction_time_ms != null) { sumLat += Number(r.reaction_time_ms); latN++; }
+        if (getFaceInfo(r).alert) cFaceAlert++;
+    });
+
+    document.getElementById("mTotal").innerText = filtered.length;
+    document.getElementById("mVerde").innerText = cG;
+    document.getElementById("mAmarelo").innerText = cY;
+    document.getElementById("mRoxo").innerText = cP;
+    document.getElementById("mVermelho").innerText = cR;
+    document.getElementById("mTempo").innerText = latN > 0 ? `${Math.round(sumLat / latN)} ms` : "-- ms";
+    document.getElementById("mFaceAlerts").innerText = cFaceAlert;
+
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+    if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:22px; color:#94a3b8;">Nenhum registro encontrado para os filtros aplicados.</td></tr>';
+        return;
     }
 
-    function setPeriod(period) {
-        ['btnToday', 'btn7Days', 'btn30Days', 'btnAll'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('active');
-        });
+    filtered.forEach((item, idx) => {
+        const dtStr = new Date(item.created_at || Date.now()).toLocaleString("pt-BR");
+        const trigBadge = item.trigger_source === "TELEMETRIA_EXTERNA"
+            ? '<br><span style="color:#fbbf24; font-size:10px; font-weight:700;">⚡ Gatilho Telemetria</span>'
+            : "";
 
-        const today = new Date();
+        const isRota = (item.checkin_type || "") === "CHECKIN_2_ROTA_60MIN";
+        const typeBadge = isRota
+            ? '<span class="badge-type type-rota">⏱️ Check-in 2 (Rota)</span>'
+            : '<span class="badge-type type-partida">🟢 Check-in 1 (Partida)</span>';
 
-        if (period === 'today') {
-            const dateStr = formatLocalYMD(today);
-            document.getElementById('startDate').value = dateStr;
-            document.getElementById('endDate').value = dateStr;
-            const b = document.getElementById('btnToday'); if (b) b.classList.add('active');
-        } else if (period === '7days') {
-            const past = new Date(); past.setDate(today.getDate() - 7);
-            document.getElementById('startDate').value = formatLocalYMD(past);
-            document.getElementById('endDate').value = formatLocalYMD(today);
-            const b = document.getElementById('btn7Days'); if (b) b.classList.add('active');
-        } else if (period === '30days') {
-            const past = new Date(); past.setDate(today.getDate() - 30);
-            document.getElementById('startDate').value = formatLocalYMD(past);
-            document.getElementById('endDate').value = formatLocalYMD(today);
-            const b = document.getElementById('btn30Days'); if (b) b.classList.add('active');
-        } else if (period === 'all') {
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            const b = document.getElementById('btnAll'); if (b) b.classList.add('active');
-        }
-        renderFilteredData();
-    }
+        const driverName = item.name || "Condutor";
+        const initial = driverName.replace(/[^a-zA-Z]/g, "").charAt(0).toUpperCase() || "C";
+        const photoHtml = item.photo_url
+            ? `<img src="${item.photo_url}" class="user-photo" alt="Foto" onclick="openFaceModalByIdx(${idx})">`
+            : `<div class="user-avatar-fallback" onclick="openFaceModalByIdx(${idx})" style="cursor:pointer;">${initial}</div>`;
 
-    function setStatusFilter(status) {
-        selectedStatus = status;
-        ['stAll', 'stVerde', 'stAmarelo', 'stRoxo', 'stVermelho'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('active');
-        });
+        const faceInfo = getFaceInfo(item);
+        const faceHtml = `<span class="badge-face ${faceInfo.cls}" onclick="openFaceModalByIdx(${idx})">${escapeHtml(faceInfo.label)}</span>` +
+            (faceInfo.sub ? `<br><small style="color:#94a3b8; font-size:10px;">${escapeHtml(faceInfo.sub)}</small>` : "");
 
-        if (status === 'ALL') document.getElementById('stAll').classList.add('active');
-        if (status === 'GREEN') document.getElementById('stVerde').classList.add('active');
-        if (status === 'YELLOW') document.getElementById('stAmarelo').classList.add('active');
-        if (status === 'PURPLE') document.getElementById('stRoxo').classList.add('active');
-        if (status === 'RED') document.getElementById('stVermelho').classList.add('active');
-
-        renderFilteredData();
-    }
-
-    async function fetchAndRenderData() {
-        const tables = [
-            { name: 'srt_checkins', url: `${SUPABASE_URL}/rest/v1/srt_checkins?select=*&order=created_at.desc&limit=150` },
-            { name: 'es_crisis_backup_checkins', url: `${SUPABASE_URL}/rest/v1/es_crisis_backup_checkins?select=*&order=created_at.desc&limit=150` }
-        ];
-        const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
-
-        try {
-            const results = await Promise.allSettled(tables.map(t => {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000);
-                return fetch(t.url, { headers, signal: controller.signal })
-                    .then(r => {
-                        clearTimeout(timeoutId);
-                        return r.ok ? r.json().then(d => ({ table: t.name, data: d })) : { table: t.name, data: [] };
-                    })
-                    .catch(() => ({ table: t.name, data: [] }));
-            }));
-
-            let allFetched = [];
-            results.forEach(res => {
-                if (res.status === 'fulfilled' && res.value && Array.isArray(res.value.data)) {
-                    res.value.data.forEach(item => {
-                        allFetched.push({ ...item, _tableName: res.value.table });
-                    });
-                }
-            });
-
-            allFetched.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-
-            const seen = new Set();
-            allRecords = allFetched.filter(item => {
-                if (!item) return false;
-                const comp = (item.company || '').toString().toUpperCase();
-                const act = (item.action || '').toString().toUpperCase();
-                const mod = (item.module_type || '').toString().toUpperCase();
-                const name = (item.name || item.driver_name || item.nome || '').toString().toLowerCase();
-
-                if (comp.includes('ES_CRISIS') || act.includes('ES-CRISE') || mod.includes('ES_CRISIS') || act.includes('C-SUITE')) return false;
-                if (comp.includes('SRT_RH') || act.includes('[SRT-RH]') || mod.includes('SRT_RH') || name.includes('anônimo') || name.includes('anonimo')) return false;
-
-                const rawDriver = (item.name || item.driver_name || item.nome || '').toString().toUpperCase().trim();
-                const dtMs = new Date(item.created_at || Date.now()).getTime();
-                const timeWindow = Math.floor(dtMs / 120000);
-                const lat = item.reaction_time_ms || item.latency_ms || item.latency || 0;
-                const vsi = Number(item.vsi_score || item.vsi || 0).toFixed(2);
-
-                const uniqueKey = `${rawDriver}_${timeWindow}_${lat}_${vsi}`;
-                if (seen.has(uniqueKey)) return false;
-                seen.add(uniqueKey);
-                return true;
-            });
-        } catch (err) {
-            console.warn('Falha na busca dos checkins:', err);
+        let voiceHtml = '<span class="badge-voice" style="color:#fbbf24;">⚠️ Voz não identificada (sem nota)</span>';
+        if (item.audio_quality_ok !== false && item.vsi_score != null) {
+            const v = Number(item.vsi_score);
+            let col = "#34d399";
+            let lbl = "🟢 Voz Estável";
+            if (v >= 3.80) { col = "#f87171"; lbl = "🔴 Instabilidade Crítica"; }
+            else if (v >= 3.00) { col = "#c084fc"; lbl = "🟣 Exaustão Vocal"; }
+            else if (v >= 2.20) { col = "#fbbf24"; lbl = "🟡 Tensão Modulada"; }
+            voiceHtml = `<span class="badge-voice" style="color:${col};">${lbl} (VSI ${v.toFixed(2)})</span>`;
+        } else if (item.vsi_status && item.vsi_score == null) {
+            voiceHtml = `<span class="badge-voice" style="color:#fbbf24;">${escapeHtml(item.vsi_status)}</span>`;
         }
 
-        renderFilteredData();
-    }
+        const zNote = item.z_score_latency != null ? `<br><small style="color:#38bdf8;">Z-Score: ${Number(item.z_score_latency) > 0 ? "+" : ""}${item.z_score_latency} DP</small>` : "";
+        const latHtml = `<span style="color:#c084fc; font-weight:700;">${item.reaction_time_ms ?? "--"} ms</span><br><small style="color:#94a3b8;">Veto: ${item.veto_errors ?? 0} | Lapsos: ${item.green_lapses ?? 0}</small>${zNote}`;
 
-    function renderFilteredData() {
-        const startVal = document.getElementById('startDate').value;
-        const endVal = document.getElementById('endDate').value;
+        const cat = getStatusCategory(item);
+        const stMap = {
+            GREEN: { cls: "b-verde", txt: "🟢 VERDE" },
+            YELLOW: { cls: "b-amarelo", txt: "🟡 AMARELO" },
+            PURPLE: { cls: "b-roxo", txt: "🟣 ROXO" },
+            RED: { cls: "b-vermelho", txt: "🔴 VERMELHO" },
+        };
+        const st = stMap[cat];
+        const decBadge = item.decision_status && item.decision_status !== "AGUARDANDO_CCO"
+            ? `<br><small style="color:#34d399; font-weight:700;">✓ ${escapeHtml(item.decision_status)} (${escapeHtml(item.decision_by || "CCO")})</small>`
+            : `<br><small style="color:#fbbf24;">⏳ Aguardando deliberação CCO</small>`;
 
-        let filtered = allRecords.filter(row => {
-            if (!row) return false;
-
-            if (startVal || endVal) {
-                let rowDate = '';
-                if (row.created_at) {
-                    const dObj = new Date(row.created_at);
-                    if (!isNaN(dObj.getTime())) {
-                        rowDate = formatLocalYMD(dObj);
-                    } else {
-                        rowDate = (row.created_at || '').split('T').at(0) || '';
-                    }
-                }
-                if (startVal && rowDate < startVal) return false;
-                if (endVal && rowDate > endVal) return false;
-            }
-
-            if (selectedStatus !== 'ALL') {
-                const category = getStatusCategory(row);
-                if (selectedStatus !== category) return false;
-            }
-            return true;
-        });
-
-        filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-
-        let cGreen = 0, cYellow = 0, cPurple = 0, cRed = 0, totalLat = 0;
-        filtered.forEach(r => {
-            const category = getStatusCategory(r);
-            if (category === 'GREEN') cGreen++;
-            else if (category === 'YELLOW') cYellow++;
-            else if (category === 'PURPLE') cPurple++;
-            else if (category === 'RED') cRed++;
-
-            totalLat += (r.reaction_time_ms || r.latency || 520);
-        });
-
-        document.getElementById('mTotal').innerText = filtered.length;
-        document.getElementById('mVerde').innerText = cGreen;
-        document.getElementById('mAmarelo').innerText = cYellow;
-        document.getElementById('mRoxo').innerText = cPurple;
-        document.getElementById('mVermelho').innerText = cRed;
-        document.getElementById('mTempo').innerText = filtered.length > 0 ? `${Math.round(totalLat / filtered.length)} ms` : '0 ms';
-
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:24px; color:#94a3b8; font-weight:600;">Nenhum registro encontrado no CCO para os filtros selecionados. Realize um teste no aplicativo ou clique em "Todo o Histórico".</td></tr>';
-            return;
-        }
-
-        filtered.forEach((item) => {
-            const dateObj = new Date(item.created_at || Date.now());
-            const formattedDate = dateObj.toLocaleString('pt-BR');
-
-            const displayName = resolveName(item);
-            const initial = displayName.replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase() || 'C';
-
-            const photoUrl = resolvePhoto(item);
-            let photoHtml = '';
-            if (photoUrl) {
-                photoHtml = `<img src="${photoUrl}" class="user-photo" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                             <div class="user-avatar-fallback" style="display:none;">${initial}</div>`;
-            } else {
-                photoHtml = `<div class="user-avatar-fallback">${initial}</div>`;
-            }
-
-            const faceCheckStatus = item.face_match || (item.raw_payload && item.raw_payload.face_match) || (photoUrl ? "🟢 Foto OK (CCO)" : "🟡 Foto Ausente (Portaria)");
-
-            const modRaw = [
-                item.module_type,
-                item.raw_payload && item.raw_payload.module_type,
-                item.action
-            ].join(' ').toUpperCase();
-
-            let checkinBadge = `<span class="badge-type type-partida">🟢 Check-in 1 (Partida)</span>`;
-            if (modRaw.includes('ROTA') || modRaw.includes('60MIN') || modRaw.includes('60M')) {
-                checkinBadge = `<span class="badge-type type-rota">⏱️ Check-in 2 (Rota 60m)</span>`;
-            }
-
-            const vsiVal = item.vsi_score !== undefined ? item.vsi_score : (item.vsi !== undefined ? item.vsi : item.vsi_val);
-            const vsiValNum = Number(vsiVal);
-            const vsiText = (item.vsi_status || item.vsi || '').toLowerCase();
-
-            const vsiDisplayVal = (!isNaN(vsiValNum) && vsiValNum > 0) ? ` (VSI ${vsiValNum.toFixed(2)})` : '';
-            let voiceStatusHtml = `<span class="badge-voice" style="color:#34d399;">🟢 Voz Estável${vsiDisplayVal}</span>`;
-
-            if (vsiText.includes('insuficiente') || (!isNaN(vsiValNum) && vsiValNum === 0 && (vsiVal !== null && vsiVal !== undefined))) {
-                voiceStatusHtml = `<span class="badge-voice" style="color:#94a3b8;">⚪ Áudio Insuficiente</span>`;
-            } else if (vsiText.includes('vermelho') || vsiText.includes('crítica') || vsiText.includes('critica') || (!isNaN(vsiValNum) && vsiValNum >= 3.80)) {
-                voiceStatusHtml = `<span class="badge-voice" style="color:#f87171;">🔴 Instabilidade Crítica${vsiDisplayVal}</span>`;
-            } else if (vsiText.includes('roxo') || vsiText.includes('exaustão') || vsiText.includes('exaustao') || (!isNaN(vsiValNum) && vsiValNum >= 3.00 && vsiValNum < 3.80)) {
-                voiceStatusHtml = `<span class="badge-voice" style="color:#c084fc;">🟣 Exaustão Autonômica${vsiDisplayVal}</span>`;
-            } else if (vsiText.includes('amarelo') || vsiText.includes('atenção') || vsiText.includes('atencao') || vsiText.includes('modulada') || (!isNaN(vsiValNum) && vsiValNum >= 2.20 && vsiValNum < 3.00)) {
-                voiceStatusHtml = `<span class="badge-voice" style="color:#fbbf24;">🟡 Tensão Modulada${vsiDisplayVal}</span>`;
-            }
-
-            const category = getStatusCategory(item);
-            let badgeClass = 'b-verde';
-            let statusLabel = '🟢 LIBERADO';
-
-            if (category === 'YELLOW') {
-                badgeClass = 'b-amarelo'; statusLabel = '🟡 PAUSA TÁTICA';
-            } else if (category === 'PURPLE') {
-                badgeClass = 'b-roxo'; statusLabel = '🟣 EXAUSTÃO';
-            } else if (category === 'RED') {
-                badgeClass = 'b-vermelho'; statusLabel = '🔴 ENCAMINHAMENTO';
-            }
-
-            const finalAction = resolveAction(item, category);
-            const encodedDriver = encodeURIComponent(displayName);
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-weight:700; color:#f8fafc; font-size:12px;">${formattedDate}</td>
-                <td>
-                    ${checkinBadge}
-                    <button class="btn-dispatch" onclick="dispatchRouteLink('${encodedDriver}')">📲 Disparar Link Rota</button>
-                </td>
-                <td>
-                    <div class="photo-container">
-                        ${photoHtml}
-                        <div>
-                            <b style="color:#38bdf8;">${displayName}</b>
-                            <br><small style="color:#94a3b8;">${item.role || item.cargo || 'Condutor Profissional'}</small>
-                        </div>
+        const tr = document.createElement("tr");
+        if (faceInfo.alert) tr.className = "row-face-alert";
+        tr.dataset.rowIdx = String(idx);
+        tr.innerHTML = `
+            <td style="font-size:11.5px;"><b>${dtStr}</b><br><small style="color:#38bdf8;">${escapeHtml(item.company || "EXCELSILIENCE")}</small>${trigBadge}</td>
+            <td>${typeBadge}</td>
+            <td>
+                <div class="photo-container">
+                    ${photoHtml}
+                    <div>
+                        <b style="color:#38bdf8;">${escapeHtml(driverName)}</b>
+                        <br><small style="color:#94a3b8;">${escapeHtml(item.role || "Condutor")}</small>
                     </div>
-                </td>
-                <td><span class="badge-face">${faceCheckStatus}</span></td>
-                <td style="font-size:12px;">${item.department || item.dept || item.sector || item.setor || 'Frotas / Operações'}</td>
-                <td>${voiceStatusHtml}</td>
-                <td style="color:#c084fc; font-weight:700;">${item.reaction_time_ms || item.latency || 520} ms <br><small style="color:#94a3b8; font-weight:normal;">Erros veto: ${item.veto_errors || 0}</small></td>
-                <td><span class="badge-status ${badgeClass}">${statusLabel}</span></td>
-                <td style="font-size:12px; font-weight:600; line-height:1.4;">${finalAction}</td>
-            `;
-            tbody.appendChild(tr);
+                </div>
+            </td>
+            <td>${faceHtml}</td>
+            <td style="font-size:12px;">${escapeHtml(item.department || "Frota Geral")}</td>
+            <td>${voiceHtml}</td>
+            <td>${latHtml}</td>
+            <td><span class="badge-status ${st.cls}">${st.txt}</span>${decBadge}</td>
+            <td style="font-size:11.5px;">
+                <div>${escapeHtml(item.action || "--")}</div>
+                <div>
+                    <button class="btn-decide" onclick="openDecisionModalByIdx(${idx})">⚖️ Decisão CCO</button>
+                    <button class="btn-dispatch" onclick="dispatchRouteLink('${escapeHtml(item.company || "EXCELSILIENCE")}', '${escapeHtml(driverName)}', '${escapeHtml(item.department || "")}')">📲 Link Rota</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    window._renderedRows = filtered;
+}
+
+function openFaceModalByIdx(idx) {
+    const item = (window._renderedRows || [])[idx];
+    if (!item) return;
+    activeCheckinForModal = item;
+    const comp = (item.company || "EXCELSILIENCE").toUpperCase();
+    const drv = driversMap.get(`${comp}::${normalizeKey(item.name)}`);
+
+    document.getElementById("fcSummary").innerHTML =
+        `<b>Condutor:</b> ${escapeHtml(item.name)} • <b>Status Facial:</b> ${escapeHtml(item.face_status || "PENDENTE")}<br>` +
+        `<b>Detalhe:</b> ${escapeHtml(item.face_reason || "Conferir visualmente a identidade antes de liberar viagem.")}`;
+
+    document.getElementById("fcRefContainer").innerHTML = drv && drv.reference_photo_url
+        ? `<img src="${drv.reference_photo_url}" alt="Referência"><small style="color:#94a3b8;">Cadastrada em ${new Date(drv.reference_updated_at || drv.created_at).toLocaleDateString("pt-BR")}</small>`
+        : '<div style="padding:36px 10px; color:#fbbf24; font-size:12px;">Sem foto-referência cadastrada no CCO.</div>';
+
+    document.getElementById("fcLiveContainer").innerHTML = item.photo_url
+        ? `<img src="${item.photo_url}" alt="Check-in"><small style="color:#94a3b8;">Capturada em ${new Date(item.created_at).toLocaleString("pt-BR")}</small>`
+        : '<div style="padding:36px 10px; color:#f87171; font-size:12px;">Sem foto enviada neste check-in.</div>';
+
+    document.getElementById("btnPromotePhoto").style.display = item.photo_url ? "inline-flex" : "none";
+    openModal("faceCompareModal");
+}
+
+async function promoteCurrentPhoto() {
+    if (!activeCheckinForModal) return;
+    const sup = prompt("Nome do Supervisor do CCO que conferiu presencialmente o motorista:");
+    if (!sup || !sup.trim()) return;
+    try {
+        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/promote_checkin_photo_to_driver`, {
+            method: "POST",
+            headers: buildHeaders(),
+            body: JSON.stringify({ p_checkin_id: String(activeCheckinForModal.id), p_supervisor_name: sup.trim() }),
         });
+        if (!res.ok) throw new Error(await res.text());
+        alert("Foto promovida como referência oficial do motorista!");
+        closeModal("faceCompareModal");
+        fetchAndRenderData();
+    } catch (err) {
+        alert("Erro ao promover foto: " + err.message);
+    }
+}
+
+function openDecisionFromFace() {
+    closeModal("faceCompareModal");
+    if (!activeCheckinForModal) return;
+    openDecisionModal(activeCheckinForModal);
+}
+
+function openDecisionModalByIdx(idx) {
+    const item = (window._renderedRows || [])[idx];
+    if (item) openDecisionModal(item);
+}
+
+function openDecisionModal(item) {
+    activeCheckinForModal = item;
+    document.getElementById("decTargetInfo").innerText =
+        `Condutor: ${item.name} • Status sugerido: ${item.status} • Conferência facial: ${item.face_status || "N/D"}`;
+    document.getElementById("decNote").value = item.decision_note || "";
+    openModal("decisionModal");
+}
+
+async function saveHumanDecision() {
+    if (!activeCheckinForModal) return;
+    const sup = document.getElementById("decSupervisor").value.trim();
+    const st = document.getElementById("decStatus").value;
+    const faceRev = document.getElementById("decFaceReview").value;
+    const note = document.getElementById("decNote").value.trim();
+    if (!sup) { alert("Informe o nome do Supervisor / Operador do CCO."); return; }
+    if (!note) { alert("Informe a justificativa operacional para registro na trilha imutável."); return; }
+
+    try {
+        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/submit_mobility_decision`, {
+            method: "POST",
+            headers: buildHeaders(),
+            body: JSON.stringify({
+                p_checkin_id: String(activeCheckinForModal.id),
+                p_supervisor_name: sup,
+                p_decision_status: st,
+                p_face_review_status: faceRev,
+                p_justification: note,
+            }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        alert("Deliberação registrada na Trilha de Auditoria Imutável!");
+        closeModal("decisionModal");
+        fetchAndRenderData();
+    } catch (err) {
+        alert("Erro ao gravar deliberação: " + err.message);
+    }
+}
+
+async function openDriversModal() {
+    openModal("driversModal");
+    ensureFaceApiLoaded();
+    renderDriversList();
+}
+
+function renderDriversList() {
+    const box = document.getElementById("driversListBox");
+    const list = Array.from(driversMap.values());
+    if (!list.length) {
+        box.innerHTML = '<div style="color:#94a3b8;">Nenhum motorista cadastrado ainda.</div>';
+        return;
+    }
+    box.innerHTML = list.map((d) => `
+        <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #1e293b;">
+            ${d.reference_photo_url ? `<img src="${d.reference_photo_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">` : '<div style="width:36px;height:36px;border-radius:50%;background:#1e293b;"></div>'}
+            <div style="flex:1;">
+                <b>${escapeHtml(d.driver_name)}</b> <small style="color:#38bdf8;">(${escapeHtml(d.company)})</small><br>
+                <small style="color:#94a3b8;">Placa: ${escapeHtml(d.vehicle_plate || "--")} • Tel: ${escapeHtml(d.phone || "--")} • Bio 128D: ${Array.isArray(d.reference_embedding) ? "✅ Ativa" : "⚠️ Pendente"}</small>
+            </div>
+        </div>
+    `).join("");
+}
+
+async function previewDriverPhoto(evt) {
+    const file = evt.target.files && evt.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById("drvEmbStatus");
+    statusEl.innerText = "Processando foto...";
+    const img = new Image();
+    img.onload = async () => {
+        const c = document.createElement("canvas");
+        c.width = 180; c.height = 180;
+        c.getContext("2d").drawImage(img, 0, 0, 180, 180);
+        newDriverPhotoB64 = c.toDataURL("image/jpeg", 0.6);
+        const prev = document.getElementById("drvPreviewImg");
+        prev.src = newDriverPhotoB64;
+        prev.style.display = "inline-block";
+
+        newDriverEmbedding = null;
+        const ok = await ensureFaceApiLoaded();
+        if (ok) {
+            try {
+                const det = await faceapi
+                    .detectSingleFace(c, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.45 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                if (det && det.descriptor) {
+                    newDriverEmbedding = Array.from(det.descriptor).map((v) => Number(v.toFixed(5)));
+                    statusEl.innerText = "✅ Rosto mapeado (128D)!";
+                    statusEl.style.color = "#34d399";
+                    return;
+                }
+            } catch (_) {}
+        }
+        statusEl.innerText = "⚠️ Foto salva (sem leitura automática 128D).";
+        statusEl.style.color = "#fbbf24";
+    };
+    img.src = URL.createObjectURL(file);
+}
+
+async function saveDriverRegistry() {
+    const name = document.getElementById("drvName").value.trim();
+    if (!name) { alert("Informe o nome do motorista."); return; }
+    const comp = currentCompany === "TODAS" || currentCompany === "ALL" ? "EXCELSILIENCE" : currentCompany;
+    try {
+        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/upsert_mobility_driver`, {
+            method: "POST",
+            headers: buildHeaders(),
+            body: JSON.stringify({
+                p_company: comp,
+                p_driver_name: name,
+                p_driver_role: document.getElementById("drvRole").value,
+                p_fleet_unit: "Frota Geral",
+                p_vehicle_plate: document.getElementById("drvPlate").value.trim() || null,
+                p_phone: document.getElementById("drvPhone").value.trim() || null,
+                p_reference_photo_url: newDriverPhotoB64,
+                p_reference_embedding: newDriverEmbedding,
+            }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        document.getElementById("drvName").value = "";
+        newDriverPhotoB64 = null;
+        newDriverEmbedding = null;
+        await fetchAndRenderData();
+        renderDriversList();
+        alert("Motorista salvo no cadastro do CCO!");
+    } catch (err) {
+        alert("Erro ao salvar motorista: " + err.message);
+    }
+}
+
+async function openWebhookModal() {
+    openModal("webhookModal");
+    const comp = currentCompany === "TODAS" || currentCompany === "ALL" ? "EXCELSILIENCE" : currentCompany;
+    document.getElementById("whEndpointBox").innerText = `POST ${PROJECT_ENDPOINT}/functions/v1/mobility-telemetry-webhook`;
+
+    const [cfgRes, evRes] = await Promise.allSettled([
+        fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/get_mobility_webhook_public_status`, {
+            method: "POST", headers: buildHeaders(), body: JSON.stringify({ p_company: comp }),
+        }).then((r) => (r.ok ? r.json() : null)),
+        fetch(`${PROJECT_ENDPOINT}/rest/v1/mobility_telemetry_events?company=eq.${encodeURIComponent(comp)}&order=created_at.desc&limit=15`, {
+            headers: buildHeaders(),
+        }).then((r) => (r.ok ? r.json() : [])),
+    ]);
+
+    const cfg = cfgRes.status === "fulfilled" ? cfgRes.value : null;
+    if (cfg && cfg.configured) {
+        document.getElementById("whCooldown").value = cfg.cooldown_minutes || 45;
+        document.getElementById("whBaseUrl").value = cfg.app_base_url || "";
+        document.getElementById("whStatusHint").innerText = `✅ Webhook ativo (${cfg.company}) • Segredo configurado: ${cfg.secret_hint}`;
+    } else {
+        document.getElementById("whStatusHint").innerText = `ℹ️ Ainda não configurado para ${comp}. Clique em Salvar para gerar o segredo.`;
     }
 
-    window.onload = () => {
-        setPeriod('all');
-        fetchAndRenderData();
+    const evs = evRes.status === "fulfilled" && Array.isArray(evRes.value) ? evRes.value : [];
+    document.getElementById("whEventsList").innerHTML = evs.length
+        ? evs.map((e) => `<div style="padding:6px 0; border-bottom:1px solid #1e293b;"><b>[${escapeHtml(e.event_type)}]</b> ${escapeHtml(e.driver_name)} (${escapeHtml(e.vehicle_plate || "--")}) • <span style="color:#38bdf8;">${escapeHtml(e.dispatch_status)}</span><br><small style="color:#94a3b8;">${new Date(e.created_at).toLocaleString("pt-BR")} — ${escapeHtml(e.dispatch_detail || "")}</small></div>`).join("")
+        : '<div style="color:#94a3b8;">Nenhum evento de telemetria recebido ainda.</div>';
+}
 
-        if (!autoRefreshTimer) {
-            autoRefreshTimer = setInterval(() => {
-                fetchAndRenderData();
-            }, 10000);
+async function saveWebhookConfig() {
+    const comp = currentCompany === "TODAS" || currentCompany === "ALL" ? "EXCELSILIENCE" : currentCompany;
+    try {
+        const res = await fetch(`${PROJECT_ENDPOINT}/rest/v1/rpc/upsert_mobility_webhook_config`, {
+            method: "POST",
+            headers: buildHeaders(),
+            body: JSON.stringify({
+                p_company: comp,
+                p_webhook_secret: document.getElementById("whSecret").value.trim() || null,
+                p_cooldown_minutes: Number(document.getElementById("whCooldown").value || 45),
+                p_app_base_url: document.getElementById("whBaseUrl").value.trim() || null,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Erro ao salvar webhook");
+        if (data.generated_secret_if_new) {
+            alert(`Webhook configurado! Anote o segredo gerado para o cliente:\n${data.generated_secret_if_new}`);
+        } else {
+            alert("Configuração de Webhook atualizada!");
         }
-    };
+        openWebhookModal();
+    } catch (err) {
+        alert("Erro: " + err.message);
+    }
+}
+
+async function dispatchRouteLink(company, driverName, dept) {
+    try {
+        const res = await fetch(`${PROJECT_ENDPOINT}/functions/v1/mobility-telemetry-webhook`, {
+            method: "POST",
+            headers: buildHeaders(),
+            body: JSON.stringify({
+                company: (company || "EXCELSILIENCE").toUpperCase(),
+                driver_name: driverName,
+                vehicle_plate: dept,
+                event_type: "SOLICITACAO_CCO",
+                source_system: "CCO_DASHBOARD",
+                force_dispatch: true,
+                app_base_url: window.location.href.split("?")[0].replace(/[^/]*$/, ""),
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || "Erro ao gerar link de rota");
+        if (navigator.clipboard && data.checkin_link) {
+            try { await navigator.clipboard.writeText(data.checkin_link); } catch (_) {}
+        }
+        alert(`Status: ${data.dispatch_status}\n${data.dispatch_detail}\n\nLink Check-in 2 (copiado):\n${data.checkin_link}`);
+    } catch (err) {
+        alert("Erro ao disparar link: " + err.message);
+    }
+}
+
+window.onload = () => {
+    fetchAndRenderData();
+    if (!autoRefreshTimer) {
+        autoRefreshTimer = setInterval(fetchAndRenderData, 10000);
+    }
+};
+
 </script>
 </body>
 </html>
+
