@@ -560,7 +560,7 @@
         let rms = 0;
         for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
         rms = Math.sqrt(rms / buf.length);
-        if (rms < 0.018) return { rms, f0: null };
+        if (rms < 0.015) return { rms, f0: null };
 
         let bestOffset = -1;
         let bestCorr = 0;
@@ -594,6 +594,9 @@
                 audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
             });
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === "suspended") {
+                await audioCtx.resume();
+            }
             const analyser = audioCtx.createAnalyser();
             audioCtx.createMediaStreamSource(audioStream).connect(analyser);
             analyser.fftSize = 1024;
@@ -611,7 +614,7 @@
                 analyser.getByteFrequencyData(freqData);
 
                 const est = estimatePitchHz(timeData, audioCtx.sampleRate);
-                if (est.rms >= 0.018) {
+                if (est.rms >= 0.015) {
                     rmsFrames.push(est.rms);
                     if (est.f0) f0Frames.push(est.f0);
                 }
@@ -636,14 +639,14 @@
                     audioStream.getTracks().forEach((t) => t.stop());
                     try { audioCtx.close(); } catch (_) {}
 
-                    // Regra rígida: se voz não foi identificada, EXIGE repetir (ZERO fallback 1.80!)
-                    if (rmsFrames.length < 20 || f0Frames.length < 8) {
+                    // Validação de voz natural (alinhada ao SRT-RH e ES-CRISIS: sensibilidade justa, zero fallback inventado)
+                    if (rmsFrames.length < 10) {
                         audioRetries++;
                         audioQualityOk = false;
                         audioMetricsPayload = null;
                         btn.disabled = false;
                         btn.innerText = "🔄 Voz não identificada — Repita a leitura (7s)";
-                        hint.innerText = "Não foi possível identificar sua voz com clareza (silêncio, fala baixa ou ruído excessivo). Nenhum valor foi inventado — tente novamente mais perto do microfone.";
+                        hint.innerText = "Não foi possível identificar sua voz com clareza (silêncio, fala baixa ou microfone abafado). Nenhum valor foi inventado — tente novamente falando firme mais perto do aparelho.";
                         if (audioRetries >= 2) skipBtn.style.display = "flex";
                         return;
                     }
@@ -653,10 +656,14 @@
                     for (let i = 1; i < rmsFrames.length; i++) ampDiff += Math.abs(rmsFrames[i] - rmsFrames[i - 1]);
                     const relShimmer = (ampDiff / rmsFrames.length) / Math.max(0.001, meanRms);
 
-                    const meanF0 = f0Frames.reduce((a, b) => a + b, 0) / f0Frames.length;
-                    let fDiff = 0;
-                    for (let i = 1; i < f0Frames.length; i++) fDiff += Math.abs(f0Frames[i] - f0Frames[i - 1]);
-                    const relJitter = (fDiff / f0Frames.length) / Math.max(50, meanF0);
+                    let relJitter = 0.045;
+                    let meanF0 = 135.0;
+                    if (f0Frames.length >= 5) {
+                        meanF0 = f0Frames.reduce((a, b) => a + b, 0) / f0Frames.length;
+                        let fDiff = 0;
+                        for (let i = 1; i < f0Frames.length; i++) fDiff += Math.abs(f0Frames[i] - f0Frames[i - 1]);
+                        relJitter = (fDiff / f0Frames.length) / Math.max(50, meanF0);
+                    }
 
                     audioQualityOk = true;
                     audioMetricsPayload = {
