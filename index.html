@@ -224,7 +224,7 @@
         <div class="meter-bar" style="margin-top:12px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 4: DESAFIO VISUOMOTOR CALIBRADO (18 RODADAS — 900ms) -->
+    <!-- PASSO 4: DESAFIO VISUOMOTOR DE ALTO RENDIMENTO (18 RODADAS — 680ms) -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação e Controle Inibitório</h3>
         <div class="info-card">
@@ -774,7 +774,7 @@
             }
 
             area.innerHTML = "";
-            const isi = Math.floor(Math.random() * (800 - 450 + 1)) + 450;
+            const isi = Math.floor(Math.random() * (350 - 180 + 1)) + 180;
             setTimeout(nextRound, isi);
         }
 
@@ -786,13 +786,13 @@
             isRoundProcessing = true;
             area.innerHTML = "";
             if (isGo) {
-                reactionTimes.push(900);
+                reactionTimes.push(680);
                 greenLapses++;
                 document.getElementById("lblErrors").innerText = String(vetoErrors + greenLapses);
             }
-            const isi = Math.floor(Math.random() * (800 - 450 + 1)) + 450;
+            const isi = 200;
             setTimeout(nextRound, isi);
-        }, 900);
+        }, 680);
     }
 
     async function submitToServer() {
