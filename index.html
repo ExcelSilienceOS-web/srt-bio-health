@@ -224,19 +224,19 @@
         <div class="meter-bar" style="margin-top:12px;"><div class="meter-fill" id="progressAudio"></div></div>
     </div>
 
-    <!-- PASSO 4: DESAFIO VISUOMOTOR ACESSÍVEL (12 RODADAS BALANCEADAS) -->
+    <!-- PASSO 4: DESAFIO VISUOMOTOR CALIBRADO (18 RODADAS — 900ms) -->
     <div id="stepInstruction" class="step">
         <h3 style="text-align:center; color:var(--accent-cyan); margin-bottom:12px; font-size:15px;">🎯 Tempo de Reação e Controle Inibitório</h3>
         <div class="info-card">
             <p style="color:var(--accent-green-bright); margin-bottom:8px;">● <b>CÍRCULO VERDE (✓ GO!):</b> Toque o mais rápido possível!</p>
             <p style="color:var(--accent-red-bright);">■ <b>QUADRADO VERMELHO (✕ NO-GO!):</b> NÃO toque! Contenha o impulso.</p>
         </div>
-        <button class="btn" onclick="startGame()">Iniciar 12 Rodadas 🎯</button>
+        <button class="btn" onclick="startGame()">Iniciar 18 Rodadas 🎯</button>
     </div>
 
     <div id="stepBolinhas" class="step">
         <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:8px; font-weight:700;">
-            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 12</b></span>
+            <span>Rodada: <b id="lblRound" style="color:var(--accent-cyan);">1 / 18</b></span>
             <span>Erros / Omissões: <b id="lblErrors" style="color:var(--accent-red-bright);">0</b></span>
         </div>
         <div class="game-box" id="gameArea"></div>
@@ -316,7 +316,7 @@
     let greenLapses = 0;
     let anticipationCount = 0;
     let currentRound = 0;
-    const totalRounds = 12;
+    const totalRounds = 18;
     let ballTimer = null;
     let ballSpawnTime = 0;
     let isRoundProcessing = false;
@@ -696,10 +696,10 @@
         showStep("stepInstruction");
     }
 
-    function buildBalanced12Rounds() {
+    function buildBalanced18Rounds() {
         const arr = [];
-        for (let i = 0; i < 8; i++) arr.push(true);
-        for (let i = 0; i < 4; i++) arr.push(false);
+        for (let i = 0; i < 12; i++) arr.push(true);
+        for (let i = 0; i < 6; i++) arr.push(false);
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -715,7 +715,7 @@
         greenLapses = 0;
         anticipationCount = 0;
         currentRound = 0;
-        roundPlan = buildBalanced12Rounds();
+        roundPlan = buildBalanced18Rounds();
         if (ballTimer) { clearTimeout(ballTimer); ballTimer = null; }
         document.getElementById("lblErrors").innerText = "0";
         showStep("stepBolinhas");
@@ -774,7 +774,8 @@
             }
 
             area.innerHTML = "";
-            setTimeout(nextRound, 260);
+            const isi = Math.floor(Math.random() * (800 - 450 + 1)) + 450;
+            setTimeout(nextRound, isi);
         }
 
         el.addEventListener("pointerdown", handleHit, { passive: false });
@@ -785,12 +786,13 @@
             isRoundProcessing = true;
             area.innerHTML = "";
             if (isGo) {
-                reactionTimes.push(1200);
+                reactionTimes.push(900);
                 greenLapses++;
                 document.getElementById("lblErrors").innerText = String(vetoErrors + greenLapses);
             }
-            setTimeout(nextRound, 260);
-        }, 1200);
+            const isi = Math.floor(Math.random() * (800 - 450 + 1)) + 450;
+            setTimeout(nextRound, isi);
+        }, 900);
     }
 
     async function submitToServer() {
