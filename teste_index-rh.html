@@ -109,7 +109,8 @@
     </div>
 
     <div id="sandboxBanner" class="badge-sandbox">
-        🧪 <b>PASTA TESTE / HOMOLOGAÇÃO (SEM TRAVAS 24H | N ≥ 1)</b> — Ambiente exclusivo para demos (não usar em clientes)
+        🧪 <b>MODO TESTE SEM TRAVAS (SANDBOX)</b> — Horário liberado 24h &amp; painel com N ≥ 1
+        <button type="button" onclick="exitSandboxMode()" style="margin-left:8px; background:#3b0764; color:#f3e8ff; border:1px solid #a855f7; border-radius:6px; padding:3px 8px; font-size:10px; font-weight:800; cursor:pointer;">🚪 Voltar p/ Produção</button>
     </div>
     <span class="badge-gov">🔒 100% ANÔNIMO • ZERO CÂMERA • QUÓRUM LGPD (N ≥ 5) • PARTICIPAÇÃO FACULTATIVA</span>
 
@@ -412,10 +413,17 @@
     const urlParams = new URLSearchParams(window.location.search);
     const companyParam = (urlParams.get('company') || 'EXCELSILIENCE').toUpperCase();
     const sectorParam = urlParams.get('sector') || '';
-    const envMode = 'SANDBOX';
+    const urlSandbox = (urlParams.get('env') || '').toUpperCase() === 'SANDBOX'
+        || urlParams.get('sandbox') === '1'
+        || urlParams.get('teste') === 'true'
+        || urlParams.get('test') === '1';
+    if (urlSandbox) { try { sessionStorage.setItem('srt_rh_sandbox', '1'); } catch (_) {} }
+    let envMode = (urlSandbox || (function(){ try { return sessionStorage.getItem('srt_rh_sandbox') === '1'; } catch(_) { return false; } })())
+        ? 'SANDBOX' : 'PRODUCAO';
+    const forceWeekly = urlParams.get('weekly') === 'true';
 
-    let windowAllowed = true;
-    let showWeeklyQuestions = true;
+    let windowAllowed = envMode === 'SANDBOX';
+    let showWeeklyQuestions = envMode === 'SANDBOX' || forceWeekly;
     let detectedShiftWindow = 'AVULSO';
 
     let roundPlan = [];
@@ -438,10 +446,46 @@
     let lastBand = 'GREEN';
 
     function applyEnvUi() {
-        document.getElementById('sandboxBanner').style.display = 'block';
-        document.getElementById('sandboxWindowGroup').style.display = 'block';
-        document.getElementById('btnSkipAudio').style.display = 'flex';
+        const isSb = envMode === 'SANDBOX';
+        document.getElementById('sandboxBanner').style.display = isSb ? 'block' : 'none';
+        document.getElementById('sandboxWindowGroup').style.display = isSb ? 'block' : 'none';
+        document.getElementById('btnSkipAudio').style.display = isSb ? 'flex' : 'none';
     }
+
+    async function unlockSandboxWithPin() {
+        const pin = prompt('Digite o PIN de Teste / Demonstração (padrão: DEMO2026):');
+        if (!pin) return;
+        let ok = false;
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/verify_sandbox_pin`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify({ p_company: companyParam, p_pin: pin.trim() })
+            });
+            if (res.ok) ok = Boolean(await res.json());
+        } catch (e) {
+            if (pin.trim() === 'DEMO2026') ok = true;
+        }
+        if (!ok) { alert('PIN inválido.'); return; }
+        envMode = 'SANDBOX';
+        try { sessionStorage.setItem('srt_rh_sandbox', '1'); } catch (_) {}
+        applyEnvUi();
+        await checkServerWindow();
+    }
+
+    function exitSandboxMode() {
+        envMode = 'PRODUCAO';
+        try { sessionStorage.removeItem('srt_rh_sandbox'); } catch (_) {}
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('env');
+        cleanUrl.searchParams.delete('sandbox');
+        cleanUrl.searchParams.delete('teste');
+        cleanUrl.searchParams.delete('test');
+        window.history.replaceState({}, '', cleanUrl.toString());
+        applyEnvUi();
+        checkServerWindow();
+    }
+
     window.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('lblHeaderCompany').innerText = `${companyParam} • Check-in Anônimo & Escuta NR-05`;
         applyEnvUi();
@@ -550,10 +594,20 @@
         skipBtn.style.display = (envMode === 'SANDBOX') ? 'flex' : 'none';
 
         try {
-            const audioStream = await navigator.mediaDevices.getUserMedia({
-                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-            });
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let audioStream = null;
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true }
+                });
+            } catch (_) {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+
+            const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioCtxClass();
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
             const analyser = audioCtx.createAnalyser();
             audioCtx.createMediaStreamSource(audioStream).connect(analyser);
             analyser.fftSize = 1024;
@@ -568,7 +622,7 @@
                 let rms = 0;
                 for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
                 rms = Math.sqrt(rms / buf.length);
-                if (rms < 0.015) return { rms, f0: null };
+                if (rms < 0.004) return { rms, f0: null };
                 let bestOffset = -1, bestCorr = 0;
                 const minLag = Math.floor(sampleRate / 350);
                 const maxLag = Math.floor(sampleRate / 70);
@@ -586,7 +640,7 @@
                 analyser.getFloatTimeDomainData(timeData);
                 analyser.getByteFrequencyData(freqData);
                 const est = estimatePitchHz(timeData, audioCtx.sampleRate);
-                if (est.rms >= 0.015) {
+                if (est.rms >= 0.004) {
                     rmsFrames.push(est.rms);
                     if (est.f0) f0Frames.push(est.f0);
                 }
@@ -608,15 +662,15 @@
                     clearInterval(timer);
                     if (animId) cancelAnimationFrame(animId);
                     audioStream.getTracks().forEach(t => t.stop());
-                    audioCtx.close();
+                    try { audioCtx.close(); } catch (_) {}
 
-                    if (rmsFrames.length < 10) {
+                    if (rmsFrames.length < 6) {
                         audioRetryCount++;
                         audioQualityOk = false;
                         vsiScoreVal = null;
                         btn.disabled = false;
                         btn.innerText = '🔄 Áudio insuficiente — Tentar novamente (7s)';
-                        hint.innerText = 'Silêncio ou volume baixo detectado. Nenhum número foi inventado — repita ou siga sem voz.';
+                        hint.innerText = 'Voz baixa ou não detectada. Fale um pouco mais alto e próximo ao aparelho.';
                         skipBtn.style.display = 'flex';
                         return;
                     }
@@ -627,7 +681,7 @@
                     const relShimmer = (ampDiff / rmsFrames.length) / Math.max(0.001, meanRms);
 
                     let relJitter = 0.05;
-                    if (f0Frames.length >= 5) {
+                    if (f0Frames.length >= 4) {
                         const meanF0 = f0Frames.reduce((a, b) => a + b, 0) / f0Frames.length;
                         let fDiff = 0;
                         for (let i = 1; i < f0Frames.length; i++) fDiff += Math.abs(f0Frames[i] - f0Frames[i - 1]);
@@ -646,7 +700,7 @@
             vsiScoreVal = null;
             btn.disabled = false;
             btn.innerText = '🔄 Microfone bloqueado — Tentar novamente';
-            hint.innerText = 'Microfone indisponível. Nenhuma nota simulada será gerada.';
+            hint.innerText = 'Microfone indisponível. Verifique as permissões no navegador.';
             skipBtn.style.display = 'flex';
         }
     }
@@ -979,8 +1033,7 @@
                     benefit_id: benefitId,
                     sector: dept,
                     shift_window: detectedShiftWindow,
-                    trigger_band: lastBand,
-                    environment_mode: envMode
+                    trigger_band: lastBand
                 })
             });
         } catch (e) {}
