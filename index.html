@@ -560,7 +560,7 @@
         let rms = 0;
         for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
         rms = Math.sqrt(rms / buf.length);
-        if (rms < 0.015) return { rms, f0: null };
+        if (rms < 0.004) return { rms, f0: null };
 
         let bestOffset = -1;
         let bestCorr = 0;
@@ -590,10 +590,17 @@
         progress.style.width = "0%";
 
         try {
-            const audioStream = await navigator.mediaDevices.getUserMedia({
-                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-            });
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let audioStream = null;
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true },
+                });
+            } catch (_) {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+
+            const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioCtxClass();
             if (audioCtx.state === "suspended") {
                 await audioCtx.resume();
             }
@@ -614,7 +621,7 @@
                 analyser.getByteFrequencyData(freqData);
 
                 const est = estimatePitchHz(timeData, audioCtx.sampleRate);
-                if (est.rms >= 0.015) {
+                if (est.rms >= 0.004) {
                     rmsFrames.push(est.rms);
                     if (est.f0) f0Frames.push(est.f0);
                 }
@@ -639,14 +646,14 @@
                     audioStream.getTracks().forEach((t) => t.stop());
                     try { audioCtx.close(); } catch (_) {}
 
-                    // Validação de voz natural (alinhada ao SRT-RH e ES-CRISIS: sensibilidade justa, zero fallback inventado)
-                    if (rmsFrames.length < 10) {
+                    // Validação de voz natural (sensibilidade justa para smartphones sem inventar dados)
+                    if (rmsFrames.length < 6) {
                         audioRetries++;
                         audioQualityOk = false;
                         audioMetricsPayload = null;
                         btn.disabled = false;
                         btn.innerText = "🔄 Voz não identificada — Repita a leitura (7s)";
-                        hint.innerText = "Não foi possível identificar sua voz com clareza (silêncio, fala baixa ou microfone abafado). Nenhum valor foi inventado — tente novamente falando firme mais perto do aparelho.";
+                        hint.innerText = "Não foi possível identificar sua voz com clareza. Fale firme mais próximo ao microfone do aparelho.";
                         if (audioRetries >= 2) skipBtn.style.display = "flex";
                         return;
                     }
@@ -658,7 +665,7 @@
 
                     let relJitter = 0.045;
                     let meanF0 = 135.0;
-                    if (f0Frames.length >= 5) {
+                    if (f0Frames.length >= 4) {
                         meanF0 = f0Frames.reduce((a, b) => a + b, 0) / f0Frames.length;
                         let fDiff = 0;
                         for (let i = 1; i < f0Frames.length; i++) fDiff += Math.abs(f0Frames[i] - f0Frames[i - 1]);
@@ -685,7 +692,7 @@
             audioMetricsPayload = null;
             btn.disabled = false;
             btn.innerText = "🔄 Microfone bloqueado — Tentar novamente";
-            hint.innerText = "Microfone indisponível ou permissão negada. Nenhuma nota simulada será gerada.";
+            hint.innerText = "Microfone indisponível ou permissão negada. Verifique as permissões do navegador.";
             skipBtn.style.display = "flex";
         }
     }
